@@ -1,0 +1,48 @@
+--
+-- Database : 'formulario'
+-- PostgreSQL
+--
+-- --------------------------------------------------------
+--
+-- Extension 'pg_trgm' for similarity
+--
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+--
+-- Table structure for table 'users'
+--
+CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  uid VARCHAR(255) NOT NULL UNIQUE,
+  display_name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  foto_profilo VARCHAR(255) NOT NULL
+);
+--
+-- Table structure for table 'formulari'
+--
+CREATE TABLE IF NOT EXISTS formulari (
+  id SERIAL PRIMARY KEY,
+  titolo VARCHAR(255) NOT NULL,
+  autore VARCHAR(255) NOT NULL,
+  anno VARCHAR(255) NOT NULL,
+  descrizione VARCHAR(255) NOT NULL,
+  visibility_public BOOLEAN NOT NULL DEFAULT false
+);
+--
+-- Table structure for table 'capitoli'
+--
+CREATE TABLE IF NOT EXISTS capitoli (
+  id SERIAL PRIMARY KEY,
+  titolo VARCHAR(255) NOT NULL,
+  formulario INTEGER NOT NULL,
+  sort_order INTEGER NOT NULL
+);
+--
+-- Table structure for table 'argomenti'
+--
+CREATE TABLE IF NOT EXISTS argomenti (
+  id SERIAL PRIMARY KEY,
+  titolo VARCHAR(255) NOT NULL,
+  capitolo INTEGER NOT NULL,
+  sort_order INTEGER NOT NULL
+);
