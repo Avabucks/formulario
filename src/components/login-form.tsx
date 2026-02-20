@@ -45,6 +45,7 @@ export function LoginForm({
     localStorage.setItem("photoURL", user.photoURL ?? "");
 
     const next = searchParams.get("next") || "/home";
+    router.refresh();
     router.push(next);
   };
 
