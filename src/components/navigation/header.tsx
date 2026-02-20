@@ -50,6 +50,7 @@ export function Header() {
         localStorage.removeItem("name");
         localStorage.removeItem("photoURL");
 
+        router.refresh();
         router.push("/");
     };
 
