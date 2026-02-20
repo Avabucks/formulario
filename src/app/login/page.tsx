@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { Pi } from "lucide-react"
 
 import { LoginForm } from "@/src/components/login-form"
