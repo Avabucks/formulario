@@ -25,6 +25,7 @@ import { redirect } from "next/navigation"
 import { Qr } from "../ui/qr"
 import { Field, FieldGroup } from "../ui/field"
 import { Switch } from "../ui/switch"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip"
 
 type Formulario = {
     id: string
@@ -136,11 +137,22 @@ export function ArgomentiView({ formulario, argomento }: Readonly<{ formulario?:
                 <TypographyH4 className="truncate min-w-0 flex-1">{argomento.titolo}</TypographyH4>
                 <div className="flex gap-2 items-center">
                     <Dialog>
-                        <DialogTrigger asChild>
-                            <Button variant="outline" size="icon">
-                                <Info size={16} />
-                            </Button>
-                        </DialogTrigger>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <DialogTrigger asChild>
+                                        <Button variant="outline" size="icon">
+                                            <Info size={16} />
+                                        </Button>
+                                    </DialogTrigger>
+                                </TooltipTrigger>
+                                <TooltipContent className="pr-1.5">
+                                    <div className="flex items-center gap-2">
+                                        Informazioni del formulario
+                                    </div>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                         <DialogContent className="sm:max-w-md">
                             <DialogHeader>
                                 <DialogTitle asChild>

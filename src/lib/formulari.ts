@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { sessionOptions, SessionData } from "@/src/lib/session";
 import { pool } from "@/src/lib/db";
 import { revalidatePath } from "next/cache";
+import slugify from 'slugify';
 
 type Formulario = {
     id: string
@@ -39,7 +40,6 @@ export async function createFormulario(formData: FormData): Promise<{ success: b
 
     const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
     const uid = session.uid;
-    const beautiful_id = Date.now().toString(36)
 
     if (!uid) throw new Error("Non autorizzato");
 
@@ -47,6 +47,8 @@ export async function createFormulario(formData: FormData): Promise<{ success: b
     const descrizione = formData.get("descrizione") as string;
     const anno = new Date().getFullYear().toString();
     const visibilityPublic = formData.get("visibilityPublic") === "on";
+
+    const beautiful_id = slugify(titolo, { lower: true, strict: true }) + "-" + Date.now().toString(36)
 
     if (!titolo || !descrizione) throw new Error("Campi obbligatori mancanti");
 
@@ -206,11 +208,12 @@ export async function createCapitolo(formData: FormData, formulario: Formulario)
 
     const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
     const uid = session.uid;
-    const beautiful_id = Date.now().toString(36)
 
     if (!uid) throw new Error("Non autorizzato");
 
     const titolo = formData.get("titolo") as string;
+
+    const beautiful_id = Date.now().toString(36)
 
     if (!titolo) throw new Error("Campi obbligatori mancanti");
 
@@ -346,11 +349,12 @@ export async function createArgomento(formData: FormData, capitolo?: Capitolo): 
 
     const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
     const uid = session.uid;
-    const beautiful_id = Date.now().toString(36)
 
     if (!uid || !capitolo) throw new Error("Non autorizzato");
 
     const titolo = formData.get("titolo") as string;
+
+    const beautiful_id = Date.now().toString(36)
 
     if (!titolo) throw new Error("Campi obbligatori mancanti");
 

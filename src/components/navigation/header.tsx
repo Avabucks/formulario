@@ -130,75 +130,79 @@ export function Header() {
                 </Button>
             </Link>
             <div className="flex items-center gap-2">
-                <div className="flex flex-col gap-4">
-                    <Button onClick={() => setOpen(true)} variant="outline" className="w-fit">
-                        <Search />
-                        <span className="hidden md:flex">Cerca nei tuoi formulari</span>
-                        <KbdGroup className="hidden md:flex">
-                            <Kbd>Ctrl</Kbd>
-                            <span>+</span>
-                            <Kbd>K</Kbd>
-                        </KbdGroup>
-                    </Button>
-                    <CommandDialog open={open} onOpenChange={setOpen}>
-                        <Command shouldFilter={false}>
-                            <div className="relative">
-                                <CommandInput
-                                    placeholder={loading ? "Ricerca in corso..." : "Inserisci un termine di ricerca"}
-                                    onValueChange={setSearch}
-                                />
-                                {loading && (
-                                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                                        <Spinner />
+                {(name && photoURL) && (
+                    <>
+                        <div className="flex flex-col gap-4">
+                            <Button onClick={() => setOpen(true)} variant="outline" className="w-fit">
+                                <Search />
+                                <span className="hidden md:flex">Cerca nei tuoi formulari</span>
+                                <KbdGroup className="hidden md:flex">
+                                    <Kbd>Ctrl</Kbd>
+                                    <span>+</span>
+                                    <Kbd>K</Kbd>
+                                </KbdGroup>
+                            </Button>
+                            <CommandDialog open={open} onOpenChange={setOpen}>
+                                <Command shouldFilter={false}>
+                                    <div className="relative">
+                                        <CommandInput
+                                            placeholder={loading ? "Ricerca in corso..." : "Inserisci un termine di ricerca"}
+                                            onValueChange={setSearch}
+                                        />
+                                        {loading && (
+                                            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                                <Spinner />
+                                            </div>
+                                        )}
                                     </div>
-                                )}
-                            </div>
-                            <CommandList>
-                                {formulari.length > 0 && (
-                                    <CommandGroup heading="Formulari">
-                                        {formulari.map((f) => (
-                                            <CommandItem value={`f-${String(f.id)}`} key={f.id} onSelect={() => router.push(`/home/${f.id}`)}>
-                                                <Book />
-                                                <span>{f.titolo}</span>
-                                            </CommandItem>
-                                        ))}
-                                    </CommandGroup>
-                                )}
-                                {capitoli.length > 0 && (
-                                    <CommandGroup heading="Capitoli">
-                                        {capitoli.map((c) => (
-                                            <CommandItem value={`c-${String(c.id)}`} key={c.id} onSelect={() => router.push(`/home/${c.formularioId}/${c.id}`)}>
-                                                <Bookmark />
-                                                <div className="flex flex-col justify-center w-full">
-                                                    <span>{c.titolo}</span>
-                                                    <span className="text-xs text-muted-foreground">{c.formularioTitolo}</span>
-                                                </div>
-                                            </CommandItem>
-                                        ))}
-                                    </CommandGroup>
-                                )}
-                                {argomenti.length > 0 && (
-                                    <CommandGroup heading="Argomenti">
-                                        {argomenti.map((a) => (
-                                            <CommandItem value={`a-${String(a.id)}`} key={a.id} onSelect={() => router.push(`/home/${a.formularioId}/${a.capitoloId}/${a.id}`)}>
-                                                <TableOfContents />
-                                                <div className="flex flex-col justify-center w-full">
-                                                    <span>{a.titolo}</span>
-                                                    <div className="inline-flex items-center">
-                                                        <span className="text-xs text-muted-foreground">{a.formularioTitolo}</span>
-                                                        <ChevronRight className="opacity-70 mt-1" />
-                                                        <span className="text-xs text-muted-foreground">{a.capitoloTitolo}</span>
-                                                    </div>
-                                                </div>
-                                            </CommandItem>
-                                        ))}
-                                    </CommandGroup>
-                                )}
-                            </CommandList>
-                        </Command>
-                    </CommandDialog>
-                </div>
-                <div className="h-6 border-l"></div>
+                                    <CommandList>
+                                        {formulari.length > 0 && (
+                                            <CommandGroup heading="Formulari">
+                                                {formulari.map((f) => (
+                                                    <CommandItem value={`f-${String(f.id)}`} key={f.id} onSelect={() => router.push(`/home/${f.id}`)}>
+                                                        <Book />
+                                                        <span>{f.titolo}</span>
+                                                    </CommandItem>
+                                                ))}
+                                            </CommandGroup>
+                                        )}
+                                        {capitoli.length > 0 && (
+                                            <CommandGroup heading="Capitoli">
+                                                {capitoli.map((c) => (
+                                                    <CommandItem value={`c-${String(c.id)}`} key={c.id} onSelect={() => router.push(`/home/${c.formularioId}/${c.id}`)}>
+                                                        <Bookmark />
+                                                        <div className="flex flex-col justify-center w-full">
+                                                            <span>{c.titolo}</span>
+                                                            <span className="text-xs text-muted-foreground">{c.formularioTitolo}</span>
+                                                        </div>
+                                                    </CommandItem>
+                                                ))}
+                                            </CommandGroup>
+                                        )}
+                                        {argomenti.length > 0 && (
+                                            <CommandGroup heading="Argomenti">
+                                                {argomenti.map((a) => (
+                                                    <CommandItem value={`a-${String(a.id)}`} key={a.id} onSelect={() => router.push(`/home/${a.formularioId}/${a.capitoloId}/${a.id}`)}>
+                                                        <TableOfContents />
+                                                        <div className="flex flex-col justify-center w-full">
+                                                            <span>{a.titolo}</span>
+                                                            <div className="inline-flex items-center">
+                                                                <span className="text-xs text-muted-foreground">{a.formularioTitolo}</span>
+                                                                <ChevronRight className="opacity-70 mt-1" />
+                                                                <span className="text-xs text-muted-foreground">{a.capitoloTitolo}</span>
+                                                            </div>
+                                                        </div>
+                                                    </CommandItem>
+                                                ))}
+                                            </CommandGroup>
+                                        )}
+                                    </CommandList>
+                                </Command>
+                            </CommandDialog>
+                        </div>
+                        <div className="h-6 border-l"></div>
+                    </>
+                )}
                 <ModeToggle />
                 <div className="h-6 border-l"></div>
                 {photoURL === null ? (
