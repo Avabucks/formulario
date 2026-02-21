@@ -9,7 +9,7 @@ import { Bookmark, TableOfContents, ChevronRightIcon } from "lucide-react"
 import Link from "next/link"
 
 type Props = {
-    id: number
+    id: string
     titolo: string
     type: number // 0 = capitolo, 1 = argomento
     argomentiCount?: number

@@ -29,9 +29,11 @@ import {
     EmptyTitle,
 } from "@/src/components/ui/empty"
 import { toast } from "sonner"
+import { Kbd, KbdGroup } from "../ui/kbd"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/components/ui/tooltip"
 
 type Formulario = {
-    id: number
+    id: string
     titolo: string
     autore?: string
     nomeAutore?: string
@@ -41,8 +43,9 @@ type Formulario = {
 }
 
 type Capitolo = {
-    id: number
+    id: string
     titolo: string
+    formularioId: string
     argomentiCount?: number
 }
 
@@ -62,7 +65,7 @@ export function CapitoliList({ formulario, capitolo }: Readonly<{ formulario?: F
             }
             getListCapitoli(formulario).then((data) => {
                 if (data.success) {
-                    setCapitoli(data.result)
+                    setCapitoli(data.capitoli)
                     setEditable(data.editable)
                     setLoading(false)
                 } else {
@@ -72,7 +75,7 @@ export function CapitoliList({ formulario, capitolo }: Readonly<{ formulario?: F
         } else if (formulario && capitolo) {
             getListArgomenti(capitolo, formulario).then((data) => {
                 if (data.success) {
-                    setArgomenti(data.result)
+                    setArgomenti(data.argomenti)
                     setEditable(data.editable)
                     setLoading(false)
                 } else {
@@ -82,6 +85,17 @@ export function CapitoliList({ formulario, capitolo }: Readonly<{ formulario?: F
         } else {
             redirect("/home");
         }
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "a" && (e.metaKey || e.ctrlKey)) {
+                e.preventDefault()
+                setOpen((prev) => !prev)
+            }
+        }
+
+        document.addEventListener("keydown", handleKeyDown)
+        return () => document.removeEventListener("keydown", handleKeyDown)
+
     }, [open])
 
     async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
@@ -145,11 +159,22 @@ export function CapitoliList({ formulario, capitolo }: Readonly<{ formulario?: F
                 {(formulario && !capitolo) ? <TypographyH2 className="w-full">{formulario?.titolo}</TypographyH2> : <TypographyH3>{capitolo?.titolo}</TypographyH3>}
                 <div className="flex gap-2 items-center">
                     <Dialog>
-                        <DialogTrigger asChild>
-                            <Button variant="outline" size="icon">
-                                <Info size={16} />
-                            </Button>
-                        </DialogTrigger>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <DialogTrigger asChild>
+                                        <Button variant="outline" size="icon">
+                                            <Info size={16} />
+                                        </Button>
+                                    </DialogTrigger>
+                                </TooltipTrigger>
+                                <TooltipContent className="pr-1.5">
+                                    <div className="flex items-center gap-2">
+                                        Informazioni del formulario
+                                    </div>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                         <DialogContent className="sm:max-w-md">
                             <DialogHeader>
                                 <DialogTitle asChild>
@@ -181,12 +206,28 @@ export function CapitoliList({ formulario, capitolo }: Readonly<{ formulario?: F
                                 </Button>
                             )}
                             <Dialog open={open} onOpenChange={(open) => setOpen(open)}>
-                                <DialogTrigger asChild>
-                                    <Button variant="default">
-                                        <Plus size={16} />
-                                        <div className="hidden md:flex">{(formulario && !capitolo) ? "Aggiungi capitolo" : "Aggiungi argomento"}</div>
-                                    </Button>
-                                </DialogTrigger>
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <DialogTrigger asChild>
+                                                <Button variant="default">
+                                                    <Plus size={16} />
+                                                    <div className="hidden md:flex">{(formulario && !capitolo) ? "Aggiungi capitolo" : "Aggiungi argomento"}</div>
+                                                </Button>
+                                            </DialogTrigger>
+                                        </TooltipTrigger>
+                                        <TooltipContent className="pr-1.5">
+                                            <div className="flex items-center gap-2">
+                                                {(formulario && !capitolo) ? "Aggiungi capitolo" : "Aggiungi argomento"}
+                                                <KbdGroup className="hidden md:flex">
+                                                    <Kbd>Ctrl</Kbd>
+                                                    <span>+</span>
+                                                    <Kbd>A</Kbd>
+                                                </KbdGroup>
+                                            </div>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
                                 <DialogContent className="sm:max-w-md">
                                     <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
                                         <DialogHeader>

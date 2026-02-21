@@ -9,18 +9,18 @@ import {
 import { ChevronRight } from "lucide-react";
 
 type Formulario = {
-    id: number
+    id: string
     titolo: string
 }
 
 type Capitolo = {
-    id: number
+    id: string
     titolo: string
     argomentiCount?: number
 }
 
 type Argomento = {
-    id: number
+    id: string
     titolo: string
 }
 

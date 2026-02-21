@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS users (
 --
 CREATE TABLE IF NOT EXISTS formulari (
   id SERIAL PRIMARY KEY,
+  beautiful_id VARCHAR(255) NOT NULL UNIQUE,
   titolo VARCHAR(255) NOT NULL,
   autore VARCHAR(255) NOT NULL,
   anno VARCHAR(255) NOT NULL,
@@ -33,8 +34,9 @@ CREATE TABLE IF NOT EXISTS formulari (
 --
 CREATE TABLE IF NOT EXISTS capitoli (
   id SERIAL PRIMARY KEY,
+  beautiful_id VARCHAR(255) NOT NULL UNIQUE,
   titolo VARCHAR(255) NOT NULL,
-  formulario INTEGER NOT NULL,
+  formulario VARCHAR(255) NOT NULL REFERENCES formulari(beautiful_id) ON DELETE CASCADE,
   sort_order INTEGER NOT NULL
 );
 --
@@ -42,7 +44,8 @@ CREATE TABLE IF NOT EXISTS capitoli (
 --
 CREATE TABLE IF NOT EXISTS argomenti (
   id SERIAL PRIMARY KEY,
+  beautiful_id VARCHAR(255) NOT NULL UNIQUE,
   titolo VARCHAR(255) NOT NULL,
-  capitolo INTEGER NOT NULL,
+  capitolo VARCHAR(255) NOT NULL REFERENCES capitoli(beautiful_id) ON DELETE CASCADE,
   sort_order INTEGER NOT NULL
 );

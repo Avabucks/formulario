@@ -24,7 +24,7 @@ import { toast } from "sonner"
 import { useState } from "react"
 
 type Formulario = {
-    id: number
+    id: string
     titolo: string
     autore?: string
     nomeAutore?: string

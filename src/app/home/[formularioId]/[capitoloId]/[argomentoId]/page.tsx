@@ -6,17 +6,17 @@ import { getListArgomenti, getListCapitoli, getListFormulari } from "@/src/lib/f
 export default async function Argomento({
     params,
 }: Readonly<{
-    params: Promise<{ formularioId: number; capitoloId: number; argomentoId: number }>
+    params: Promise<{ formularioId: string; capitoloId: string; argomentoId: string }>
 }>) {
     const { formularioId } = await params
     const formulari = await getListFormulari("all")
-    const formulario = formulari.result.find((f) => f.id === Number(formularioId))
+    const formulario = formulari.find((f) => f.id === formularioId)
     const { capitoloId } = await params
     const capitoli = await getListCapitoli(formulario || null)
-    const capitolo = capitoli.result.find((c) => c.id === Number(capitoloId))
+    const capitolo = capitoli.capitoli.find((c) => c.id === capitoloId)
     const { argomentoId } = await params
     const argomenti = await getListArgomenti(capitolo || null, formulario || null)
-    const argomento = argomenti.result.find((a) => a.id === Number(argomentoId))
+    const argomento = argomenti.argomenti.find((a) => a.id === argomentoId)
 
     return (
         <div className="flex flex-col gap-4 w-full px-2 md:px-6">
