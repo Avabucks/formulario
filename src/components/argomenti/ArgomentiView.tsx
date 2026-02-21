@@ -19,12 +19,15 @@ import { Input } from "@/src/components/ui/input"
 import { toast } from "sonner"
 import { TypographyH4 } from "@/src/components/ui/typography"
 import { Check, Copy, Edit, Eye, GlobeIcon, Info, LockIcon, Share } from "lucide-react"
-import { getArgomentoFromId } from "@/src/lib/formulari"
+import { changeVisibilityFormulario, getArgomentoFromId } from "@/src/lib/formulari"
 import Editor from "@/src/components/editor"
 import { redirect } from "next/navigation"
+import { Qr } from "../ui/qr"
+import { Field, FieldGroup } from "../ui/field"
+import { Switch } from "../ui/switch"
 
 type Formulario = {
-    id: number
+    id: string
     titolo: string
     autore?: string
     nomeAutore?: string
@@ -34,9 +37,12 @@ type Formulario = {
 }
 
 type Argomento = {
-    id: number
+    id: string
     titolo: string
-    formula?: string
+    formularioId: string
+    formularioTitolo?: string
+    capitoloId: string
+    capitoloTitolo?: string
 }
 
 export function ArgomentiView({ formulario, argomento }: Readonly<{ formulario?: Formulario, argomento?: Argomento }>) {
@@ -44,6 +50,7 @@ export function ArgomentiView({ formulario, argomento }: Readonly<{ formulario?:
     const [copied, setCopied] = useState(false)
     const [argomentoFull, setArgomentoFull] = useState<Argomento>()
     const [editable, setEditable] = useState(false)
+    const [sharable, setSharable] = useState(false)
 
     const currentUrl = globalThis.window === undefined ? "" : globalThis.location.href
 
@@ -54,11 +61,29 @@ export function ArgomentiView({ formulario, argomento }: Readonly<{ formulario?:
         setTimeout(() => setCopied(false), 2000)
     }
 
+    const handleSwitchVisibility = (checked: boolean) => {
+        toast.promise(
+            changeVisibilityFormulario(checked),
+            {
+                loading: checked ? "Pubblicazione in corso..." : "Rimozione dalla pubblicazione in corso...",
+                success: () => {
+                    setSharable(checked)
+                    return checked ? "Formulario pubblicato con successo!" : "Formulario rimosso dalla pubblicazione!"
+                },
+                error: (err) => err?.message || checked
+                    ? "Errore durante la pubblicazione del formulario."
+                    : "Errore durante la rimozione della pubblicazione.",
+                position: "bottom-center",
+            },
+        );
+    }
+
     useEffect(() => {
-        getArgomentoFromId(formulario!, argomento?.id ?? 0).then((data) => {
+        getArgomentoFromId(formulario!, argomento?.id ?? "").then((data) => {
             if (data.success) {
                 setArgomentoFull(data.result)
                 setEditable(data.editable)
+                setSharable(formulario?.visibilityPublic ?? false)
                 setLoading(false)
             } else {
                 redirect("/home");
@@ -121,7 +146,7 @@ export function ArgomentiView({ formulario, argomento }: Readonly<{ formulario?:
                                 <DialogTitle asChild>
                                     <div className="flex gap-2 items-center">
                                         {formulario?.titolo}
-                                        <div className="text-muted-foreground">{formulario?.visibilityPublic ? <GlobeIcon size={16} /> : <LockIcon size={16} />}</div>
+                                        <div className="text-muted-foreground">{sharable ? <GlobeIcon size={16} /> : <LockIcon size={16} />}</div>
                                     </div>
                                 </DialogTitle>
                                 <DialogDescription asChild>
@@ -140,36 +165,43 @@ export function ArgomentiView({ formulario, argomento }: Readonly<{ formulario?:
                         </DialogContent>
                     </Dialog>
                     <Dialog>
-                        {formulario?.visibilityPublic ? (
-                            <DialogTrigger asChild>
-                                <Button variant="outline" size="icon">
-                                    <Share size={16} />
-                                </Button>
-                            </DialogTrigger>
-                        ) : (
-                            <Button variant="outline" size="icon" onClick={() => toast.warning("Puoi copiare il link solo se il formulario è pubblico.", { position: "bottom-center" })}>
+                        <DialogTrigger asChild>
+                            <Button variant="outline" size="icon">
                                 <Share size={16} />
                             </Button>
-                        )}
-                        <DialogContent className="sm:max-w-md">
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-sm">
                             <DialogHeader>
                                 <DialogTitle>Condividi</DialogTitle>
                             </DialogHeader>
-                            <div className="flex items-center gap-2">
-                                <div className="grid flex-1 gap-2">
-                                    <Label htmlFor="link" className="sr-only">
-                                        Link
-                                    </Label>
-                                    <Input
-                                        id="link"
-                                        defaultValue={currentUrl}
-                                        readOnly
-                                    />
+                            {editable && (
+                                <FieldGroup>
+                                    <div className="flex items-center justify-between">
+                                        <Label htmlFor="visibilityPublic-1">Condividi con tutti (solo tu puoi modificare)</Label>
+                                        <Switch id="visibilityPublic-1" name="visibilityPublic" defaultChecked={sharable} onCheckedChange={handleSwitchVisibility} />
+                                    </div>
+                                </FieldGroup>
+                            )}
+                            {sharable && (
+                                <div className="flex flex-col items-center gap-4">
+                                    <Qr text={currentUrl} />
+                                    <div className="flex items-center gap-2 w-full">
+                                        <div className="grid flex-1 gap-2">
+                                            <Label htmlFor="link" className="sr-only">
+                                                Link
+                                            </Label>
+                                            <Input
+                                                id="link"
+                                                defaultValue={currentUrl}
+                                                readOnly
+                                            />
+                                        </div>
+                                        <Button variant="outline" size="icon" onClick={handleCopy}>
+                                            {copied ? <Check size={16} /> : <Copy size={16} />}
+                                        </Button>
+                                    </div>
                                 </div>
-                                <Button variant="outline" size="icon" onClick={handleCopy}>
-                                    {copied ? <Check size={16} /> : <Copy size={16} />}
-                                </Button>
-                            </div>
+                            )}
                             <DialogFooter>
                                 <DialogClose asChild>
                                     <Button variant="outline">Chiudi</Button>

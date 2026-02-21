@@ -30,11 +30,11 @@ export async function FormularioList() {
     return (
         <>
             <FormularioTitle />
-            {formulari.result.length === 0 ? (
+            {formulari.length === 0 ? (
                 renderEmpty()
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 w-full">
-                    {formulari.result.map((f) => (
+                    {formulari.map((f) => (
                         <FormularioCard formulario={f} key={f.id} />
                     ))}
                 </div>

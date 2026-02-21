@@ -11,6 +11,7 @@ export default function Home() {
 // TODOs:
 // - edit capitoli e argomenti con modifica titolo, modifca ordine ed eliminazione
 // - migliorare l'editor con supporto a formule matematiche, codice, ecc.
-// - aggiungere funzionalità di ricerca e filtro per formulari, capitoli e argomenti
-// - aggiungere preferiti formulari e rendi tuo (modifiche i formulari pubblici e salvali nei tuoi)
+// - aggiungere formulario d'esempio nel nuovo account
+
+// - [COMMUNITY] cerca e aggiungi ai preferiti formulari e rendi tuo (modifiche i formulari pubblici e salvali nei tuoi)
 // - aggiungere funzionalità di esportazione (pdf, markdown, ecc.)
