@@ -2,8 +2,18 @@ import { Suspense } from "react"
 import { FormularioList } from "@/src/components/formulario/FormularioList"
 import { Skeleton } from "@/src/components/ui/skeleton";
 import { Header } from "@/src/components/navigation/header";
+import { getIronSession } from "iron-session";
+import { cookies } from "next/headers";
+import { SessionData, sessionOptions } from "@/src/lib/session";
+import { pool } from "@/src/lib/db";
+import CheckUser from "@/src/components/check-user";
 
-export default function Page() {
+export default async function Page() {
+
+    const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
+
+    const { rows } = await pool.query(`SELECT id FROM users WHERE uid = $1`, [session.uid]);
+
     const renderLoadingSkeleton = () => (
         <div className="flex flex-col gap-4 w-full">
             <Skeleton className="h-10 w-full" />
@@ -17,6 +27,7 @@ export default function Page() {
 
     return (
         <div className="flex flex-col gap-4 w-full px-2 md:px-6">
+            <CheckUser check={rows.length != 0} />
             <Header />
             <Suspense fallback={renderLoadingSkeleton()}>
                 <FormularioList />

@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getIronSession } from "iron-session";
 import { sessionOptions, SessionData } from "@/src/lib/session";
+import { cookies } from "next/headers";
 
-export async function POST(req: NextRequest) {
-  const res = NextResponse.json({ ok: true });
-  const session = await getIronSession<SessionData>(req, res, sessionOptions);
-  session.destroy(); // cancella il cookie
-  return res;
+export async function GET(request: Request) {
+    const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
+    await session.destroy();
+    return NextResponse.redirect(new URL("/", request.url));
 }
