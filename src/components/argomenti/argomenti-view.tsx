@@ -20,7 +20,8 @@ import { toast } from "sonner"
 import { TypographyH4 } from "@/src/components/ui/typography"
 import { Check, Copy, Edit, Eye, GlobeIcon, Info, LockIcon, Share } from "lucide-react"
 import { changeVisibilityFormulario, getArgomentoFromId } from "@/src/lib/formulari"
-import Editor from "@/src/components/editor"
+import EditorPreview from "@/src/components/editor/editor-preview"
+import EditorEdit from "@/src/components/editor/editor-edit"
 import { redirect } from "next/navigation"
 import { Qr } from "../ui/qr"
 import { Field, FieldGroup } from "../ui/field"
@@ -119,11 +120,11 @@ export function ArgomentiView({ formulario, argomento }: Readonly<{ formulario?:
                         </TabsTrigger>
                     </TabsList>
                     <TabsContent value="preview">
-                        <Editor />
+                        <EditorPreview />
                     </TabsContent>
                     {editable && (
                         <TabsContent value="edit">
-                            <p>Edit</p>
+                            <EditorEdit />
                         </TabsContent>
                     )}
                 </Tabs>

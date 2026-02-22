@@ -1,6 +1,6 @@
 "use client"
 
-import { Book, Bookmark, ChevronRight, Pi, Search, TableOfContents } from "lucide-react";
+import { Book, Bookmark, ChevronRight, Cookie, Handshake, Pi, Search, TableOfContents } from "lucide-react";
 import { ModeToggle } from "../theme/theme-toggler";
 import Link from "next/link";
 import { Button } from "@/src/components/ui/button"
@@ -45,6 +45,7 @@ type Capitolo = {
     titolo: string
     formularioId: string
     formularioTitolo?: string
+    sortOrder: number
 }
 
 type Argomento = {
@@ -54,6 +55,7 @@ type Argomento = {
     formularioTitolo?: string
     capitoloId: string
     capitoloTitolo?: string
+    sortOrder: number
 }
 
 export function Header() {
@@ -227,6 +229,19 @@ export function Header() {
                                 <DropdownMenuItem>
                                     <Book />
                                     Visualizza Formulari
+                                </DropdownMenuItem>
+                            </Link>
+                            <DropdownMenuSeparator />
+                            <Link href="/terms">
+                                <DropdownMenuItem>
+                                    <Handshake />
+                                    Termini e condizioni
+                                </DropdownMenuItem>
+                            </Link>
+                            <Link href="/privacy">
+                                <DropdownMenuItem>
+                                    <Cookie />
+                                    Privacy
                                 </DropdownMenuItem>
                             </Link>
                             <DropdownMenuSeparator />

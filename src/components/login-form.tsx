@@ -140,7 +140,7 @@ export function LoginForm({
         </CardContent>
       </Card>
       <FieldDescription className="px-6 text-center">
-        Cliccando qui sotto, accetti i nostri <Link href="/">Termini di servizio</Link> e la nostra{" "}<Link href="/">Informativa sulla privacy</Link>.
+        Cliccando qui sotto, accetti i nostri <Link href="/terms">Termini di servizio</Link> e la nostra{" "}<Link href="/privacy">Informativa sulla privacy</Link>.
       </FieldDescription>
     </div >
   )

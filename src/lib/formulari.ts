@@ -167,9 +167,10 @@ type Capitolo = {
     formularioId: string
     formularioTitolo?: string
     argomentiCount?: number
+    sortOrder: number
 }
 
-export async function getListCapitoli(currentFormulario: Formulario | null): Promise<{success: boolean, capitoli: Capitolo[], editable: boolean}> {
+export async function getListCapitoli(currentFormulario: Formulario | null): Promise<{ success: boolean, capitoli: Capitolo[], editable: boolean }> {
     if (!currentFormulario) {
         return { success: false, capitoli: [], editable: false };
     }
@@ -188,7 +189,7 @@ export async function getListCapitoli(currentFormulario: Formulario | null): Pro
     }
 
     const result = await pool.query(
-        `SELECT c.beautiful_id AS "id", c.titolo, c.formulario as "formularioId", COUNT(a.beautiful_id) AS "argomentiCount"
+        `SELECT c.beautiful_id AS "id", c.titolo, c.formulario as "formularioId", COUNT(a.beautiful_id) AS "argomentiCount", c.sort_order AS "sortOrder"
         FROM capitoli c
         LEFT JOIN argomenti a ON a.capitolo = c.beautiful_id
         WHERE c.formulario = $1
@@ -266,9 +267,10 @@ type Argomento = {
     formularioTitolo?: string
     capitoloId: string
     capitoloTitolo?: string
+    sortOrder: number
 }
 
-export async function getListArgomenti(currentCapitolo: Capitolo | null, currentFormulario: Formulario | null): Promise<{success: boolean, argomenti: Argomento[], editable: boolean}> {
+export async function getListArgomenti(currentCapitolo: Capitolo | null, currentFormulario: Formulario | null): Promise<{ success: boolean, argomenti: Argomento[], editable: boolean }> {
     if (!currentCapitolo || !currentFormulario) {
         return { success: false, argomenti: [], editable: false };
     }
@@ -297,7 +299,7 @@ export async function getListArgomenti(currentCapitolo: Capitolo | null, current
     }
 
     const result = await pool.query(
-        `SELECT A.beautiful_id AS "id", A.titolo, C.formulario as "formularioId", A.capitolo as "capitoloId"
+        `SELECT A.beautiful_id AS "id", A.titolo, C.formulario as "formularioId", A.capitolo as "capitoloId", A.sort_order AS "sortOrder"
             FROM argomenti A JOIN capitoli C ON A.capitolo = C.beautiful_id
             WHERE A.capitolo = $1
             ORDER BY A.sort_order ASC`,
@@ -397,5 +399,144 @@ export async function findArgomentoByTitle(titolo: string): Promise<Argomento[]>
     } catch (error) {
         console.error(error);
         return [];
+    }
+}
+
+export async function renameItem(id: string, type: "capitolo" | "argomento", formData: FormData) {
+    const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
+    const uid = session.uid;
+    if (!uid) throw new Error("Non autorizzato");
+
+    const titolo = formData.get("titolo") as string;
+    if (!titolo) throw new Error("Titolo obbligatorio");
+
+    try {
+        const query = type === "capitolo"
+            ? `UPDATE capitoli SET titolo = $1
+               WHERE beautiful_id = $2
+               AND formulario IN (SELECT beautiful_id FROM formulari WHERE autore = $3)`
+            : `UPDATE argomenti SET titolo = $1
+               WHERE beautiful_id = $2
+               AND capitolo IN (
+                  SELECT beautiful_id FROM capitoli
+                  WHERE formulario IN (SELECT beautiful_id FROM formulari WHERE autore = $3)
+               )`;
+
+        const result = await pool.query(query, [titolo, id, uid]);
+        if (result.rowCount === 0) throw new Error(`${type === "capitolo" ? "Capitolo" : "Argomento"} non trovato o non autorizzato`);
+        return { success: true };
+    } catch (error) {
+        console.error(error);
+        throw new Error(`Errore nella modifica del ${type}`);
+    }
+}
+
+export async function deleteItem(id: string, type: "capitolo" | "argomento") {
+    const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
+    const uid = session.uid;
+    if (!uid) throw new Error("Non autorizzato");
+
+    const table = type === "capitolo" ? "capitoli" : "argomenti";
+    const parentCol = type === "capitolo" ? "formulario" : "capitolo";
+
+    try {
+        // Prendi sort_order e parent prima di eliminare
+        const { rows } = await pool.query(
+            `SELECT sort_order, ${parentCol} AS parent FROM ${table} WHERE beautiful_id = $1`,
+            [id]
+        );
+        if (rows.length === 0) throw new Error(`${type === "capitolo" ? "Capitolo" : "Argomento"} non trovato o non autorizzato`);
+
+        const { sort_order, parent } = rows[0];
+
+        const query = type === "capitolo"
+            ? `DELETE FROM capitoli
+               WHERE beautiful_id = $1
+               AND formulario IN (SELECT beautiful_id FROM formulari WHERE autore = $2)`
+            : `DELETE FROM argomenti
+               WHERE beautiful_id = $1
+               AND capitolo IN (
+                  SELECT beautiful_id FROM capitoli
+                  WHERE formulario IN (SELECT beautiful_id FROM formulari WHERE autore = $2)
+               )`;
+
+        const result = await pool.query(query, [id, uid]);
+        if (result.rowCount === 0) throw new Error(`${type === "capitolo" ? "Capitolo" : "Argomento"} non trovato o non autorizzato`);
+
+        // Scala i sort_order degli elementi successivi
+        await pool.query(
+            `UPDATE ${table} SET sort_order = sort_order - 1
+             WHERE ${parentCol} = $1 AND sort_order > $2`,
+            [parent, sort_order]
+        );
+
+        return { success: true };
+    } catch (error) {
+        console.error(error);
+        throw new Error(`Errore nell'eliminazione del ${type}`);
+    }
+}
+
+export async function moveItem(id: string, type: "capitolo" | "argomento", direction: "up" | "down") {
+    const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
+    const uid = session.uid;
+    if (!uid) throw new Error("Non autorizzato");
+
+    try {
+        const { rows } = type === "capitolo"
+            ? await pool.query(
+                `SELECT c.sort_order, c.formulario AS parent FROM capitoli c
+                 JOIN formulari f ON f.beautiful_id = c.formulario
+                 WHERE c.beautiful_id = $1 AND f.autore = $2`,
+                [id, uid]
+            )
+            : await pool.query(
+                `SELECT a.sort_order, a.capitolo AS parent FROM argomenti a
+                 JOIN capitoli c ON c.beautiful_id = a.capitolo
+                 JOIN formulari f ON f.beautiful_id = c.formulario
+                 WHERE a.beautiful_id = $1 AND f.autore = $2`,
+                [id, uid]
+            );
+
+        if (rows.length === 0) throw new Error(`${type === "capitolo" ? "Capitolo" : "Argomento"} non trovato o non autorizzato`);
+
+        const { sort_order, parent } = rows[0];
+        const targetOrder = direction === "up" ? sort_order - 1 : sort_order + 1;
+        const table = type === "capitolo" ? "capitoli" : "argomenti";
+        const parentCol = type === "capitolo" ? "formulario" : "capitolo";
+
+        const { rows: adjacent } = await pool.query(
+            `SELECT beautiful_id FROM ${table} WHERE ${parentCol} = $1 AND sort_order = $2`,
+            [parent, targetOrder]
+        );
+        if (adjacent.length === 0) throw new Error("Movimento non possibile");
+
+        await pool.query(`UPDATE ${table} SET sort_order = $1 WHERE beautiful_id = $2`, [targetOrder, id]);
+        await pool.query(`UPDATE ${table} SET sort_order = $1 WHERE beautiful_id = $2`, [sort_order, adjacent[0].beautiful_id]);
+
+        return { success: true };
+    } catch (error) {
+        console.error(error);
+        throw new Error(`Errore nello spostamento del ${type}`);
+    }
+}
+
+// ELIMINAZIONE ACCOUNT PER GDPR
+export async function deleteAccountGDPR() {
+    const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
+    const uid = session.uid;
+    if (!uid) throw new Error("Non autorizzato");
+
+    try {
+        await pool.query(`DELETE FROM formulari WHERE autore = $1`, [uid]);
+        await pool.query(`DELETE FROM users WHERE uid = $1`, [uid]);
+
+        session.destroy();
+
+        revalidatePath("/");
+        return { success: true };
+    } catch (error) {
+        console.error(error);
+        throw new Error("Errore nell'eliminazione dell'account");
     }
 }

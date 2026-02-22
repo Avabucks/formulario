@@ -1,4 +1,4 @@
-import { ArgomentiView } from "@/src/components/argomenti/ArgomentiView";
+import { ArgomentiView } from "@/src/components/argomenti/argomenti-view";
 import { BreadcrumbLogic } from "@/src/components/navigation/breadcrumb-logic";
 import { Header } from "@/src/components/navigation/header";
 import { getListArgomenti, getListCapitoli, getListFormulari } from "@/src/lib/formulari"

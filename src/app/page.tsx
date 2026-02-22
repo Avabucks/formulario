@@ -9,7 +9,6 @@ export default function Home() {
 }
 
 // TODOs:
-// - edit capitoli e argomenti con modifica titolo, modifca ordine ed eliminazione
 // - migliorare l'editor con supporto a formule matematiche, codice, ecc.
 // - aggiungere formulario d'esempio nel nuovo account
 
