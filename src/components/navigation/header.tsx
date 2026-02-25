@@ -56,6 +56,7 @@ type Argomento = {
     capitoloId: string
     capitoloTitolo?: string
     sortOrder: number
+    content: string
 }
 
 export function Header() {

@@ -18,8 +18,8 @@ import { Label } from "@/src/components/ui/label"
 import { Input } from "@/src/components/ui/input"
 import { toast } from "sonner"
 import { TypographyH4 } from "@/src/components/ui/typography"
-import { Check, Copy, Edit, Eye, GlobeIcon, Info, LockIcon, Share } from "lucide-react"
-import { changeVisibilityFormulario, getArgomentoFromId } from "@/src/lib/formulari"
+import { Check, CloudAlert, CloudCheck, Copy, Edit, Eye, GlobeIcon, Info, LockIcon, Share } from "lucide-react"
+import { changeVisibilityFormulario, getArgomentoFromId, saveContent } from "@/src/lib/formulari"
 import EditorPreview from "@/src/components/editor/editor-preview"
 import EditorEdit from "@/src/components/editor/editor-edit"
 import { redirect } from "next/navigation"
@@ -27,6 +27,7 @@ import { Qr } from "../ui/qr"
 import { Field, FieldGroup } from "../ui/field"
 import { Switch } from "../ui/switch"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip"
+import { Spinner } from "../ui/spinner"
 
 type Formulario = {
     id: string
@@ -45,14 +46,17 @@ type Argomento = {
     formularioTitolo?: string
     capitoloId: string
     capitoloTitolo?: string
+    content: string
 }
 
 export function ArgomentiView({ formulario, argomento }: Readonly<{ formulario?: Formulario, argomento?: Argomento }>) {
     const [loading, setLoading] = useState(true)
+    const [saving, setSaving] = useState(0)
     const [copied, setCopied] = useState(false)
     const [argomentoFull, setArgomentoFull] = useState<Argomento>()
     const [editable, setEditable] = useState(false)
     const [sharable, setSharable] = useState(false)
+    const [content, setContent] = useState("")
 
     const currentUrl = globalThis.window === undefined ? "" : globalThis.location.href
 
@@ -82,8 +86,9 @@ export function ArgomentiView({ formulario, argomento }: Readonly<{ formulario?:
 
     useEffect(() => {
         getArgomentoFromId(formulario!, argomento?.id ?? "").then((data) => {
-            if (data.success) {
+            if (data.result && data.success) {
                 setArgomentoFull(data.result)
+                setContent(data.result.content)
                 setEditable(data.editable)
                 setSharable(formulario?.visibilityPublic ?? false)
                 setLoading(false)
@@ -93,10 +98,26 @@ export function ArgomentiView({ formulario, argomento }: Readonly<{ formulario?:
         })
     }, [])
 
+    useEffect(() => {
+        setSaving(0);
+
+        const timeout = setTimeout(async () => {
+            try {
+                await saveContent(content, argomento?.id);
+                setSaving(1);
+            } catch (e: any) {
+                toast.error(e?.message || "Errore durante il salvataggio.", { position: "bottom-center" });
+                setSaving(2)
+            }
+        }, 2000)
+
+        return () => clearTimeout(timeout)
+    }, [content])
+
     const renderLoadingSkeleton = () => (
-        <div className="flex flex-col gap-2 w-full">
+        <div className="flex flex-col gap-2 w-full h-full flex-1">
             <Skeleton className="h-8 w-full" />
-            <Skeleton className="h-40 w-full" />
+            <Skeleton className="h-full w-full" />
         </div>
     );
 
@@ -107,10 +128,10 @@ export function ArgomentiView({ formulario, argomento }: Readonly<{ formulario?:
 
     const renderArgomento = () => (
         (argomentoFull && (
-            <div className="flex flex-col gap-4 w-full">
-                <Tabs defaultValue="preview">
+            <div className="flex flex-col gap-4 w-full h-full flex-1">
+                <Tabs defaultValue={content == "" ? "edit" : "preview"} className="flex-1">
                     <TabsList className="w-full">
-                        <TabsTrigger value="preview">
+                        <TabsTrigger value="preview" disabled={content == ""}>
                             <Eye />
                             Anteprima
                         </TabsTrigger>
@@ -119,12 +140,12 @@ export function ArgomentiView({ formulario, argomento }: Readonly<{ formulario?:
                             Modifica
                         </TabsTrigger>
                     </TabsList>
-                    <TabsContent value="preview">
-                        <EditorPreview />
+                    <TabsContent value="preview" className="flex-1">
+                        <EditorPreview content={content} />
                     </TabsContent>
                     {editable && (
                         <TabsContent value="edit">
-                            <EditorEdit />
+                            <EditorEdit content={content} setContent={setContent} />
                         </TabsContent>
                     )}
                 </Tabs>
@@ -133,9 +154,46 @@ export function ArgomentiView({ formulario, argomento }: Readonly<{ formulario?:
     )
 
     return (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 flex-1 h-full mb-4">
             <div className="flex justify-between items-center gap-4">
-                <TypographyH4 className="truncate min-w-0 flex-1">{argomento.titolo}</TypographyH4>
+                <div className="flex items-center gap-4">
+                    <TypographyH4 className="truncate min-w-0 flex-1">{argomento.titolo}</TypographyH4>
+                    <div className="scale-130 opacity-70">
+                        {(() => {
+                            switch (saving) {
+                                case 0:
+                                    return <Spinner />;
+                                case 1:
+                                    return (
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <CloudCheck size={16} />
+                                                </TooltipTrigger>
+                                                <TooltipContent className="pr-1.5">
+                                                        Sincronizzato correttamente
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                    );
+                                case 2:
+                                    return (
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <CloudAlert size={16} />
+                                                </TooltipTrigger>
+                                                <TooltipContent className="pr-1.5">
+                                                        Errore durante il salvataggio
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                    );
+                                default:
+                                    return null;
+                            }
+                        })()}                    </div>
+                </div>
                 <div className="flex gap-2 items-center">
                     <Dialog>
                         <TooltipProvider>

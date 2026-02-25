@@ -48,5 +48,5 @@ CREATE TABLE IF NOT EXISTS argomenti (
   titolo VARCHAR(255) NOT NULL,
   capitolo VARCHAR(255) NOT NULL REFERENCES capitoli(beautiful_id) ON DELETE CASCADE,
   sort_order INTEGER NOT NULL,
-  testo JSONB
+  content TEXT NOT NULL DEFAULT ''
 );

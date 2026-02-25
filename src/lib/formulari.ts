@@ -268,6 +268,7 @@ type Argomento = {
     capitoloId: string
     capitoloTitolo?: string
     sortOrder: number
+    content: string
 }
 
 export async function getListArgomenti(currentCapitolo: Capitolo | null, currentFormulario: Formulario | null): Promise<{ success: boolean, argomenti: Argomento[], editable: boolean }> {
@@ -331,7 +332,7 @@ export async function getArgomentoFromId(formulario: Formulario, id: string): Pr
 
     try {
         const result = await pool.query(
-            `SELECT * FROM argomenti WHERE beautiful_id = $1`,
+            `SELECT titolo, content FROM argomenti WHERE beautiful_id = $1`,
             [id]
         );
 
@@ -518,6 +519,41 @@ export async function moveItem(id: string, type: "capitolo" | "argomento", direc
     } catch (error) {
         console.error(error);
         throw new Error(`Errore nello spostamento del ${type}`);
+    }
+}
+
+export async function saveContent(content: string, id?: string) {
+    const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
+    const uid = session.uid;
+    if (!uid || !id) throw new Error("Non autorizzato");
+
+    if (!content) throw new Error("Contenuto obbligatorio");
+
+    try {
+        const query = `
+            UPDATE argomenti
+            SET content = $1
+            WHERE beautiful_id = $2
+                AND capitolo IN (
+                SELECT beautiful_id
+                FROM capitoli
+                WHERE formulario IN (
+                    SELECT beautiful_id
+                    FROM formulari
+                    WHERE autore = $3
+                )
+                )
+            `;
+
+        const result = await pool.query(query, [content, id, uid]);
+
+        if (result.rowCount === 0) {
+            throw new Error("Argomento non trovato o non autorizzato");
+        }
+        return { success: true };
+    } catch (error) {
+        console.error(error);
+        throw new Error(`Errore nel salvataggio`);
     }
 }
 

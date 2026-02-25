@@ -26,7 +26,7 @@ type Argomento = {
 
 export function BreadcrumbLogic({ formulario, capitolo, argomento }: Readonly<{ formulario?: Formulario; capitolo?: Capitolo; argomento?: Argomento }>) {
     return (
-        <Breadcrumb>
+        <Breadcrumb className="max-w-screen">
             <BreadcrumbList>
                 <BreadcrumbItem>
                     <BreadcrumbLink href="/home">Home</BreadcrumbLink>

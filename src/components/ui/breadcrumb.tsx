@@ -6,7 +6,7 @@ import { cn } from "@/src/lib/utils"
 import Link from "next/link"
 
 function Breadcrumb({ ...props }: React.ComponentProps<"nav">) {
-  return <nav aria-label="breadcrumb" data-slot="breadcrumb" className="flex overflow-hidden" {...props} />
+  return <nav aria-label="breadcrumb" data-slot="breadcrumb" className="flex" {...props} />
 }
 
 function BreadcrumbList({ className, ...props }: React.ComponentProps<"ol">) {

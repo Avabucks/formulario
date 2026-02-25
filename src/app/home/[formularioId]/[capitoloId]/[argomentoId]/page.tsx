@@ -19,7 +19,7 @@ export default async function Argomento({
     const argomento = argomenti.argomenti.find((a) => a.id === argomentoId)
 
     return (
-        <div className="flex flex-col gap-4 w-full px-2 md:px-6">
+        <div className="flex flex-col gap-4 w-full px-2 md:px-6 flex-1">
             <Header />
             <BreadcrumbLogic formulario={formulario} capitolo={capitolo} argomento={argomento} />
             <ArgomentiView formulario={formulario} argomento={argomento} />
