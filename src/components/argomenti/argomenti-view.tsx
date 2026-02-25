@@ -99,6 +99,8 @@ export function ArgomentiView({ formulario, argomento }: Readonly<{ formulario?:
     }, [])
 
     useEffect(() => {
+        if (!editable) return;
+        
         setSaving(0);
 
         const timeout = setTimeout(async () => {
@@ -159,40 +161,45 @@ export function ArgomentiView({ formulario, argomento }: Readonly<{ formulario?:
                 <div className="flex items-center gap-4">
                     <TypographyH4 className="truncate min-w-0 flex-1">{argomento.titolo}</TypographyH4>
                     <div className="scale-130 opacity-70">
-                        {(() => {
-                            switch (saving) {
-                                case 0:
-                                    return <Spinner />;
-                                case 1:
-                                    return (
-                                        <TooltipProvider>
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <CloudCheck size={16} />
-                                                </TooltipTrigger>
-                                                <TooltipContent className="pr-1.5">
-                                                        Sincronizzato correttamente
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
-                                    );
-                                case 2:
-                                    return (
-                                        <TooltipProvider>
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <CloudAlert size={16} />
-                                                </TooltipTrigger>
-                                                <TooltipContent className="pr-1.5">
-                                                        Errore durante il salvataggio
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
-                                    );
-                                default:
-                                    return null;
-                            }
-                        })()}                    </div>
+                        {editable && (
+                            <>
+                                {(() => {
+                                    switch (saving) {
+                                        case 0:
+                                            return <Spinner />;
+                                        case 1:
+                                            return (
+                                                <TooltipProvider>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <CloudCheck size={16} />
+                                                        </TooltipTrigger>
+                                                        <TooltipContent className="pr-1.5">
+                                                            Sincronizzato correttamente
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </TooltipProvider>
+                                            );
+                                        case 2:
+                                            return (
+                                                <TooltipProvider>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <CloudAlert size={16} />
+                                                        </TooltipTrigger>
+                                                        <TooltipContent className="pr-1.5">
+                                                            Errore durante il salvataggio
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </TooltipProvider>
+                                            );
+                                        default:
+                                            return null;
+                                    }
+                                })()}
+                            </>
+                        )}
+                    </div>
                 </div>
                 <div className="flex gap-2 items-center">
                     <Dialog>
