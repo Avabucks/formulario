@@ -19,9 +19,9 @@ import { Label } from "../ui/label"
 import { Input } from "../ui/input"
 import { Textarea } from "../ui/textarea"
 import { Switch } from "../ui/switch"
-import { deleteFormulario, updateFormulario } from "@/src/lib/formulari"
 import { toast } from "sonner"
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 
 type Formulario = {
     id: string
@@ -34,32 +34,54 @@ type Formulario = {
 }
 
 export function FormularioCard({ formulario }: Readonly<{ formulario: Formulario }>) {
-
+    const router = useRouter();
     const [open, setOpen] = useState(false);
 
     async function handleDelete() {
+
         toast.promise(
-            deleteFormulario(formulario.id),
+            fetch("/api/formulari/delete", {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ formularioId: formulario.id }),
+            }).then(async (res) => {
+                if (!res.ok) {
+                    const text = await res.text();
+                    throw new Error(text);
+                }
+                router.refresh()
+            }),
             {
                 loading: "Eliminazione in corso...",
                 success: "Formulario cancellato con successo!",
-                error: (err) => err?.message || "Errore durante la cancellazione del formulario.",
+                error: "Errore durante la cancellazione del formulario.",
                 position: "bottom-center",
             },
         );
+
     }
 
     async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
 
         const formData = new FormData(e.currentTarget);
+        formData.append("formularioId", formulario.id);
 
         toast.promise(
-            updateFormulario(formulario.id, formData),
+            fetch("/api/formulari/update", {
+                method: "PUT",
+                body: formData,
+            }).then(async (res) => {
+                if (!res.ok) {
+                    const text = await res.text();
+                    throw new Error(text);
+                }
+                router.refresh()
+            }),
             {
                 loading: "Modifica in corso...",
                 success: "Formulario modificato con successo!",
-                error: (err) => err?.message || "Errore durante la modifica del formulario.",
+                error: "Errore durante la modifica del formulario.",
                 position: "bottom-center",
             },
         );

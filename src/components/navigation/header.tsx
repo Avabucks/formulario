@@ -89,13 +89,8 @@ export function Header() {
 
     const handleLogout = async () => {
         await signOut(auth);
-        await fetch("/api/auth/logout", { method: "GET" });
-        localStorage.removeItem("email");
-        localStorage.removeItem("name");
-        localStorage.removeItem("photoURL");
-
-        router.refresh();
-        router.push("/");
+        await fetch("/api/auth/logout");
+        router.push("/login");
     };
 
     useEffect(() => {

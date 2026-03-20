@@ -17,9 +17,10 @@ import { Plus } from "lucide-react"
 import { Textarea } from "@/src/components/ui/textarea"
 import { Switch } from "@/src/components/ui/switch"
 import { toast } from "sonner";
-import { createFormulario } from "@/src/lib/formulari";
+import { useRouter } from "next/navigation";
 
 export default function FormularioTitle() {
+    const router = useRouter();
     const [name, setName] = useState<string | null>(null);
     const [open, setOpen] = useState(false);
 
@@ -33,11 +34,20 @@ export default function FormularioTitle() {
         const formData = new FormData(e.currentTarget);
 
         toast.promise(
-            createFormulario(formData),
+            fetch("/api/formulari/create", {
+                method: "POST",
+                body: formData,
+            }).then(async (res) => {
+                if (!res.ok) {
+                    const text = await res.text();
+                    throw new Error(text);
+                }
+                router.refresh()
+            }),
             {
                 loading: "Creazione in corso...",
                 success: "Formulario creato con successo!",
-                error: (err) => err?.message || "Errore durante la creazione del formulario.",
+                error: "Errore durante la creazione del formulario.",
                 position: "bottom-center",
             },
         );
@@ -48,7 +58,7 @@ export default function FormularioTitle() {
 
     return (
         <div className="flex flex-row justify-between items-center w-full">
-            <h2 className="text-xl">I Formulari di {name || "Utente"}</h2>
+            <h2 className="text-xl">{name && "I Formulari di " + name}</h2>
             <Dialog open={open} onOpenChange={(open) => setOpen(open)}>
                 <DialogTrigger asChild>
                     <Button variant="default">

@@ -2,7 +2,7 @@ import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { Header } from "@/src/components/navigation/header";
-import DeleteAccount from "@/src/components/delete-account";
+import DeleteAccount from "@/src/components/auth/delete-account";
 
 export default async function TermsPage() {
   const session = await getIronSession<SessionData>(await cookies(), sessionOptions);

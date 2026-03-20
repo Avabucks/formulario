@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { Pi } from "lucide-react"
 
-import { LoginForm } from "@/src/components/login-form"
+import { LoginForm } from "@/src/components/auth/login-form"
 import Link from "next/link"
 
 export default function LoginPage() {

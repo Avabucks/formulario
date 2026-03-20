@@ -36,67 +36,6 @@ export async function getListFormulari(variant: string): Promise<Formulario[]> {
     return result.rows;
 }
 
-export async function createFormulario(formData: FormData): Promise<{ success: boolean, error?: string }> {
-
-    const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
-    const uid = session.uid;
-
-    if (!uid) throw new Error("Non autorizzato");
-
-    const titolo = formData.get("titolo") as string;
-    const descrizione = formData.get("descrizione") as string;
-    const anno = new Date().getFullYear().toString();
-    const visibilityPublic = formData.get("visibilityPublic") === "on";
-
-    const beautiful_id = slugify(titolo, { lower: true, strict: true }) + "-" + Date.now().toString(36)
-
-    if (!titolo || !descrizione) throw new Error("Campi obbligatori mancanti");
-
-    try {
-        await pool.query(
-            `INSERT INTO formulari (beautiful_id, titolo, descrizione, autore, anno, visibility_public)
-             VALUES ($1, $2, $3, $4, $5, $6)`,
-            [beautiful_id, titolo, descrizione, uid, anno, visibilityPublic]
-        );
-
-        revalidatePath("/home");
-        return { success: true };
-    } catch (error) {
-        console.error(error);
-        throw new Error("Errore nel salvataggio");
-    }
-}
-
-export async function updateFormulario(id: string, formData: FormData) {
-    const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
-    const uid = session.uid;
-
-    if (!uid) throw new Error("Non autorizzato");
-
-    const titolo = formData.get("titolo") as string;
-    const descrizione = formData.get("descrizione") as string;
-    const visibilityPublic = formData.get("visibilityPublic") === "on";
-
-    if (!titolo || !descrizione) throw new Error("Campi obbligatori mancanti");
-
-    try {
-        const result = await pool.query(
-            `UPDATE formulari 
-             SET titolo = $1, descrizione = $2, visibility_public = $3
-             WHERE beautiful_id = $4 AND autore = $5`,
-            [titolo, descrizione, visibilityPublic, id, uid]
-        );
-
-        if (result.rowCount === 0) throw new Error("Formulario non trovato o non autorizzato");
-
-        revalidatePath("/home");
-        return { success: true };
-    } catch (error) {
-        console.error(error);
-        throw new Error("Errore nell'aggiornamento");
-    }
-}
-
 export async function findFormularioByTitle(titolo: string): Promise<Formulario[]> {
 
     const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
@@ -135,29 +74,6 @@ export async function changeVisibilityFormulario(visibilityPublic: boolean): Pro
     } catch (error) {
         console.error(error);
         throw new Error("Errore nell'aggiornamento");
-    }
-}
-
-export async function deleteFormulario(formularioId: string): Promise<{ success: boolean, error?: string }> {
-
-    const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
-    const uid = session.uid;
-    if (!uid) throw new Error("Non autorizzato");
-
-    try {
-        const result = await pool.query(
-            `DELETE FROM formulari 
-             WHERE beautiful_id = $1 AND autore = $2`,
-            [formularioId, uid]
-        );
-        if (result.rowCount === 0) {
-            throw new Error("Formulario non trovato o non autorizzato");
-        }
-        revalidatePath("/home");
-        return { success: true };
-    } catch (error) {
-        console.error(error);
-        throw new Error("Errore nel cancellare");
     }
 }
 
@@ -554,25 +470,5 @@ export async function saveContent(content: string, id?: string) {
     } catch (error) {
         console.error(error);
         throw new Error(`Errore nel salvataggio`);
-    }
-}
-
-// ELIMINAZIONE ACCOUNT PER GDPR
-export async function deleteAccountGDPR() {
-    const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
-    const uid = session.uid;
-    if (!uid) throw new Error("Non autorizzato");
-
-    try {
-        await pool.query(`DELETE FROM formulari WHERE autore = $1`, [uid]);
-        await pool.query(`DELETE FROM users WHERE uid = $1`, [uid]);
-
-        session.destroy();
-
-        revalidatePath("/");
-        return { success: true };
-    } catch (error) {
-        console.error(error);
-        throw new Error("Errore nell'eliminazione dell'account");
     }
 }
