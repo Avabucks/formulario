@@ -1,16 +1,16 @@
+import { ArgomentoItem } from "@/src/components/capitolo/argomento-item";
+import { CapitoloTitle } from "@/src/components/capitolo/capitolo-title";
 import { BreadcrumbLogic } from "@/src/components/navigation/breadcrumb-logic";
 import { Header } from "@/src/components/navigation/header";
-import { pool } from "@/src/lib/db";
-import { getIronSession } from "iron-session";
-import { cookies } from "next/headers";
-import { SessionData, sessionOptions } from "@/src/lib/session";
-import { redirect } from "next/navigation";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/src/components/ui/empty";
-import { BookmarkX } from "lucide-react";
-import { Suspense } from "react";
 import { Skeleton } from "@/src/components/ui/skeleton";
-import { CapitoloTitle } from "@/src/components/capitolo/capitolo-title"
-import { ArgomentoItem } from "@/src/components/capitolo/argomento-item";
+import { pool } from "@/src/lib/db";
+import { SessionData, sessionOptions } from "@/src/lib/session";
+import { getIronSession } from "iron-session";
+import { BookmarkX } from "lucide-react";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 export default async function Capitolo({
     params,
@@ -91,21 +91,23 @@ export default async function Capitolo({
     );
 
     return (
-        <div className="flex flex-col gap-4 w-full px-2 md:px-6">
+        <>
             <Header />
-            <BreadcrumbLogic items={breadcrumbs} />
-            <CapitoloTitle capitolo={capitolo} />
-            <Suspense fallback={renderLoadingSkeleton()}>
-                <div className="flex flex-col gap-4 w-full">
-                    {argomenti.length == 0 ?
-                        renderEmpty()
-                        :
-                        argomenti.map((a, index) => (
-                            <ArgomentoItem key={a.id} argomento={{ ...a, editable: capitolo.editable, argomentiCount: argomenti.length }} />
-                        ))
-                    }
-                </div>
-            </Suspense>
-        </div>
+            <div className="flex flex-col gap-4 w-full px-2 md:px-6 pt-16">
+                <BreadcrumbLogic items={breadcrumbs} />
+                <CapitoloTitle capitolo={capitolo} />
+                <Suspense fallback={renderLoadingSkeleton()}>
+                    <div className="flex flex-col gap-4 w-full">
+                        {argomenti.length == 0 ?
+                            renderEmpty()
+                            :
+                            argomenti.map((a, index) => (
+                                <ArgomentoItem key={a.id} argomento={{ ...a, editable: capitolo.editable, argomentiCount: argomenti.length }} />
+                            ))
+                        }
+                    </div>
+                </Suspense>
+            </div>
+        </>
     )
 }

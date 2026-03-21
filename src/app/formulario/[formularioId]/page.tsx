@@ -91,21 +91,23 @@ export default async function Formulario({
     );
 
     return (
-        <div className="flex flex-col gap-4 w-full px-2 md:px-6">
+        <>
             <Header />
-            <BreadcrumbLogic items={breadcrumbs} />
-            <FormularioTitle formulario={formulario} />
-            <Suspense fallback={renderLoadingSkeleton()}>
-                <div className="flex flex-col gap-4 w-full">
-                    {capitoli.length == 0 ?
-                        renderEmpty()
-                        :
-                        capitoli.map((c, index) => (
-                            <CapitoloItem key={c.id} capitolo={{ ...c, editable: formulario.editable, capitoliCount: capitoli.length }} />
-                        ))
-                    }
-                </div>
-            </Suspense>
-        </div>
+            <div className="flex flex-col gap-4 w-full px-2 md:px-6 pt-16">
+                <BreadcrumbLogic items={breadcrumbs} />
+                <FormularioTitle formulario={formulario} />
+                <Suspense fallback={renderLoadingSkeleton()}>
+                    <div className="flex flex-col gap-4 w-full">
+                        {capitoli.length == 0 ?
+                            renderEmpty()
+                            :
+                            capitoli.map((c, index) => (
+                                <CapitoloItem key={c.id} capitolo={{ ...c, editable: formulario.editable, capitoliCount: capitoli.length }} />
+                            ))
+                        }
+                    </div>
+                </Suspense>
+            </div>
+        </>
     )
 }

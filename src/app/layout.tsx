@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import NextTopLoader from 'nextjs-toploader';
 import { ThemeProvider } from "../components/theme/theme-provider";
 import "../styles/globals.css";
+import packageJson from '@/package.json'
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Formulario",
-  description: "Forulario digitale",
+  title: `${packageJson.displayName} - Formulario digitale`,
+  description: "Formulario digitale",
 };
 
 export default function RootLayout({
@@ -28,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning >
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex h-screen overflow-y-auto`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col h-screen overflow-y-auto`}
       >
         <ThemeProvider
           attribute="class"
@@ -41,7 +42,9 @@ export default function RootLayout({
             height={3}
             showSpinner={false}
           />
-          {children}
+          <main>
+            {children}
+          </main>
           <Toaster />
         </ThemeProvider>
       </body>

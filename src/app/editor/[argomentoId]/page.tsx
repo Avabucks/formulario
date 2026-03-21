@@ -56,11 +56,13 @@ export default async function Argomento({
     ];
 
     return (
-        <div className="flex flex-col gap-4 w-full px-2 md:px-6 flex-1">
+        <>
             <Header />
-            <BreadcrumbLogic items={breadcrumbs} />
-            <EditorTitle argomento={argomento} />
-            {/* TODO: editor */}
-        </div>
+            <div className="flex flex-col gap-4 w-full px-2 md:px-6 flex-1 pt-16">
+                <BreadcrumbLogic items={breadcrumbs} />
+                <EditorTitle argomento={argomento} />
+                {/* TODO: editor */}
+            </div>
+        </>
     )
 }
