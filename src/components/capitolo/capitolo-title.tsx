@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import { redirect, useRouter } from "next/navigation"
-import { getListCapitoli, getListArgomenti, createCapitolo, createArgomento } from "@/src/lib/formulari"
 import { BookmarkX, Check, Edit, GlobeIcon, Info, LockIcon, Plus, TableOfContents, X } from "lucide-react"
 import { Skeleton } from "@/src/components/ui/skeleton"
 import { TypographyH2, TypographyH3 } from "@/src/components/ui/typography"
@@ -23,19 +22,17 @@ import { Input } from "@/src/components/ui/input"
 import { toast } from "sonner"
 import { Kbd, KbdGroup } from "../ui/kbd"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/components/ui/tooltip"
+import { FormularioInfo } from "../home/formulario-info"
 
-type Formulario = {
+type Capitolo = {
     id: string;
     titolo: string;
-    descrizione: string;
-    autore: string;
-    nomeAutore: string;
-    anno: string;
-    visibilityPublic: boolean;
+    formularioId: string;
+    sortOrder: number;
     editable: boolean;
 };
 
-export function CapitoloTitle({ formulario }: Readonly<{ formulario: Formulario }>) {
+export function CapitoloTitle({ capitolo }: Readonly<{ capitolo: Capitolo }>) {
     const router = useRouter()
     const [open, setOpen] = useState(false)
 
@@ -55,10 +52,10 @@ export function CapitoloTitle({ formulario }: Readonly<{ formulario: Formulario 
     async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
-        formData.append("formularioId", formulario.id);
+        formData.append("capitoloId", capitolo.id);
 
         toast.promise(
-            fetch("/api/capitoli/create", {
+            fetch("/api/argomenti/create", {
                 method: "POST",
                 body: formData,
             }).then(async (res) => {
@@ -70,8 +67,8 @@ export function CapitoloTitle({ formulario }: Readonly<{ formulario: Formulario 
             }),
             {
                 loading: "Creazione in corso...",
-                success: "Capitolo creato con successo!",
-                error: "Errore durante la creazione del capitolo.",
+                success: "Argomento creato con successo!",
+                error: "Errore durante la creazione dell'argomento.",
                 position: "bottom-center",
             },
         );
@@ -82,49 +79,10 @@ export function CapitoloTitle({ formulario }: Readonly<{ formulario: Formulario 
     return (
         <div className="flex flex-col gap-4">
             <div className="flex justify-between items-center gap-4">
-                <TypographyH2 className="w-full">{formulario.titolo}</TypographyH2>
+                <TypographyH2 className="w-full">{capitolo.titolo}</TypographyH2>
                 <div className="flex gap-2 items-center">
-                    <Dialog>
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <DialogTrigger asChild>
-                                        <Button variant="outline" size="icon">
-                                            <Info size={16} />
-                                        </Button>
-                                    </DialogTrigger>
-                                </TooltipTrigger>
-                                <TooltipContent className="pr-1.5">
-                                    <div className="flex items-center gap-2">
-                                        Informazioni del formulario
-                                    </div>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                        <DialogContent className="sm:max-w-md">
-                            <DialogHeader>
-                                <DialogTitle asChild>
-                                    <div className="flex gap-2 items-center">
-                                        {formulario.titolo}
-                                        <div className="text-muted-foreground">{formulario.visibilityPublic ? <GlobeIcon size={16} /> : <LockIcon size={16} />}</div>
-                                    </div>
-                                </DialogTitle>
-                                <DialogDescription asChild>
-                                    <div className="flex justify-between text-sm text-muted-foreground">
-                                        <span>by {formulario.nomeAutore}</span>
-                                        <span>Anno {formulario.anno}</span>
-                                    </div>
-                                </DialogDescription>
-                            </DialogHeader>
-                            <p>{formulario.descrizione}</p>
-                            <DialogFooter>
-                                <DialogClose asChild>
-                                    <Button variant="outline">Chiudi</Button>
-                                </DialogClose>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-                    {formulario.editable && (
+                    <FormularioInfo formularioId={capitolo.formularioId} />
+                    {capitolo.editable && (
                         <Dialog open={open} onOpenChange={(open) => setOpen(open)}>
                             <TooltipProvider>
                                 <Tooltip>
@@ -153,7 +111,7 @@ export function CapitoloTitle({ formulario }: Readonly<{ formulario: Formulario 
                                     <DialogHeader>
                                         <DialogTitle>Aggiungi nuovo capitolo</DialogTitle>
                                         <DialogDescription>
-                                            <span>Crea un nuovo capitolo in {formulario?.titolo}.</span>
+                                            <span>Crea un nuovo capitolo in {capitolo.titolo}.</span>
                                         </DialogDescription>
                                     </DialogHeader>
                                     <Field>

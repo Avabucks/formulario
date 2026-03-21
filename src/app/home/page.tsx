@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { pool } from "@/src/lib/db";
 import { redirect } from "next/navigation"
-import { FormularioCard } from "@/src/components/formulario/formulario-card"
+import { FormularioCard } from "@/src/components/home/formulario-card"
 import {
     Empty,
     EmptyDescription,
@@ -15,7 +15,7 @@ import {
     EmptyTitle,
 } from "@/src/components/ui/empty"
 import { BookOpen } from "lucide-react"
-import FormularioTitle from "@/src/components/formulario/formulario-title";
+import HomeTitle from "@/src/components/home/home-title";
 
 export default async function Page() {
 
@@ -62,7 +62,7 @@ export default async function Page() {
     return (
         <div className="flex flex-col gap-4 w-full px-2 md:px-6">
             <Header />
-            <FormularioTitle />
+            <HomeTitle />
             <Suspense fallback={renderLoadingSkeleton()}>
                 {formulari.length === 0 ? (
                     renderEmpty()

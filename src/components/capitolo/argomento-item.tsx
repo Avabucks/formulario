@@ -138,7 +138,7 @@ export function ArgomentoItem({ argomento }: Readonly<{ argomento: Argomento }>)
                 {isEditing ? (
                     <>{content}</>
                 ) : (
-                    <Link href="/" onClick={(e: any) => { e.preventDefault(); router.push(`/argomento/${argomento.id}`) }} className="flex w-full gap-2 items-center">
+                    <Link href="/" onClick={(e: any) => { e.preventDefault(); router.push(`/editor/${argomento.id}`) }} className="flex w-full gap-2 items-center">
                         {content}
                     </Link>
                 )}

@@ -1,4 +1,3 @@
-import { ArgomentoTitle } from "@/src/components/argomento/argomento-title"
 import { BreadcrumbLogic } from "@/src/components/navigation/breadcrumb-logic";
 import { Header } from "@/src/components/navigation/header";
 import { pool } from "@/src/lib/db";
@@ -10,7 +9,8 @@ import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/
 import { BookmarkX } from "lucide-react";
 import { Suspense } from "react";
 import { Skeleton } from "@/src/components/ui/skeleton";
-import { ArgomentoItem } from "@/src/components/argomento/argomento-item";
+import { CapitoloTitle } from "@/src/components/capitolo/capitolo-title"
+import { ArgomentoItem } from "@/src/components/capitolo/argomento-item";
 
 export default async function Capitolo({
     params,
@@ -31,9 +31,8 @@ export default async function Capitolo({
     // Check if user has access to the capitolo (owner or public)
     const { rows: capitoloRows, rowCount } = await pool.query(
         `SELECT C.beautiful_id AS "id", C.titolo, C.formulario,
-            F.titolo AS "formularioTitolo", F.descrizione AS "formularioDescrizione", F.autore, F.beautiful_id AS "formularioId",
-            U.display_name AS "nomeAutore",
-            F.visibility_public AS "visibilityPublic"
+            F.titolo AS "formularioTitolo", F.autore, F.beautiful_id AS "formularioId",
+            U.display_name AS "nomeAutore"
             FROM capitoli C
             JOIN formulari F ON F.beautiful_id = C.formulario
             JOIN users U ON F.autore = U.uid
@@ -95,14 +94,14 @@ export default async function Capitolo({
         <div className="flex flex-col gap-4 w-full px-2 md:px-6">
             <Header />
             <BreadcrumbLogic items={breadcrumbs} />
-            <ArgomentoTitle capitolo={capitolo} />
+            <CapitoloTitle capitolo={capitolo} />
             <Suspense fallback={renderLoadingSkeleton()}>
                 <div className="flex flex-col gap-4 w-full">
                     {argomenti.length == 0 ?
                         renderEmpty()
                         :
                         argomenti.map((a, index) => (
-                            <ArgomentoItem key={a.id} argomento={{ ...a, editable: capitolo.editable, capitoliCount: argomenti.length }} />
+                            <ArgomentoItem key={a.id} argomento={{ ...a, editable: capitolo.editable, argomentiCount: argomenti.length }} />
                         ))
                     }
                 </div>

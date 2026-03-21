@@ -1,16 +1,16 @@
-import { CapitoloTitle } from "@/src/components/capitolo/capitolo-title"
+import { CapitoloItem } from "@/src/components/formulario/capitolo-item";
+import { FormularioTitle } from "@/src/components/formulario/formulario-title";
 import { BreadcrumbLogic } from "@/src/components/navigation/breadcrumb-logic";
 import { Header } from "@/src/components/navigation/header";
-import { pool } from "@/src/lib/db";
-import { getIronSession } from "iron-session";
-import { cookies } from "next/headers";
-import { SessionData, sessionOptions } from "@/src/lib/session";
-import { redirect } from "next/navigation";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/src/components/ui/empty";
-import { BookmarkX } from "lucide-react";
-import { CapitoloItem } from "@/src/components/capitolo/capitolo-item";
-import { Suspense } from "react";
 import { Skeleton } from "@/src/components/ui/skeleton";
+import { pool } from "@/src/lib/db";
+import { SessionData, sessionOptions } from "@/src/lib/session";
+import { getIronSession } from "iron-session";
+import { BookmarkX } from "lucide-react";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 export default async function Formulario({
     params,
@@ -94,7 +94,7 @@ export default async function Formulario({
         <div className="flex flex-col gap-4 w-full px-2 md:px-6">
             <Header />
             <BreadcrumbLogic items={breadcrumbs} />
-            <CapitoloTitle formulario={formulario} />
+            <FormularioTitle formulario={formulario} />
             <Suspense fallback={renderLoadingSkeleton()}>
                 <div className="flex flex-col gap-4 w-full">
                     {capitoli.length == 0 ?
