@@ -22,23 +22,27 @@ export default function deleteAccount() {
 
         setLoading(true);
 
+        let deleted = false;
+
         try {
             await deleteUser(user);
+            deleted = true;
         } catch (error: any) {
             if (error.code === "auth/requires-recent-login") {
                 try {
                     await reauthenticateWithPopup(user, new GoogleAuthProvider());
                     await deleteUser(user);
+                    deleted = true;
                 } catch (error: any) {
                     console.error("Errore ri-autenticazione:", error.message);
                     toast.error("Errore durante la ri-autenticazione", { position: "bottom-center" });
-                    return;
                 }
             } else {
                 toast.error("Errore durante l'eliminazione dell'account", { position: "bottom-center" });
-                return;
             }
-        } finally {
+        }
+
+        if (deleted) {
             const res = await fetch("/api/auth/delete", {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
@@ -48,8 +52,9 @@ export default function deleteAccount() {
             if (res.ok) {
                 await signOut(auth);
                 router.push("/login");
-                setLoading(false);
             }
+
+            setLoading(false);
         }
 
     }
