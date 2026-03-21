@@ -7,7 +7,7 @@ import {
     ItemMedia,
     ItemTitle,
 } from "@/src/components/ui/item"
-import { Bookmark, ChevronRightIcon, EllipsisVertical, Trash2, ArrowUp, ArrowDown, PenLine, X, Check } from "lucide-react"
+import { TableOfContents, ChevronRightIcon, EllipsisVertical, Trash2, ArrowUp, ArrowDown, PenLine, X, Check } from "lucide-react"
 import Link from "next/link"
 import {
     DropdownMenu,
@@ -26,16 +26,15 @@ import { toast } from "sonner"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog"
 import { useRouter } from "next/navigation"
 
-type Capitolo = {
+type Argomento = {
     id: string;
     titolo: string;
-    capitoliCount: number;
     argomentiCount: number;
     sortOrder: number;
     editable: boolean;
 };
 
-export function CapitoloItem({ capitolo }: Readonly<{ capitolo: Capitolo }>) {
+export function ArgomentoItem({ argomento }: Readonly<{ argomento: Argomento }>) {
     const router = useRouter();
     const [isEditing, setIsEditing] = useState(false);
     const [deleteOpen, setDeleteOpen] = useState(false);
@@ -43,10 +42,10 @@ export function CapitoloItem({ capitolo }: Readonly<{ capitolo: Capitolo }>) {
     async function handleRename(e: React.SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
-        formData.append("capitoloId", capitolo.id);
+        formData.append("argomentoId", argomento.id);
 
         toast.promise(
-            fetch("/api/capitoli/update", {
+            fetch("/api/argomenti/update", {
                 method: "PUT",
                 body: formData,
             }).then(async (res) => {
@@ -58,8 +57,8 @@ export function CapitoloItem({ capitolo }: Readonly<{ capitolo: Capitolo }>) {
             }),
             {
                 loading: "Modifica in corso...",
-                success: "Capitolo rinominato con successo!",
-                error: "Errore durante la modifica del capitolo.",
+                success: "Argomento rinominato con successo!",
+                error: "Errore durante la modifica dell'argomento.",
                 position: "bottom-center",
             },
         );
@@ -69,10 +68,10 @@ export function CapitoloItem({ capitolo }: Readonly<{ capitolo: Capitolo }>) {
 
     async function handleDelete() {
         const formData = new FormData();
-        formData.append("capitoloId", capitolo.id);
+        formData.append("argomentoId", argomento.id);
 
         toast.promise(
-            fetch("/api/capitoli/delete", {
+            fetch("/api/argomenti/delete", {
                 method: "DELETE",
                 body: formData,
             }).then(async (res) => {
@@ -84,8 +83,8 @@ export function CapitoloItem({ capitolo }: Readonly<{ capitolo: Capitolo }>) {
             }),
             {
                 loading: "Eliminazione in corso...",
-                success: "Capitolo eliminato con successo!",
-                error: "Errore durante l'eliminazione del capitolo.",
+                success: "Argomento eliminato con successo!",
+                error: "Errore durante l'eliminazione dell'argomento.",
                 position: "bottom-center",
             },
         );
@@ -93,11 +92,11 @@ export function CapitoloItem({ capitolo }: Readonly<{ capitolo: Capitolo }>) {
 
     async function handleMove(direction: "up" | "down") {
         const formData = new FormData();
-        formData.append("capitoloId", capitolo.id);
+        formData.append("argomentoId", argomento.id);
         formData.append("direction", direction);
 
         toast.promise(
-            fetch("/api/capitoli/move", {
+            fetch("/api/argomenti/move", {
                 method: "POST",
                 body: formData,
             }).then(async (res) => {
@@ -109,8 +108,8 @@ export function CapitoloItem({ capitolo }: Readonly<{ capitolo: Capitolo }>) {
             }),
             {
                 loading: "Spostamento in corso...",
-                success: "Capitolo spostato con successo!",
-                error: "Errore durante lo spostamento del capitolo.",
+                success: "Argomento spostato con successo!",
+                error: "Errore durante lo spostamento dell'argomento.",
                 position: "bottom-center",
             },
         );
@@ -119,18 +118,15 @@ export function CapitoloItem({ capitolo }: Readonly<{ capitolo: Capitolo }>) {
     const content = (
         <>
             <ItemMedia>
-                <Bookmark size={16} />
+                <TableOfContents size={16} />
             </ItemMedia>
             <ItemContent>
                 {isEditing ? (
                     <Field>
-                        <Input id="titolo-1" name="titolo" defaultValue={capitolo.titolo} />
+                        <Input id="titolo-1" name="titolo" defaultValue={argomento.titolo} />
                     </Field>
                 ) : (
-                    <ItemTitle>{capitolo.titolo}</ItemTitle>
-                )}
-                {capitolo.argomentiCount !== undefined && !isEditing && (
-                    <div className="text-xs text-muted-foreground">{capitolo.argomentiCount} {capitolo.argomentiCount == 1 ? "argomento" : "argomenti"}</div>
+                    <ItemTitle>{argomento.titolo}</ItemTitle>
                 )}
             </ItemContent>
         </>
@@ -142,11 +138,11 @@ export function CapitoloItem({ capitolo }: Readonly<{ capitolo: Capitolo }>) {
                 {isEditing ? (
                     <>{content}</>
                 ) : (
-                    <Link href="/" onClick={(e: any) => { e.preventDefault(); router.push(`/capitolo/${capitolo.id}`) }} className="flex w-full gap-2 items-center">
+                    <Link href="/" onClick={(e: any) => { e.preventDefault(); router.push(`/argomento/${argomento.id}`) }} className="flex w-full gap-2 items-center">
                         {content}
                     </Link>
                 )}
-                {capitolo.editable && !isEditing && (
+                {argomento.editable && !isEditing && (
                     <>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -155,13 +151,13 @@ export function CapitoloItem({ capitolo }: Readonly<{ capitolo: Capitolo }>) {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                {capitolo.sortOrder > 1 && (
+                                {argomento.sortOrder > 1 && (
                                     <DropdownMenuItem onSelect={() => handleMove("up")}>
                                         <ArrowUp />
                                         Sposta Su
                                     </DropdownMenuItem>
                                 )}
-                                {capitolo.sortOrder < capitolo.capitoliCount && (
+                                {argomento.sortOrder < argomento.argomentiCount && (
                                     <DropdownMenuItem onSelect={() => handleMove("down")}>
                                         <ArrowDown />
                                         Sposta Giu
@@ -186,7 +182,7 @@ export function CapitoloItem({ capitolo }: Readonly<{ capitolo: Capitolo }>) {
                                     <DialogTitle>Elimina</DialogTitle>
                                 </DialogHeader>
                                 <DialogDescription>
-                                    Sei sicuro di voler eliminare "{capitolo.titolo}"? Questa azione non è reversibile.
+                                    Sei sicuro di voler eliminare "{argomento.titolo}"? Questa azione non è reversibile.
                                 </DialogDescription>
                                 <DialogFooter>
                                     <DialogClose asChild>
@@ -200,12 +196,12 @@ export function CapitoloItem({ capitolo }: Readonly<{ capitolo: Capitolo }>) {
                         </Dialog>
                     </>
                 )}
-                {!capitolo.editable && (
+                {!argomento.editable && (
                     <ItemActions>
                         <ChevronRightIcon size={16} />
                     </ItemActions>
                 )}
-                {capitolo.editable && isEditing && (
+                {argomento.editable && isEditing && (
                     <div className="flex gap-2">
                         <Button variant="outline" size="icon" onClick={() => setIsEditing(false)}>
                             <X />

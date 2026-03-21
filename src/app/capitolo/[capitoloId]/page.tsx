@@ -1,4 +1,4 @@
-import { CapitoloTitle } from "@/src/components/capitolo/capitolo-title"
+import { ArgomentoTitle } from "@/src/components/argomento/argomento-title"
 import { BreadcrumbLogic } from "@/src/components/navigation/breadcrumb-logic";
 import { Header } from "@/src/components/navigation/header";
 import { pool } from "@/src/lib/db";
@@ -8,16 +8,16 @@ import { SessionData, sessionOptions } from "@/src/lib/session";
 import { redirect } from "next/navigation";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/src/components/ui/empty";
 import { BookmarkX } from "lucide-react";
-import { CapitoloItem } from "@/src/components/capitolo/capitolo-item";
 import { Suspense } from "react";
 import { Skeleton } from "@/src/components/ui/skeleton";
+import { ArgomentoItem } from "@/src/components/argomento/argomento-item";
 
-export default async function Formulario({
+export default async function Capitolo({
     params,
 }: Readonly<{
-    params: Promise<{ formularioId: string; }>
+    params: Promise<{ capitoloId: string; }>
 }>) {
-    const { formularioId } = await params
+    const { capitoloId } = await params
 
     const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
     const uid = session.uid;
@@ -28,44 +28,45 @@ export default async function Formulario({
         redirect('/api/auth/logout')
     }
 
-    // Check if user has access to the formulario (owner or public)
-    const { rows: formularioRows, rowCount } = await pool.query(
-        `SELECT F.beautiful_id AS "id", F.titolo, F.autore, F.anno, F.descrizione,
-                F.visibility_public AS "visibilityPublic", U.display_name AS "nomeAutore"
-         FROM formulari F
-         JOIN users U ON F.autore = U.uid
-         WHERE F.beautiful_id = $1
-           AND (F.autore = $2 OR F.visibility_public = true)`,
-        [formularioId, uid]
+    // Check if user has access to the capitolo (owner or public)
+    const { rows: capitoloRows, rowCount } = await pool.query(
+        `SELECT C.beautiful_id AS "id", C.titolo, C.formulario,
+            F.titolo AS "formularioTitolo", F.descrizione AS "formularioDescrizione", F.autore, F.beautiful_id AS "formularioId",
+            U.display_name AS "nomeAutore",
+            F.visibility_public AS "visibilityPublic"
+            FROM capitoli C
+            JOIN formulari F ON F.beautiful_id = C.formulario
+            JOIN users U ON F.autore = U.uid
+            WHERE C.beautiful_id = $1
+            AND (F.autore = $2 OR F.visibility_public = true)`,
+        [capitoloId, uid]
     );
 
     if (rowCount === 0) {
-        redirect('/home')
+        redirect('/home');
     }
 
-    const formulario = {
-        ...formularioRows[0],
-        editable: formularioRows[0].autore === uid,
+    const capitolo = {
+        ...capitoloRows[0],
+        editable: capitoloRows[0].autore === uid,
     };
 
     const breadcrumbs = [
         { label: "Home", href: "/" },
-        { label: formulario.titolo, href: `/formulario/${formularioId}` },
+        { label: capitolo.formularioTitolo, href: `/formulario/${capitolo.formularioId}` },
+        { label: capitolo.titolo, href: `/capitolo/${capitoloId}` },
     ];
 
-    // Fetch capitoli for the formulario
-    const { rows: capitoli } = await pool.query(
+    // Fetch argomenti for the capitolo
+    const { rows: argomenti } = await pool.query(
         `SELECT
-            c.beautiful_id        AS "id",
-            c.titolo,
-            COUNT(a.beautiful_id) AS "argomentiCount",
-            c.sort_order          AS "sortOrder"
-         FROM capitoli c
-         LEFT JOIN argomenti a ON a.capitolo = c.beautiful_id
-         WHERE c.formulario = $1
-         GROUP BY c.beautiful_id, c.titolo, c.formulario, c.sort_order
-         ORDER BY c.sort_order ASC`,
-        [formularioId]
+        a.beautiful_id AS "id",
+        a.titolo,
+        a.sort_order   AS "sortOrder"
+        FROM argomenti a
+        WHERE a.capitolo = $1
+        ORDER BY a.sort_order ASC`,
+        [capitoloId]
     );
 
     const renderEmpty = () => (
@@ -76,7 +77,7 @@ export default async function Formulario({
                 </EmptyMedia>
                 <EmptyTitle>Nessun Capitolo</EmptyTitle>
                 <EmptyDescription>
-                    {`Non ci sono capitoli da mostrare in "${formulario?.titolo}".`}
+                    {`Non ci sono capitoli da mostrare in "${capitolo.titolo}".`}
                 </EmptyDescription>
             </EmptyHeader>
         </Empty>
@@ -94,14 +95,14 @@ export default async function Formulario({
         <div className="flex flex-col gap-4 w-full px-2 md:px-6">
             <Header />
             <BreadcrumbLogic items={breadcrumbs} />
-            <CapitoloTitle formulario={formulario} />
+            <ArgomentoTitle capitolo={capitolo} />
             <Suspense fallback={renderLoadingSkeleton()}>
                 <div className="flex flex-col gap-4 w-full">
-                    {capitoli.length == 0 ?
+                    {argomenti.length == 0 ?
                         renderEmpty()
                         :
-                        capitoli.map((c, index) => (
-                            <CapitoloItem key={c.id} capitolo={{ ...c, editable: formulario.editable, capitoliCount: capitoli.length }} />
+                        argomenti.map((a, index) => (
+                            <ArgomentoItem key={a.id} argomento={{ ...a, editable: capitolo.editable, capitoliCount: argomenti.length }} />
                         ))
                     }
                 </div>

@@ -7,6 +7,7 @@ import {
     BreadcrumbSeparator,
 } from "@/src/components/ui/breadcrumb"
 import { ChevronRight } from "lucide-react";
+import Link from "next/link";
 import { Fragment } from "react";
 
 type BreadcrumbItem = {
@@ -27,7 +28,11 @@ export function BreadcrumbLogic({ items }: Readonly<{ items: BreadcrumbItem[] }>
                                     {isLast || !item.href ? (
                                         <BreadcrumbPage>{item.label}</BreadcrumbPage>
                                     ) : (
-                                        <BreadcrumbLink href={item.href}>{item.label}</BreadcrumbLink>
+                                        <BreadcrumbLink asChild>
+                                            <Link href={item.href}>
+                                                {item.label}
+                                            </Link>
+                                        </BreadcrumbLink>
                                     )}
                                 </BreadcrumbItem>
                                 {!isLast && (
