@@ -24,8 +24,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ form
         if (result.rowCount === 0) return NextResponse.json({ error: "Formulario non trovato o non autorizzato" }, { status: 404 });
 
         return NextResponse.json({ success: true });
-    } catch (error) {
-        console.error(error);
+    } catch (error: any) {
+        console.error(error.message);
         return NextResponse.json({ error: "Errore nell'aggiornamento" }, { status: 500 });
     }
 }

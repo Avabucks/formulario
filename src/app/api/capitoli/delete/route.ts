@@ -17,22 +17,18 @@ export async function DELETE(request: Request) {
 
     try {
         const { rows } = await pool.query(
-            `SELECT sort_order, formulario AS parent FROM capitoli WHERE beautiful_id = $1`,
-            [capitoloId]
-        );
-
-        if (rows.length === 0) return NextResponse.json({ error: "Capitolo non trovato" }, { status: 404 });
-
-        const { sort_order, parent } = rows[0];
-
-        const result = await pool.query(
-            `DELETE FROM capitoli
-             WHERE beautiful_id = $1
-             AND formulario IN (SELECT beautiful_id AS "id" FROM formulari WHERE autore = $2)`,
+            `SELECT c.sort_order, c.formulario AS parent
+             FROM capitoli c
+             JOIN formulari f ON f.beautiful_id = c.formulario
+             WHERE c.beautiful_id = $1 AND f.autore = $2`,
             [capitoloId, uid]
         );
 
-        if (result.rowCount === 0) return NextResponse.json({ error: "Capitolo non trovato o non autorizzato" }, { status: 404 });
+        if (rows.length === 0) return NextResponse.json({ error: "Capitolo non trovato o non autorizzato" }, { status: 404 });
+
+        const { sort_order, parent } = rows[0];
+
+        await pool.query(`DELETE FROM capitoli WHERE beautiful_id = $1`, [capitoloId]);
 
         await pool.query(
             `UPDATE capitoli SET sort_order = sort_order - 1
@@ -41,8 +37,8 @@ export async function DELETE(request: Request) {
         );
 
         return NextResponse.json({ success: true });
-    } catch (error) {
-        console.error(error);
+    } catch (error: unknown) {
+        console.error(error instanceof Error ? error.message : error);
         return NextResponse.json({ error: "Errore nell'eliminazione del capitolo" }, { status: 500 });
     }
 }

@@ -41,8 +41,8 @@ export async function POST(request: Request) {
         await pool.query(`UPDATE capitoli SET sort_order = $1 WHERE beautiful_id = $2`, [sort_order, adjacent[0].beautiful_id]);
 
         return NextResponse.json({ success: true });
-    } catch (error) {
-        console.error(error);
+    } catch (error: any) {
+        console.error(error.message);
         return NextResponse.json({ error: "Errore nello spostamento del capitolo" }, { status: 500 });
     }
 }
