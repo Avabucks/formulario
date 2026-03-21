@@ -25,84 +25,113 @@ import { useState } from "react"
 import { toast } from "sonner"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog"
 import { deleteItem, moveItem, renameItem } from "@/src/lib/formulari"
+import { useRouter } from "next/navigation"
 
-type Props = {
-    id: string
-    titolo: string
-    type: number // 0 = capitolo, 1 = argomento
-    argomentiCount?: number
-    sortOrder: number
-    editable: boolean
-    tot: number
-    onOpen: () => void
-    setRefresh: React.Dispatch<React.SetStateAction<number>>
-}
+type Capitolo = {
+    id: string;
+    titolo: string;
+    capitoliCount: number;
+    argomentiCount: number;
+    sortOrder: number;
+    editable: boolean;
+};
 
-export function CapitoliItem({ id, titolo, type, argomentiCount, sortOrder, editable, tot, onOpen, setRefresh }: Readonly<Props>) {
+export function CapitoloItem({ capitolo }: Readonly<{ capitolo: Capitolo }>) {
+    const router = useRouter();
     const [isEditing, setIsEditing] = useState(false);
     const [deleteOpen, setDeleteOpen] = useState(false);
 
     async function handleRename(e: React.SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
-        const label = type === 0 ? "capitolo" : "argomento" as "capitolo" | "argomento";
+        formData.append("capitoloId", capitolo.id);
 
         toast.promise(
-            renameItem(id, label, formData),
+            fetch("/api/capitoli/update", {
+                method: "PUT",
+                body: formData,
+            }).then(async (res) => {
+                if (!res.ok) {
+                    const text = await res.text();
+                    throw new Error(text);
+                }
+                router.refresh()
+            }),
             {
                 loading: "Modifica in corso...",
-                success: `${label.charAt(0).toUpperCase() + label.slice(1)} rinominato con successo!`,
-                error: (err) => err?.message || `Errore durante la modifica del ${label}.`,
+                success: "Capitolo rinominato con successo!",
+                error: "Errore durante la modifica del capitolo.",
                 position: "bottom-center",
             },
         );
+
         setIsEditing(false);
-        setRefresh((n: number) => n + 1)
     }
 
     async function handleDelete() {
-        const label = type === 0 ? "capitolo" : "argomento" as "capitolo" | "argomento";
+        const formData = new FormData();
+        formData.append("capitoloId", capitolo.id);
+
         toast.promise(
-            deleteItem(id, label),
+            fetch("/api/capitoli/delete", {
+                method: "DELETE",
+                body: formData,
+            }).then(async (res) => {
+                if (!res.ok) {
+                    const text = await res.text();
+                    throw new Error(text);
+                }
+                router.refresh()
+            }),
             {
                 loading: "Eliminazione in corso...",
-                success: `${label.charAt(0).toUpperCase() + label.slice(1)} eliminato con successo!`,
-                error: (err) => err?.message || `Errore durante l'eliminazione del ${label}.`,
+                success: "Capitolo eliminato con successo!",
+                error: "Errore durante l'eliminazione del capitolo.",
                 position: "bottom-center",
             },
         );
-        setRefresh((n: number) => n + 1)
     }
 
     async function handleMove(direction: "up" | "down") {
-        const label = type === 0 ? "capitolo" : "argomento" as "capitolo" | "argomento";
+        const formData = new FormData();
+        formData.append("capitoloId", capitolo.id);
+        formData.append("direction", direction);
+
         toast.promise(
-            moveItem(id, label, direction),
+            fetch("/api/capitoli/move", {
+                method: "POST",
+                body: formData,
+            }).then(async (res) => {
+                if (!res.ok) {
+                    const text = await res.text();
+                    throw new Error(text);
+                }
+                router.refresh()
+            }),
             {
                 loading: "Spostamento in corso...",
-                success: `${label.charAt(0).toUpperCase() + label.slice(1)} spostato con successo!`,
-                error: (err) => err?.message || `Errore durante lo spostamento del ${label}.`,
+                success: "Capitolo spostato con successo!",
+                error: "Errore durante lo spostamento del capitolo.",
                 position: "bottom-center",
             },
         );
-        setRefresh((n: number) => n + 1)
     }
 
     const content = (
         <>
             <ItemMedia>
-                {type === 0 ? <Bookmark size={16} /> : <TableOfContents size={16} />}
+                <Bookmark size={16} />
             </ItemMedia>
             <ItemContent>
                 {isEditing ? (
                     <Field>
-                        <Input id="titolo-1" name="titolo" defaultValue={titolo} />
+                        <Input id="titolo-1" name="titolo" defaultValue={capitolo.titolo} />
                     </Field>
                 ) : (
-                    <ItemTitle>{titolo}</ItemTitle>
+                    <ItemTitle>{capitolo.titolo}</ItemTitle>
                 )}
-                {argomentiCount !== undefined && !isEditing && (
-                    <div className="text-xs text-muted-foreground">{argomentiCount} {argomentiCount == 1 ? "argomento" : "argomenti"}</div>
+                {capitolo.argomentiCount !== undefined && !isEditing && (
+                    <div className="text-xs text-muted-foreground">{capitolo.argomentiCount} {capitolo.argomentiCount == 1 ? "argomento" : "argomenti"}</div>
                 )}
             </ItemContent>
         </>
@@ -114,11 +143,11 @@ export function CapitoliItem({ id, titolo, type, argomentiCount, sortOrder, edit
                 {isEditing ? (
                     <>{content}</>
                 ) : (
-                    <Link href="/" onClick={(e: any) => { e.preventDefault(); onOpen() }} className="flex w-full gap-2 items-center">
+                    <Link href="/" onClick={(e: any) => { e.preventDefault(); router.push(`/home/capitolo/${capitolo.id}`) }} className="flex w-full gap-2 items-center">
                         {content}
                     </Link>
                 )}
-                {editable && !isEditing && (
+                {capitolo.editable && !isEditing && (
                     <>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -127,13 +156,13 @@ export function CapitoliItem({ id, titolo, type, argomentiCount, sortOrder, edit
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                {sortOrder > 1 && (
+                                {capitolo.sortOrder > 1 && (
                                     <DropdownMenuItem onSelect={() => handleMove("up")}>
                                         <ArrowUp />
                                         Sposta Su
                                     </DropdownMenuItem>
                                 )}
-                                {sortOrder < tot && (
+                                {capitolo.sortOrder < capitolo.capitoliCount && (
                                     <DropdownMenuItem onSelect={() => handleMove("down")}>
                                         <ArrowDown />
                                         Sposta Giu
@@ -158,7 +187,7 @@ export function CapitoliItem({ id, titolo, type, argomentiCount, sortOrder, edit
                                     <DialogTitle>Elimina</DialogTitle>
                                 </DialogHeader>
                                 <DialogDescription>
-                                    Sei sicuro di voler eliminare "{titolo}"? Questa azione non è reversibile.
+                                    Sei sicuro di voler eliminare "{capitolo.titolo}"? Questa azione non è reversibile.
                                 </DialogDescription>
                                 <DialogFooter>
                                     <DialogClose asChild>
@@ -172,12 +201,12 @@ export function CapitoliItem({ id, titolo, type, argomentiCount, sortOrder, edit
                         </Dialog>
                     </>
                 )}
-                {!editable && (
+                {!capitolo.editable && (
                     <ItemActions>
                         <ChevronRightIcon size={16} />
                     </ItemActions>
                 )}
-                {editable && isEditing && (
+                {capitolo.editable && isEditing && (
                     <div className="flex gap-2">
                         <Button variant="outline" size="icon" onClick={() => setIsEditing(false)}>
                             <X />

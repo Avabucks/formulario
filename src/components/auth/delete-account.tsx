@@ -39,12 +39,11 @@ export default function deleteAccount() {
                 return;
             }
         } finally {
+            await signOut(auth);
+            router.push("/api/auth/delete");
             setLoading(false);
         }
 
-        await signOut(auth);
-        await fetch("/api/auth/delete-account");
-        router.push("/login");
     }
 
     return (

@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { pool } from "@/src/lib/db";
 import { redirect } from "next/navigation"
-import { FormularioCard } from "@/src/components/formulario/FormularioCard"
+import { FormularioCard } from "@/src/components/formulario/formulario-card"
 import {
     Empty,
     EmptyDescription,
@@ -15,7 +15,7 @@ import {
     EmptyTitle,
 } from "@/src/components/ui/empty"
 import { BookOpen } from "lucide-react"
-import FormularioTitle from "@/src/components/formulario/FormularioTitle";
+import FormularioTitle from "@/src/components/formulario/formulario-title";
 
 export default async function Page() {
 

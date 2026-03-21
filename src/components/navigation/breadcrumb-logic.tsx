@@ -7,79 +7,39 @@ import {
     BreadcrumbSeparator,
 } from "@/src/components/ui/breadcrumb"
 import { ChevronRight } from "lucide-react";
+import { Fragment } from "react";
 
-type Formulario = {
-    id: string
-    titolo: string
-}
+type BreadcrumbItem = {
+    label: string;
+    href?: string;
+};
 
-type Capitolo = {
-    id: string
-    titolo: string
-    argomentiCount?: number
-}
-
-type Argomento = {
-    id: string
-    titolo: string
-}
-
-export function BreadcrumbLogic({ formulario, capitolo, argomento }: Readonly<{ formulario?: Formulario; capitolo?: Capitolo; argomento?: Argomento }>) {
+export function BreadcrumbLogic({ items }: Readonly<{ items: BreadcrumbItem[] }>) {
     return (
-        <Breadcrumb className="max-w-screen">
-            <BreadcrumbList>
-                <BreadcrumbItem>
-                    <BreadcrumbLink href="/home">Home</BreadcrumbLink>
-                </BreadcrumbItem>
-                {formulario && !capitolo && !argomento && (
-                    <>
-                        <BreadcrumbSeparator>
-                            <ChevronRight />
-                        </BreadcrumbSeparator>
-                        <BreadcrumbItem>
-                            <BreadcrumbPage>{formulario.titolo}</BreadcrumbPage>
-                        </BreadcrumbItem>
-                    </>
-                )}
-                {formulario && capitolo && !argomento && (
-                    <>
-                        <BreadcrumbSeparator>
-                            <ChevronRight />
-                        </BreadcrumbSeparator>
-                        <BreadcrumbItem>
-                            <BreadcrumbLink href={`/home/${formulario.id}`}>{formulario.titolo}</BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator>
-                            <ChevronRight />
-                        </BreadcrumbSeparator>
-                        <BreadcrumbItem>
-                            <BreadcrumbPage>{capitolo.titolo}</BreadcrumbPage>
-                        </BreadcrumbItem>
-                    </>
-                )}
-                {formulario && capitolo && argomento && (
-                    <>
-                        <BreadcrumbSeparator>
-                            <ChevronRight />
-                        </BreadcrumbSeparator>
-                        <BreadcrumbItem>
-                            <BreadcrumbLink href={`/home/${formulario.id}`}>{formulario.titolo}</BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator>
-                            <ChevronRight />
-                        </BreadcrumbSeparator>
-                        <BreadcrumbItem>
-                            <BreadcrumbLink href={`/home/${formulario.id}/${capitolo.id}`}>{capitolo.titolo}</BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator>
-                            <ChevronRight />
-                        </BreadcrumbSeparator>
-                        <BreadcrumbItem>
-                            <BreadcrumbPage>{argomento.titolo}</BreadcrumbPage>
-                        </BreadcrumbItem>
-                    </>
-                )}
-            </BreadcrumbList>
-        </Breadcrumb>
+        <div className="w-full overflow-x-auto">
+            <Breadcrumb className="max-w-screen">
+                <BreadcrumbList>
+                    {items.map((item, index) => {
+                        const isLast = index === items.length - 1;
+                        return (
+                            <Fragment key={index}>
+                                <BreadcrumbItem>
+                                    {isLast || !item.href ? (
+                                        <BreadcrumbPage>{item.label}</BreadcrumbPage>
+                                    ) : (
+                                        <BreadcrumbLink href={item.href}>{item.label}</BreadcrumbLink>
+                                    )}
+                                </BreadcrumbItem>
+                                {!isLast && (
+                                    <BreadcrumbSeparator>
+                                        <ChevronRight />
+                                    </BreadcrumbSeparator>
+                                )}
+                            </Fragment>
+                        );
+                    })}
+                </BreadcrumbList>
+            </Breadcrumb>
+        </div>
     );
 }

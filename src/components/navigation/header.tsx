@@ -89,8 +89,7 @@ export function Header() {
 
     const handleLogout = async () => {
         await signOut(auth);
-        await fetch("/api/auth/logout");
-        router.push("/login");
+        router.push("/api/auth/logout");
     };
 
     useEffect(() => {

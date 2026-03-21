@@ -1,4 +1,4 @@
-import { CapitoliList } from "@/src/components/capitoli/CapitoliList"
+import { CapitoliList } from "@/src/components/capitolo/capitolo-title"
 import { BreadcrumbLogic } from "@/src/components/navigation/breadcrumb-logic";
 import { Header } from "@/src/components/navigation/header";
 import { getListCapitoli, getListFormulari } from "@/src/lib/formulari"

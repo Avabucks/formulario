@@ -107,7 +107,7 @@ export function FormularioCard({ formulario }: Readonly<{ formulario: Formulario
             </CardContent>
             <CardFooter>
                 <div className="flex flex-1 items-center gap-2">
-                    <Link href={`/home/${formulario.id}`} className="flex-1 w-full">
+                    <Link href={`/home/formulario/${formulario.id}`} className="flex-1 w-full">
                         <Button variant="outline" className="w-full">
                             <BookOpen size={16} />
                             Apri il formulario
