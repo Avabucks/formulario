@@ -4,7 +4,7 @@ import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-export async function GET(request: Request, { params }: { params: Promise<{ formularioId: string }> }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ formularioId: string }> }) {
     const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
     const uid = session.uid;
 
@@ -12,6 +12,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ form
 
     const { formularioId } = await params;
     const { visibilityPublic } = await request.json();
+
+    console.log(formularioId);
 
     if (typeof visibilityPublic !== "boolean") return NextResponse.json({ error: "Valore non valido" }, { status: 400 });
 
