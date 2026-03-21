@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     if (!titolo) return NextResponse.json({ error: "Campi obbligatori mancanti" }, { status: 400 });
     if (!capitoloId) return NextResponse.json({ error: "Capitolo non specificato" }, { status: 400 });
 
-    const beautiful_id = Date.now().toString(36);
+    const beautiful_id = crypto.randomUUID();
 
     const { rows: capitoloRows } = await pool.query(
         `SELECT c.beautiful_id FROM capitoli c

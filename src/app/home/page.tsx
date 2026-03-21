@@ -60,22 +60,24 @@ export default async function Page() {
     );
 
     return (
-        <div className="flex flex-col gap-4 w-full px-2 md:px-6">
+        <>
             <Header />
-            <HomeTitle />
-            <Suspense fallback={renderLoadingSkeleton()}>
-                <div className="flex flex-col gap-4 w-full">
-                    {formulari.length === 0 ? (
-                        renderEmpty()
-                    ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 w-full">
-                            {formulari.map((f) => (
-                                <FormularioCard formulario={f} key={f.id} />
-                            ))}
-                        </div>
-                    )}
-                </div>
-            </Suspense>
-        </div>
+            <div className="flex flex-col gap-4 w-full px-2 md:px-6 pt-16">
+                <HomeTitle />
+                <Suspense fallback={renderLoadingSkeleton()}>
+                    <div className="flex flex-col gap-4 w-full">
+                        {formulari.length === 0 ? (
+                            renderEmpty()
+                        ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 w-full">
+                                {formulari.map((f) => (
+                                    <FormularioCard formulario={f} key={f.id} />
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </Suspense>
+            </div>
+        </>
     )
 }

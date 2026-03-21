@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     if (!titolo) return NextResponse.json({ error: "Campi obbligatori mancanti" }, { status: 400 });
     if (!formularioId) return NextResponse.json({ error: "Formulario non specificato" }, { status: 400 });
 
-    const beautiful_id = Date.now().toString(36);
+    const beautiful_id = crypto.randomUUID();
 
     const { rows: formularioRows } = await pool.query(
         `SELECT id FROM formulari WHERE beautiful_id = $1 AND autore = $2`,
