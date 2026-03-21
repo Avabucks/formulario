@@ -4,7 +4,7 @@ import { sessionOptions, SessionData } from "@/src/lib/session";
 import { cookies } from "next/headers";
 import { pool } from "@/src/lib/db";
 
-export async function GET(request: Request, { params }: { params: { formularioId: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ formularioId: string }> }) {
     const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
     const uid = session.uid;
 
