@@ -3,10 +3,9 @@ import { ChevronRight, MoreHorizontal } from "lucide-react"
 import { Slot } from "radix-ui"
 
 import { cn } from "@/src/lib/utils"
-import Link from "next/link"
 
 function Breadcrumb({ ...props }: React.ComponentProps<"nav">) {
-  return <nav aria-label="breadcrumb" data-slot="breadcrumb" className="flex" {...props} />
+  return <nav aria-label="breadcrumb" data-slot="breadcrumb" {...props} />
 }
 
 function BreadcrumbList({ className, ...props }: React.ComponentProps<"ol">) {
@@ -14,7 +13,7 @@ function BreadcrumbList({ className, ...props }: React.ComponentProps<"ol">) {
     <ol
       data-slot="breadcrumb-list"
       className={cn(
-        "text-muted-foreground flex whitespace-nowrap items-center gap-1.5 text-sm sm:gap-2.5",
+        "flex flex-wrap items-center gap-1.5 text-sm wrap-break-words text-muted-foreground sm:gap-2.5",
         className
       )}
       {...props}
@@ -26,7 +25,7 @@ function BreadcrumbItem({ className, ...props }: React.ComponentProps<"li">) {
   return (
     <li
       data-slot="breadcrumb-item"
-      className={cn("inline-flex items-center gap-1.5 min-w-0", className)}
+      className={cn("inline-flex items-center gap-1.5", className)}
       {...props}
     />
   )
@@ -35,26 +34,16 @@ function BreadcrumbItem({ className, ...props }: React.ComponentProps<"li">) {
 function BreadcrumbLink({
   asChild,
   className,
-  href,
   ...props
 }: React.ComponentProps<"a"> & {
   asChild?: boolean
 }) {
-  if (asChild) {
-    return (
-      <Slot.Root
-        data-slot="breadcrumb-link"
-        className={cn("hover:text-foreground transition-colors", className)}
-        {...props}
-      />
-    )
-  }
+  const Comp = asChild ? Slot.Root : "a"
 
   return (
-    <Link
+    <Comp
       data-slot="breadcrumb-link"
-      href={href ?? "/"}
-      className={cn("hover:text-foreground transition-colors truncate min-w-0 flex-1", className)}
+      className={cn("transition-colors hover:text-foreground", className)}
       {...props}
     />
   )
@@ -67,7 +56,7 @@ function BreadcrumbPage({ className, ...props }: React.ComponentProps<"span">) {
       role="link"
       aria-disabled="true"
       aria-current="page"
-      className={cn("text-foreground font-normal truncate min-w-0 flex-1", className)}
+      className={cn("font-normal text-foreground", className)}
       {...props}
     />
   )

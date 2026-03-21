@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getIronSession } from "iron-session";
-import { adminAuth } from "@/src/lib/firebase-admin";
-import { sessionOptions, SessionData } from "@/src/lib/session";
 import { pool } from "@/src/lib/db";
+import { adminAuth } from "@/src/lib/firebase-admin";
+import { SessionData, sessionOptions } from "@/src/lib/session";
+import { getIronSession } from "iron-session";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   const { idToken } = await req.json();
