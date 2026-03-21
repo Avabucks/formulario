@@ -1,29 +1,26 @@
 "use client";
-import { cn } from "@/src/lib/utils"
-import { Button } from "@/src/components/ui/button"
+import { Button } from "@/src/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/src/components/ui/card"
+} from "@/src/components/ui/card";
 import {
   Field,
   FieldDescription,
-  FieldGroup,
-  FieldLabel,
-  FieldSeparator,
-} from "@/src/components/ui/field"
-import { Input } from "@/src/components/ui/input"
-import Link from "next/link"
-import { signInWithPopup } from "firebase/auth";
+  FieldGroup
+} from "@/src/components/ui/field";
 import { auth, googleProvider } from "@/src/lib/firebase";
-import { useRouter, useSearchParams } from "next/navigation";
+import { cn } from "@/src/lib/utils";
+import { signInWithPopup } from "firebase/auth";
 import { User } from "lucide-react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Spinner } from "../ui/spinner";
 import { toast } from "sonner";
+import { Spinner } from "../ui/spinner";
 
 type User = {
   email: string | null;

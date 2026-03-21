@@ -1,9 +1,7 @@
 "use client"
 
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/src/components/ui/card"
 import { Button } from "@/src/components/ui/button"
-import Link from "next/link"
-import { LockIcon, GlobeIcon, BookOpen, Trash2, Edit } from "lucide-react"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/src/components/ui/card"
 import {
     Dialog,
     DialogClose,
@@ -14,14 +12,16 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/src/components/ui/dialog"
-import { Field, FieldGroup } from "../ui/field"
-import { Label } from "../ui/label"
-import { Input } from "../ui/input"
-import { Textarea } from "../ui/textarea"
-import { Switch } from "../ui/switch"
-import { toast } from "sonner"
-import { useState } from "react"
+import { BookOpen, Edit, GlobeIcon, LockIcon, Trash2 } from "lucide-react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useState } from "react"
+import { toast } from "sonner"
+import { Field, FieldGroup } from "../ui/field"
+import { Input } from "../ui/input"
+import { Label } from "../ui/label"
+import { Switch } from "../ui/switch"
+import { Textarea } from "../ui/textarea"
 
 type Formulario = {
     id: string

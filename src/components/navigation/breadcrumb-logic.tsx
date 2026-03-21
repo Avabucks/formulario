@@ -5,7 +5,7 @@ import {
     BreadcrumbList,
     BreadcrumbPage,
     BreadcrumbSeparator,
-} from "@/src/components/ui/breadcrumb"
+} from "@/src/components/ui/breadcrumb";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { Fragment } from "react";

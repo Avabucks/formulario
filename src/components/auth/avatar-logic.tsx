@@ -1,13 +1,7 @@
 "use client"
 
-import { Book, Cookie, Handshake, LogOutIcon } from "lucide-react";
-import Link from "next/link";
-import { Button } from "@/src/components/ui/button"
-import { useEffect, useState } from "react";
-import { signOut } from "firebase/auth";
-import { auth } from "@/src/lib/firebase";
-import { useRouter } from "next/navigation";
-import { Avatar, AvatarFallback, AvatarImage } from "@/src/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/src/components/ui/avatar";
+import { Button } from "@/src/components/ui/button";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -15,7 +9,13 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from "@/src/components/ui/dropdown-menu"
+} from "@/src/components/ui/dropdown-menu";
+import { auth } from "@/src/lib/firebase";
+import { signOut } from "firebase/auth";
+import { Book, Cookie, Handshake, LogOutIcon } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export function AvatarLogic() {
     const router = useRouter();

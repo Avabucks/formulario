@@ -1,12 +1,12 @@
 "use client"
 import { Button } from "@/src/components/ui/button";
-import { Trash } from "lucide-react";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/src/components/ui/dialog";
-import { toast } from "sonner";
-import { deleteUser, GoogleAuthProvider, reauthenticateWithPopup, signOut } from "firebase/auth";
 import { auth } from "@/src/lib/firebase";
+import { deleteUser, GoogleAuthProvider, reauthenticateWithPopup, signOut } from "firebase/auth";
+import { Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 import { Spinner } from "../ui/spinner";
 
 export default function deleteAccount() {

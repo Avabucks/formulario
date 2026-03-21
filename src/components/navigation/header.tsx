@@ -1,12 +1,12 @@
-import { ModeToggle } from "../theme/theme-toggler";
-import Link from "next/link";
-import { Button } from "@/src/components/ui/button"
-import { AvatarLogic } from "../auth/avatar-logic";
-import { SearchLogic } from "./search-logic";
-import { Pi } from "lucide-react";
-import { getIronSession } from "iron-session";
-import { cookies } from "next/headers";
+import { Button } from "@/src/components/ui/button";
 import { SessionData, sessionOptions } from "@/src/lib/session";
+import { getIronSession } from "iron-session";
+import { Pi } from "lucide-react";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { AvatarLogic } from "../auth/avatar-logic";
+import { ModeToggle } from "../theme/theme-toggler";
+import { SearchLogic } from "./search-logic";
 
 export async function Header() {
 

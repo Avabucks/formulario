@@ -1,10 +1,10 @@
-import { NextResponse } from "next/server";
-import { getIronSession } from "iron-session";
-import { sessionOptions, SessionData } from "@/src/lib/session";
-import { cookies } from "next/headers";
 import { pool } from "@/src/lib/db";
-import slugify from "slugify";
+import { SessionData, sessionOptions } from "@/src/lib/session";
+import { getIronSession } from "iron-session";
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
+import slugify from "slugify";
 
 export async function POST(request: Request) {
     const session = await getIronSession<SessionData>(await cookies(), sessionOptions);

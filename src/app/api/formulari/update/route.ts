@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
-import { getIronSession } from "iron-session";
-import { sessionOptions, SessionData } from "@/src/lib/session";
-import { cookies } from "next/headers";
 import { pool } from "@/src/lib/db";
+import { SessionData, sessionOptions } from "@/src/lib/session";
+import { getIronSession } from "iron-session";
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 
 export async function PUT(request: Request) {
     const session = await getIronSession<SessionData>(await cookies(), sessionOptions);

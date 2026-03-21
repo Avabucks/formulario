@@ -1,21 +1,21 @@
-import { Suspense } from "react"
-import { Skeleton } from "@/src/components/ui/skeleton";
+import { FormularioCard } from "@/src/components/home/formulario-card";
+import HomeTitle from "@/src/components/home/home-title";
 import { Header } from "@/src/components/navigation/header";
-import { getIronSession } from "iron-session";
-import { cookies } from "next/headers";
-import { SessionData, sessionOptions } from "@/src/lib/session";
-import { pool } from "@/src/lib/db";
-import { redirect } from "next/navigation"
-import { FormularioCard } from "@/src/components/home/formulario-card"
 import {
     Empty,
     EmptyDescription,
     EmptyHeader,
     EmptyMedia,
     EmptyTitle,
-} from "@/src/components/ui/empty"
-import { BookOpen } from "lucide-react"
-import HomeTitle from "@/src/components/home/home-title";
+} from "@/src/components/ui/empty";
+import { Skeleton } from "@/src/components/ui/skeleton";
+import { pool } from "@/src/lib/db";
+import { SessionData, sessionOptions } from "@/src/lib/session";
+import { getIronSession } from "iron-session";
+import { BookOpen } from "lucide-react";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 export default async function Page() {
 

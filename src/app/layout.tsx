@@ -1,9 +1,9 @@
+import { Toaster } from "@/src/components/ui/sonner";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "../styles/globals.css";
+import NextTopLoader from 'nextjs-toploader';
 import { ThemeProvider } from "../components/theme/theme-provider";
-import { Toaster } from "@/src/components/ui/sonner"
-import NextTopLoader from 'nextjs-toploader'
+import "../styles/globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

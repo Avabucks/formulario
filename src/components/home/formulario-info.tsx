@@ -1,8 +1,8 @@
 import { GlobeIcon, Info, LockIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
-import { useEffect, useState } from "react";
 
 
 type Formulario = {
