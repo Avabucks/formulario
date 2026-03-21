@@ -17,25 +17,19 @@ export async function DELETE(request: Request) {
 
     try {
         const { rows } = await pool.query(
-            `SELECT sort_order, capitolo AS parent FROM argomenti WHERE beautiful_id = $1`,
-            [argomentoId]
-        );
-
-        if (rows.length === 0) return NextResponse.json({ error: "Argomento non trovato" }, { status: 404 });
-
-        const { sort_order, parent } = rows[0];
-
-        const result = await pool.query(
-            `DELETE FROM argomenti
-             WHERE beautiful_id = $1
-             AND capitolo IN (
-                SELECT beautiful_id FROM capitoli
-                WHERE formulario IN (SELECT beautiful_id FROM formulari WHERE autore = $2)
-             )`,
+            `SELECT a.sort_order, a.capitolo AS parent
+             FROM argomenti a
+             JOIN capitoli c ON c.beautiful_id = a.capitolo
+             JOIN formulari f ON f.beautiful_id = c.formulario
+             WHERE a.beautiful_id = $1 AND f.autore = $2`,
             [argomentoId, uid]
         );
 
-        if (result.rowCount === 0) return NextResponse.json({ error: "Argomento non trovato o non autorizzato" }, { status: 404 });
+        if (rows.length === 0) return NextResponse.json({ error: "Argomento non trovato o non autorizzato" }, { status: 404 });
+
+        const { sort_order, parent } = rows[0];
+
+        await pool.query(`DELETE FROM argomenti WHERE beautiful_id = $1`, [argomentoId]);
 
         await pool.query(
             `UPDATE argomenti SET sort_order = sort_order - 1
@@ -44,8 +38,8 @@ export async function DELETE(request: Request) {
         );
 
         return NextResponse.json({ success: true });
-    } catch (error) {
-        console.error(error);
+    } catch (error: unknown) {
+        console.error(error instanceof Error ? error.message : error);
         return NextResponse.json({ error: "Errore nell'eliminazione dell'argomento" }, { status: 500 });
     }
 }

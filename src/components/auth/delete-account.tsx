@@ -29,8 +29,8 @@ export default function deleteAccount() {
                 try {
                     await reauthenticateWithPopup(user, new GoogleAuthProvider());
                     await deleteUser(user);
-                } catch (e) {
-                    console.error("Errore ri-autenticazione:", e);
+                } catch (error: any) {
+                    console.error("Errore ri-autenticazione:", error.message);
                     toast.error("Errore durante la ri-autenticazione", { position: "bottom-center" });
                     return;
                 }
@@ -39,9 +39,17 @@ export default function deleteAccount() {
                 return;
             }
         } finally {
-            await signOut(auth);
-            router.push("/api/auth/delete");
-            setLoading(false);
+            const res = await fetch("/api/auth/delete", {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ confirm: true }),
+            });
+
+            if (res.ok) {
+                await signOut(auth);
+                router.push("/login");
+                setLoading(false);
+            }
         }
 
     }

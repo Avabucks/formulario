@@ -41,8 +41,8 @@ export async function PUT(request: Request) {
 
         revalidatePath("/home");
         return NextResponse.json({ success: true });
-    } catch (error) {
-        console.error(error);
+    } catch (error: any) {
+        console.error(error.message);
         return NextResponse.json({ error: "Errore nell'aggiornamento" }, { status: 500 });
     }
 }

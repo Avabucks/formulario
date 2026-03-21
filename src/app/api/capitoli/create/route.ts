@@ -42,8 +42,8 @@ export async function POST(request: Request) {
         revalidatePath(`/formulari/${formularioId}`);
         return NextResponse.json({ success: true });
 
-    } catch (error) {
-        console.error(error);
+    } catch (error: any) {
+        console.error(error.message);
         return NextResponse.json({ error: "Errore nel salvataggio del capitolo" }, { status: 500 });
     }
 }

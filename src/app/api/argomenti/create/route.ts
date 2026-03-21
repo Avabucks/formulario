@@ -44,8 +44,8 @@ export async function POST(request: Request) {
         revalidatePath(`/formulari/${capitoloId}`);
         return NextResponse.json({ success: true });
 
-    } catch (error) {
-        console.error(error);
+    } catch (error: any) {
+        console.error(error.message);
         return NextResponse.json({ error: "Errore nel salvataggio dell'argomento" }, { status: 500 });
     }
 }

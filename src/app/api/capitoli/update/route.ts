@@ -28,8 +28,8 @@ export async function PUT(request: Request) {
         if (result.rowCount === 0) return NextResponse.json({ error: "Capitolo non trovato o non autorizzato" }, { status: 404 });
 
         return NextResponse.json({ success: true });
-    } catch (error) {
-        console.error(error);
+    } catch (error: any) {
+        console.error(error.message);
         return NextResponse.json({ error: "Errore nella modifica del capitolo" }, { status: 500 });
     }
 }

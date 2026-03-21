@@ -35,8 +35,8 @@ export async function POST(request: Request) {
 
         revalidatePath("/home");
         return NextResponse.json({ success: true });
-    } catch (error) {
-        console.error(error);
+    } catch (error: any) {
+        console.error(error.message);
         return NextResponse.json({ error: "Errore nel salvataggio" }, { status: 500 });
     }
 }

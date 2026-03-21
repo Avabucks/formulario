@@ -31,8 +31,8 @@ export async function DELETE(request: Request) {
 
         revalidatePath("/home");
         return NextResponse.json({ success: true });
-    } catch (error) {
-        console.error(error);
+    } catch (error: any) {
+        console.error(error.message);
         return NextResponse.json({ error: "Errore nel cancellare" }, { status: 500 });
     }
 }
