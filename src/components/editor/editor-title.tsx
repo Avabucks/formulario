@@ -14,7 +14,7 @@ import { Label } from "@/src/components/ui/label"
 import { TypographyH4 } from "@/src/components/ui/typography"
 import { Check, Copy, Share } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { FormularioInfo } from "../home/formulario-info"
 import { FieldGroup } from "../ui/field"
@@ -33,8 +33,11 @@ export function EditorTitle({ argomento }: Readonly<{ argomento: Argomento }>) {
     const router = useRouter();
     const [copied, setCopied] = useState(false)
     const [visibility, setVisibility] = useState(argomento.visibilityPublic);
+    const [currentUrl, setCurrentUrl] = useState("");
 
-    const currentUrl = globalThis.window === undefined ? "" : globalThis.location.href
+    useEffect(() => {
+        setCurrentUrl(globalThis.location.href);
+    }, []);
 
     const handleCopy = async () => {
         await navigator.clipboard.writeText(currentUrl)
