@@ -26,16 +26,16 @@ export default async function Argomento({
     // Check if user has access to the capitolo (owner or public)
     const { rows: argomentoRows, rowCount } = await pool.query(
         `SELECT A.beautiful_id AS "id", A.titolo, A.capitolo,
-            F.titolo AS "formularioTitolo", F.autore, F.beautiful_id AS "formularioId",
+            F.titolo AS "formularioTitolo", F.owner_uid as "ownerUid", U_A.display_name AS "nomeAutore", F.beautiful_id AS "formularioId",
             C.titolo AS "capitoloTitolo", C.beautiful_id AS "capitoloId",
-            U.display_name AS "nomeAutore",
+            A.content,
             F.visibility_public AS "visibilityPublic"
             FROM argomenti A
             JOIN capitoli C ON  A.capitolo = C.beautiful_id
             JOIN formulari F ON F.beautiful_id = C.formulario
-            JOIN users U ON F.autore = U.uid
+            JOIN users U_A ON F.author_uid = U_A.uid
             WHERE A.beautiful_id = $1
-            AND (F.autore = $2 OR F.visibility_public = true)`,
+            AND (F.owner_uid = $2 OR F.visibility_public = true)`,
         [argomentoId, uid]
     );
 

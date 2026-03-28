@@ -21,7 +21,7 @@ export async function DELETE(request: Request) {
 
     try {
         const result = await pool.query(
-            `DELETE FROM formulari WHERE beautiful_id = $1 AND autore = $2`,
+            `DELETE FROM formulari WHERE beautiful_id = $1 AND owner_uid = $2`,
             [formularioId, uid]
         );
 

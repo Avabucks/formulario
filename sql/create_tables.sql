@@ -24,7 +24,8 @@ CREATE TABLE IF NOT EXISTS formulari (
   id SERIAL PRIMARY KEY,
   beautiful_id VARCHAR(255) NOT NULL UNIQUE,
   titolo VARCHAR(255) NOT NULL,
-  autore VARCHAR(255) NOT NULL,
+  owner_uid VARCHAR(255) NOT NULL,
+  author_uid VARCHAR(255) NOT NULL,
   anno VARCHAR(255) NOT NULL,
   descrizione VARCHAR(255) NOT NULL,
   visibility_public BOOLEAN NOT NULL DEFAULT false

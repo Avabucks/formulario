@@ -18,7 +18,7 @@ export async function GET(request: Request) {
     const { rows } = await pool.query(
         `SELECT beautiful_id AS "id", titolo, similarity(titolo, $1) AS "similarity"
          FROM formulari
-         WHERE autore = $2 AND similarity(titolo, $1) > 0.2
+         WHERE owner_uid = $2 AND similarity(titolo, $1) > 0.2
          ORDER BY similarity DESC, titolo DESC
          LIMIT 4`,
         [titolo, uid]

@@ -23,7 +23,7 @@ export async function PUT(request: Request) {
              WHERE beautiful_id = $2
              AND capitolo IN (
                 SELECT beautiful_id FROM capitoli
-                WHERE formulario IN (SELECT beautiful_id FROM formulari WHERE autore = $3)
+                WHERE formulario IN (SELECT beautiful_id FROM formulari WHERE owner_uid = $3)
              )`,
             [titolo, argomentoId, uid]
         );

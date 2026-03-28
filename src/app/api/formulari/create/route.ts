@@ -28,9 +28,9 @@ export async function POST(request: Request) {
 
     try {
         await pool.query(
-            `INSERT INTO formulari (beautiful_id, titolo, descrizione, autore, anno, visibility_public)
-             VALUES ($1, $2, $3, $4, $5, $6)`,
-            [beautiful_id, titolo, descrizione, uid, anno, visibilityPublic]
+            `INSERT INTO formulari (beautiful_id, titolo, descrizione, owner_uid, author_uid, anno, visibility_public)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+            [beautiful_id, titolo, descrizione, uid, uid, anno, visibilityPublic]
         );
 
         revalidatePath("/home");

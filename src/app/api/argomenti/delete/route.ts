@@ -21,7 +21,7 @@ export async function DELETE(request: Request) {
              FROM argomenti a
              JOIN capitoli c ON c.beautiful_id = a.capitolo
              JOIN formulari f ON f.beautiful_id = c.formulario
-             WHERE a.beautiful_id = $1 AND f.autore = $2`,
+             WHERE a.beautiful_id = $1 AND f.owner_uid = $2`,
             [argomentoId, uid]
         );
 

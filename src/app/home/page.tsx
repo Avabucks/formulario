@@ -28,9 +28,10 @@ export default async function Page() {
     }
 
     const { rows: formulari } = await pool.query(`
-        SELECT F.beautiful_id AS "id", titolo, autore, U.display_name AS "nomeAutore", anno, descrizione, visibility_public AS "visibilityPublic"
-        FROM formulari F JOIN users U ON F.autore = U.uid
-        WHERE autore = $1
+        SELECT F.beautiful_id AS "id", titolo, owner_uid as "ownerUid", U_A.display_name AS "nomeAutore", anno, descrizione, visibility_public AS "visibilityPublic"
+        FROM formulari F
+        JOIN users U_A ON F.author_uid = U_A.uid
+        WHERE owner_uid = $1
         ORDER BY titolo DESC
     `, [session.uid]);
 

@@ -31,7 +31,7 @@ export async function PUT(request: Request) {
         const result = await pool.query(
             `UPDATE formulari 
              SET titolo = $1, descrizione = $2, visibility_public = $3
-             WHERE beautiful_id = $4 AND autore = $5`,
+             WHERE beautiful_id = $4 AND owner_uid = $5`,
             [titolo, descrizione, visibilityPublic, id, uid]
         );
 

@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     const beautiful_id = crypto.randomUUID();
 
     const { rows: formularioRows } = await pool.query(
-        `SELECT id FROM formulari WHERE beautiful_id = $1 AND autore = $2`,
+        `SELECT id FROM formulari WHERE beautiful_id = $1 AND owner_uid = $2`,
         [formularioId, uid]
     );
 
