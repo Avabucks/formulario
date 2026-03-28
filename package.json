@@ -1,7 +1,8 @@
 {
   "name": "formulabase",
   "displayName": "FormulaBase",
-  "version": "2.0.1",
+  "email": "avabuckssociety@gmail.com",
+  "version": "2.1.2",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -29,6 +30,7 @@
     "react-dom": "19.2.3",
     "react-katex": "^3.1.0",
     "react-markdown": "^10.1.0",
+    "react-resizable-panels": "^4.8.0",
     "rehype-katex": "^7.0.1",
     "rehype-raw": "^7.0.0",
     "remark-breaks": "^4.0.0",

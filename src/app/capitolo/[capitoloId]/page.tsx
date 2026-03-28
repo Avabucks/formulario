@@ -100,7 +100,7 @@ export default async function Capitolo({
                     <div className="flex justify-between items-center gap-4">
                         <TypographyH2 className="w-full">{capitolo.titolo}</TypographyH2>
                         <div className="flex gap-2 items-center">
-                            <FormularioSettings formularioId={capitolo.formularioId} />
+                            <FormularioSettings formularioId={capitolo.formularioId}/>
                             {capitolo.editable && (
                                 <ArgomentoAdd capitolo={capitolo} />
                             )}

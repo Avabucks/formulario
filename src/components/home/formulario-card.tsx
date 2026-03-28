@@ -38,7 +38,7 @@ export function FormularioCard({ formulario }: Readonly<{ formulario: Formulario
                             Apri il formulario
                         </Button>
                     </Link>
-                    <FormularioSettings formularioId={formulario.id} />
+                    <FormularioSettings formularioId={formulario.id} allowKey={false} />
                 </div>
             </CardFooter>
         </Card>

@@ -1,7 +1,7 @@
 import { Button } from "@/src/components/ui/button";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { getIronSession } from "iron-session";
-import { Pi } from "lucide-react";
+import { LogIn, Pi } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { AvatarLogic } from "../auth/avatar-logic";
@@ -31,6 +31,7 @@ export async function Header() {
                 {session.uid ? <AvatarLogic /> : (
                     <Link href="/login">
                         <Button variant="default" className="w-fit">
+                            <LogIn size={16} />
                             Accedi
                         </Button>
                     </Link>

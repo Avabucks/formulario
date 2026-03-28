@@ -73,7 +73,7 @@ export default async function Argomento({
                         <div className="flex items-center gap-4">
                             <TypographyH4 className="truncate min-w-0 flex-1">{argomento.titolo}</TypographyH4>
                         </div>
-                        <FormularioSettings formularioId={argomento.formularioId} />
+                        <FormularioSettings formularioId={argomento.formularioId}/>
                     </div>
                 </div>
                 <Suspense fallback={renderLoadingSkeleton()}>
