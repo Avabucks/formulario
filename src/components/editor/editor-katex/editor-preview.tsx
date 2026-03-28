@@ -13,8 +13,8 @@ export function EditorPreview({ value }: Readonly<{ value: string }>) {
         .replaceAll(/\$\$([^\n]+?)\$\$/g, (_, math) => `\n$$\n${math}\n$$\n`);
 
     return (
-        <div className="flex-1 p-3">
-            <div className="px-3 py-2 rounded-lg bg-accent/50 h-full leading-loose">
+        <div className="flex-1 p-3 h-full">
+            <div className="px-3 py-2 rounded-lg bg-primary/5 h-full leading-loose">
                 <ReactMarkdown
                     remarkPlugins={[
                         remarkMath,
@@ -56,7 +56,7 @@ const markdownComponents: Components = {
         </h6>
     ),
     p: ({ children }) => (
-        <p className="mb-4 leading-[1.75] text-[16px]">{children}</p>
+        <p className="mb-4 leading-[1.75] text-base font-sans">{children}</p>
     ),
     ul: ({ children }) => (
         <ul className="list-disc pl-8 mb-4 space-y-1">{children}</ul>
