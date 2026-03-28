@@ -81,8 +81,22 @@ $$\\int_{-\\infty}^{+\\infty} e^{-x^2} dx = \\sqrt{\\pi}$$
 $$\\sum_{n=1}^{\\infty} \\frac{1}{n^2} = \\frac{\\pi^2}{6}$$`,
           },
           {
+            titolo: "Titoli e intestazioni",
+            sort_order: 4,
+            content: `I titoli si creano con il simbolo cancelletto:
+
+# Titolo di primo livello
+## Titolo di secondo livello
+### Titolo di terzo livello
+#### Titolo di quarto livello
+##### Titolo di quinto livello
+###### Titolo di sesto livello
+
+I titoli principali (H1 e H2) hanno una linea separatrice sotto.`,
+          },
+          {
             titolo: "Testo in grassetto e corsivo",
-            sort_order: 3,
+            sort_order: 4,
             content: `Puoi formattare il testo normalmente:
 
 **Grassetto** per i concetti importanti.
@@ -93,7 +107,7 @@ All'interno delle formule puoi usare \\textbf{testo} per il grassetto matematico
           },
           {
             titolo: "Altre funzionalità dell'editor",
-            sort_order: 4,
+            sort_order: 5,
             content: `L'editor supporta:
 
 - **Frazioni**: $\\frac{numeratore}{denominatore}$

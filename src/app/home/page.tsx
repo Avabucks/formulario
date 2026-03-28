@@ -1,5 +1,5 @@
+import ForumlarioAdd from "@/src/components/home/formulario-add";
 import { FormularioCard } from "@/src/components/home/formulario-card";
-import HomeTitle from "@/src/components/home/home-title";
 import { Header } from "@/src/components/navigation/header";
 import {
     Empty,
@@ -21,7 +21,7 @@ export default async function Page() {
 
     const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
 
-    const { rows: users } = await pool.query(`SELECT id FROM users WHERE uid = $1`, [session.uid]);
+    const { rows: users } = await pool.query(`SELECT id, display_name as "displayName" FROM users WHERE uid = $1`, [session.uid]);
 
     if (users.length === 0) {
         redirect('/api/auth/logout')
@@ -64,7 +64,10 @@ export default async function Page() {
         <>
             <Header />
             <div className="flex flex-col gap-4 w-full px-2 md:px-6 pt-16">
-                <HomeTitle />
+                <div className="flex flex-row justify-between items-center w-full">
+                    <h2 className="text-xl">I Formulari di {users[0].displayName}</h2>
+                    <ForumlarioAdd />
+                </div >
                 <Suspense fallback={renderLoadingSkeleton()}>
                     <div className="flex flex-col gap-4 w-full">
                         {formulari.length === 0 ? (

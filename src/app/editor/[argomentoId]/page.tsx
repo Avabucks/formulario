@@ -1,11 +1,15 @@
-import { EditorTitle } from "@/src/components/editor/editor-title";
+import { EditorPage } from "@/src/components/editor/editor-page";
+import { FormularioSettings } from "@/src/components/home/formulario-settings";
 import { BreadcrumbLogic } from "@/src/components/navigation/breadcrumb-logic";
 import { Header } from "@/src/components/navigation/header";
+import { Skeleton } from "@/src/components/ui/skeleton";
+import { TypographyH4 } from "@/src/components/ui/typography";
 import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 export default async function Argomento({
     params,
@@ -55,13 +59,26 @@ export default async function Argomento({
         { label: argomento.titolo, href: `/editor/${argomento}` },
     ];
 
+    const renderLoadingSkeleton = () => (
+        <Skeleton className="h-full w-full" />
+    );
+
     return (
         <>
             <Header />
-            <div className="flex flex-col gap-4 w-full px-2 md:px-6 flex-1 pt-16">
+            <div className="flex flex-col gap-4 w-full px-2 md:px-6 flex-1 pt-16 pb-5">
                 <BreadcrumbLogic items={breadcrumbs} />
-                <EditorTitle argomento={argomento} />
-                {/* TODO: editor */}
+                <div className="flex flex-col gap-4">
+                    <div className="flex justify-between items-center gap-4">
+                        <div className="flex items-center gap-4">
+                            <TypographyH4 className="truncate min-w-0 flex-1">{argomento.titolo}</TypographyH4>
+                        </div>
+                        <FormularioSettings formularioId={argomento.formularioId} />
+                    </div>
+                </div>
+                <Suspense fallback={renderLoadingSkeleton()}>
+                    <EditorPage content={argomento.content} />
+                </Suspense>
             </div>
         </>
     )
