@@ -13,14 +13,26 @@ export function EditorPreview({ value }: Readonly<{ value: string }>) {
         .replaceAll(/\$\$([^\n]+?)\$\$/g, (_, math) => `\n$$\n${math}\n$$\n`);
 
     return (
-        <div className="flex-1 p-5 h-full leading-loose overflow-y-auto">
-            <ReactMarkdown
-                remarkPlugins={[remarkMath, remarkBreaks]}
-                rehypePlugins={[rehypeKatex]}
-                components={markdownComponents}
-            >
-                {processedValue}
-            </ReactMarkdown>
+        <div className="relative flex-1 h-full">
+            <div className="p-5 min-h-full leading-loose relative">
+                <svg
+                    className="absolute inset-0 h-full w-full dark:opacity-[0.06] opacity-[0.10] pointer-events-none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    preserveAspectRatio="none"
+                >
+                    <defs>
+                        <pattern id="cross" width="22" height="22" patternUnits="userSpaceOnUse">
+                            <path d="M16 0v22M0 16h22" stroke="currentColor" strokeWidth="0.5" fill="none" />
+                        </pattern>
+                    </defs>
+                    <rect width="100%" height="100%" fill="url(#cross)" />
+                </svg>
+                <ReactMarkdown
+                    remarkPlugins={[remarkMath, remarkBreaks]}
+                    rehypePlugins={[rehypeKatex]}
+                    components={markdownComponents}
+                >{processedValue}</ReactMarkdown>
+            </div>
         </div>
     );
 }

@@ -22,7 +22,7 @@ export function EditorPage({ argomento }: Readonly<{ argomento: Argomento }>) {
     const input = argomento.editable && <EditorInput argomentoId={argomento.id} value={value} onChange={setValue} />;
 
     return (
-        <div className="flex flex-1 flex-col min-h-0 border rounded-lg">
+        <div className="flex flex-1 flex-col min-h-0 border rounded-lg overflow-hidden">
             {argomento.editable && toolbar}
 
             {/* Desktop */}

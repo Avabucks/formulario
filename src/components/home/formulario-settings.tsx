@@ -1,6 +1,6 @@
 "use client"
 
-import { CopyPlus, GlobeIcon, LinkIcon, LockIcon, SaveAll, Settings, Trash2, X } from "lucide-react";
+import { CopyPlus, GlobeIcon, LinkIcon, LockIcon, SaveAll, Settings, Trash2, UserRound, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -18,6 +18,7 @@ import { Switch } from "../ui/switch";
 import { Textarea } from "../ui/textarea";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { NavigationBlocker } from "../navigation/navigation-blocker";
+import { ScrollArea } from "../ui/scroll-area";
 
 type Formulario = {
     titolo: string
@@ -185,12 +186,15 @@ export function FormularioSettings({ formularioId, allowKey = true }: Readonly<{
                             </SheetTitle>
                             <SheetDescription asChild>
                                 <div className="flex items-center justify-between">
-                                    <span>by {formulario.nomeAutore}</span>
+                                    <span className="flex gap-1 item-center">
+                                        <span className="flex items-center"><UserRound size={16} /></span>
+                                        <span>{formulario.nomeAutore}</span>
+                                    </span>
                                     <span>Anno {formulario.anno}</span>
                                 </div>
                             </SheetDescription>
                         </SheetHeader>
-                        <div className="px-4 flex-1 overflow-y-auto">
+                        <ScrollArea className="px-4 flex-1 min-h-0">
                             <div className="mb-4">
                                 <span>{formulario.descrizione}</span>
                             </div>
@@ -290,7 +294,7 @@ export function FormularioSettings({ formularioId, allowKey = true }: Readonly<{
                                     </AccordionContent>
                                 </AccordionItem>
                             </Accordion>
-                        </div>
+                        </ScrollArea>
                         <SheetFooter>
                             {formulario.editable ? (
                                 <Dialog>

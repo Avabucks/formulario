@@ -1,20 +1,20 @@
 import Link from "next/link"
 import { Button } from "@/src/components/ui/button"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, Sparkles } from "lucide-react"
 import packageJson from '@/package.json'
 
 export function Hero() {
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden px-6">
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
-        }}
-        aria-hidden="true"
-      />
+            <div className="absolute inset-0 bg-background" />
+            <svg className="absolute inset-0 h-full w-full dark:opacity-[0.06] opacity-[0.10]" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <pattern id="cross" width="50" height="50" patternUnits="userSpaceOnUse">
+                        <path d="M16 0v50M0 16h50" stroke="currentColor" strokeWidth="0.5" fill="none" />
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#cross)" />
+            </svg>
 
       <div className="relative z-10 mx-auto max-w-4xl text-center">
         <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-4 py-1.5">
@@ -37,8 +37,14 @@ export function Hero() {
         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Button size="lg" asChild className="gap-2 px-8">
             <Link href="login">
-              Accedi
+              Inizia ora
               <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Button>
+          <Button asChild variant="outline" size="lg" className="gap-2 px-8">
+            <Link href="/community">
+              <Sparkles className="h-5 w-5" />
+              Esplora la Community
             </Link>
           </Button>
         </div>
