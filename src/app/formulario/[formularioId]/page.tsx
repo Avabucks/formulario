@@ -33,11 +33,11 @@ export default async function Formulario({
     // Check if user has access to the formulario (owner or public)
     const { rows: formularioRows, rowCount } = await pool.query(
         `SELECT F.beautiful_id AS "id", F.titolo, F.owner_uid as "ownerUid", U_A.display_name AS "nomeAutore", F.anno,
-                F.visibility_public AS "visibilityPublic"
+                F.visibility
          FROM formulari F
          JOIN users U_A ON F.author_uid = U_A.uid
          WHERE F.beautiful_id = $1
-           AND (F.owner_uid = $2 OR F.visibility_public = true)`,
+           AND (F.owner_uid = $2 OR F.visibility > 0)`,
         [formularioId, uid]
     );
 

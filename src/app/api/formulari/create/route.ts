@@ -10,27 +10,24 @@ export async function POST(request: Request) {
     const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
     const uid = session.uid;
 
-    if (!uid) {
-        return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
-    }
+    if (!uid) return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
 
     const formData = await request.formData();
     const titolo = formData.get("titolo") as string;
     const descrizione = formData.get("descrizione") as string;
+    const visibility = Number(formData.get("visibility")) as 0 | 1 | 2;
     const anno = new Date().getFullYear().toString();
-    const visibilityPublic = formData.get("visibilityPublic") === "on";
 
-    if (!titolo || !descrizione) {
-        return NextResponse.json({ error: "Campi obbligatori mancanti" }, { status: 400 });
-    }
+    if (!titolo || !descrizione) return NextResponse.json({ error: "Campi obbligatori mancanti" }, { status: 400 });
+    if (![0, 1, 2].includes(visibility)) return NextResponse.json({ error: "Visibility non valida" }, { status: 400 });
 
     const beautiful_id = slugify(titolo, { lower: true, strict: true }) + "-" + crypto.randomUUID();
 
     try {
         await pool.query(
-            `INSERT INTO formulari (beautiful_id, titolo, descrizione, owner_uid, author_uid, anno, visibility_public)
+            `INSERT INTO formulari (beautiful_id, titolo, descrizione, owner_uid, author_uid, anno, visibility)
             VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-            [beautiful_id, titolo, descrizione, uid, uid, anno, visibilityPublic]
+            [beautiful_id, titolo, descrizione, uid, uid, anno, visibility]
         );
 
         revalidatePath("/home");

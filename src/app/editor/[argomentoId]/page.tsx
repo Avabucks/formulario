@@ -33,13 +33,13 @@ export default async function Argomento({
             F.titolo AS "formularioTitolo", F.owner_uid as "ownerUid", U_A.display_name AS "nomeAutore", F.beautiful_id AS "formularioId",
             C.titolo AS "capitoloTitolo", C.beautiful_id AS "capitoloId",
             A.content,
-            F.visibility_public AS "visibilityPublic"
+            F.visibility
             FROM argomenti A
             JOIN capitoli C ON  A.capitolo = C.beautiful_id
             JOIN formulari F ON F.beautiful_id = C.formulario
             JOIN users U_A ON F.author_uid = U_A.uid
             WHERE A.beautiful_id = $1
-            AND (F.owner_uid = $2 OR F.visibility_public = true)`,
+            AND (F.owner_uid = $2 OR F.visibility > 0)`,
         [argomentoId, uid]
     );
 
@@ -59,27 +59,21 @@ export default async function Argomento({
         { label: argomento.titolo, href: `/editor/${argomento}` },
     ];
 
-    const renderLoadingSkeleton = () => (
-        <Skeleton className="h-full w-full" />
-    );
-
     return (
-        <>
+        <div className="flex flex-col h-screen">
             <Header />
-            <div className="flex flex-col gap-4 w-full px-2 md:px-6 flex-1 pt-16 pb-5">
+            <div className="flex flex-1 flex-col gap-4 w-full px-2 md:px-6 pt-16 pb-5 overflow-hidden">
                 <BreadcrumbLogic items={breadcrumbs} />
-                <div className="flex flex-col gap-4">
-                    <div className="flex justify-between items-center gap-4">
-                        <div className="flex items-center gap-4">
-                            <TypographyH4 className="truncate min-w-0 flex-1">{argomento.titolo}</TypographyH4>
-                        </div>
-                        <FormularioSettings formularioId={argomento.formularioId}/>
+                <div className="flex justify-between items-center gap-4">
+                    <div className="flex items-center gap-4">
+                        <TypographyH4 className="truncate min-w-0 flex-1">{argomento.titolo}</TypographyH4>
                     </div>
+                    <FormularioSettings formularioId={argomento.formularioId} />
                 </div>
-                <Suspense fallback={renderLoadingSkeleton()}>
+                <Suspense fallback={<Skeleton className="h-full w-full" />}>
                     <EditorPage argomento={argomento} />
                 </Suspense>
             </div>
-        </>
+        </div>
     )
 }

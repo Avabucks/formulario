@@ -23,14 +23,14 @@ export function EditorToolbar({
                     {/* Desktop */}
                     <div className="flex md:hidden border-l items-center px-3">
                         <Button variant="outline" size="icon" onClick={() => setSwitchView((prev) => !prev)}>
-                            <ArrowRightLeft />
+                            <ArrowRightLeft size={16} />
                         </Button>
                     </div>
 
                     {/* Mobile */}
                     <div className="hidden md:flex border-l items-center px-3">
                         <Toggle variant="outline" pressed={switchView} onClick={() => setSwitchView((prev) => !prev)}>
-                            {switchView ? <Eye /> : <EyeClosed />}
+                            {switchView ? <Eye size={16} /> : <EyeClosed size={16} />}
                         </Toggle>
                     </div>
                 </>

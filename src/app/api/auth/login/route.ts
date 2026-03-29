@@ -8,7 +8,6 @@ import slugify from "slugify";
 export async function POST(req: NextRequest) {
   const { idToken } = await req.json();
 
-  try {
     const decoded = await adminAuth.verifyIdToken(idToken);
 
     const res = NextResponse.json({ ok: true });
@@ -32,9 +31,6 @@ export async function POST(req: NextRequest) {
 
     await session.save();
     return res;
-  } catch (e) {
-    return NextResponse.json({ error: "Token non valido" }, { status: 401 });
-  }
 }
 
 async function creaFormularioBenvenuto(uid: string) {
@@ -46,7 +42,7 @@ async function creaFormularioBenvenuto(uid: string) {
     const formularioId = slugify("Benvenuto su FormulaBase", { lower: true, strict: true }) + "-" + crypto.randomUUID();
 
     await client.query(
-      `INSERT INTO formulari (beautiful_id, titolo, descrizione, owner_uid, author_uid, anno, visibility_public)
+      `INSERT INTO formulari (beautiful_id, titolo, descrizione, owner_uid, author_uid, anno, visibility)
        VALUES ($1, $2, $3, $4, $5, $6, $7)`,
       [
         formularioId,
@@ -55,7 +51,7 @@ async function creaFormularioBenvenuto(uid: string) {
         uid,
         uid,
         new Date().getFullYear().toString(),
-        false,
+        0
       ]
     );
 
@@ -110,13 +106,13 @@ All'interno delle formule puoi usare \\textbf{testo} per il grassetto matematico
             sort_order: 5,
             content: `L'editor supporta:
 
-- **Frazioni**: $\\frac{numeratore}{denominatore}$
-- **Pedici e apici**: $x_i^2$
-- **Radici**: $\\sqrt[n]{x}$
-- **Matrici**: $\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}$
-- **Limiti**: $\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1$
-- **Integrali**: $\\int_a^b f(x)\\,dx$
-- **Sommatorie**: $\\sum_{i=0}^{n} i$`,
+- **Frazioni**: $$\\frac{numeratore}{denominatore}$$
+- **Pedici e apici**: $$x_i^2$$
+- **Radici**: $$\\sqrt[n]{x}$$
+- **Matrici**: $$\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}$$
+- **Limiti**: $$\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1$$
+- **Integrali**: $$\\int_a^b f(x)\\,dx$$
+- **Sommatorie**: $$\\sum_{i=0}^{n} i$$`,
           },
         ],
       },

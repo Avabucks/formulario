@@ -20,10 +20,12 @@ export default function Home() {
 
 // TODOs:
 // - [EDITOR]
-// - migliorare l'editor con supporto a formule matematiche, codice, ecc.
-// - aggiungere formulario d'esempio nel nuovo account
+// - toolbar
+// - aggiungere funzionalità di esportazione (pdf, markdown, ecc.)
+// - search anche nel content
 // - migliorare sicurezza db (RLS)
 
 // - [COMMUNITY]
-// - aggiungere funzionalità di esportazione (pdf, markdown, ecc.)
-// - pubblico/link/privato con possibilità di cercare pubblico (proprio pagina nuova accessibile anche da fuori ma che quando apri devi fare il login per vedere il formulario)
+// - home con elenco formulari community
+// - pagina nuova accessibile anche da fuori ma che quando apri devi fare il login per vedere il formulario
+// - ceerca nella community

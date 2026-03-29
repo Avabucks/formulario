@@ -132,11 +132,11 @@ export function ArgomentoItem({ argomento }: Readonly<{ argomento: Argomento }>)
 
     return (
         <Item className={`${!isEditing && "hover:bg-muted/50 cursor-pointer"}`} variant="outline" size="sm">
-            <form className="flex w-full gap-2" onSubmit={handleRename}>
+            <form className="flex w-full gap-2 items-center" onSubmit={handleRename}>
                 {isEditing ? (
                     <>{content}</>
                 ) : (
-                    <Link href="/" onClick={(e: any) => { e.preventDefault(); router.push(`/editor/${argomento.id}`) }} className="flex w-full gap-2 items-center">
+                    <Link href={`/editor/${argomento.id}`} onClick={(e: any) => { e.preventDefault(); router.push(`/editor/${argomento.id}`) }} className="flex w-full gap-2 items-center">
                         {content}
                     </Link>
                 )}

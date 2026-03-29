@@ -1,6 +1,6 @@
 import { Button } from "@/src/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/src/components/ui/card"
-import { BookOpen, GlobeIcon, LockIcon } from "lucide-react"
+import { BookOpen, GlobeIcon, LinkIcon, LockIcon } from "lucide-react"
 import Link from "next/link"
 import { FormularioSettings } from "./formulario-settings"
 
@@ -10,7 +10,7 @@ type Formulario = {
     nomeAutore?: string
     anno?: string
     descrizione?: string
-    visibilityPublic?: boolean
+    visibility: 0 | 1 | 2
 }
 
 export function FormularioCard({ formulario }: Readonly<{ formulario: Formulario }>) {
@@ -20,7 +20,9 @@ export function FormularioCard({ formulario }: Readonly<{ formulario: Formulario
             <CardHeader>
                 <div className="flex gap-2 items-center">
                     <CardTitle>{formulario.titolo}</CardTitle>
-                    <div className="text-muted-foreground">{formulario.visibilityPublic ? <GlobeIcon size={16} /> : <LockIcon size={16} />}</div>
+                    <div className="text-muted-foreground">
+                        <VisibilityIcon visibility={formulario.visibility} />
+                    </div>
                 </div>
                 <div className="flex justify-between text-sm text-muted-foreground">
                     <span>by {formulario.nomeAutore}</span>
@@ -43,4 +45,10 @@ export function FormularioCard({ formulario }: Readonly<{ formulario: Formulario
             </CardFooter>
         </Card>
     )
+}
+
+const VisibilityIcon = ({ visibility }: { visibility: 0 | 1 | 2 }) => {
+    if (visibility === 0) return <LockIcon size={16} />
+    if (visibility === 1) return <LinkIcon size={16} />
+    return <GlobeIcon size={16} />
 }

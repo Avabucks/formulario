@@ -1,6 +1,6 @@
 "use client"
 
-import { CopyPlus, GlobeIcon, LockIcon, SaveAll, Settings, Trash2, X } from "lucide-react";
+import { CopyPlus, GlobeIcon, LinkIcon, LockIcon, SaveAll, Settings, Trash2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -13,24 +13,27 @@ import { Kbd, KbdGroup } from "../ui/kbd";
 import { Label } from "../ui/label";
 import { Qr } from "../ui/qr";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "../ui/sheet";
+import { Spinner } from "../ui/spinner";
 import { Switch } from "../ui/switch";
 import { Textarea } from "../ui/textarea";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
+import { NavigationBlocker } from "../navigation/navigation-blocker";
 
 type Formulario = {
     titolo: string
     descrizione: string
     nomeAutore: string
     anno: string
-    visibilityPublic: boolean
+    visibility: 0 | 1 | 2
     editable: boolean
 }
 
 export function FormularioSettings({ formularioId, allowKey = true }: Readonly<{ formularioId: string; allowKey?: boolean }>) {
     const router = useRouter();
     const [formulario, setFormulario] = useState<Formulario>();
-    const [visibility, setVisibility] = useState(false);
+    const [visibility, setVisibility] = useState<0 | 1 | 2>(0)
     const [open, setOpen] = useState(false)
+    const [edited, setEdited] = useState(false)
 
     const SHARE_URL = `${process.env.NEXT_PUBLIC_APP_URL}/formulario/${formularioId}`;
 
@@ -44,11 +47,12 @@ export function FormularioSettings({ formularioId, allowKey = true }: Readonly<{
 
         const data = await response.json();
         setFormulario(data);
-        setVisibility(data.visibilityPublic);
+        setVisibility(data.visibility);
+        setEdited(false);
     }
 
     useEffect(() => {
-        fetchFormulario();
+        fetchFormulario()
 
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === "i" && (e.metaKey || e.ctrlKey) && allowKey) {
@@ -60,7 +64,7 @@ export function FormularioSettings({ formularioId, allowKey = true }: Readonly<{
         document.addEventListener("keydown", handleKeyDown)
         return () => document.removeEventListener("keydown", handleKeyDown)
 
-    }, [formularioId]);
+    }, []);
 
     async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -140,6 +144,7 @@ export function FormularioSettings({ formularioId, allowKey = true }: Readonly<{
 
     return (
         <div className="flex gap-2 items-center">
+            <NavigationBlocker blocked={edited} />
             <Sheet open={open} onOpenChange={setOpen}>
                 <SheetTrigger asChild>
                     <TooltipProvider>
@@ -167,13 +172,15 @@ export function FormularioSettings({ formularioId, allowKey = true }: Readonly<{
                     </TooltipProvider>
 
                 </SheetTrigger>
-                {formulario && (
+                {formulario ? (
                     <SheetContent>
                         <SheetHeader>
                             <SheetTitle>
                                 <div className="flex gap-2 items-center">
                                     {formulario.titolo}
-                                    <div className="text-muted-foreground">{formulario.visibilityPublic ? <GlobeIcon size={16} /> : <LockIcon size={16} />}</div>
+                                    <div className="text-muted-foreground">
+                                        <VisibilityIcon visibility={formulario.visibility} />
+                                    </div>
                                 </div>
                             </SheetTitle>
                             <SheetDescription asChild>
@@ -202,18 +209,51 @@ export function FormularioSettings({ formularioId, allowKey = true }: Readonly<{
                                                     <FieldGroup>
                                                         <Field>
                                                             <Label htmlFor="titolo-1">Titolo del formulario</Label>
-                                                            <Input id="titolo-1" name="titolo" defaultValue={formulario.titolo} />
+                                                            <Input
+                                                                id="titolo-1"
+                                                                name="titolo"
+                                                                defaultValue={formulario.titolo}
+                                                                onInput={(e) => setEdited(true)}
+                                                            />
                                                         </Field>
                                                         <Field>
                                                             <Label htmlFor="descrizione-1">Descrizione del formulario</Label>
-                                                            <Textarea id="descrizione-1" name="descrizione" defaultValue={formulario.descrizione} />
+                                                            <Textarea
+                                                                id="descrizione-1"
+                                                                name="descrizione"
+                                                                defaultValue={formulario.descrizione}
+                                                                onInput={(e) => setEdited(true)}
+                                                            />
                                                         </Field>
-                                                        <div className="flex items-center justify-between">
-                                                            <Label htmlFor="visibilityPublic-1">Condividi con tutti (solo tu puoi modificare)</Label>
-                                                            <Switch id="visibilityPublic-1" name="visibilityPublic" defaultChecked={formulario.visibilityPublic} />
+                                                        <div className="flex flex-col gap-4">
+                                                            <div className="flex items-center justify-between">
+                                                                <Label htmlFor="visibility-1">Condividi con link</Label>
+                                                                <Switch
+                                                                    id="visibility-1"
+                                                                    checked={visibility >= 1}
+                                                                    onCheckedChange={(checked) => {
+                                                                        setVisibility(checked ? 1 : 0)
+                                                                        setEdited(true)
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                            {visibility >= 1 && (
+                                                                <div className="flex items-center justify-between">
+                                                                    <Label htmlFor="visibility-2">Condividi con la community</Label>
+                                                                    <Switch
+                                                                        id="visibility-2"
+                                                                        checked={visibility === 2}
+                                                                        onCheckedChange={(checked) => {
+                                                                            setVisibility(checked ? 2 : 1)
+                                                                            setEdited(true)
+                                                                        }}
+                                                                    />
+                                                                </div>
+                                                            )}
+                                                            <input type="hidden" name="visibility" value={visibility} />
                                                         </div>
                                                     </FieldGroup>
-                                                    <Button type="submit">
+                                                    <Button type="submit" variant={edited ? "default" : "secondary"} disabled={!edited}>
                                                         <SaveAll size={16} /> Salva le modifiche
                                                     </Button>
                                                 </form>
@@ -221,7 +261,7 @@ export function FormularioSettings({ formularioId, allowKey = true }: Readonly<{
                                         </AccordionContent>
                                     </AccordionItem>
                                 )}
-                                {visibility && (
+                                {formulario.visibility !== 0 && (
                                     <AccordionItem value="qr">
                                         <AccordionTrigger>Condividi formulario</AccordionTrigger>
                                         <AccordionContent>
@@ -284,8 +324,23 @@ export function FormularioSettings({ formularioId, allowKey = true }: Readonly<{
                             </SheetClose>
                         </SheetFooter>
                     </SheetContent>
+                ) : (
+                    <SheetContent>
+                        <SheetHeader>
+                            <SheetTitle>Caricamento...</SheetTitle>
+                        </SheetHeader>
+                        <div className="px-4 flex-1 flex items-center justify-center">
+                            <Spinner />
+                        </div>
+                    </SheetContent>
                 )}
             </Sheet>
         </div>
     )
+}
+
+const VisibilityIcon = ({ visibility }: { visibility: 0 | 1 | 2 }) => {
+    if (visibility === 0) return <LockIcon size={16} />
+    if (visibility === 1) return <LinkIcon size={16} />
+    return <GlobeIcon size={16} />
 }

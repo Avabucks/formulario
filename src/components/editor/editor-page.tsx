@@ -22,11 +22,11 @@ export function EditorPage({ argomento }: Readonly<{ argomento: Argomento }>) {
     const input = argomento.editable && <EditorInput argomentoId={argomento.id} value={value} onChange={setValue} />;
 
     return (
-        <div className="flex flex-1 flex-col border rounded-lg">
+        <div className="flex flex-1 flex-col min-h-0 border rounded-lg">
             {argomento.editable && toolbar}
 
             {/* Desktop */}
-            <div className="hidden md:flex flex-1">
+            <div className="hidden md:flex flex-1 min-h-0">
                 <ResizablePanelGroup
                     onLayoutChanged={(sizes) => {if (sizes.input) setResizableSize(sizes.input)}}
                     orientation="horizontal"
@@ -42,7 +42,7 @@ export function EditorPage({ argomento }: Readonly<{ argomento: Argomento }>) {
             </div>
 
             {/* Mobile */}
-            <div className="md:hidden flex-1">
+            <div className="md:hidden flex-1 min-h-0">
                 {switchView ? input : preview}
             </div>
         </div>

@@ -28,8 +28,7 @@ CREATE TABLE IF NOT EXISTS formulari (
   author_uid VARCHAR(255) NOT NULL,
   anno VARCHAR(255) NOT NULL,
   descrizione VARCHAR(255) NOT NULL,
-  visibility_link BOOLEAN NOT NULL DEFAULT false,
-  visibility_public BOOLEAN NOT NULL DEFAULT false
+  visibility INTEGER NOT NULL DEFAULT 0
 );
 --
 -- Table structure for table 'capitoli'

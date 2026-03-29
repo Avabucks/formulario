@@ -135,11 +135,11 @@ export function CapitoloItem({ capitolo }: Readonly<{ capitolo: Capitolo }>) {
 
     return (
         <Item className={`${!isEditing && "hover:bg-muted/50 cursor-pointer"}`} variant="outline" size="sm">
-            <form className="flex w-full gap-2" onSubmit={handleRename}>
+            <form className="flex w-full gap-2 items-center" onSubmit={handleRename}>
                 {isEditing ? (
                     <>{content}</>
                 ) : (
-                    <Link href="/" onClick={(e: any) => { e.preventDefault(); router.push(`/capitolo/${capitolo.id}`) }} className="flex w-full gap-2 items-center">
+                    <Link href={`/capitolo/${capitolo.id}`} onClick={(e: any) => { e.preventDefault(); router.push(`/capitolo/${capitolo.id}`) }} className="flex w-full gap-2 items-center">
                         {content}
                     </Link>
                 )}

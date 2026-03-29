@@ -1,10 +1,10 @@
 "use client";
 
-import ReactMarkdown, { Components } from "react-markdown";
-import remarkMath from "remark-math";
-import remarkBreaks from "remark-breaks";
-import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
+import ReactMarkdown, { Components } from "react-markdown";
+import rehypeKatex from "rehype-katex";
+import remarkBreaks from "remark-breaks";
+import remarkMath from "remark-math";
 
 export function EditorPreview({ value }: Readonly<{ value: string }>) {
 
@@ -13,12 +13,9 @@ export function EditorPreview({ value }: Readonly<{ value: string }>) {
         .replaceAll(/\$\$([^\n]+?)\$\$/g, (_, math) => `\n$$\n${math}\n$$\n`);
 
     return (
-        <div className="flex-1 p-3 h-full leading-loose">
+        <div className="flex-1 p-5 h-full leading-loose overflow-y-auto">
             <ReactMarkdown
-                remarkPlugins={[
-                    remarkMath,
-                    remarkBreaks
-                ]}
+                remarkPlugins={[remarkMath, remarkBreaks]}
                 rehypePlugins={[rehypeKatex]}
                 components={markdownComponents}
             >

@@ -38,7 +38,7 @@ export default async function Capitolo({
             JOIN formulari F ON F.beautiful_id = C.formulario
             JOIN users U_A ON F.author_uid = U_A.uid
             WHERE C.beautiful_id = $1
-            AND (F.owner_uid = $2 OR F.visibility_public = true)`,
+            AND (F.owner_uid = $2 OR F.visibility > 0)`,
         [capitoloId, uid]
     );
 
