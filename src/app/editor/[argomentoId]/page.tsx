@@ -49,7 +49,7 @@ export default async function Argomento({
 
     const argomento = {
         ...argomentoRows[0],
-        editable: argomentoRows[0].autore === uid,
+        editable: argomentoRows[0].ownerUid === uid,
     };
 
     const breadcrumbs = [
@@ -77,7 +77,7 @@ export default async function Argomento({
                     </div>
                 </div>
                 <Suspense fallback={renderLoadingSkeleton()}>
-                    <EditorPage content={argomento.content} />
+                    <EditorPage argomento={argomento} />
                 </Suspense>
             </div>
         </>
