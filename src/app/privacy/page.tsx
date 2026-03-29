@@ -1,4 +1,7 @@
 import { Header } from "@/src/components/navigation/header"
+import packageJson from '@/package.json'
+import { Button } from "@/src/components/ui/button"
+import { Footer } from "@/src/components/landing/footer"
 
 export default function PrivacyPage() {
   return (
@@ -13,7 +16,7 @@ export default function PrivacyPage() {
           </div>
 
           <Section title="1. Titolare del trattamento">
-            <p>Il titolare del trattamento dei dati personali è il gestore della piattaforma Formulario. Per qualsiasi richiesta relativa al trattamento dei tuoi dati, puoi contattarci tramite i canali indicati nella sezione "Contatti".</p>
+            <p>Il titolare del trattamento dei dati personali è il gestore della piattaforma {packageJson.displayName}. Per qualsiasi richiesta relativa al trattamento dei tuoi dati, puoi contattarci tramite i canali indicati nella sezione "Contatti".</p>
           </Section>
 
           <Section title="2. Dati raccolti">
@@ -42,27 +45,21 @@ export default function PrivacyPage() {
             <p>I dati vengono conservati per tutta la durata dell'account. In caso di cancellazione dell'account, i dati personali verranno eliminati dai nostri sistemi entro 30 giorni, salvo obblighi di legge contrari.</p>
           </Section>
 
-          <Section title="6. Diritti dell'interessato">
-            <p>Ai sensi degli artt. 15–22 del GDPR, hai il diritto di:</p>
-            <ul className="list-disc list-inside flex flex-col gap-1 mt-2 text-muted-foreground">
-              <li>Accedere ai tuoi dati personali</li>
-              <li>Richiedere la rettifica o la cancellazione dei dati</li>
-              <li>Opporti al trattamento o richiederne la limitazione</li>
-              <li>Richiedere la portabilità dei dati</li>
-              <li>Proporre reclamo all'Autorità Garante per la protezione dei dati personali</li>
-            </ul>
-            <p className="mt-3">Per esercitare i tuoi diritti, contattaci tramite i canali indicati nella sezione "Contatti".</p>
-          </Section>
-
-          <Section title="7. Sicurezza">
+          <Section title="6. Sicurezza">
             <p>Adottiamo misure tecniche e organizzative adeguate per proteggere i tuoi dati personali da accessi non autorizzati, perdita o divulgazione, in conformità con l'art. 32 del GDPR.</p>
           </Section>
 
-          <Section title="8. Contatti">
-            <p>Per qualsiasi richiesta relativa alla presente informativa o al trattamento dei tuoi dati personali, puoi contattarci all'indirizzo email indicato nella piattaforma.</p>
+          <Section title="7. Contatti">
+            <p>Per qualsiasi richiesta relativa alla presente informativa o al trattamento dei tuoi dati personali, puoi contattarci all'indirizzo email.</p>
+            <Button variant="link">
+              <a href={`mailto:${packageJson.email}`}>
+                {packageJson.email}
+              </a>
+            </Button>
           </Section>
         </div>
       </div>
+      <Footer />
     </>
   )
 }

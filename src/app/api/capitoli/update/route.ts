@@ -21,7 +21,7 @@ export async function PUT(request: Request) {
         const result = await pool.query(
             `UPDATE capitoli SET titolo = $1
              WHERE beautiful_id = $2
-             AND formulario IN (SELECT beautiful_id AS "id" FROM formulari WHERE autore = $3)`,
+             AND formulario IN (SELECT beautiful_id AS "id" FROM formulari WHERE owner_uid = $3)`,
             [titolo, capitoloId, uid]
         );
 

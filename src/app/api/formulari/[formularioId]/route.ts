@@ -13,12 +13,12 @@ export async function GET(request: Request, { params }: { params: Promise<{ form
     const { formularioId } = await params;
 
     const { rows, rowCount } = await pool.query(
-        `SELECT F.beautiful_id AS "id", F.titolo, F.descrizione, F.autore, F.anno,
-                F.visibility_public AS "visibilityPublic", U.display_name AS "nomeAutore"
+        `SELECT F.beautiful_id AS "id", F.titolo, F.descrizione, F.owner_uid as "ownerUid", U_A.display_name AS "nomeAutore", F.anno,
+                F.visibility
          FROM formulari F
-         JOIN users U ON F.autore = U.uid
+         JOIN users U_A ON F.author_uid = U_A.uid
          WHERE F.beautiful_id = $1
-           AND (F.autore = $2 OR F.visibility_public = true)`,
+           AND (F.owner_uid = $2 OR F.visibility > 0)`,
         [formularioId, uid]
     );
 
@@ -26,7 +26,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ form
 
     const formulario = {
         ...rows[0],
-        editable: rows[0].autore === uid,
+        editable: rows[0].ownerUid === uid,
     };
 
     return NextResponse.json(formulario);

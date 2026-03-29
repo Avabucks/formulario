@@ -11,7 +11,7 @@ export async function DELETE(request: Request) {
         return NextResponse.redirect(new URL("/login", request.url));
     }
 
-    await pool.query(`DELETE FROM formulari WHERE autore = $1`, [session.uid]);
+    await pool.query(`DELETE FROM formulari WHERE owner_uid = $1`, [session.uid]);
     await pool.query(`DELETE FROM users WHERE uid = $1`, [session.uid]);
     
     session.destroy();

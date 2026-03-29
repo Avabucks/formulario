@@ -14,7 +14,7 @@ import {
 } from "@/src/components/ui/field";
 import { auth, googleProvider } from "@/src/lib/firebase";
 import { cn } from "@/src/lib/utils";
-import { signInWithPopup } from "firebase/auth";
+import { signInWithPopup, signOut } from "firebase/auth";
 import { User } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -72,7 +72,7 @@ export function LoginForm({
   };
 
   useEffect(() => {
-    localStorage.clear()
+    signOut(auth).then(() => localStorage.clear())
   }, [])
 
   return (

@@ -20,7 +20,7 @@ export async function DELETE(request: Request) {
             `SELECT c.sort_order, c.formulario AS parent
              FROM capitoli c
              JOIN formulari f ON f.beautiful_id = c.formulario
-             WHERE c.beautiful_id = $1 AND f.autore = $2`,
+             WHERE c.beautiful_id = $1 AND f.owner_uid = $2`,
             [capitoloId, uid]
         );
 

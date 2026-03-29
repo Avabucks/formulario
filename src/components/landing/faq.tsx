@@ -7,19 +7,24 @@ import {
 
 const faqs = [
   {
-    question: "Come funziona l'editor LaTeX?",
+    question: "Come funziona l'editor?",
     answer:
-      "L'editor LaTeX integrato ti permette di scrivere formule usando la sintassi LaTeX standard e vedere l'anteprima renderizzata in tempo reale. Non è richiesta nessuna installazione aggiuntiva: tutto funziona direttamente nel browser.",
+      "L'editor supporta la sintassi KaTeX per scrivere formule matematiche. Puoi usare formule inline con $...$ o in blocco con $$...$$, oltre a grassetto, corsivo, frazioni, radici, matrici e molto altro. L'anteprima è in tempo reale, tutto nel browser.",
   },
   {
     question: "Come funziona la condivisione via QR code?",
     answer:
-      "Ogni formula ha un QR code univoco generato automaticamente. Puoi scaricarlo e stamparlo, così chiunque punta la fotocamera ottiene accesso immediato alla versione online aggiornata.",
+      "Ogni formulario ha un QR code univoco generato automaticamente. Prima di condividere scegli la visibilità: privato (solo tu), pubblico con link (chiunque abbia il QR o l'URL) o community (visibile a tutti gli utenti di FormulaBase).",
   },
   {
-    question: "Qual è la differenza tra formulario privato e pubblico?",
+    question: "Qual è la differenza tra privato, pubblico e community?",
     answer:
-      "I formulari privati sono visibili solo a te. Quelli condivisi tramite link sono accessibili a chi ha l'URL o il QR code e sono cercabili da tutti gli utenti della piattaforma.",
+      "Privato: visibile solo a te. Pubblico con link: accessibile a chiunque abbia il link o il QR code. Community: appare nella raccolta pubblica di FormulaBase e può essere trovato e duplicato da altri utenti.",
+  },
+  {
+    question: "Posso modificare il formulario di qualcun altro?",
+    answer:
+      "Sì. Dalla community puoi rendere tuo qualsiasi formulario pubblico con un click. Viene creata una copia nel tuo account, con te come proprietario, che puoi modificare liberamente senza toccare l'originale.",
   },
 ]
 

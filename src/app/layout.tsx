@@ -42,7 +42,7 @@ export default function RootLayout({
             height={3}
             showSpinner={false}
           />
-          <main>
+          <main className="flex flex-1 flex-col">
             {children}
           </main>
           <Toaster />

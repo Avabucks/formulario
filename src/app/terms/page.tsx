@@ -3,6 +3,9 @@ import { Header } from "@/src/components/navigation/header";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
+import packageJson from '@/package.json'
+import { Footer } from "@/src/components/landing/footer";
+import { Button } from "@/src/components/ui/button";
 
 export default async function TermsPage() {
   const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
@@ -10,7 +13,7 @@ export default async function TermsPage() {
   return (
     <>
       <Header />
-      <div className="flex flex-col gap-4 w-full pt-16">
+      <div className="flex flex-col gap-4 w-full pt-16 px-2 md:px-6">
         <div className="max-w-3xl mx-auto w-full py-8 flex flex-col gap-8">
           <div className="flex flex-col gap-2">
             <p className="text-xs text-muted-foreground uppercase tracking-widest">Ultimo aggiornamento: Febbraio 2026</p>
@@ -19,11 +22,11 @@ export default async function TermsPage() {
           </div>
 
           <Section title="1. Accettazione dei termini">
-            <p>Utilizzando la piattaforma Formulario, accetti integralmente i presenti Termini di Servizio. Se non accetti questi termini, ti invitiamo a non utilizzare il servizio.</p>
+            <p>Utilizzando la piattaforma {packageJson.displayName}, accetti integralmente i presenti Termini di Servizio. Se non accetti questi termini, ti invitiamo a non utilizzare il servizio.</p>
           </Section>
 
           <Section title="2. Descrizione del servizio">
-            <p>Formulario è una piattaforma che consente agli utenti registrati di creare, organizzare e consultare formulari strutturati in capitoli e argomenti. Il servizio è fornito così com'è, senza garanzie di disponibilità continua.</p>
+            <p>{packageJson.displayName} è una piattaforma che consente agli utenti registrati di creare, organizzare e consultare formulari strutturati in capitoli e argomenti. Il servizio è fornito così com'è, senza garanzie di disponibilità continua.</p>
           </Section>
 
           <Section title="3. Registrazione e account">
@@ -66,10 +69,16 @@ export default async function TermsPage() {
           </Section>
 
           <Section title="10. Contatti">
-            <p>Per qualsiasi domanda relativa ai presenti termini, puoi contattarci tramite i canali indicati nella piattaforma.</p>
+            <p>Per qualsiasi domanda relativa ai presenti termini, puoi contattarci tramite mail.</p>
+            <Button variant="link">
+              <a href={`mailto:${packageJson.email}`}>
+                {packageJson.email}
+              </a>
+            </Button>
           </Section>
         </div>
       </div>
+      <Footer />
     </>
   )
 }

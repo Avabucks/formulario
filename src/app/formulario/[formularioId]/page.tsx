@@ -1,9 +1,11 @@
 import { CapitoloItem } from "@/src/components/formulario/capitolo-item";
-import { FormularioTitle } from "@/src/components/formulario/formulario-title";
+import { CapitoloAdd } from "@/src/components/formulario/capitolo-add";
+import { FormularioSettings } from "@/src/components/home/formulario-settings";
 import { BreadcrumbLogic } from "@/src/components/navigation/breadcrumb-logic";
 import { Header } from "@/src/components/navigation/header";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/src/components/ui/empty";
 import { Skeleton } from "@/src/components/ui/skeleton";
+import { TypographyH2 } from "@/src/components/ui/typography";
 import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { getIronSession } from "iron-session";
@@ -30,12 +32,12 @@ export default async function Formulario({
 
     // Check if user has access to the formulario (owner or public)
     const { rows: formularioRows, rowCount } = await pool.query(
-        `SELECT F.beautiful_id AS "id", F.titolo, F.autore, F.anno, F.descrizione,
-                F.visibility_public AS "visibilityPublic", U.display_name AS "nomeAutore"
+        `SELECT F.beautiful_id AS "id", F.titolo, F.owner_uid as "ownerUid", U_A.display_name AS "nomeAutore", F.anno,
+                F.visibility
          FROM formulari F
-         JOIN users U ON F.autore = U.uid
+         JOIN users U_A ON F.author_uid = U_A.uid
          WHERE F.beautiful_id = $1
-           AND (F.autore = $2 OR F.visibility_public = true)`,
+           AND (F.owner_uid = $2 OR F.visibility > 0)`,
         [formularioId, uid]
     );
 
@@ -45,7 +47,7 @@ export default async function Formulario({
 
     const formulario = {
         ...formularioRows[0],
-        editable: formularioRows[0].autore === uid,
+        editable: formularioRows[0].ownerUid === uid,
     };
 
     const breadcrumbs = [
@@ -95,7 +97,17 @@ export default async function Formulario({
             <Header />
             <div className="flex flex-col gap-4 w-full px-2 md:px-6 pt-16">
                 <BreadcrumbLogic items={breadcrumbs} />
-                <FormularioTitle formulario={formulario} />
+                <div className="flex flex-col gap-4">
+                    <div className="flex justify-between items-center gap-4">
+                        <TypographyH2 className="w-full">{formulario.titolo}</TypographyH2>
+                        <div className="flex gap-2 items-center">
+                            <FormularioSettings formularioId={formulario.id} />
+                            {formulario.editable && (
+                                <CapitoloAdd formulario={formulario} />
+                            )}
+                        </div>
+                    </div>
+                </div>
                 <Suspense fallback={renderLoadingSkeleton()}>
                     <div className="flex flex-col gap-4 w-full">
                         {capitoli.length == 0 ?

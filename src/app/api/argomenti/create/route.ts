@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     const { rows: capitoloRows } = await pool.query(
         `SELECT c.beautiful_id FROM capitoli c
          JOIN formulari f ON f.beautiful_id = c.formulario
-         WHERE c.beautiful_id = $1 AND f.autore = $2`,
+         WHERE c.beautiful_id = $1 AND f.owner_uid = $2`,
         [capitoloId, uid]
     );
 

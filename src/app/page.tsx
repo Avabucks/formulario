@@ -19,8 +19,13 @@ export default function Home() {
 }
 
 // TODOs:
-// - migliorare l'editor con supporto a formule matematiche, codice, ecc.
-// - aggiungere formulario d'esempio nel nuovo account
-
-// - [COMMUNITY] cerca e aggiungi ai preferiti formulari e rendi tuo (modifiche i formulari pubblici e salvali nei tuoi)
+// - [EDITOR]
+// - toolbar
 // - aggiungere funzionalità di esportazione (pdf, markdown, ecc.)
+// - search anche nel content
+// - migliorare sicurezza db (RLS)
+
+// - [COMMUNITY]
+// - home con elenco formulari community
+// - pagina nuova accessibile anche da fuori ma che quando apri devi fare il login per vedere il formulario
+// - ceerca nella community
