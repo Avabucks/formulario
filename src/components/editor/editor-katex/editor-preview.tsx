@@ -1,13 +1,15 @@
 "use client";
 
 import "katex/dist/katex.min.css";
+import { useId } from "react";
 import ReactMarkdown, { Components } from "react-markdown";
 import rehypeKatex from "rehype-katex";
 import remarkBreaks from "remark-breaks";
 import remarkMath from "remark-math";
 
 export function EditorPreview({ value }: Readonly<{ value: string }>) {
-
+    const patternId = `cross-${useId()}`;
+    
     const processedValue = value
         .replaceAll(/^(#{1,6})([^\s#])/gm, "$1 $2")
         .replaceAll(/\$\$([^\n]+?)\$\$/g, (_, math) => `\n$$\n${math}\n$$\n`);
@@ -21,11 +23,11 @@ export function EditorPreview({ value }: Readonly<{ value: string }>) {
                     preserveAspectRatio="none"
                 >
                     <defs>
-                        <pattern id="cross" width="22" height="22" patternUnits="userSpaceOnUse">
+                        <pattern id={patternId} width="22" height="22" patternUnits="userSpaceOnUse">
                             <path d="M16 0v22M0 16h22" stroke="currentColor" strokeWidth="0.5" fill="none" />
                         </pattern>
                     </defs>
-                    <rect width="100%" height="100%" fill="url(#cross)" />
+                    <rect width="100%" height="100%" fill={`url(#${patternId})`} />
                 </svg>
                 <ReactMarkdown
                     remarkPlugins={[remarkMath, remarkBreaks]}
