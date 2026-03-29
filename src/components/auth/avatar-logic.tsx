@@ -12,7 +12,7 @@ import {
 } from "@/src/components/ui/dropdown-menu";
 import { auth } from "@/src/lib/firebase";
 import { signOut } from "firebase/auth";
-import { Book, Cookie, Handshake, LogOutIcon } from "lucide-react";
+import { Book, Cookie, Handshake, LogOutIcon, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -47,7 +47,13 @@ export function AvatarLogic() {
                 <Link href="/home">
                     <DropdownMenuItem>
                         <Book />
-                        Visualizza Formulari
+                        Visualizza i tuoi formulari
+                    </DropdownMenuItem>
+                </Link>
+                <Link href="/community">
+                    <DropdownMenuItem>
+                        <Sparkles />
+                        Community
                     </DropdownMenuItem>
                 </Link>
                 <DropdownMenuSeparator />

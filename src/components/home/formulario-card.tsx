@@ -1,6 +1,6 @@
 import { Button } from "@/src/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/src/components/ui/card"
-import { BookOpen, GlobeIcon, LinkIcon, LockIcon } from "lucide-react"
+import { BookOpen, GlobeIcon, LinkIcon, LockIcon, UserRound } from "lucide-react"
 import Link from "next/link"
 import { FormularioSettings } from "./formulario-settings"
 
@@ -25,7 +25,10 @@ export function FormularioCard({ formulario }: Readonly<{ formulario: Formulario
                     </div>
                 </div>
                 <div className="flex justify-between text-sm text-muted-foreground">
-                    <span>by {formulario.nomeAutore}</span>
+                    <span className="flex gap-1 item-center">
+                        <span className="flex items-center"><UserRound size={16} /></span>
+                        <span>{formulario.nomeAutore}</span>
+                    </span>
                     <span>Anno {formulario.anno}</span>
                 </div>
             </CardHeader>
