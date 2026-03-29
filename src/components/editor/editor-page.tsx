@@ -33,11 +33,11 @@ export function EditorPage({ argomento }: Readonly<{ argomento: Argomento }>) {
                 >
                     {(argomento.editable && !switchView) && (
                         <>
-                            <ResizablePanel id="input" collapsedSize={resizableSize} defaultSize="50%">{input}</ResizablePanel>
+                            <ResizablePanel id="input" collapsedSize={resizableSize} minSize="20%" defaultSize="50%">{input}</ResizablePanel>
                             <ResizableHandle className="focus-visible:ring-0" withHandle />
                         </>
                     )}
-                    <ResizablePanel id="preview" collapsedSize={100 - resizableSize} defaultSize="50%">{preview}</ResizablePanel>
+                    <ResizablePanel id="preview" collapsedSize={100 - resizableSize} minSize="20%" defaultSize="50%">{preview}</ResizablePanel>
                 </ResizablePanelGroup>
             </div>
 
