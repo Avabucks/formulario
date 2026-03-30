@@ -99,7 +99,7 @@ const markdownComponents: Components = {
             );
         }
         return (
-            <code className="bg-[#afb8c133] dark:bg-[#3d444d] px-[0.4em] py-[0.2em] rounded-[6px] text-[85%] font-mono">
+            <code className="text-[85%] font-mono">
                 {children}
             </code>
         );

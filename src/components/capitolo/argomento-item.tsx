@@ -124,7 +124,11 @@ export function ArgomentoItem({ argomento }: Readonly<{ argomento: Argomento }>)
                         <Input id="titolo-1" name="titolo" defaultValue={argomento.titolo} />
                     </Field>
                 ) : (
-                    <ItemTitle>{argomento.titolo}</ItemTitle>
+                    <ItemTitle>
+                        <span className="group-hover:underline">
+                            {argomento.titolo}
+                        </span>
+                    </ItemTitle>
                 )}
             </ItemContent>
         </>
@@ -132,7 +136,7 @@ export function ArgomentoItem({ argomento }: Readonly<{ argomento: Argomento }>)
 
     return (
         <Item className={`${!isEditing && "hover:bg-muted/50 cursor-pointer"}`} variant="outline" size="sm">
-            <form className="flex w-full gap-2 items-center" onSubmit={handleRename}>
+            <form className="flex w-full gap-2 items-center group" onSubmit={handleRename}>
                 {isEditing ? (
                     <>{content}</>
                 ) : (
