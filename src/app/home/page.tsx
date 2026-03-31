@@ -30,7 +30,7 @@ export default async function Home() {
     }
 
     const { rows: formulari } = await pool.query(`
-        SELECT F.beautiful_id AS "id", titolo, owner_uid as "ownerUid", U_A.display_name AS "nomeAutore", anno, descrizione, visibility
+        SELECT F.beautiful_id AS "id", titolo, owner_uid as "ownerUid", U_A.display_name AS "nomeAutore", anno, descrizione, visibility, views
         FROM formulari F
         JOIN users U_A ON F.author_uid = U_A.uid
         WHERE owner_uid = $1
@@ -66,7 +66,7 @@ export default async function Home() {
         <>
             <Header />
             <section className="relative overflow-hidden border-t border-b border-border bg-secondary/30 mt-16 mb-5">
-                <svg className="absolute inset-0 h-full w-full dark:opacity-[0.06] opacity-[0.10]" xmlns="http://www.w3.org/2000/svg">
+                <svg className="absolute inset-0 h-full w-full opacity-[0.10]" xmlns="http://www.w3.org/2000/svg">
                     <defs>
                         <pattern id="cross" width="32" height="32" patternUnits="userSpaceOnUse">
                             <path d="M16 0v32M0 16h32" stroke="currentColor" strokeWidth="0.5" fill="none" />

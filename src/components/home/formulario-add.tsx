@@ -16,13 +16,28 @@ import { Switch } from "@/src/components/ui/switch";
 import { Textarea } from "@/src/components/ui/textarea";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { Kbd, KbdGroup } from "../ui/kbd";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 
 export default function ForumlarioAdd() {
     const router = useRouter();
     const [open, setOpen] = useState(false);
     const [visibility, setVisibility] = useState<0 | 1 | 2>(0)
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "a" && (e.metaKey || e.ctrlKey)) {
+                e.preventDefault()
+                setOpen((prev) => !prev)
+            }
+        }
+
+        document.addEventListener("keydown", handleKeyDown)
+        return () => document.removeEventListener("keydown", handleKeyDown)
+
+    }, [open])
 
     async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -55,12 +70,28 @@ export default function ForumlarioAdd() {
 
     return (
         <Dialog open={open} onOpenChange={(open) => setOpen(open)}>
-            <DialogTrigger asChild>
-                <Button variant="default">
-                    <Plus size={16} />
-                    <div className="hidden md:flex">Aggiungi formulario</div>
-                </Button>
-            </DialogTrigger>
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <DialogTrigger asChild>
+                            <Button variant="default">
+                                <Plus size={16} />
+                                <div className="hidden md:flex">Aggiungi un formulario</div>
+                            </Button>
+                        </DialogTrigger>
+                    </TooltipTrigger>
+                    <TooltipContent className="pr-1.5">
+                        <div className="flex items-center gap-2">
+                            Aggiungi un formulario
+                            <KbdGroup className="hidden md:flex">
+                                <Kbd>Ctrl</Kbd>
+                                <span>+</span>
+                                <Kbd>A</Kbd>
+                            </KbdGroup>
+                        </div>
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
             <DialogContent className="sm:max-w-md">
                 <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
                     <DialogHeader>

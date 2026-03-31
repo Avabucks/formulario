@@ -1,8 +1,9 @@
 import { Button } from "@/src/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/src/components/ui/card"
-import { BookOpen, GlobeIcon, LinkIcon, LockIcon, UserRound } from "lucide-react"
+import { BookOpen, Calendar, Eye, GlobeIcon, LinkIcon, LockIcon, UserRound } from "lucide-react"
 import Link from "next/link"
 import { FormularioSettings } from "./formulario-settings"
+import { Separator } from "../ui/separator"
 
 type Formulario = {
     id: string
@@ -11,6 +12,7 @@ type Formulario = {
     anno?: string
     descrizione?: string
     visibility: 0 | 1 | 2
+    views: number
 }
 
 export function FormularioCard({ formulario }: Readonly<{ formulario: Formulario }>) {
@@ -24,12 +26,25 @@ export function FormularioCard({ formulario }: Readonly<{ formulario: Formulario
                         <VisibilityIcon visibility={formulario.visibility} />
                     </div>
                 </div>
-                <div className="flex justify-between text-sm text-muted-foreground">
-                    <span className="flex gap-1 item-center">
-                        <span className="flex items-center"><UserRound size={16} /></span>
-                        <span>{formulario.nomeAutore}</span>
+                <div className="flex h-5 gap-4 text-sm text-muted-foreground min-w-0">
+                    <span className="flex flex-1 gap-1 items-center min-w-0 overflow-hidden">
+                        <UserRound size={16} className="shrink-0" />
+                        <span className="truncate">{formulario.nomeAutore}</span>
                     </span>
-                    <span>Anno {formulario.anno}</span>
+                    <Separator orientation="vertical" className="shrink-0" />
+                    <span className="flex gap-1 items-center shrink-0">
+                        <Calendar size={16} />
+                        <span>{formulario.anno}</span>
+                    </span>
+                    {formulario.visibility === 2 && (
+                        <>
+                            <Separator orientation="vertical" className="shrink-0" />
+                            <span className="flex gap-1 items-center shrink-0">
+                                <Eye size={16} />
+                                <span>{formulario.views}</span>
+                            </span>
+                        </>
+                    )}
                 </div>
             </CardHeader>
             <CardContent>

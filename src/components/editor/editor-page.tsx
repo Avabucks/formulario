@@ -42,7 +42,7 @@ export function EditorPage({ argomento }: Readonly<{ argomento: Argomento }>) {
             </div>
 
             {/* Mobile */}
-            <div className="md:hidden flex-1 min-h-0">
+            <div className="md:hidden flex-1 min-h-0 overflow-auto">
                 {switchView ? input : preview}
             </div>
         </div>

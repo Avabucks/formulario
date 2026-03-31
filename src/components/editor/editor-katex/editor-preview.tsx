@@ -18,7 +18,7 @@ export function EditorPreview({ value }: Readonly<{ value: string }>) {
         <div className="relative flex-1 h-full">
             <div className="p-5 min-h-full leading-loose relative">
                 <svg
-                    className="absolute inset-0 h-full w-full dark:opacity-[0.06] opacity-[0.10] pointer-events-none"
+                    className="absolute inset-0 h-full w-full opacity-[0.10] pointer-events-none"
                     xmlns="http://www.w3.org/2000/svg"
                     preserveAspectRatio="none"
                 >
