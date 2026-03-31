@@ -19,6 +19,7 @@ export default function Home() {
 }
 
 // TODOs:
+
 // - [EDITOR]
 // - toolbar
 // - aggiungere funzionalità di esportazione (pdf, markdown, ecc.)
@@ -26,6 +27,6 @@ export default function Home() {
 // - migliorare sicurezza db (RLS)
 
 // - [COMMUNITY]
-// - home con elenco formulari community
-// - pagina nuova accessibile anche da fuori ma che quando apri devi fare il login per vedere il formulario
-// - ceerca nella community
+// - elenco formulari community
+// - cerca nella community e pagination
+// - preferiti formulari (like da impostazioni o card, elenco likes nella home) -> primo formulario nei like

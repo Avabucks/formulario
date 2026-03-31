@@ -1,24 +1,20 @@
 "use client"
 
-import { CopyPlus, GlobeIcon, LinkIcon, LockIcon, SaveAll, Settings, Trash2, UserRound, X } from "lucide-react";
+import { cn } from "@/src/lib/utils";
+import { Calendar, CopyPlus, Download, Eye, GlobeIcon, Info, LinkIcon, LockIcon, Pencil, QrCode, Settings, Trash2, UserRound, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion";
+import { NavigationBlocker } from "../navigation/navigation-blocker";
 import { Button } from "../ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
-import { Field, FieldGroup } from "../ui/field";
-import { Input } from "../ui/input";
 import { Kbd, KbdGroup } from "../ui/kbd";
-import { Label } from "../ui/label";
 import { Qr } from "../ui/qr";
-import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "../ui/sheet";
-import { Spinner } from "../ui/spinner";
-import { Switch } from "../ui/switch";
-import { Textarea } from "../ui/textarea";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
-import { NavigationBlocker } from "../navigation/navigation-blocker";
 import { ScrollArea } from "../ui/scroll-area";
+import { Separator } from "../ui/separator";
+import { Spinner } from "../ui/spinner";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
+import { EditSection } from "./settings-sections/edit-section";
 
 type Formulario = {
     titolo: string
@@ -26,15 +22,16 @@ type Formulario = {
     nomeAutore: string
     anno: string
     visibility: 0 | 1 | 2
+    views: number
     editable: boolean
 }
 
 export function FormularioSettings({ formularioId, allowKey = true }: Readonly<{ formularioId: string; allowKey?: boolean }>) {
     const router = useRouter();
     const [formulario, setFormulario] = useState<Formulario>();
-    const [visibility, setVisibility] = useState<0 | 1 | 2>(0)
     const [open, setOpen] = useState(false)
     const [edited, setEdited] = useState(false)
+    const [activeSection, setActiveSection] = useState<"info" | "edit" | "qr">()
 
     const SHARE_URL = `${process.env.NEXT_PUBLIC_APP_URL}/formulario/${formularioId}`;
 
@@ -48,8 +45,8 @@ export function FormularioSettings({ formularioId, allowKey = true }: Readonly<{
 
         const data = await response.json();
         setFormulario(data);
-        setVisibility(data.visibility);
         setEdited(false);
+        setActiveSection(data.editable ? "edit" : "info")
     }
 
     useEffect(() => {
@@ -66,34 +63,6 @@ export function FormularioSettings({ formularioId, allowKey = true }: Readonly<{
         return () => document.removeEventListener("keydown", handleKeyDown)
 
     }, []);
-
-    async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
-        e.preventDefault();
-
-        const formData = new FormData(e.currentTarget);
-        formData.append("formularioId", formularioId);
-
-        toast.promise(
-            fetch("/api/formulari/update", {
-                method: "PUT",
-                body: formData,
-            }).then(async (res) => {
-                if (!res.ok) {
-                    const text = await res.text();
-                    throw new Error(text);
-                }
-                router.refresh();
-                fetchFormulario();
-            }),
-            {
-                loading: "Modifica in corso...",
-                success: "Formulario modificato con successo!",
-                error: "Errore durante la modifica del formulario.",
-                position: "bottom-center",
-            },
-        );
-
-    }
 
     async function handleTake() {
 
@@ -146,199 +115,209 @@ export function FormularioSettings({ formularioId, allowKey = true }: Readonly<{
     return (
         <div className="flex gap-2 items-center">
             <NavigationBlocker blocked={edited} />
-            <Sheet open={open} onOpenChange={setOpen}>
-                <SheetTrigger asChild>
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <DialogTrigger asChild>
-                                    <Button variant="outline" size="icon">
-                                        <Settings size={16} />
-                                    </Button>
-                                </DialogTrigger>
-                            </TooltipTrigger>
-                            <TooltipContent className="pr-1.5">
-                                <div className="flex items-center gap-2">
-                                    Impostazioni formulario
-                                    {allowKey && (
-                                        <KbdGroup className="hidden md:flex">
-                                            <Kbd>Ctrl</Kbd>
-                                            <span>+</span>
-                                            <Kbd>I</Kbd>
-                                        </KbdGroup>
+            <Dialog open={open} onOpenChange={setOpen}>
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <DialogTrigger asChild>
+                                <Button variant="outline" size="icon" className="relative">
+                                    <Settings size={16} />
+                                    {edited && (
+                                        <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-primary" />
                                     )}
-                                </div>
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
-
-                </SheetTrigger>
-                {formulario ? (
-                    <SheetContent>
-                        <SheetHeader>
-                            <SheetTitle>
-                                <div className="flex gap-2 items-center">
-                                    {formulario.titolo}
-                                    <div className="text-muted-foreground">
-                                        <VisibilityIcon visibility={formulario.visibility} />
-                                    </div>
-                                </div>
-                            </SheetTitle>
-                            <SheetDescription asChild>
-                                <div className="flex items-center justify-between">
-                                    <span className="flex gap-1 item-center">
-                                        <span className="flex items-center"><UserRound size={16} /></span>
-                                        <span>{formulario.nomeAutore}</span>
-                                    </span>
-                                    <span>Anno {formulario.anno}</span>
-                                </div>
-                            </SheetDescription>
-                        </SheetHeader>
-                        <ScrollArea className="px-4 flex-1 min-h-0">
-                            <div className="mb-4">
-                                <span>{formulario.descrizione}</span>
+                                </Button>
+                            </DialogTrigger>
+                        </TooltipTrigger>
+                        <TooltipContent className="pr-1.5">
+                            <div className="flex items-center gap-2">
+                                Impostazioni formulario
+                                {allowKey && (
+                                    <KbdGroup className="hidden md:flex">
+                                        <Kbd>Ctrl</Kbd>
+                                        <span>+</span>
+                                        <Kbd>I</Kbd>
+                                    </KbdGroup>
+                                )}
                             </div>
-                            <Accordion
-                                type="multiple"
-                                defaultValue={formulario.editable ? ["edit"] : ["qr"]}
-                                className="max-w-lg"
-                            >
-                                {formulario.editable && (
-                                    <AccordionItem value="edit">
-                                        <AccordionTrigger>Modifica formulario</AccordionTrigger>
-                                        <AccordionContent>
-                                            <div className="flex mb-3 pl-2">
-                                                <div className="border-l pl-3"></div>
-                                                <form className="flex flex-1 flex-col gap-6" onSubmit={handleSubmit}>
-                                                    <FieldGroup>
-                                                        <Field>
-                                                            <Label htmlFor="titolo-1">Titolo del formulario</Label>
-                                                            <Input
-                                                                id="titolo-1"
-                                                                name="titolo"
-                                                                defaultValue={formulario.titolo}
-                                                                onInput={(e) => setEdited(true)}
-                                                            />
-                                                        </Field>
-                                                        <Field>
-                                                            <Label htmlFor="descrizione-1">Descrizione del formulario</Label>
-                                                            <Textarea
-                                                                id="descrizione-1"
-                                                                name="descrizione"
-                                                                defaultValue={formulario.descrizione}
-                                                                onInput={(e) => setEdited(true)}
-                                                            />
-                                                        </Field>
-                                                        <div className="flex flex-col gap-4">
-                                                            <div className="flex items-center justify-between">
-                                                                <Label htmlFor="visibility-1">Condividi con link</Label>
-                                                                <Switch
-                                                                    id="visibility-1"
-                                                                    checked={visibility >= 1}
-                                                                    onCheckedChange={(checked) => {
-                                                                        setVisibility(checked ? 1 : 0)
-                                                                        setEdited(true)
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                            {visibility >= 1 && (
-                                                                <div className="flex items-center justify-between">
-                                                                    <Label htmlFor="visibility-2">Condividi con la community</Label>
-                                                                    <Switch
-                                                                        id="visibility-2"
-                                                                        checked={visibility === 2}
-                                                                        onCheckedChange={(checked) => {
-                                                                            setVisibility(checked ? 2 : 1)
-                                                                            setEdited(true)
-                                                                        }}
-                                                                    />
-                                                                </div>
-                                                            )}
-                                                            <input type="hidden" name="visibility" value={visibility} />
-                                                        </div>
-                                                    </FieldGroup>
-                                                    <Button type="submit" variant={edited ? "default" : "secondary"} disabled={!edited}>
-                                                        <SaveAll size={16} /> Salva le modifiche
-                                                    </Button>
-                                                </form>
-                                            </div>
-                                        </AccordionContent>
-                                    </AccordionItem>
-                                )}
-                                {formulario.visibility !== 0 && (
-                                    <AccordionItem value="qr">
-                                        <AccordionTrigger>Condividi formulario</AccordionTrigger>
-                                        <AccordionContent>
-                                            <Qr link={SHARE_URL} title={formulario.titolo} />
-                                        </AccordionContent>
-                                    </AccordionItem>
-                                )}
-                                <AccordionItem value="export" disabled>
-                                    <AccordionTrigger>
-                                        <div className="flex flex-1 items-center justify-between">
-                                            Esporta formulario
-                                            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-4 py-0.5">
-                                                <span className="text-xs font-medium">
-                                                    Coming soon
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+
+                <DialogContent className="h-[80vh] flex flex-col p-0 gap-0 md:max-w-4xl" showCloseButton={false}>
+                    {formulario ? (
+                        <>
+                            <DialogHeader className="px-6 py-4 border-b shrink-0">
+                                <DialogTitle>
+                                    <div className="flex gap-2 items-center">
+                                        {formulario.titolo}
+                                        <div className="text-muted-foreground">
+                                            <VisibilityIcon visibility={formulario.visibility} />
+                                        </div>
+                                    </div>
+                                </DialogTitle>
+                                <DialogDescription asChild>
+                                    <div className="flex h-5 gap-4 text-sm text-muted-foreground min-w-0">
+                                        <span className="flex gap-1 items-center min-w-0 overflow-hidden">
+                                            <UserRound size={16} />
+                                            <span className="truncate">{formulario.nomeAutore}</span>
+                                        </span>
+                                        <Separator orientation="vertical" />
+                                        <span className="flex gap-1 items-center shrink-0">
+                                            <Calendar size={16} />
+                                            <span>{formulario.anno}</span>
+                                        </span>
+                                        {formulario.visibility === 2 && (
+                                            <>
+                                                <Separator orientation="vertical" />
+                                                <span className="flex gap-1 items-center shrink-0">
+                                                    <Eye size={16} />
+                                                    <span>{formulario.views}</span>
                                                 </span>
+                                            </>
+                                        )}
+                                    </div>
+                                </DialogDescription>
+                            </DialogHeader>
+
+                            <div className="flex flex-1 min-h-0">
+                                {/* Sidebar */}
+                                <div className="md:w-56 shrink-0 border-r flex flex-col">
+                                    <nav className="flex flex-col gap-1 p-2">
+                                        {formulario.editable ? (
+                                            <button
+                                                onClick={() => setActiveSection("edit")}
+                                                className={cn(
+                                                    "flex items-center gap-2 rounded-md px-3 py-2 text-sm text-left transition-colors",
+                                                    activeSection === "edit"
+                                                        ? "bg-accent text-accent-foreground font-medium"
+                                                        : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+                                                )}
+                                            >
+                                                <Pencil size={15} />
+                                                <span className="hidden md:flex">Modifica</span>
+                                            </button>
+                                        ) : (
+                                            <button
+                                                onClick={() => setActiveSection("info")}
+                                                className={cn(
+                                                    "flex items-center gap-2 rounded-md px-3 py-2 text-sm text-left transition-colors",
+                                                    activeSection === "info"
+                                                        ? "bg-accent text-accent-foreground font-medium"
+                                                        : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+                                                )}
+                                            >
+                                                <Info size={15} />
+                                                <span className="hidden md:flex">Informazioni</span>
+                                            </button>
+                                        )}
+                                        {formulario.visibility !== 0 && (
+                                            <button
+                                                onClick={() => setActiveSection("qr")}
+                                                className={cn(
+                                                    "flex items-center gap-2 rounded-md px-3 py-2 text-sm text-left transition-colors",
+                                                    activeSection === "qr"
+                                                        ? "bg-accent text-accent-foreground font-medium"
+                                                        : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+                                                )}
+                                            >
+                                                <QrCode size={15} />
+                                                <span className="hidden md:flex">Condividi</span>
+                                            </button>
+                                        )}
+                                        <button
+                                            disabled
+                                            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-left text-muted-foreground/50 cursor-not-allowed"
+                                        >
+                                            <Download size={15} />
+                                            <span className="hidden md:flex">Esporta</span>
+                                            <span className="hidden md:flex ml-auto text-xs border border-border rounded-full px-2 py-0.5 bg-secondary">
+                                                Soon
+                                            </span>
+                                        </button>
+                                    </nav>
+                                </div>
+
+                                {/* Content */}
+                                <ScrollArea className="flex-1 min-w-0">
+                                    <div className="p-6">
+
+                                        {activeSection === "info" && (
+                                            <div className="flex flex-col gap-6">
+                                                <div>
+                                                    <h3 className="text-sm font-medium mb-1">Descrizione</h3>
+                                                    <p className="text-sm text-muted-foreground">{formulario.descrizione}</p>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </AccordionTrigger>
-                                    <AccordionContent>
-                                        <div className="flex mb-3 pl-2">
-                                            <div className="border-l pl-3"></div>
+                                        )}
+
+                                        {activeSection === "edit" && formulario.editable && (
+                                            <EditSection
+                                                formularioId={formularioId}
+                                                formulario={formulario}
+                                                setFormulario={setFormulario}
+                                                edited={edited}
+                                                setEdited={setEdited}
+                                            />
+                                        )}
+
+                                        {(activeSection === "qr" && formulario.visibility !== 0) && (
                                             <div>
-                                                {/* // TODO */}
+                                                <Qr link={SHARE_URL} title={formulario.titolo} />
                                             </div>
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
-                            </Accordion>
-                        </ScrollArea>
-                        <SheetFooter>
-                            {formulario.editable ? (
-                                <Dialog>
-                                    <DialogTrigger asChild>
-                                        <Button variant="destructive"><Trash2 size={16} />Elimina formulario</Button>
-                                    </DialogTrigger>
-                                    <DialogContent className="sm:max-w-md">
-                                        <DialogHeader>
-                                            <DialogTitle>Elimina</DialogTitle>
-                                        </DialogHeader>
-                                        <DialogDescription>
-                                            Sei sicuro di voler eliminare "{formulario.titolo}"? Questa azione non è reversibile.
-                                        </DialogDescription>
-                                        <DialogFooter>
-                                            <DialogClose asChild>
-                                                <Button variant="outline">Chiudi</Button>
-                                            </DialogClose>
-                                            <DialogClose asChild>
-                                                <Button variant="destructive" onClick={handleDelete}>Elimina</Button>
-                                            </DialogClose>
-                                        </DialogFooter>
-                                    </DialogContent>
-                                </Dialog>
-                            ) : (
+                                        )}
+                                    </div>
+                                </ScrollArea>
+                            </div>
+
+                            <div className="flex px-6 py-4 border-t shrink-0 justify-end gap-2">
                                 <DialogClose asChild>
-                                    <Button onClick={handleTake}><CopyPlus size={16} />Aggiungi ai miei formulari</Button>
+                                    <Button variant="outline"><X size={16} />Chiudi</Button>
                                 </DialogClose>
-                            )}
-                            <SheetClose asChild>
-                                <Button variant="outline"><X size={16} />Chiudi</Button>
-                            </SheetClose>
-                        </SheetFooter>
-                    </SheetContent>
-                ) : (
-                    <SheetContent>
-                        <SheetHeader>
-                            <SheetTitle>Caricamento...</SheetTitle>
-                        </SheetHeader>
-                        <div className="px-4 flex-1 flex items-center justify-center">
-                            <Spinner />
-                        </div>
-                    </SheetContent>
-                )}
-            </Sheet>
+                                {formulario.editable ? (
+                                    <Dialog>
+                                        <DialogTrigger asChild>
+                                            <Button variant="destructive"><Trash2 size={16} />Elimina formulario</Button>
+                                        </DialogTrigger>
+                                        <DialogContent className="sm:max-w-md">
+                                            <DialogHeader>
+                                                <DialogTitle>Elimina</DialogTitle>
+                                            </DialogHeader>
+                                            <DialogDescription>
+                                                Sei sicuro di voler eliminare "{formulario.titolo}"? Questa azione non è reversibile.
+                                            </DialogDescription>
+                                            <DialogFooter>
+                                                <DialogClose asChild>
+                                                    <Button variant="outline">Chiudi</Button>
+                                                </DialogClose>
+                                                <DialogClose asChild>
+                                                    <Button variant="destructive" onClick={handleDelete}>Elimina</Button>
+                                                </DialogClose>
+                                            </DialogFooter>
+                                        </DialogContent>
+                                    </Dialog>
+                                ) : (
+                                    <Button onClick={handleTake}><CopyPlus size={16} />Aggiungi ai miei formulari</Button>
+                                )}
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <DialogHeader className="px-6 py-4 border-b shrink-0">
+                                <DialogTitle>
+                                    Caricamento in corso
+                                </DialogTitle>
+                                <DialogDescription>
+                                    Caricamento del formulario in corso, attendere prego.
+                                </DialogDescription>
+                            </DialogHeader>
+
+                            <div className="flex-1 flex items-center justify-center">
+                                <Spinner />
+                            </div>
+                        </>
+                    )}
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }
