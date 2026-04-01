@@ -13,6 +13,7 @@ import { BookmarkX } from "lucide-react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { decrypt } from "@/src/lib/crypto";
 
 export default async function Formulario({
     params,
@@ -51,14 +52,15 @@ export default async function Formulario({
         [formularioId, session.uid ?? ""]
     );
 
-    const formulario = {
+    const formularioDecrypted = {
         ...formularioRows[0],
+        titolo: decrypt(formularioRows[0].titolo, formularioRows[0].ownerUid),
         editable: formularioRows[0].ownerUid === uid,
     };
 
     const breadcrumbs = [
         { label: "Home", href: "/" },
-        { label: formulario.titolo, href: `/formulario/${formularioId}` },
+        { label: formularioDecrypted.titolo, href: `/formulario/${formularioId}` },
     ];
 
     // Fetch capitoli for the formulario
@@ -67,14 +69,21 @@ export default async function Formulario({
             c.beautiful_id        AS "id",
             c.titolo,
             COUNT(a.beautiful_id) AS "argomentiCount",
-            c.sort_order          AS "sortOrder"
-         FROM capitoli c
-         LEFT JOIN argomenti a ON a.capitolo = c.beautiful_id
-         WHERE c.formulario = $1
-         GROUP BY c.beautiful_id, c.titolo, c.formulario, c.sort_order
-         ORDER BY c.sort_order ASC`,
+            c.sort_order          AS "sortOrder",
+            f.owner_uid           AS "ownerUid"
+        FROM capitoli c
+        LEFT JOIN argomenti a ON a.capitolo = c.beautiful_id
+        JOIN formulari f ON f.beautiful_id = c.formulario
+        WHERE c.formulario = $1
+        GROUP BY c.beautiful_id, c.titolo, c.formulario, c.sort_order, f.owner_uid
+        ORDER BY c.sort_order ASC`,
         [formularioId]
     );
+
+    const capitoliDecrypted = capitoli.map((c) => ({
+        ...c,
+        titolo: decrypt(c.titolo, c.ownerUid),
+    }));
 
     const renderEmpty = () => (
         <Empty className="border border-dashed">
@@ -84,7 +93,7 @@ export default async function Formulario({
                 </EmptyMedia>
                 <EmptyTitle>Nessun Capitolo</EmptyTitle>
                 <EmptyDescription>
-                    {`Non ci sono capitoli da mostrare in "${formulario.titolo}".`}
+                    {`Non ci sono capitoli da mostrare in "${formularioDecrypted.titolo}".`}
                 </EmptyDescription>
             </EmptyHeader>
         </Empty>
@@ -105,22 +114,22 @@ export default async function Formulario({
                 <BreadcrumbLogic items={breadcrumbs} />
                 <div className="flex flex-col gap-4">
                     <div className="flex justify-between items-center gap-4">
-                        <TypographyH2 className="w-full">{formulario.titolo}</TypographyH2>
+                        <TypographyH2 className="w-full">{formularioDecrypted.titolo}</TypographyH2>
                         <div className="flex gap-2 items-center">
-                            <FormularioSettings formularioId={formulario.id} />
-                            {formulario.editable && (
-                                <CapitoloAdd formulario={formulario} />
+                            <FormularioSettings formularioId={formularioDecrypted.id} />
+                            {formularioDecrypted.editable && (
+                                <CapitoloAdd formulario={formularioDecrypted} />
                             )}
                         </div>
                     </div>
                 </div>
                 <Suspense fallback={renderLoadingSkeleton()}>
                     <div className="flex flex-col gap-4 w-full">
-                        {capitoli.length == 0 ?
+                        {capitoliDecrypted.length == 0 ?
                             renderEmpty()
                             :
-                            capitoli.map((c, index) => (
-                                <CapitoloItem key={c.id} capitolo={{ ...c, editable: formulario.editable, capitoliCount: capitoli.length }} />
+                            capitoliDecrypted.map((c, index) => (
+                                <CapitoloItem key={c.id} capitolo={{ ...c, editable: formularioDecrypted.editable, capitoliCount: capitoliDecrypted.length }} />
                             ))
                         }
                     </div>

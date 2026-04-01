@@ -12,6 +12,7 @@ import {
 } from "@/src/components/ui/empty";
 import { Separator } from "@/src/components/ui/separator";
 import { Skeleton } from "@/src/components/ui/skeleton";
+import { decrypt } from "@/src/lib/crypto";
 import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { getIronSession } from "iron-session";
@@ -38,8 +39,16 @@ export default async function Home() {
         FROM formulari F
         JOIN users U_A ON F.author_uid = U_A.uid
         WHERE owner_uid = $1
-        ORDER BY titolo DESC
+        ORDER BY F.id DESC
     `, [session.uid]);
+
+    console.log("Formulari:", formulari);
+
+    const formulariDecrypted = formulari.map((f) => ({
+        ...f,
+        titolo: decrypt(f.titolo, f.ownerUid),
+        descrizione: decrypt(f.descrizione, f.ownerUid),
+    }));
 
     const { rows: preferiti } = await pool.query(`
         SELECT F.beautiful_id AS "id", titolo, owner_uid AS "ownerUid", U_A.display_name AS "nomeAutore", anno, descrizione, visibility, views,
@@ -49,8 +58,14 @@ export default async function Home() {
         JOIN users U_A ON F.author_uid = U_A.uid
         JOIN preferiti P ON P.formulario_id = F.beautiful_id
         WHERE P.user_uid = $1 AND F.visibility > 0
-        ORDER BY titolo DESC
+        ORDER BY F.id DESC
     `, [session.uid]);
+
+    const preferitiDecrypted = preferiti.map((f) => ({
+        ...f,
+        titolo: decrypt(f.titolo, f.ownerUid),
+        descrizione: decrypt(f.descrizione, f.ownerUid),
+    }));
 
     const renderEmptyFormulari = () => (
         <Empty className="border border-dashed">
@@ -147,11 +162,11 @@ export default async function Home() {
                 </div>
                 <Suspense fallback={renderLoadingSkeleton()}>
                     <div className="flex flex-col gap-4 w-full">
-                        {formulari.length === 0 ? (
+                        {formulariDecrypted.length === 0 ? (
                             renderEmptyFormulari()
                         ) : (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[101rem]:grid-cols-5 gap-4 w-full">
-                                {formulari.map((f) => (
+                                {formulariDecrypted.map((f) => (
                                     <FormularioCard formulario={f} key={f.id} />
                                 ))}
                             </div>
@@ -168,11 +183,11 @@ export default async function Home() {
                 </div>
                 <Suspense fallback={renderLoadingSkeleton()}>
                     <div className="flex flex-col gap-4 w-full">
-                        {preferiti.length === 0 ? (
+                        {preferitiDecrypted.length === 0 ? (
                             renderEmptyPreferiti()
                         ) : (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[101rem]:grid-cols-5 gap-4 w-full">
-                                {preferiti.map((f) => (
+                                {preferitiDecrypted.map((f) => (
                                     <FormularioCard formulario={f} key={f.id} />
                                 ))}
                             </div>

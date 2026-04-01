@@ -1,3 +1,4 @@
+import { encrypt } from "@/src/lib/crypto";
 import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { getIronSession } from "iron-session";
@@ -28,7 +29,7 @@ export async function POST(request: Request) {
     try {
         await pool.query(
             `UPDATE argomenti SET content = $1 WHERE beautiful_id = $2`,
-            [content, argomentoId]
+            [encrypt(content, uid), argomentoId]
         );
 
         return NextResponse.json({ success: true });

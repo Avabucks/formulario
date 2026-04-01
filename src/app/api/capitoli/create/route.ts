@@ -1,3 +1,4 @@
+import { encrypt } from "@/src/lib/crypto";
 import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { getIronSession } from "iron-session";
@@ -16,6 +17,7 @@ export async function POST(request: Request) {
     const formularioId = formData.get("formularioId") as string;
 
     if (!titolo) return NextResponse.json({ error: "Campi obbligatori mancanti" }, { status: 400 });
+    if (titolo.length > 50) return NextResponse.json({ error: "Il titolo è troppo lungo" }, { status: 400 });
     if (!formularioId) return NextResponse.json({ error: "Formulario non specificato" }, { status: 400 });
 
     const beautiful_id = crypto.randomUUID();
@@ -36,7 +38,7 @@ export async function POST(request: Request) {
         await pool.query(
             `INSERT INTO capitoli (beautiful_id, titolo, formulario, sort_order)
              VALUES ($1, $2, $3, $4)`,
-            [beautiful_id, titolo, formularioId, rows[0].next_order]
+            [beautiful_id, encrypt(titolo, uid), formularioId, rows[0].next_order]
         );
 
         revalidatePath(`/formulari/${formularioId}`);

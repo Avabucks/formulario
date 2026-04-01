@@ -1,3 +1,4 @@
+import { encrypt } from "@/src/lib/crypto";
 import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { getIronSession } from "iron-session";
@@ -26,7 +27,7 @@ export async function PUT(request: Request) {
             `UPDATE formulari 
              SET titolo = $1, descrizione = $2, visibility = $3
              WHERE beautiful_id = $4 AND owner_uid = $5`,
-            [titolo, descrizione, visibility, id, uid]
+            [encrypt(titolo, uid), encrypt(descrizione, uid), visibility, id, uid]
         );
 
         if (result.rowCount === 0) return NextResponse.json({ error: "Formulario non trovato o non autorizzato" }, { status: 404 });

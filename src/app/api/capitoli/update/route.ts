@@ -1,3 +1,4 @@
+import { encrypt } from "@/src/lib/crypto";
 import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { getIronSession } from "iron-session";
@@ -22,7 +23,7 @@ export async function PUT(request: Request) {
             `UPDATE capitoli SET titolo = $1
              WHERE beautiful_id = $2
              AND formulario IN (SELECT beautiful_id AS "id" FROM formulari WHERE owner_uid = $3)`,
-            [titolo, capitoloId, uid]
+            [encrypt(titolo, uid), capitoloId, uid]
         );
 
         if (result.rowCount === 0) return NextResponse.json({ error: "Capitolo non trovato o non autorizzato" }, { status: 404 });

@@ -6,6 +6,7 @@ import { Header } from "@/src/components/navigation/header";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/src/components/ui/empty";
 import { Skeleton } from "@/src/components/ui/skeleton";
 import { TypographyH2 } from "@/src/components/ui/typography";
+import { decrypt } from "@/src/lib/crypto";
 import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { getIronSession } from "iron-session";
@@ -46,15 +47,17 @@ export default async function Capitolo({
         redirect('/home');
     }
 
-    const capitolo = {
+    const capitoloDecrypted = {
         ...capitoloRows[0],
+        titolo: decrypt(capitoloRows[0].titolo, capitoloRows[0].ownerUid),
+        formularioTitolo: decrypt(capitoloRows[0].formularioTitolo, capitoloRows[0].ownerUid),
         editable: capitoloRows[0].ownerUid === uid,
     };
 
     const breadcrumbs = [
         { label: "Home", href: "/" },
-        { label: capitolo.formularioTitolo, href: `/formulario/${capitolo.formularioId}` },
-        { label: capitolo.titolo, href: `/capitolo/${capitoloId}` },
+        { label: capitoloDecrypted.formularioTitolo, href: `/formulario/${capitoloDecrypted.formularioId}` },
+        { label: capitoloDecrypted.titolo, href: `/capitolo/${capitoloId}` },
     ];
 
     // Fetch argomenti for the capitolo
@@ -69,6 +72,11 @@ export default async function Capitolo({
         [capitoloId]
     );
 
+    const argomentiDecrypted = argomenti.map((a) => ({
+        ...a,
+        titolo: decrypt(a.titolo, capitoloRows[0].ownerUid),
+    }));
+
     const renderEmpty = () => (
         <Empty className="border border-dashed">
             <EmptyHeader>
@@ -77,7 +85,7 @@ export default async function Capitolo({
                 </EmptyMedia>
                 <EmptyTitle>Nessun Capitolo</EmptyTitle>
                 <EmptyDescription>
-                    {`Non ci sono capitoli da mostrare in "${capitolo.titolo}".`}
+                    {`Non ci sono capitoli da mostrare in "${capitoloDecrypted.titolo}".`}
                 </EmptyDescription>
             </EmptyHeader>
         </Empty>
@@ -98,22 +106,22 @@ export default async function Capitolo({
                 <BreadcrumbLogic items={breadcrumbs} />
                 <div className="flex flex-col gap-4">
                     <div className="flex justify-between items-center gap-4">
-                        <TypographyH2 className="w-full">{capitolo.titolo}</TypographyH2>
+                        <TypographyH2 className="w-full">{capitoloDecrypted.titolo}</TypographyH2>
                         <div className="flex gap-2 items-center">
-                            <FormularioSettings formularioId={capitolo.formularioId}/>
-                            {capitolo.editable && (
-                                <ArgomentoAdd capitolo={capitolo} />
+                            <FormularioSettings formularioId={capitoloDecrypted.formularioId} />
+                            {capitoloDecrypted.editable && (
+                                <ArgomentoAdd capitolo={capitoloDecrypted} />
                             )}
                         </div>
                     </div>
                 </div>
                 <Suspense fallback={renderLoadingSkeleton()}>
                     <div className="flex flex-col gap-4 w-full">
-                        {argomenti.length == 0 ?
+                        {argomentiDecrypted.length == 0 ?
                             renderEmpty()
                             :
-                            argomenti.map((a, index) => (
-                                <ArgomentoItem key={a.id} argomento={{ ...a, editable: capitolo.editable, argomentiCount: argomenti.length }} />
+                            argomentiDecrypted.map((a, index) => (
+                                <ArgomentoItem key={a.id} argomento={{ ...a, editable: capitoloDecrypted.editable, argomentiCount: argomentiDecrypted.length }} />
                             ))
                         }
                     </div>

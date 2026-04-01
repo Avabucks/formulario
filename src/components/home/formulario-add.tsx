@@ -106,7 +106,7 @@ export default function ForumlarioAdd({ allowKey = true }: Readonly<{ allowKey?:
                         </Field>
                         <Field>
                             <Label htmlFor="descrizione-1">Descrizione del formulario</Label>
-                            <Textarea id="descrizione-1" name="descrizione" placeholder="Descrivi il formulario" required />
+                            <Textarea id="descrizione-1" name="descrizione" placeholder="Descrivi il formulario" maxLength={200} required />
                         </Field>
                         <div className="flex flex-col gap-4">
                             <div className="flex items-center justify-between">

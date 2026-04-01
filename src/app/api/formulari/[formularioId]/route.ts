@@ -1,3 +1,4 @@
+import { decrypt } from "@/src/lib/crypto";
 import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { getIronSession } from "iron-session";
@@ -25,10 +26,12 @@ export async function GET(request: Request, { params }: { params: Promise<{ form
 
     if (rowCount === 0) return NextResponse.json({ error: "Formulario non trovato" }, { status: 404 });
 
-    const formulario = {
+    const formularioDecrypted = {
         ...rows[0],
+        titolo: decrypt(rows[0].titolo, rows[0].ownerUid),
+        descrizione: decrypt(rows[0].descrizione, rows[0].ownerUid),
         editable: rows[0].ownerUid === uid,
     };
 
-    return NextResponse.json(formulario);
+    return NextResponse.json(formularioDecrypted);
 }

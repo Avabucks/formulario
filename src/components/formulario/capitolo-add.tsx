@@ -104,7 +104,7 @@ export function CapitoloAdd({ formulario }: Readonly<{ formulario: Formulario }>
                     </DialogHeader>
                     <Field>
                         <Label htmlFor="titolo-1">Titolo del nuovo capitolo</Label>
-                        <Input id="titolo-1" name="titolo" />
+                        <Input id="titolo-1" name="titolo" maxLength={50} required />
                     </Field>
                     <DialogFooter>
                         <DialogClose asChild>

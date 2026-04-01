@@ -82,6 +82,7 @@ export function EditSection(
                             name="descrizione"
                             value={formulario.descrizione}
                             onInput={(e) => { setFormulario({ ...formulario, descrizione: (e.target as HTMLTextAreaElement).value }); setEdited(true) }}
+                            maxLength={200}
                         />
                     </Field>
                     <div className="flex flex-col gap-4">

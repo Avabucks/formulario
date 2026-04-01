@@ -4,6 +4,7 @@ import { BreadcrumbLogic } from "@/src/components/navigation/breadcrumb-logic";
 import { Header } from "@/src/components/navigation/header";
 import { Skeleton } from "@/src/components/ui/skeleton";
 import { TypographyH4 } from "@/src/components/ui/typography";
+import { decrypt } from "@/src/lib/crypto";
 import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { getIronSession } from "iron-session";
@@ -47,16 +48,20 @@ export default async function Argomento({
         redirect('/home');
     }
 
-    const argomento = {
+    const argomentoDecrypted = {
         ...argomentoRows[0],
+        titolo: decrypt(argomentoRows[0].titolo, argomentoRows[0].ownerUid),
+        formularioTitolo: decrypt(argomentoRows[0].formularioTitolo, argomentoRows[0].ownerUid),
+        capitoloTitolo: decrypt(argomentoRows[0].capitoloTitolo, argomentoRows[0].ownerUid),
+        content: decrypt(argomentoRows[0].content, argomentoRows[0].ownerUid),
         editable: argomentoRows[0].ownerUid === uid,
     };
 
     const breadcrumbs = [
         { label: "Home", href: "/" },
-        { label: argomento.formularioTitolo, href: `/formulario/${argomento.formularioId}` },
-        { label: argomento.capitoloTitolo, href: `/capitolo/${argomento.capitoloId}` },
-        { label: argomento.titolo, href: `/editor/${argomento}` },
+        { label: argomentoDecrypted.formularioTitolo, href: `/formulario/${argomentoDecrypted.formularioId}` },
+        { label: argomentoDecrypted.capitoloTitolo, href: `/capitolo/${argomentoDecrypted.capitoloId}` },
+        { label: argomentoDecrypted.titolo, href: `/editor/${argomentoDecrypted.id}` },
     ];
 
     return (
@@ -66,12 +71,12 @@ export default async function Argomento({
                 <BreadcrumbLogic items={breadcrumbs} />
                 <div className="flex justify-between items-center gap-4">
                     <div className="flex items-center gap-4">
-                        <TypographyH4 className="truncate min-w-0 flex-1">{argomento.titolo}</TypographyH4>
+                        <TypographyH4 className="truncate min-w-0 flex-1">{argomentoDecrypted.titolo}</TypographyH4>
                     </div>
-                    <FormularioSettings formularioId={argomento.formularioId} />
+                    <FormularioSettings formularioId={argomentoDecrypted.formularioId} />
                 </div>
                 <Suspense fallback={<Skeleton className="h-full w-full" />}>
-                    <EditorPage argomento={argomento} />
+                    <EditorPage argomento={argomentoDecrypted} />
                 </Suspense>
             </div>
         </div>

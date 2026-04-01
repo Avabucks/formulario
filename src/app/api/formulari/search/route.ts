@@ -1,3 +1,4 @@
+import { decrypt, encrypt } from "@/src/lib/crypto";
 import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { getIronSession } from "iron-session";
@@ -16,13 +17,17 @@ export async function GET(request: Request) {
     if (!titolo) return NextResponse.json({ error: "Titolo obbligatorio" }, { status: 400 });
 
     const { rows } = await pool.query(
-        `SELECT beautiful_id AS "id", titolo, similarity(titolo, $1) AS "similarity"
-         FROM formulari
-         WHERE owner_uid = $2 AND similarity(titolo, $1) > 0.2
-         ORDER BY similarity DESC, titolo DESC
-         LIMIT 4`,
-        [titolo, uid]
+        `SELECT beautiful_id AS "id", titolo
+        FROM formulari
+        WHERE owner_uid = $1`,
+        [uid]
     );
 
-    return NextResponse.json(rows);
+    // Decifra tutto e filtra in memoria
+    const results = rows
+        .map((r) => ({ ...r, titolo: decrypt(r.titolo, uid) }))
+        .filter((r) => r.titolo.toLowerCase().includes(titolo.toLowerCase()))
+        .slice(0, 4);
+
+    return NextResponse.json(results);
 }

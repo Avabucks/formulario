@@ -1,3 +1,4 @@
+import { encrypt } from "@/src/lib/crypto";
 import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { getIronSession } from "iron-session";
@@ -25,7 +26,7 @@ export async function PUT(request: Request) {
                 SELECT beautiful_id FROM capitoli
                 WHERE formulario IN (SELECT beautiful_id FROM formulari WHERE owner_uid = $3)
              )`,
-            [titolo, argomentoId, uid]
+            [encrypt(titolo, uid), argomentoId, uid]
         );
 
         if (result.rowCount === 0) return NextResponse.json({ error: "Argomento non trovato o non autorizzato" }, { status: 404 });
