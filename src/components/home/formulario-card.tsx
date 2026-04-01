@@ -1,9 +1,13 @@
 import { Button } from "@/src/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/src/components/ui/card"
-import { BookOpen, Calendar, Eye, GlobeIcon, LinkIcon, LockIcon, UserRound } from "lucide-react"
+import { BookOpen, Calendar, Eye, GlobeIcon, LinkIcon, LockIcon, Star, UserRound } from "lucide-react"
 import Link from "next/link"
 import { FormularioSettings } from "./formulario-settings"
 import { Separator } from "../ui/separator"
+import { StarFormulario } from "./star-formulario"
+import { SessionData, sessionOptions } from "@/src/lib/session"
+import { getIronSession } from "iron-session"
+import { cookies } from "next/headers";
 
 type Formulario = {
     id: string
@@ -13,9 +17,13 @@ type Formulario = {
     descrizione?: string
     visibility: 0 | 1 | 2
     views: number
+    likes: number
+    starred: boolean
 }
 
-export function FormularioCard({ formulario }: Readonly<{ formulario: Formulario }>) {
+export async function FormularioCard({ formulario }: Readonly<{ formulario: Formulario }>) {
+
+    const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
 
     return (
         <Card className="w-full">
@@ -25,6 +33,9 @@ export function FormularioCard({ formulario }: Readonly<{ formulario: Formulario
                     <div className="text-muted-foreground">
                         <VisibilityIcon visibility={formulario.visibility} />
                     </div>
+                    {session.uid && (
+                        <StarFormulario formularioId={formulario.id} isStarred={formulario.starred} />
+                    )}
                 </div>
                 <div className="flex h-5 gap-4 text-sm text-muted-foreground min-w-0">
                     <span className="flex flex-1 gap-1 items-center min-w-0 overflow-hidden">
@@ -36,6 +47,15 @@ export function FormularioCard({ formulario }: Readonly<{ formulario: Formulario
                         <Calendar size={16} />
                         <span>{formulario.anno}</span>
                     </span>
+                    {formulario.visibility > 0 && (
+                        <>
+                            <Separator orientation="vertical" className="shrink-0" />
+                            <span className="flex gap-1 items-center shrink-0">
+                                <Star size={16} />
+                                <span>{formulario.likes}</span>
+                            </span>
+                        </>
+                    )}
                     {formulario.visibility === 2 && (
                         <>
                             <Separator orientation="vertical" className="shrink-0" />
@@ -58,7 +78,9 @@ export function FormularioCard({ formulario }: Readonly<{ formulario: Formulario
                             Apri il formulario
                         </Button>
                     </Link>
-                    <FormularioSettings formularioId={formulario.id} allowKey={false} />
+                    {session.uid && (
+                        <FormularioSettings formularioId={formulario.id} allowKey={false} />
+                    )}
                 </div>
             </CardFooter>
         </Card>

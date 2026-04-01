@@ -21,14 +21,14 @@ import { toast } from "sonner";
 import { Kbd, KbdGroup } from "../ui/kbd";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 
-export default function ForumlarioAdd() {
+export default function ForumlarioAdd({ allowKey = true }: Readonly<{ allowKey?: boolean }>) {
     const router = useRouter();
     const [open, setOpen] = useState(false);
     const [visibility, setVisibility] = useState<0 | 1 | 2>(0)
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "a" && (e.metaKey || e.ctrlKey)) {
+            if (e.key === "a" && (e.metaKey || e.ctrlKey) && allowKey) {
                 e.preventDefault()
                 setOpen((prev) => !prev)
             }
@@ -83,11 +83,13 @@ export default function ForumlarioAdd() {
                     <TooltipContent className="pr-1.5">
                         <div className="flex items-center gap-2">
                             Aggiungi un formulario
-                            <KbdGroup className="hidden md:flex">
-                                <Kbd>Ctrl</Kbd>
-                                <span>+</span>
-                                <Kbd>A</Kbd>
-                            </KbdGroup>
+                            {allowKey && (
+                                <KbdGroup className="hidden md:flex">
+                                    <Kbd>Ctrl</Kbd>
+                                    <span>+</span>
+                                    <Kbd>A</Kbd>
+                                </KbdGroup>
+                            )}
                         </div>
                     </TooltipContent>
                 </Tooltip>
@@ -100,7 +102,7 @@ export default function ForumlarioAdd() {
                     <FieldGroup>
                         <Field>
                             <Label htmlFor="titolo-1">Titolo del formulario</Label>
-                            <Input id="titolo-1" name="titolo" placeholder="Titolo del formulario" required />
+                            <Input id="titolo-1" name="titolo" placeholder="Titolo del formulario" maxLength={30} required />
                         </Field>
                         <Field>
                             <Label htmlFor="descrizione-1">Descrizione del formulario</Label>

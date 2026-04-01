@@ -17,6 +17,8 @@ type Formulario = {
     anno: string
     visibility: 0 | 1 | 2
     views: number
+    likes: number
+    starred: boolean
     editable: boolean
 }
 
@@ -70,6 +72,7 @@ export function EditSection(
                             name="titolo"
                             value={formulario.titolo}
                             onInput={(e) => { setFormulario({ ...formulario, titolo: (e.target as HTMLInputElement).value }); setEdited(true) }}
+                            maxLength={30}
                         />
                     </Field>
                     <Field>
@@ -114,6 +117,5 @@ export function EditSection(
                 </Button>
             </form>
         </div>
-
     );
 }

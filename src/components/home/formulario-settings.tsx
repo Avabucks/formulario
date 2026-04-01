@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/src/lib/utils";
-import { Calendar, CopyPlus, Download, Eye, GlobeIcon, Info, LinkIcon, LockIcon, Pencil, QrCode, Settings, Trash2, UserRound, X } from "lucide-react";
+import { Calendar, CopyPlus, Download, Eye, GlobeIcon, Info, LinkIcon, LockIcon, Pencil, QrCode, Settings, Star, Trash2, UserRound, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -15,6 +15,7 @@ import { Separator } from "../ui/separator";
 import { Spinner } from "../ui/spinner";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { EditSection } from "./settings-sections/edit-section";
+import { StarFormulario } from "./star-formulario";
 
 type Formulario = {
     titolo: string
@@ -23,6 +24,8 @@ type Formulario = {
     anno: string
     visibility: 0 | 1 | 2
     views: number
+    likes: number
+    starred: boolean
     editable: boolean
 }
 
@@ -153,6 +156,7 @@ export function FormularioSettings({ formularioId, allowKey = true }: Readonly<{
                                         <div className="text-muted-foreground">
                                             <VisibilityIcon visibility={formulario.visibility} />
                                         </div>
+                                        <StarFormulario formularioId={formularioId} isStarred={formulario.starred} />
                                     </div>
                                 </DialogTitle>
                                 <DialogDescription asChild>
@@ -166,6 +170,15 @@ export function FormularioSettings({ formularioId, allowKey = true }: Readonly<{
                                             <Calendar size={16} />
                                             <span>{formulario.anno}</span>
                                         </span>
+                                        {formulario.visibility > 0 && (
+                                            <>
+                                                <Separator orientation="vertical" />
+                                                <span className="flex gap-1 items-center shrink-0">
+                                                    <Star size={16} />
+                                                    <span>{formulario.likes}</span>
+                                                </span>
+                                            </>
+                                        )}
                                         {formulario.visibility === 2 && (
                                             <>
                                                 <Separator orientation="vertical" />

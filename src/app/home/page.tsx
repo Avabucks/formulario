@@ -4,16 +4,18 @@ import { Header } from "@/src/components/navigation/header";
 import { Button } from "@/src/components/ui/button";
 import {
     Empty,
+    EmptyContent,
     EmptyDescription,
     EmptyHeader,
     EmptyMedia,
     EmptyTitle,
 } from "@/src/components/ui/empty";
+import { Separator } from "@/src/components/ui/separator";
 import { Skeleton } from "@/src/components/ui/skeleton";
 import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { getIronSession } from "iron-session";
-import { ArrowRight, BookOpen, Users } from "lucide-react";
+import { ArrowRight, BookOpen, Sparkles, Star, StarOff, Users } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -30,14 +32,27 @@ export default async function Home() {
     }
 
     const { rows: formulari } = await pool.query(`
-        SELECT F.beautiful_id AS "id", titolo, owner_uid as "ownerUid", U_A.display_name AS "nomeAutore", anno, descrizione, visibility, views
+        SELECT F.beautiful_id AS "id", titolo, owner_uid AS "ownerUid", U_A.display_name AS "nomeAutore", anno, descrizione, visibility, views,
+            EXISTS (SELECT 1 FROM preferiti P WHERE P.formulario_id = F.beautiful_id AND P.user_uid = $1) AS starred,
+            (SELECT COUNT(*) FROM preferiti P2 WHERE P2.formulario_id = F.beautiful_id) AS likes
         FROM formulari F
         JOIN users U_A ON F.author_uid = U_A.uid
         WHERE owner_uid = $1
         ORDER BY titolo DESC
     `, [session.uid]);
 
-    const renderEmpty = () => (
+    const { rows: preferiti } = await pool.query(`
+        SELECT F.beautiful_id AS "id", titolo, owner_uid AS "ownerUid", U_A.display_name AS "nomeAutore", anno, descrizione, visibility, views,
+            TRUE AS starred,
+            (SELECT COUNT(*) FROM preferiti P2 WHERE P2.formulario_id = F.beautiful_id) AS likes
+        FROM formulari F
+        JOIN users U_A ON F.author_uid = U_A.uid
+        JOIN preferiti P ON P.formulario_id = F.beautiful_id
+        WHERE P.user_uid = $1 AND F.visibility > 0
+        ORDER BY titolo DESC
+    `, [session.uid]);
+
+    const renderEmptyFormulari = () => (
         <Empty className="border border-dashed">
             <EmptyHeader>
                 <EmptyMedia variant="icon">
@@ -48,6 +63,31 @@ export default async function Home() {
                     Non ci sono formulari da mostrare.
                 </EmptyDescription>
             </EmptyHeader>
+            <EmptyContent className="flex-row justify-center gap-2">
+                <ForumlarioAdd allowKey={false} />
+            </EmptyContent>
+        </Empty>
+    )
+
+    const renderEmptyPreferiti = () => (
+        <Empty className="border border-dashed">
+            <EmptyHeader>
+                <EmptyMedia variant="icon">
+                    <StarOff />
+                </EmptyMedia>
+                <EmptyTitle>Nessun formulario preferito</EmptyTitle>
+                <EmptyDescription>
+                    Non hai ancora aggiunto formulari ai preferiti.
+                </EmptyDescription>
+            </EmptyHeader>
+            <EmptyContent className="flex-row justify-center gap-2">
+                <Button asChild variant="outline" size="lg" className="gap-2 px-8">
+                    <Link href="/community">
+                        <Sparkles className="h-5 w-5" />
+                        Esplora la Community
+                    </Link>
+                </Button>
+            </EmptyContent>
         </Empty>
     )
 
@@ -104,14 +144,35 @@ export default async function Home() {
                         </p>
                     </div>
                     <ForumlarioAdd />
-                </div >
+                </div>
                 <Suspense fallback={renderLoadingSkeleton()}>
                     <div className="flex flex-col gap-4 w-full">
                         {formulari.length === 0 ? (
-                            renderEmpty()
+                            renderEmptyFormulari()
                         ) : (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 w-full">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[101rem]:grid-cols-5 gap-4 w-full">
                                 {formulari.map((f) => (
+                                    <FormularioCard formulario={f} key={f.id} />
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </Suspense>
+                <Separator />
+                <div className="flex flex-row justify-between items-center w-full">
+                    <div>
+                        <h2 className="flex gap-3 items-center text-xl font-bold text-foreground md:text-2xl">
+                            <Star size={30} className="fill-foreground/50 text-transparent" />I tuoi preferiti
+                        </h2>
+                    </div>
+                </div>
+                <Suspense fallback={renderLoadingSkeleton()}>
+                    <div className="flex flex-col gap-4 w-full">
+                        {preferiti.length === 0 ? (
+                            renderEmptyPreferiti()
+                        ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[101rem]:grid-cols-5 gap-4 w-full">
+                                {preferiti.map((f) => (
                                     <FormularioCard formulario={f} key={f.id} />
                                 ))}
                             </div>

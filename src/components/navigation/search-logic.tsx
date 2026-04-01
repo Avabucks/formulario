@@ -106,6 +106,7 @@ export function SearchLogic() {
                     <div className="relative">
                         <CommandInput
                             placeholder={loading ? "Ricerca in corso..." : "Inserisci un termine di ricerca"}
+                            value={search}
                             onValueChange={setSearch}
                         />
                         {loading && (

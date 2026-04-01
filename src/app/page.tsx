@@ -21,12 +21,11 @@ export default function Home() {
 // TODOs:
 
 // - [EDITOR]
-// - toolbar
+// - toolbar (con regex)
+// - sistemare components katex e aggiungere highlight codice
 // - aggiungere funzionalità di esportazione (pdf, markdown, ecc.)
-// - search anche nel content
 // - migliorare sicurezza db (RLS)
 
 // - [COMMUNITY]
-// - elenco formulari community
+// - [BUG] (like da impostazioni o card)
 // - cerca nella community e pagination
-// - preferiti formulari (like da impostazioni o card, elenco likes nella home) -> primo formulario nei like
