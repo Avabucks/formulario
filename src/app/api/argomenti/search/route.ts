@@ -18,10 +18,10 @@ export async function GET(request: Request) {
     const { rows } = await pool.query(
         `SELECT A.beautiful_id AS "id", A.titolo, A.capitolo AS "capitoloId", C.titolo AS "capitoloTitolo", C.formulario AS "formularioId", F.titolo AS "formularioTitolo", similarity(A.titolo, $1) AS similarity
          FROM argomenti A JOIN capitoli C ON A.capitolo = C.beautiful_id JOIN formulari F ON C.formulario = F.beautiful_id
-         WHERE F.owner_uid = $2 AND similarity(A.titolo, $1) > 0.2
+         WHERE F.owner_uid = $2 AND (similarity(A.titolo, $1) > 0.2 OR A.content ILIKE $3)
          ORDER BY similarity DESC, A.titolo DESC
          LIMIT 4`,
-        [titolo, uid]
+        [titolo, uid, `%${titolo}%`]
     );
 
     return NextResponse.json(rows);

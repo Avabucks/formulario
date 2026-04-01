@@ -13,8 +13,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ form
     const { formularioId } = await params;
 
     const { rows, rowCount } = await pool.query(
-        `SELECT F.beautiful_id AS "id", F.titolo, F.descrizione, F.owner_uid as "ownerUid", U_A.display_name AS "nomeAutore", F.anno,
-                F.visibility
+        `SELECT F.beautiful_id AS "id", F.titolo, F.descrizione, F.owner_uid as "ownerUid", U_A.display_name AS "nomeAutore", F.anno, F.views, F.visibility,
+            EXISTS (SELECT 1 FROM preferiti P WHERE P.formulario_id = F.beautiful_id AND P.user_uid = $2) AS starred,
+            (SELECT COUNT(*) FROM preferiti P2 WHERE P2.formulario_id = F.beautiful_id) AS likes
          FROM formulari F
          JOIN users U_A ON F.author_uid = U_A.uid
          WHERE F.beautiful_id = $1

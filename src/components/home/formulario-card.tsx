@@ -1,8 +1,12 @@
 import { Button } from "@/src/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/src/components/ui/card"
-import { BookOpen, GlobeIcon, LinkIcon, LockIcon, UserRound } from "lucide-react"
+import { SessionData, sessionOptions } from "@/src/lib/session"
+import { getIronSession } from "iron-session"
+import { BookOpen, Calendar, Eye, GlobeIcon, LinkIcon, LockIcon, Star, UserRound } from "lucide-react"
+import { cookies } from "next/headers"
 import Link from "next/link"
-import { FormularioSettings } from "./formulario-settings"
+import { Separator } from "../ui/separator"
+import { StarFormulario } from "./star-formulario"
 
 type Formulario = {
     id: string
@@ -11,9 +15,14 @@ type Formulario = {
     anno?: string
     descrizione?: string
     visibility: 0 | 1 | 2
+    views: number
+    likes: number
+    starred: boolean
 }
 
-export function FormularioCard({ formulario }: Readonly<{ formulario: Formulario }>) {
+export async function FormularioCard({ formulario }: Readonly<{ formulario: Formulario }>) {
+
+    const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
 
     return (
         <Card className="w-full">
@@ -23,13 +32,38 @@ export function FormularioCard({ formulario }: Readonly<{ formulario: Formulario
                     <div className="text-muted-foreground">
                         <VisibilityIcon visibility={formulario.visibility} />
                     </div>
+                    {session.uid && (
+                        <StarFormulario formularioId={formulario.id} isStarred={formulario.starred} />
+                    )}
                 </div>
-                <div className="flex justify-between text-sm text-muted-foreground">
-                    <span className="flex gap-1 item-center">
-                        <span className="flex items-center"><UserRound size={16} /></span>
-                        <span>{formulario.nomeAutore}</span>
+                <div className="flex h-5 gap-4 text-sm text-muted-foreground min-w-0">
+                    <span className="flex flex-1 gap-1 items-center min-w-0 overflow-hidden">
+                        <UserRound size={16} className="shrink-0" />
+                        <span className="truncate">{formulario.nomeAutore}</span>
                     </span>
-                    <span>Anno {formulario.anno}</span>
+                    <Separator orientation="vertical" className="shrink-0" />
+                    <span className="flex gap-1 items-center shrink-0">
+                        <Calendar size={16} />
+                        <span>{formulario.anno}</span>
+                    </span>
+                    {formulario.visibility > 0 && (
+                        <>
+                            <Separator orientation="vertical" className="shrink-0" />
+                            <span className="flex gap-1 items-center shrink-0">
+                                <Star size={16} />
+                                <span>{formulario.likes}</span>
+                            </span>
+                        </>
+                    )}
+                    {formulario.visibility === 2 && (
+                        <>
+                            <Separator orientation="vertical" className="shrink-0" />
+                            <span className="flex gap-1 items-center shrink-0">
+                                <Eye size={16} />
+                                <span>{formulario.views}</span>
+                            </span>
+                        </>
+                    )}
                 </div>
             </CardHeader>
             <CardContent>
@@ -43,7 +77,6 @@ export function FormularioCard({ formulario }: Readonly<{ formulario: Formulario
                             Apri il formulario
                         </Button>
                     </Link>
-                    <FormularioSettings formularioId={formulario.id} allowKey={false} />
                 </div>
             </CardFooter>
         </Card>

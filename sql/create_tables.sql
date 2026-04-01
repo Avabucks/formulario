@@ -23,12 +23,13 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS formulari (
   id SERIAL PRIMARY KEY,
   beautiful_id VARCHAR(255) NOT NULL UNIQUE,
-  titolo VARCHAR(255) NOT NULL,
+  titolo VARCHAR(30) NOT NULL,
   owner_uid VARCHAR(255) NOT NULL,
   author_uid VARCHAR(255) NOT NULL,
   anno VARCHAR(255) NOT NULL,
   descrizione VARCHAR(255) NOT NULL,
-  visibility INTEGER NOT NULL DEFAULT 0
+  visibility INTEGER NOT NULL DEFAULT 0,
+  views INTEGER NOT NULL DEFAULT 0
 );
 --
 -- Table structure for table 'capitoli'
@@ -50,4 +51,13 @@ CREATE TABLE IF NOT EXISTS argomenti (
   capitolo VARCHAR(255) NOT NULL REFERENCES capitoli(beautiful_id) ON DELETE CASCADE,
   sort_order INTEGER NOT NULL,
   content TEXT NOT NULL DEFAULT ''
+);
+--
+-- Table structure for table 'preferiti'
+--
+CREATE TABLE IF NOT EXISTS preferiti (
+  id SERIAL PRIMARY KEY,
+  user_uid VARCHAR(255) NOT NULL,
+  formulario_id VARCHAR(255) NOT NULL REFERENCES formulari(beautiful_id) ON DELETE CASCADE,
+  UNIQUE(user_uid, formulario_id)
 );

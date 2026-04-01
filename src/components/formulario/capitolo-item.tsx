@@ -124,7 +124,11 @@ export function CapitoloItem({ capitolo }: Readonly<{ capitolo: Capitolo }>) {
                         <Input id="titolo-1" name="titolo" defaultValue={capitolo.titolo} />
                     </Field>
                 ) : (
-                    <ItemTitle>{capitolo.titolo}</ItemTitle>
+                    <ItemTitle>
+                        <span className="group-hover:underline">
+                            {capitolo.titolo}
+                        </span>
+                    </ItemTitle>
                 )}
                 {capitolo.argomentiCount !== undefined && !isEditing && (
                     <div className="text-xs text-muted-foreground">{capitolo.argomentiCount} {capitolo.argomentiCount == 1 ? "argomento" : "argomenti"}</div>
@@ -135,7 +139,7 @@ export function CapitoloItem({ capitolo }: Readonly<{ capitolo: Capitolo }>) {
 
     return (
         <Item className={`${!isEditing && "hover:bg-muted/50 cursor-pointer"}`} variant="outline" size="sm">
-            <form className="flex w-full gap-2 items-center" onSubmit={handleRename}>
+            <form className="flex w-full gap-2 items-center group" onSubmit={handleRename}>
                 {isEditing ? (
                     <>{content}</>
                 ) : (

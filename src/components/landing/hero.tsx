@@ -7,7 +7,7 @@ export function Hero() {
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden px-6">
             <div className="absolute inset-0 bg-background" />
-            <svg className="absolute inset-0 h-full w-full dark:opacity-[0.06] opacity-[0.10]" xmlns="http://www.w3.org/2000/svg">
+            <svg className="absolute inset-0 h-full w-full opacity-[0.10]" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <pattern id="cross" width="50" height="50" patternUnits="userSpaceOnUse">
                         <path d="M16 0v50M0 16h50" stroke="currentColor" strokeWidth="0.5" fill="none" />

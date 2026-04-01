@@ -19,13 +19,12 @@ export default function Home() {
 }
 
 // TODOs:
+
 // - [EDITOR]
-// - toolbar
+// - toolbar (con regex)
+// - sistemare components katex e aggiungere highlight codice
 // - aggiungere funzionalità di esportazione (pdf, markdown, ecc.)
-// - search anche nel content
 // - migliorare sicurezza db (RLS)
 
 // - [COMMUNITY]
-// - home con elenco formulari community
-// - pagina nuova accessibile anche da fuori ma che quando apri devi fare il login per vedere il formulario
-// - ceerca nella community
+// - cerca nella community e pagination

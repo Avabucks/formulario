@@ -45,6 +45,12 @@ export default async function Formulario({
         redirect('/home')
     }
 
+    // Views should only be incremented if the viewer is not the owner and the formulario is public
+    await pool.query(
+        `UPDATE formulari SET views = views + 1 WHERE beautiful_id = $1 AND owner_uid != $2 AND visibility > 0`,
+        [formularioId, session.uid ?? ""]
+    );
+
     const formulario = {
         ...formularioRows[0],
         editable: formularioRows[0].ownerUid === uid,

@@ -1,12 +1,12 @@
 "use client"
 
-import { useQRCode } from 'next-qrcode';
-import { Button } from './button';
 import { Check, Copy, Download } from 'lucide-react';
+import { useQRCode } from 'next-qrcode';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { Label } from './label';
+import { Button } from './button';
 import { Input } from './input';
+import { Label } from './label';
 
 export function Qr({ link, title }: Readonly<{ link: string, title: string }>) {
     const { SVG: SvgQrCode } = useQRCode();
@@ -87,8 +87,8 @@ export function Qr({ link, title }: Readonly<{ link: string, title: string }>) {
 
     return (
         <div className="flex mb-3 pl-2">
-            <div className="border-l pl-3"></div>
-            <div className="flex flex-1 flex-col items-center gap-4">
+            <div className="flex flex-1 flex-col gap-4">
+                <Label>Condividi il tuo formulario</Label>
                 <div className="flex items-center gap-2 w-full">
                     <div className="grid flex-1 gap-2">
                         <Label htmlFor="link" className="sr-only">
@@ -103,23 +103,25 @@ export function Qr({ link, title }: Readonly<{ link: string, title: string }>) {
                     <Button variant="outline" size="icon" onClick={handleCopy}>
                         {copied ? <Check size={16} /> : <Copy size={16} />}
                     </Button>
-                    <Button variant="outline" size="icon" onClick={downloadQrPng}>
-                        <Download size={16} />
-                    </Button>
                 </div>
-                <div className="rounded-xl overflow-hidden" ref={svgRef}>
-                    <SvgQrCode
-                        text={link}
-                        options={{
-                            margin: 3,
-                            scale: 5,
-                            width: 150,
-                            color: {
-                                dark: '#000000',
-                                light: '#ffffff',
-                            },
-                        }}
-                    />
+                <div className="flex flex-col items-center gap-4 w-full">
+                    <div className="rounded-xl overflow-hidden mx-auto" ref={svgRef}>
+                        <SvgQrCode
+                            text={link}
+                            options={{
+                                margin: 3,
+                                scale: 5,
+                                width: 200,
+                                color: {
+                                    dark: '#000000',
+                                    light: '#ffffff',
+                                },
+                            }}
+                        />
+                    </div>
+                    <Button variant="outline" onClick={downloadQrPng}>
+                        <Download size={16} /> Download QR
+                    </Button>
                 </div>
             </div>
         </div>
