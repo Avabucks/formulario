@@ -1,13 +1,17 @@
 import { CommunityFilters } from "@/src/components/community/community-filters";
 import { CtaCommunity } from "@/src/components/community/cta-community";
 import { FormularioCard } from "@/src/components/home/formulario-card";
+import { Footer } from "@/src/components/landing/footer";
 import { Header } from "@/src/components/navigation/header";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink } from "@/src/components/ui/pagination";
 import { Separator } from "@/src/components/ui/separator";
+import { Toggle } from "@/src/components/ui/toggle";
 import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
+import { cn } from "@/src/lib/utils";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
+import Link from "next/link";
 
 const SORT_MAP = {
     trending: "views DESC",
@@ -106,12 +110,14 @@ export default async function Capitolo({
                                         const page = i + 1;
                                         return (
                                             <PaginationItem key={page}>
-                                                <PaginationLink
+                                                <Link
+                                                    key={page}
                                                     href={createPageLink(page)}
-                                                    isActive={page === currentPage}
                                                 >
-                                                    {page}
-                                                </PaginationLink>
+                                                    <Toggle variant="outline" pressed={page === currentPage} className="cursor-pointer">
+                                                        {page}
+                                                    </Toggle>
+                                                </Link>
                                             </PaginationItem>
                                         );
                                     })}
@@ -123,6 +129,7 @@ export default async function Capitolo({
                     </div>
                 )}
             </div>
+            <Footer />
         </>
     )
 }
