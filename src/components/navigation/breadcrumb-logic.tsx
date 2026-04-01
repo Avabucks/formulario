@@ -19,7 +19,7 @@ export function BreadcrumbLogic({ items }: Readonly<{ items: BreadcrumbItem[] }>
     return (
         <div className="w-full overflow-x-auto">
             <Breadcrumb className="max-w-screen">
-                <BreadcrumbList>
+                <BreadcrumbList className="flex flex-nowrap text-nowrap">
                     {items.map((item, index) => {
                         const isLast = index === items.length - 1;
                         return (

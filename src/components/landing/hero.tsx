@@ -42,7 +42,7 @@ export function Hero() {
             </Link>
           </Button>
           <Button asChild variant="outline" size="lg" className="gap-2 px-8">
-            <Link href="/community">
+            <Link href="/community/page/1">
               <Sparkles className="h-5 w-5" />
               Esplora la Community
             </Link>

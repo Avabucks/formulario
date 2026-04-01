@@ -50,7 +50,7 @@ export function AvatarLogic() {
                         Visualizza i tuoi formulari
                     </DropdownMenuItem>
                 </Link>
-                <Link href="/community">
+                <Link href="/community/page/1">
                     <DropdownMenuItem>
                         <Sparkles />
                         Community
