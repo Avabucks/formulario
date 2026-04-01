@@ -29,7 +29,7 @@ type Formulario = {
     editable: boolean
 }
 
-export function FormularioSettings({ formularioId, allowKey = true }: Readonly<{ formularioId: string; allowKey?: boolean }>) {
+export function FormularioSettings({ formularioId }: Readonly<{ formularioId: string }>) {
     const router = useRouter();
     const [formulario, setFormulario] = useState<Formulario>();
     const [open, setOpen] = useState(false)
@@ -56,7 +56,7 @@ export function FormularioSettings({ formularioId, allowKey = true }: Readonly<{
         fetchFormulario()
 
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "i" && (e.metaKey || e.ctrlKey) && allowKey) {
+            if (e.key === "i" && (e.metaKey || e.ctrlKey)) {
                 e.preventDefault()
                 setOpen((prev) => !prev)
             }
@@ -134,13 +134,11 @@ export function FormularioSettings({ formularioId, allowKey = true }: Readonly<{
                         <TooltipContent className="pr-1.5">
                             <div className="flex items-center gap-2">
                                 Impostazioni formulario
-                                {allowKey && (
-                                    <KbdGroup className="hidden md:flex">
-                                        <Kbd>Ctrl</Kbd>
-                                        <span>+</span>
-                                        <Kbd>I</Kbd>
-                                    </KbdGroup>
-                                )}
+                                <KbdGroup className="hidden md:flex">
+                                    <Kbd>Ctrl</Kbd>
+                                    <span>+</span>
+                                    <Kbd>I</Kbd>
+                                </KbdGroup>
                             </div>
                         </TooltipContent>
                     </Tooltip>

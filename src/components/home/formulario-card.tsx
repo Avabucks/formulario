@@ -1,13 +1,12 @@
 import { Button } from "@/src/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/src/components/ui/card"
-import { BookOpen, Calendar, Eye, GlobeIcon, LinkIcon, LockIcon, Star, UserRound } from "lucide-react"
-import Link from "next/link"
-import { FormularioSettings } from "./formulario-settings"
-import { Separator } from "../ui/separator"
-import { StarFormulario } from "./star-formulario"
 import { SessionData, sessionOptions } from "@/src/lib/session"
 import { getIronSession } from "iron-session"
-import { cookies } from "next/headers";
+import { BookOpen, Calendar, Eye, GlobeIcon, LinkIcon, LockIcon, Star, UserRound } from "lucide-react"
+import { cookies } from "next/headers"
+import Link from "next/link"
+import { Separator } from "../ui/separator"
+import { StarFormulario } from "./star-formulario"
 
 type Formulario = {
     id: string
@@ -78,9 +77,6 @@ export async function FormularioCard({ formulario }: Readonly<{ formulario: Form
                             Apri il formulario
                         </Button>
                     </Link>
-                    {session.uid && (
-                        <FormularioSettings formularioId={formulario.id} allowKey={false} />
-                    )}
                 </div>
             </CardFooter>
         </Card>

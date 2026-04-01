@@ -27,5 +27,4 @@ export default function Home() {
 // - migliorare sicurezza db (RLS)
 
 // - [COMMUNITY]
-// - [BUG] (like da impostazioni o card)
 // - cerca nella community e pagination
