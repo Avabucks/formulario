@@ -15,19 +15,17 @@ export async function POST(request: Request) {
     const formData = await request.formData();
     const titolo = formData.get("titolo") as string;
     const descrizione = formData.get("descrizione") as string;
-    const visibility = Number(formData.get("visibility")) as 0 | 1 | 2;
     const anno = new Date().getFullYear().toString();
 
     if (!titolo || !descrizione) return NextResponse.json({ error: "Campi obbligatori mancanti" }, { status: 400 });
-    if (![0, 1, 2].includes(visibility)) return NextResponse.json({ error: "Visibility non valida" }, { status: 400 });
 
     const beautiful_id = slugify(titolo, { lower: true, strict: true }) + "-" + crypto.randomUUID();
 
     try {
         await pool.query(
-            `INSERT INTO formulari (beautiful_id, titolo, descrizione, owner_uid, author_uid, anno, visibility)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-            [beautiful_id, titolo, descrizione, uid, uid, anno, visibility]
+            `INSERT INTO formulari (beautiful_id, titolo, descrizione, owner_uid, author_uid, anno)
+            VALUES ($1, $2, $3, $4, $5, $6)`,
+            [beautiful_id, titolo, descrizione, uid, uid, anno]
         );
 
         revalidatePath("/home");

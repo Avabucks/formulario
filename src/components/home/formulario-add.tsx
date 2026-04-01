@@ -24,7 +24,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/
 export default function ForumlarioAdd({ allowKey = true }: Readonly<{ allowKey?: boolean }>) {
     const router = useRouter();
     const [open, setOpen] = useState(false);
-    const [visibility, setVisibility] = useState<0 | 1 | 2>(0)
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -64,7 +63,6 @@ export default function ForumlarioAdd({ allowKey = true }: Readonly<{ allowKey?:
         );
 
         setOpen(false)
-        setVisibility(0)
 
     }
 
@@ -108,27 +106,6 @@ export default function ForumlarioAdd({ allowKey = true }: Readonly<{ allowKey?:
                             <Label htmlFor="descrizione-1">Descrizione del formulario</Label>
                             <Textarea id="descrizione-1" name="descrizione" placeholder="Descrivi il formulario" required />
                         </Field>
-                        <div className="flex flex-col gap-4">
-                            <div className="flex items-center justify-between">
-                                <Label htmlFor="visibility-1">Condividi con link</Label>
-                                <Switch
-                                    id="visibility-1"
-                                    checked={visibility >= 1}
-                                    onCheckedChange={(checked) => setVisibility(checked ? 1 : 0)}
-                                />
-                            </div>
-                            {visibility >= 1 && (
-                                <div className="flex items-center justify-between">
-                                    <Label htmlFor="visibility-2">Condividi con la community</Label>
-                                    <Switch
-                                        id="visibility-2"
-                                        checked={visibility === 2}
-                                        onCheckedChange={(checked) => setVisibility(checked ? 2 : 1)}
-                                    />
-                                </div>
-                            )}
-                            <input type="hidden" name="visibility" value={visibility} />
-                        </div>
                     </FieldGroup>
                     <DialogFooter>
                         <DialogClose asChild>

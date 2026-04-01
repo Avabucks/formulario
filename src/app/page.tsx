@@ -25,6 +25,3 @@ export default function Home() {
 // - sistemare components katex e aggiungere highlight codice
 // - aggiungere funzionalità di esportazione (pdf, markdown, ecc.)
 // - migliorare sicurezza db (RLS)
-
-// - [COMMUNITY]
-// - cerca nella community e pagination
