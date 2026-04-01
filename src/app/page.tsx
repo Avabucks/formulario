@@ -21,6 +21,7 @@ export default function Home() {
 // TODOs:
 
 // - [EDITOR]
+// - [BUG] preferiti in settings
 // - toolbar (con regex)
 // - sistemare components katex e aggiungere highlight codice
 // - aggiungere funzionalità di esportazione (pdf, markdown, ecc.)

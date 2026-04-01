@@ -1,40 +1,25 @@
 "use client"
-import { Clock, Search, SlidersHorizontal, Star, TrendingUp } from "lucide-react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useState } from "react";
+import { Clock, Search, Star, TrendingUp } from "lucide-react";
 import { useDebouncedCallback } from "use-debounce";
 import { Button } from "../ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { Input } from "../ui/input";
+import { useFilters } from "@/src/hooks/useFilters"; // il nostro hook custom
 
-type SortOption = "trending" | "recent" | "popular"
+type SortOption = "trending" | "recent" | "popular";
 
 export function CommunityFilters() {
-    const router = useRouter();
-    const pathname = usePathname();
-    const searchParams = useSearchParams();
-
-    const sortBy = (searchParams.get("sort") as SortOption) ?? "trending";
-    const [searchQuery, setSearchQuery] = useState(searchParams.get("q") ?? "");
-
-    const updateParams = useCallback((key: string, value: string) => {
-        const params = new URLSearchParams(searchParams.toString());
-
-        params.set(key, value);
-        params.delete("page");
-
-        router.push(`${pathname.split("/page")[0]}/page/1?${params.toString()}`);
-    }, [searchParams, pathname, router]);
+    const { sortBy, searchQuery, setSearchQuery, updateParams } = useFilters();
 
     const handleSearch = useDebouncedCallback((value: string) => {
-        updateParams("q", value);
+        updateParams({ q: value });
     }, 400);
 
     const sortLabels: Record<SortOption, { label: string; icon: React.ReactNode }> = {
         trending: { label: "In tendenza", icon: <TrendingUp className="h-4 w-4" /> },
         recent: { label: "Recenti", icon: <Clock className="h-4 w-4" /> },
         popular: { label: "Popolari", icon: <Star className="h-4 w-4" /> },
-    }
+    };
 
     return (
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -54,21 +39,20 @@ export function CommunityFilters() {
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" className="gap-2">
-                            <SlidersHorizontal className="h-4 w-4" />
                             {sortLabels[sortBy].icon}
                             {sortLabels[sortBy].label}
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => updateParams("sort", "trending")}>
+                        <DropdownMenuItem onClick={() => updateParams({ sort: "trending" })}>
                             <TrendingUp className="mr-2 h-4 w-4" />
                             In tendenza
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => updateParams("sort", "recent")}>
+                        <DropdownMenuItem onClick={() => updateParams({ sort: "recent" })}>
                             <Clock className="mr-2 h-4 w-4" />
                             Recenti
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => updateParams("sort", "popular")}>
+                        <DropdownMenuItem onClick={() => updateParams({ sort: "popular" })}>
                             <Star className="mr-2 h-4 w-4" />
                             Popolari
                         </DropdownMenuItem>
@@ -76,5 +60,5 @@ export function CommunityFilters() {
                 </DropdownMenu>
             </div>
         </div>
-    )
+    );
 }
