@@ -21,8 +21,19 @@ export default function Home() {
 // TODOs:
 
 // - [EDITOR]
-// - [BUG] preferiti in settings
-// - toolbar (con regex)
-// - sistemare components katex e aggiungere highlight codice
+// - toolbar (con regex), anche con kb e tooltip
+// - ctrl + c, ctrl + x funziona sulla parola o su tutta la linea se la selezione è vuota
+// - [FORSE] auto refactor che sistema spazi mentre scrivi (per evitare non ritorni a capi che)
 // - aggiungere funzionalità di esportazione (pdf, markdown, ecc.)
-// - migliorare sicurezza db (RLS)
+
+// - [GENERALI]
+// - [BUG] preferiti in settings
+// - padding bottom nelle liste
+// - seo
+// - disabilita elimina formulario per quella con id dell'env (formlario di benvenuto)
+// - report che manda mail a admin (mail nell'env) solo se la formula non è tua (in impostazioni)
+
+// - [NOVITA]
+// - image manager nelle impostazioni
+// - tree del formulario (accessibile da tasto di fianco a impostazioni e apre drawer laterale)
+// - note protette da password

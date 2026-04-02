@@ -133,7 +133,7 @@ export function SearchLogic() {
                                         <Bookmark />
                                         <div className="flex flex-col justify-center w-full">
                                             <span>{c.titolo}</span>
-                                            <span className="text-xs text-muted-foreground">{c.formularioTitolo}</span>
+                                            <span className="text-xs text-muted-foreground text-nowrap">{c.formularioTitolo}</span>
                                         </div>
                                     </CommandItem>
                                 ))}
@@ -147,9 +147,9 @@ export function SearchLogic() {
                                         <div className="flex flex-col justify-center w-full">
                                             <span>{a.titolo}</span>
                                             <div className="inline-flex items-center">
-                                                <span className="text-xs text-muted-foreground">{a.formularioTitolo}</span>
-                                                <ChevronRight className="opacity-70 mt-1" />
-                                                <span className="text-xs text-muted-foreground">{a.capitoloTitolo}</span>
+                                                <span className="text-xs text-muted-foreground text-nowrap">{a.formularioTitolo}</span>
+                                                <ChevronRight className="opacity-70 mt-0.5" />
+                                                <span className="text-xs text-muted-foreground text-nowrap">{a.capitoloTitolo}</span>
                                             </div>
                                         </div>
                                     </CommandItem>

@@ -38,7 +38,7 @@ export default async function Home() {
         FROM formulari F
         JOIN users U_A ON F.author_uid = U_A.uid
         WHERE owner_uid = $1
-        ORDER BY titolo DESC
+        ORDER BY titolo
     `, [session.uid]);
 
     const { rows: preferiti } = await pool.query(`
@@ -49,7 +49,7 @@ export default async function Home() {
         JOIN users U_A ON F.author_uid = U_A.uid
         JOIN preferiti P ON P.formulario_id = F.beautiful_id
         WHERE P.user_uid = $1 AND F.visibility > 0
-        ORDER BY titolo DESC
+        ORDER BY titolo
     `, [session.uid]);
 
     const renderEmptyFormulari = () => (

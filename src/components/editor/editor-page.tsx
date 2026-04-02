@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "../ui/resizable";
 import { EditorInput } from "./editor-katex/editor-input";
 import { EditorPreview } from "./editor-katex/editor-preview";
@@ -12,14 +12,49 @@ type Argomento = {
     editable: boolean;
 }
 
+interface Selection {
+    start: number;
+    end: number;
+    text: string;
+}
+
 export function EditorPage({ argomento }: Readonly<{ argomento: Argomento }>) {
     const [value, setValue] = useState(argomento.content);
     const [switchView, setSwitchView] = useState<boolean>(false);
     const [resizableSize, setResizableSize] = useState<number>(50);
+    const [selection, setSelection] = useState<Selection | null>(null);
 
-    const toolbar = <EditorToolbar switchView={switchView} setSwitchView={setSwitchView} editable={argomento.editable} />;
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+    
+    const handleSelect = (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
+        const el = e.currentTarget;
+        const start = el.selectionStart;
+        const end = el.selectionEnd;
+        setSelection({ start, end, text: value.slice(start, end) });
+    };
+
+    const toolbar = (
+        <EditorToolbar
+            switchView={switchView}
+            setSwitchView={setSwitchView}
+            editable={argomento.editable}
+            markdownContent={value}
+            selection={selection}
+            onApply={setValue}
+            textareaRef={textareaRef}
+        />
+    );
+
     const preview = <EditorPreview value={value} />;
-    const input = argomento.editable && <EditorInput argomentoId={argomento.id} value={value} onChange={setValue} />;
+    const input = argomento.editable && (
+        <EditorInput
+            argomentoId={argomento.id}
+            value={value}
+            setValue={setValue}
+            onSelect={handleSelect}
+            textareaRef={textareaRef}
+        />
+    );
 
     return (
         <div className="flex flex-1 flex-col min-h-0 border rounded-lg overflow-hidden">
@@ -28,7 +63,7 @@ export function EditorPage({ argomento }: Readonly<{ argomento: Argomento }>) {
             {/* Desktop */}
             <div className="hidden md:flex flex-1 min-h-0">
                 <ResizablePanelGroup
-                    onLayoutChanged={(sizes) => {if (sizes.input) setResizableSize(sizes.input)}}
+                    onLayoutChanged={(sizes) => { if (sizes.input) setResizableSize(sizes.input) }}
                     orientation="horizontal"
                 >
                     {(argomento.editable && !switchView) && (
