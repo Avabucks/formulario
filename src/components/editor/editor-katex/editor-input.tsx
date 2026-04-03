@@ -4,13 +4,22 @@ import { useEffect, useState } from "react";
 import { NavigationBlocker } from "../../navigation/navigation-blocker";
 import { Spinner } from "../../ui/spinner";
 
-export function EditorInput({ argomentoId, value, setValue, onSelect, textareaRef }: Readonly<{
+export function EditorInput({
+    argomentoId,
+    value,
+    setValue,
+    onSelect,
+    setEnableToolbar,
+    textareaRef,
+}: Readonly<{
     argomentoId: string,
     value: string,
     setValue: (value: string) => void,
     onSelect?: (e: React.SyntheticEvent<HTMLTextAreaElement>) => void
-    textareaRef?: React.RefObject<HTMLTextAreaElement | null>
+    setEnableToolbar: (value: boolean) => void,
+    textareaRef: React.RefObject<HTMLTextAreaElement | null>,
 }>) {
+
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(false)
 
@@ -61,6 +70,8 @@ export function EditorInput({ argomentoId, value, setValue, onSelect, textareaRe
                 onChange={(e) => setValue(e.target.value)}
                 onSelect={onSelect}
                 onKeyUp={onSelect}
+                onBlur={() => setEnableToolbar(false)}
+                onFocus={() => setEnableToolbar(true)}
             />
             {loading ? (
                 <div className="absolute right-3 bottom-3">

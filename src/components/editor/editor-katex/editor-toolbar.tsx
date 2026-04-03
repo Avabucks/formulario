@@ -1,11 +1,14 @@
 "use client";
 
-import { ArrowRightLeft, Eye, EyeClosed } from "lucide-react";
+import { ArrowRightLeft, Eye, EyeClosed, Redo2, Undo2 } from "lucide-react";
 import { Button } from "../../ui/button";
+import { Separator } from "../../ui/separator";
 import { Toggle } from "../../ui/toggle";
 import { FormattingBold } from "./tools/formatting-bold";
-import { FormattingItalic } from "./tools/formatting-italic";
 import { FormattingDel } from "./tools/formatting-del";
+import { FormattingItalic } from "./tools/formatting-italic";
+import { FormattingBlockquote } from "./tools/formatting-blockquote";
+import { FormattingHr } from "./tools/formatting-hr";
 
 interface Selection {
     start: number;
@@ -20,7 +23,11 @@ export function EditorToolbar({
     markdownContent,
     selection,
     onApply,
-    textareaRef,
+    onUndo,
+    onRedo,
+    canUndo,
+    canRedo,
+    enableToolbar,
 }: Readonly<{
     switchView: boolean;
     setSwitchView: (value: boolean | ((prev: boolean) => boolean)) => void;
@@ -28,29 +35,65 @@ export function EditorToolbar({
     markdownContent: string;
     selection: Selection | null;
     onApply: (newContent: string) => void;
-    textareaRef?: React.RefObject<HTMLTextAreaElement | null>
+    onUndo: () => void;
+    onRedo: () => void;
+    canUndo: boolean;
+    canRedo: boolean;
+    enableToolbar: boolean;
 }>) {
+
     return (
         <div className="flex w-full border-b min-h-15">
-            <div className="flex flex-1 items-center p-3 gap-2">
-                {/* TODO: non deve modifcare quando non c'è selection */}
+            <div className="flex flex-1 items-center p-3 gap-2 overflow-x-auto">
+                <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={onUndo}
+                    onMouseDown={(e) => e.preventDefault()}
+                    disabled={!canUndo}
+                >
+                    <Undo2 size={16} />
+                </Button>
+                <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={onRedo}
+                    onMouseDown={(e) => e.preventDefault()}
+                    disabled={!canRedo}
+                >
+                    <Redo2 size={16} />
+                </Button>
+                <Separator orientation="vertical" />
                 <FormattingBold
                     markdownContent={markdownContent}
                     selection={selection}
                     onApply={onApply}
-                    textareaRef={textareaRef}
+                    enableToolbar={enableToolbar}
                 />
                 <FormattingItalic
                     markdownContent={markdownContent}
                     selection={selection}
                     onApply={onApply}
-                    textareaRef={textareaRef}
+                    enableToolbar={enableToolbar}
                 />
                 <FormattingDel
                     markdownContent={markdownContent}
                     selection={selection}
                     onApply={onApply}
-                    textareaRef={textareaRef}
+                    enableToolbar={enableToolbar}
+                />
+                <Separator orientation="vertical" />
+                <FormattingBlockquote
+                    markdownContent={markdownContent}
+                    selection={selection}
+                    onApply={onApply}
+                    enableToolbar={enableToolbar}
+                />
+                <FormattingHr
+                    markdownContent={markdownContent}
+                    selection={selection}
+                    onApply={onApply}
+                    enableToolbar={enableToolbar}
                 />
             </div>
             {editable && (

@@ -1,8 +1,9 @@
 "use client";
 
 import { Toggle } from "@/src/components/ui/toggle";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/components/ui/tooltip";
 import { Strikethrough } from "lucide-react";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 
 interface SelectionInfo {
     start: number;
@@ -16,12 +17,12 @@ export function FormattingDel({
     markdownContent,
     selection,
     onApply,
-    textareaRef,
+    enableToolbar,
 }: Readonly<{
     markdownContent: string;
     selection: SelectionInfo | null;
-    onApply: (newContent: string) => void;
-    textareaRef?: React.RefObject<HTMLTextAreaElement | null>
+    onApply: (newContent: string, cursorPos?: number) => void;
+    enableToolbar: boolean;
 }>) {
     const isActive = useMemo(() => {
         if (!selection) return false;
@@ -38,8 +39,10 @@ export function FormattingDel({
         if (!selection) return;
 
         const { start, end } = selection;
-        const trimmedText = markdownContent.slice(start, end).trim();
-        const trimStart = start + markdownContent.slice(start, end).length - markdownContent.slice(start, end).trimStart().length;
+        const raw = markdownContent.slice(start, end);
+        const trimmedText = raw.trim();
+        const leadingSpaces = raw.length - raw.trimStart().length;
+        const trimStart = start + leadingSpaces;
         const trimEnd = trimStart + trimmedText.length;
 
         if (isActive) {
@@ -47,41 +50,49 @@ export function FormattingDel({
             let match;
             while ((match = regex.exec(markdownContent)) !== null) {
                 if (trimStart >= match.index && trimEnd <= match.index + match[0].length) {
-                    onApply(markdownContent.slice(0, match.index) + match[1] + markdownContent.slice(match.index + match[0].length));
-                    textareaRef?.current?.focus();
-                    setTimeout(() => textareaRef?.current?.setSelectionRange(trimStart, trimStart), 0);
+                    const newContent =
+                        markdownContent.slice(0, match.index) +
+                        match[1] +
+                        markdownContent.slice(match.index + match[0].length);
+                    // Cursor at logical position minus the 2 "~~" removed on the left
+                    const cursorPos = Math.max(match.index, trimStart - 2);
+                    onApply(newContent, cursorPos);
                     return;
                 }
             }
         } else {
             if (selection.text === "") return;
-            onApply(markdownContent.slice(0, trimStart) + `~~${trimmedText}~~` + markdownContent.slice(trimEnd));
-            textareaRef?.current?.focus();
-            setTimeout(() => textareaRef?.current?.setSelectionRange(trimStart, trimStart), 0);
+            const newContent =
+                markdownContent.slice(0, trimStart) +
+                `~~${trimmedText}~~` +
+                markdownContent.slice(trimEnd);
+            // Cursor right after closing "~~"
+            const cursorPos = trimStart + trimmedText.length + 4; // 4 = "~~" + "~~"
+            onApply(newContent, cursorPos);
         }
     };
 
-
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "i" && (e.ctrlKey || e.metaKey)) {
-                e.preventDefault();
-                handleToggle();
-            }
-        };
-        document.addEventListener("keydown", handleKeyDown);
-        return () => document.removeEventListener("keydown", handleKeyDown);
-    }, [selection, markdownContent, isActive]);
-
     return (
-        <Toggle
-            variant="outline"
-            pressed={isActive}
-            onPressedChange={handleToggle}
-            aria-label="Strikethrough"
-            disabled={!selection}
-        >
-            <Strikethrough size={16} />
-        </Toggle>
+        <TooltipProvider>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <Toggle
+                        variant="outline"
+                        pressed={enableToolbar ? isActive : false}
+                        onPressedChange={handleToggle}
+                        onMouseDown={(e) => e.preventDefault()}
+                        aria-label="Strikethrough"
+                        disabled={!enableToolbar}
+                    >
+                        <Strikethrough size={16} />
+                    </Toggle>
+                </TooltipTrigger>
+                <TooltipContent className="pr-1.5">
+                    <div className="flex items-center gap-2">
+                        Strike Through
+                    </div>
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
     );
 }
