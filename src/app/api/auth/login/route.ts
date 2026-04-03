@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
   if (isNewUser) {
     await pool.query(
       `INSERT INTO preferiti (user_uid, formulario_id) VALUES ($1, $2)`,
-      [decoded.uid, process.env.FORMULARIO_BENVENUTO_ID]
+      [decoded.uid, process.env.NEXT_PUBLIC_FORMULARIO_BENVENUTO_ID]
     );
   }
 

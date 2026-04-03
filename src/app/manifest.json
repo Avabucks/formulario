@@ -1,6 +1,6 @@
 {
-  "name": "Formulario",
-  "short_name": "Formulario",
+  "name": "FormulaBase",
+  "short_name": "FormulaBase",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",

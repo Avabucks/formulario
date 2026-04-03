@@ -38,7 +38,7 @@ export default async function Home() {
         FROM formulari F
         JOIN users U_A ON F.author_uid = U_A.uid
         WHERE owner_uid = $1
-        ORDER BY titolo DESC
+        ORDER BY titolo
     `, [session.uid]);
 
     const { rows: preferiti } = await pool.query(`
@@ -49,7 +49,7 @@ export default async function Home() {
         JOIN users U_A ON F.author_uid = U_A.uid
         JOIN preferiti P ON P.formulario_id = F.beautiful_id
         WHERE P.user_uid = $1 AND F.visibility > 0
-        ORDER BY titolo DESC
+        ORDER BY titolo
     `, [session.uid]);
 
     const renderEmptyFormulari = () => (
@@ -133,7 +133,7 @@ export default async function Home() {
                     </Button>
                 </div>
             </section>
-            <div className="flex flex-col gap-4 w-full px-2 pb-10 md:px-6">
+            <div className="flex flex-col gap-4 w-full px-2 pb-5 md:px-6">
                 <div className="flex flex-row justify-between items-center w-full">
                     <div>
                         <h2 className="text-2xl font-bold text-foreground md:text-3xl">

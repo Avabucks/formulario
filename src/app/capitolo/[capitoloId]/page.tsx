@@ -94,7 +94,7 @@ export default async function Capitolo({
     return (
         <>
             <Header />
-            <div className="flex flex-col gap-4 w-full px-2 md:px-6 pt-16">
+            <div className="flex flex-col gap-4 w-full px-2 md:px-6 pt-16 pb-5">
                 <BreadcrumbLogic items={breadcrumbs} />
                 <div className="flex flex-col gap-4">
                     <div className="flex justify-between items-center gap-4">

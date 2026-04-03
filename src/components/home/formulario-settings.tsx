@@ -56,7 +56,7 @@ export function FormularioSettings({ formularioId }: Readonly<{ formularioId: st
         fetchFormulario()
 
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "i" && (e.metaKey || e.ctrlKey)) {
+            if (e.key === "o" && (e.metaKey || e.ctrlKey)) {
                 e.preventDefault()
                 setOpen((prev) => !prev)
             }
@@ -137,7 +137,7 @@ export function FormularioSettings({ formularioId }: Readonly<{ formularioId: st
                                 <KbdGroup className="hidden md:flex">
                                     <Kbd>Ctrl</Kbd>
                                     <span>+</span>
-                                    <Kbd>I</Kbd>
+                                    <Kbd>O</Kbd>
                                 </KbdGroup>
                             </div>
                         </TooltipContent>
@@ -284,7 +284,7 @@ export function FormularioSettings({ formularioId }: Readonly<{ formularioId: st
                                 <DialogClose asChild>
                                     <Button variant="outline"><X size={16} />Chiudi</Button>
                                 </DialogClose>
-                                {formulario.editable ? (
+                                {formulario.editable ? formularioId != process.env.NEXT_PUBLIC_FORMULARIO_BENVENUTO_ID && (
                                     <Dialog>
                                         <DialogTrigger asChild>
                                             <Button variant="destructive"><Trash2 size={16} />Elimina formulario</Button>
