@@ -284,7 +284,7 @@ export function FormularioSettings({ formularioId }: Readonly<{ formularioId: st
                                 <DialogClose asChild>
                                     <Button variant="outline"><X size={16} />Chiudi</Button>
                                 </DialogClose>
-                                {formulario.editable ? (
+                                {formulario.editable ? formularioId != process.env.NEXT_PUBLIC_FORMULARIO_BENVENUTO_ID && (
                                     <Dialog>
                                         <DialogTrigger asChild>
                                             <Button variant="destructive"><Trash2 size={16} />Elimina formulario</Button>

@@ -4,11 +4,15 @@ import { Star } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function StarFormulario({ formularioId, isStarred }: Readonly<{ formularioId: string; isStarred: boolean }>) {
     const router = useRouter();
     const [starred, setStarred] = useState(isStarred);
+
+    useEffect(() => {
+        setStarred(isStarred)
+    }, [isStarred]);
 
     async function handleStar() {
 

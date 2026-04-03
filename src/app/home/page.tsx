@@ -133,7 +133,7 @@ export default async function Home() {
                     </Button>
                 </div>
             </section>
-            <div className="flex flex-col gap-4 w-full px-2 pb-10 md:px-6">
+            <div className="flex flex-col gap-4 w-full px-2 pb-5 md:px-6">
                 <div className="flex flex-row justify-between items-center w-full">
                     <div>
                         <h2 className="text-2xl font-bold text-foreground md:text-3xl">

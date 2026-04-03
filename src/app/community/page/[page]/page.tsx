@@ -84,7 +84,7 @@ export default async function Capitolo({
     return (
         <>
             <Header />
-            <div className="flex flex-col gap-4 w-full px-2 pt-16 pb-10 md:px-6">
+            <div className="flex flex-col gap-4 w-full px-2 pt-16 pb-5 md:px-6">
                 <div className="rounded-xl overflow-hidden">
                     <CtaCommunity />
                 </div>

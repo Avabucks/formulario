@@ -24,14 +24,11 @@ export default function Home() {
 // - toolbar (con regex), anche con kb e tooltip
 // - ctrl + c, ctrl + x funziona sulla parola o su tutta la linea se la selezione è vuota
 // - [FORSE] auto refactor che sistema spazi mentre scrivi (per evitare non ritorni a capi che)
-// - aggiungere funzionalità di esportazione (pdf, markdown, ecc.)
 
 // - [GENERALI]
-// - [BUG] preferiti in settings
-// - padding bottom nelle liste
 // - seo
-// - disabilita elimina formulario per quella con id dell'env (formlario di benvenuto)
 // - report che manda mail a admin (mail nell'env) solo se la formula non è tua (in impostazioni)
+// - aggiungere funzionalità di esportazione (pdf, markdown, ecc.)
 
 // - [NOVITA]
 // - image manager nelle impostazioni
