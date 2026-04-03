@@ -1,6 +1,6 @@
 "use client"
 
-import { cn } from "@/src/lib/utils";
+import { cn, formatNumber } from "@/src/lib/utils";
 import { Calendar, CopyPlus, Download, Eye, GlobeIcon, Info, LinkIcon, LockIcon, Pencil, QrCode, Settings, Star, Trash2, UserRound, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -173,7 +173,7 @@ export function FormularioSettings({ formularioId }: Readonly<{ formularioId: st
                                                 <Separator orientation="vertical" />
                                                 <span className="flex gap-1 items-center shrink-0">
                                                     <Star size={16} />
-                                                    <span>{formulario.likes}</span>
+                                                    <span>{formatNumber(formulario.likes)}</span>
                                                 </span>
                                             </>
                                         )}
@@ -182,7 +182,7 @@ export function FormularioSettings({ formularioId }: Readonly<{ formularioId: st
                                                 <Separator orientation="vertical" />
                                                 <span className="flex gap-1 items-center shrink-0">
                                                     <Eye size={16} />
-                                                    <span>{formulario.views}</span>
+                                                    <span>{formatNumber(formulario.views)}</span>
                                                 </span>
                                             </>
                                         )}
