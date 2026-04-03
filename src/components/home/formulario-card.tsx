@@ -7,6 +7,7 @@ import { cookies } from "next/headers"
 import Link from "next/link"
 import { Separator } from "../ui/separator"
 import { StarFormulario } from "./star-formulario"
+import { formatNumber } from "@/src/lib/utils"
 
 type Formulario = {
     id: string
@@ -51,7 +52,7 @@ export async function FormularioCard({ formulario }: Readonly<{ formulario: Form
                             <Separator orientation="vertical" className="shrink-0" />
                             <span className="flex gap-1 items-center shrink-0">
                                 <Star size={16} />
-                                <span>{formulario.likes}</span>
+                                <span>{formatNumber(formulario.likes)}</span>
                             </span>
                         </>
                     )}
@@ -60,7 +61,7 @@ export async function FormularioCard({ formulario }: Readonly<{ formulario: Form
                             <Separator orientation="vertical" className="shrink-0" />
                             <span className="flex gap-1 items-center shrink-0">
                                 <Eye size={16} />
-                                <span>{formulario.views}</span>
+                                <span>{formatNumber(formulario.views)}</span>
                             </span>
                         </>
                     )}
