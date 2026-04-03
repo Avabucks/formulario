@@ -13,6 +13,7 @@ import { BookmarkX } from "lucide-react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import ViewTracker from "@/src/components/formulario/view-tracker";
 
 export default async function Formulario({
     params,
@@ -44,12 +45,6 @@ export default async function Formulario({
     if (rowCount === 0) {
         redirect('/home')
     }
-
-    // Views should only be incremented if the viewer is not the owner and the formulario is public
-    await pool.query(
-        `UPDATE formulari SET views = views + 1 WHERE beautiful_id = $1 AND owner_uid != $2 AND visibility > 0`,
-        [formularioId, session.uid ?? ""]
-    );
 
     const formulario = {
         ...formularioRows[0],
@@ -102,6 +97,7 @@ export default async function Formulario({
         <>
             <Header />
             <div className="flex flex-col gap-4 w-full px-2 md:px-6 pt-16 pb-5">
+                <ViewTracker formularioId={formulario.id} />
                 <BreadcrumbLogic items={breadcrumbs} />
                 <div className="flex flex-col gap-4">
                     <div className="flex justify-between items-center gap-4">
