@@ -4,22 +4,29 @@ import { useEffect, useState } from "react";
 import { NavigationBlocker } from "../../navigation/navigation-blocker";
 import { Spinner } from "../../ui/spinner";
 
-export function EditorInput({
-    argomentoId,
-    value,
-    setValue,
-    onSelect,
-    setEnableToolbar,
-    textareaRef,
-}: Readonly<{
-    argomentoId: string,
-    value: string,
-    setValue: (value: string) => void,
-    onSelect?: (e: React.SyntheticEvent<HTMLTextAreaElement>) => void
-    setEnableToolbar: (value: boolean) => void,
-    textareaRef: React.RefObject<HTMLTextAreaElement | null>,
-}>) {
+interface Selection {
+    start: number;
+    end: number;
+    text: string;
+}
 
+export function EditorInput({
+    textAreaRef,
+    argomentoId,
+    textAreaContent,
+    setTextAreaContent,
+    setSelection,
+    edited,
+    setEdited,
+}: Readonly<{
+    textAreaRef: React.RefObject<HTMLTextAreaElement | null>,
+    argomentoId: string,
+    textAreaContent: string,
+    setTextAreaContent: (value: string) => void,
+    setSelection: (selection: Selection | null) => void,
+    edited: boolean
+    setEdited: (value: boolean) => void,
+}>) {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(false)
 
@@ -38,7 +45,10 @@ export function EditorInput({
             }
         })
             .catch(() => setError(true))
-            .finally(() => setLoading(false))
+            .finally(() => {
+                setLoading(false)
+                setEdited(false)
+            })
     }
 
     useEffect(() => {
@@ -53,25 +63,41 @@ export function EditorInput({
     }, [])
 
     useEffect(() => {
+        if (!edited) return
         setLoading(true)
         setError(false)
-        const timeout = setTimeout(() => save(value), 1000)
+        const timeout = setTimeout(() => save(textAreaContent), 1000)
         return () => clearTimeout(timeout)
-    }, [value])
+    }, [textAreaContent])
+
+    const handleChange = (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
+        const target = e.currentTarget;
+        setTextAreaContent(target.value)
+        setEdited(true)
+    }
+
+    const handleSelect = (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
+        const target = e.target as HTMLTextAreaElement;
+
+        const start = target.selectionStart ?? 0;
+        const end = target.selectionEnd ?? 0;
+        const text = target.value.substring(start, end);
+
+        setSelection({ start, end, text });
+    }
 
     return (
         <div className="relative h-full overflow-hidden group">
             <NavigationBlocker blocked={loading} />
             <textarea
-                ref={textareaRef}
+                ref={textAreaRef}
                 placeholder="Scrivi qui..."
                 className="resize-none w-full h-full bg-primary/5 group-hover:bg-primary/8 outline-none p-3 font-mono text-xs duration-300"
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                onSelect={onSelect}
-                onKeyUp={onSelect}
-                onBlur={() => setEnableToolbar(false)}
-                onFocus={() => setEnableToolbar(true)}
+                value={textAreaContent}
+                onChange={handleChange}
+                onSelect={handleSelect}
+                onMouseUp={handleSelect}
+                onBlur={() => setSelection(null)}
             />
             {loading ? (
                 <div className="absolute right-3 bottom-3">

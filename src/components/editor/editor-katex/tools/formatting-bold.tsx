@@ -6,7 +6,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/
 import { Bold } from "lucide-react";
 import { useEffect, useMemo } from "react";
 
-interface SelectionInfo {
+interface Selection {
     start: number;
     end: number;
     text: string;
@@ -15,78 +15,70 @@ interface SelectionInfo {
 const getBoldRegex = () => /\*\*(.+?)\*\*/g;
 
 export function FormattingBold({
-    markdownContent,
     selection,
+    textAreaContent,
     onApply,
-    enableToolbar,
 }: Readonly<{
-    markdownContent: string;
-    selection: SelectionInfo | null;
-    onApply: (newContent: string, cursorPos?: number) => void;
-    enableToolbar: boolean;
+    selection: Selection | null,
+    textAreaContent: string,
+    onApply: (newContent: string, cursorPos?: number) => void,
 }>) {
     const isActive = useMemo(() => {
         if (!selection) return false;
         const { start, end } = selection;
         const regex = getBoldRegex();
         let match;
-        while ((match = regex.exec(markdownContent)) !== null) {
+        while ((match = regex.exec(textAreaContent)) !== null) {
             if (start >= match.index && end <= match.index + match[0].length) return true;
         }
         return false;
-    }, [selection, markdownContent]);
+    }, [selection, textAreaContent]);
 
     const handleToggle = () => {
         if (!selection) return;
 
         const { start, end } = selection;
-        const raw = markdownContent.slice(start, end);
+        const raw = textAreaContent.slice(start, end);
         const trimmedText = raw.trim();
         const leadingSpaces = raw.length - raw.trimStart().length;
         const trimStart = start + leadingSpaces;
         const trimEnd = trimStart + trimmedText.length;
 
         if (isActive) {
-            // Remove bold markers — find the enclosing match and strip **…**
             const regex = getBoldRegex();
             let match;
-            while ((match = regex.exec(markdownContent)) !== null) {
+            while ((match = regex.exec(textAreaContent)) !== null) {
                 if (trimStart >= match.index && trimEnd <= match.index + match[0].length) {
                     const newContent =
-                        markdownContent.slice(0, match.index) +
+                        textAreaContent.slice(0, match.index) +
                         match[1] +
-                        markdownContent.slice(match.index + match[0].length);
-
-                    // Cursor lands at the same logical position minus the two
-                    // removed "**" on the left (2 chars).
-                    const cursorPos = trimStart - 2;
-                    onApply(newContent, Math.max(match.index, cursorPos));
+                        textAreaContent.slice(match.index + match[0].length);
+                    const cursorPos = match.index + match[1].length;
+                    onApply(newContent, cursorPos);
                     return;
                 }
             }
         } else {
             if (selection.text === "") return;
             const newContent =
-                markdownContent.slice(0, trimStart) +
+                textAreaContent.slice(0, trimStart) +
                 `**${trimmedText}**` +
-                markdownContent.slice(trimEnd);
-
-            // Place cursor right after the closing "**"
-            const cursorPos = trimStart + trimmedText.length + 4;
+                textAreaContent.slice(trimEnd);
+            const cursorPos = trimStart + trimmedText.length + 2;
             onApply(newContent, cursorPos);
         }
     };
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "b" && (e.ctrlKey || e.metaKey) && enableToolbar) {
+            if (e.key === "b" && (e.ctrlKey || e.metaKey) && selection) {
                 e.preventDefault();
                 handleToggle();
             }
         };
         document.addEventListener("keydown", handleKeyDown);
         return () => document.removeEventListener("keydown", handleKeyDown);
-    }, [selection, markdownContent, isActive, enableToolbar]);
+    }, [selection, textAreaContent, isActive]);
 
     return (
         <TooltipProvider>
@@ -94,11 +86,11 @@ export function FormattingBold({
                 <TooltipTrigger asChild>
                     <Toggle
                         variant="outline"
-                        pressed={enableToolbar ? isActive : false}
                         onPressedChange={handleToggle}
                         onMouseDown={(e) => e.preventDefault()}
                         aria-label="Bold"
-                        disabled={!enableToolbar}
+                        disabled={selection === null}
+                        pressed={isActive}
                     >
                         <Bold size={16} />
                     </Toggle>

@@ -1,10 +1,15 @@
 "use client";
 
+import { ArrowRightLeft, Eye, EyeClosed, Redo2, Undo2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { Button } from "../ui/button";
+import { Kbd, KbdGroup } from "../ui/kbd";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "../ui/resizable";
+import { Toggle } from "../ui/toggle";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { EditorInput } from "./editor-katex/editor-input";
 import { EditorPreview } from "./editor-katex/editor-preview";
-import { EditorToolbar } from "./editor-katex/editor-toolbar";
+import { FormattingBold } from "./editor-katex/tools/formatting-bold";
 
 type Argomento = {
     id: string;
@@ -19,109 +24,88 @@ interface Selection {
 }
 
 interface Snapshot {
-    value: string;
+    textAreaContent: string;
     cursor: number;
 }
 
 export function EditorPage({ argomento }: Readonly<{ argomento: Argomento }>) {
-    const [value, setValue] = useState(argomento.content);
+    const [textAreaContent, setTextAreaContent] = useState(argomento.content);
+    const [edited, setEdited] = useState<boolean>(false);
     const [switchView, setSwitchView] = useState<boolean>(false);
-    const [enableToolbar, setEnableToolbar] = useState<boolean>(false);
     const [resizableSize, setResizableSize] = useState<number>(50);
-    const [selection, setSelection] = useState<Selection | null>(null);
     const [history, setHistory] = useState<Snapshot[]>([]);
     const [future, setFuture] = useState<Snapshot[]>([]);
 
-    const pendingCursorRef = useRef<number | null>(null);
-    const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const committedValueRef = useRef(value);
-    const historyDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-    // Frozen copy of the last non-null selection — toolbar tools read this
-    // so they still have a valid position even after the textarea loses focus.
-    const lastSelectionRef = useRef<Selection | null>(null);
-
-    const handleSelect = (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
-        const el = e.currentTarget;
-        const start = el.selectionStart;
-        const end = el.selectionEnd;
-        const sel = { start, end, text: value.slice(start, end) };
-        setSelection(sel);
-        lastSelectionRef.current = sel;
-    };
+    const textAreaRef = useRef<HTMLTextAreaElement>(null);
+    const isUndoRedoRef = useRef(false);
+    const [selection, setSelection] = useState<Selection | null>(null);
 
     const handleApply = (newContent: string, cursorPos?: number) => {
-        const cursor = textareaRef.current?.selectionStart ?? lastSelectionRef.current?.start ?? 0;
-        setHistory((prev) => {
-            if (prev.at(-1)?.value === value) return prev;
-            return [...prev, { value, cursor }];
-        });
-        setFuture([]);
-        setValue(newContent);
-        committedValueRef.current = newContent;
-        if (historyDebounceRef.current) {
-            clearTimeout(historyDebounceRef.current);
-            historyDebounceRef.current = null;
-        }
-        pendingCursorRef.current = cursorPos ?? cursor;
-    };
-
-    // Restore focus + cursor after every apply.
-    useEffect(() => {
-        if (pendingCursorRef.current === null) return;
-        const pos = pendingCursorRef.current;
-        pendingCursorRef.current = null;
-        const ta = textareaRef.current;
-        if (!ta) return;
-        ta.focus();
-        ta.setSelectionRange(pos, pos);
-    }, [value]);
-
-    const handleWrite = (newContent: string) => {
-        setFuture([]);
-        setValue(newContent);
-
-        if (historyDebounceRef.current) clearTimeout(historyDebounceRef.current);
-        historyDebounceRef.current = setTimeout(() => {
-            const snapshot = committedValueRef.current;
-            const cursor = textareaRef.current?.selectionStart ?? 0;
-            setHistory((prev) => {
-                if (prev.at(-1)?.value === snapshot) return prev;
-                return [...prev, { value: snapshot, cursor }];
+        setEdited(true)
+        setTextAreaContent(newContent);
+        if (cursorPos !== undefined && textAreaRef.current) {
+            requestAnimationFrame(() => {
+                const ta = textAreaRef.current!;
+                ta.focus();
+                ta.setSelectionRange(cursorPos, cursorPos);
             });
-            committedValueRef.current = newContent;
-        }, 800);
+        }
     };
 
     const handleUndo = () => {
-        const prev = history.at(-1);
+        const prev = history.at(-2);
         if (!prev) return;
-        const cursor = textareaRef.current?.selectionStart ?? 0;
+        const cursor = textAreaRef.current?.selectionStart ?? 0;
         setHistory((h) => h.slice(0, -1));
-        setFuture((f) => [{ value, cursor }, ...f]);
-        setValue(prev.value);
-        committedValueRef.current = prev.value;
-        pendingCursorRef.current = prev.cursor;
+        setFuture((f) => [{ textAreaContent, cursor }, ...f]);
+        isUndoRedoRef.current = true;
+        handleApply(prev.textAreaContent, prev.cursor);
+        setSelection({ start: prev.cursor, end: prev.cursor, text: "" })
     };
 
     const handleRedo = () => {
         if (future.length === 0) return;
         const next = future[0];
-        const cursor = textareaRef.current?.selectionStart ?? 0;
+        setHistory((h) => [...h, next]);
         setFuture((f) => f.slice(1));
-        setHistory((h) => [...h, { value, cursor }]);
-        setValue(next.value);
-        committedValueRef.current = next.value;
-        pendingCursorRef.current = next.cursor;
+        isUndoRedoRef.current = true;
+        handleApply(next.textAreaContent, next.cursor);
+        setSelection({ start: next.cursor, end: next.cursor, text: "" })
     };
 
     useEffect(() => {
+        console.log(history)
+    }, [history])
+
+    useEffect(() => {
+        console.log(future)
+    }, [future])
+
+    useEffect(() => {
+        if (isUndoRedoRef.current) {
+            isUndoRedoRef.current = false;
+            return;
+        }
+
+        const timeout = setTimeout(() => {
+            const cursor = textAreaRef.current?.selectionStart ?? 0;
+            setHistory((prev) => {
+                if (prev.at(-1)?.textAreaContent === textAreaContent) return prev;
+                return [...prev, { textAreaContent, cursor }];
+            });
+            setFuture([]);
+        }, 500);
+
+        return () => clearTimeout(timeout);
+    }, [textAreaContent]);
+
+    useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "z" && (e.ctrlKey || e.metaKey)) {
+            if (e.key === "z" && (e.ctrlKey || e.metaKey) && selection) {
                 e.preventDefault();
                 handleUndo();
             }
-            if (e.key === "y" && (e.ctrlKey || e.metaKey)) {
+            if (e.key === "y" && (e.ctrlKey || e.metaKey) && selection) {
                 e.preventDefault();
                 handleRedo();
             }
@@ -131,30 +115,92 @@ export function EditorPage({ argomento }: Readonly<{ argomento: Argomento }>) {
     }, [handleUndo, handleRedo]);
 
     const toolbar = (
-        <EditorToolbar
-            switchView={switchView}
-            setSwitchView={setSwitchView}
-            editable={argomento.editable}
-            markdownContent={value}
-            selection={lastSelectionRef.current}
-            onApply={handleApply}
-            onUndo={handleUndo}
-            onRedo={handleRedo}
-            canUndo={history.length > 0}
-            canRedo={future.length > 0}
-            enableToolbar={enableToolbar}
-        />
-    );
+        <div className="flex w-full border-b min-h-15">
+            <div className="flex gap-2 border-r items-center px-3">
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={handleUndo}
+                                onMouseDown={(e) => e.preventDefault()}
+                                disabled={history.length < 2 || selection === null}
+                            >
+                                <Undo2 size={16} />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className="pr-1.5">
+                            <div className="flex items-center gap-2">
+                                Undo
+                                <KbdGroup className="hidden md:flex">
+                                    <Kbd>Ctrl</Kbd>
+                                    <span>+</span>
+                                    <Kbd>Z</Kbd>
+                                </KbdGroup>
+                            </div>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={handleRedo}
+                                onMouseDown={(e) => e.preventDefault()}
+                                disabled={future.length <= 0 || selection === null}
+                            >
+                                <Redo2 size={16} />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className="pr-1.5">
+                            <div className="flex items-center gap-2">
+                                Redo
+                                <KbdGroup className="hidden md:flex">
+                                    <Kbd>Ctrl</Kbd>
+                                    <span>+</span>
+                                    <Kbd>Y</Kbd>
+                                </KbdGroup>
+                            </div>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+            </div>
 
-    const preview = <EditorPreview value={value} />;
+            <div className="flex flex-1 items-center p-3">
+                <FormattingBold
+                    textAreaContent={textAreaContent}
+                    selection={selection}
+                    onApply={handleApply}
+                />
+            </div>
+            {/* Desktop */}
+            <div className="flex md:hidden border-l items-center px-3">
+                <Button variant="outline" size="icon" onClick={() => setSwitchView((prev) => !prev)}>
+                    <ArrowRightLeft size={16} />
+                </Button>
+            </div>
+
+            {/* Mobile */}
+            <div className="hidden md:flex border-l items-center px-3">
+                <Toggle variant="outline" pressed={switchView} onClick={() => setSwitchView((prev) => !prev)}>
+                    {switchView ? <Eye size={16} /> : <EyeClosed size={16} />}
+                </Toggle>
+            </div>
+        </div>
+    );
+    const preview = <EditorPreview textAreaContent={textAreaContent} />;
     const input = argomento.editable && (
         <EditorInput
+            textAreaRef={textAreaRef}
             argomentoId={argomento.id}
-            value={value}
-            setValue={handleWrite}
-            onSelect={handleSelect}
-            setEnableToolbar={setEnableToolbar}
-            textareaRef={textareaRef}
+            textAreaContent={textAreaContent}
+            setTextAreaContent={setTextAreaContent}
+            setSelection={setSelection}
+            edited={edited}
+            setEdited={setEdited}
         />
     );
 

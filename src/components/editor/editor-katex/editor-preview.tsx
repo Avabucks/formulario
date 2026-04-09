@@ -9,10 +9,10 @@ import remarkMath from "remark-math";
 import { markdownComponents } from "./markdown-components";
 import remarkGfm from "remark-gfm";
 
-export function EditorPreview({ value }: Readonly<{ value: string }>) {
+export function EditorPreview({ textAreaContent }: Readonly<{ textAreaContent: string }>) {
     const patternId = `cross-${useId()}`;
 
-    const markdownContent = value
+    const markdownContent = textAreaContent
         .replaceAll(/\$\$([^\n]+?)\$\$/g, (_, math) => `\n$$\n${math}\n$$\n`); // formule block
 
     return (

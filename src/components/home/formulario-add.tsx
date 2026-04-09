@@ -74,13 +74,13 @@ export default function ForumlarioAdd({ allowKey = true }: Readonly<{ allowKey?:
                         <DialogTrigger asChild>
                             <Button variant="default">
                                 <Plus size={16} />
-                                <div className="hidden md:flex">Aggiungi un formulario</div>
+                                <div className="hidden md:flex">Aggiungi formulario</div>
                             </Button>
                         </DialogTrigger>
                     </TooltipTrigger>
                     <TooltipContent className="pr-1.5">
                         <div className="flex items-center gap-2">
-                            Aggiungi un formulario
+                            Aggiungi formulario
                             {allowKey && (
                                 <KbdGroup className="hidden md:flex">
                                     <Kbd>Ctrl</Kbd>
