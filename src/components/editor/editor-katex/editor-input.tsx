@@ -63,12 +63,12 @@ export function EditorInput({
     }, [])
 
     useEffect(() => {
-        if (!edited) return;
+        if (!edited) return
         setLoading(true)
         setError(false)
         const timeout = setTimeout(() => save(textAreaContent), 1000)
         return () => clearTimeout(timeout)
-    }, [edited])
+    }, [textAreaContent])
 
     const handleChange = (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
         const target = e.currentTarget;

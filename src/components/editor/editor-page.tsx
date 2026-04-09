@@ -1,10 +1,15 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { ArrowRightLeft, Eye, EyeClosed, Redo2, Undo2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Button } from "../ui/button";
+import { Kbd, KbdGroup } from "../ui/kbd";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "../ui/resizable";
+import { Toggle } from "../ui/toggle";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { EditorInput } from "./editor-katex/editor-input";
 import { EditorPreview } from "./editor-katex/editor-preview";
-import { EditorToolbar } from "./editor-katex/editor-toolbar";
+import { FormattingBold } from "./editor-katex/tools/formatting-bold";
 
 type Argomento = {
     id: string;
@@ -18,13 +23,21 @@ interface Selection {
     text: string;
 }
 
+interface Snapshot {
+    textAreaContent: string;
+    cursor: number;
+}
+
 export function EditorPage({ argomento }: Readonly<{ argomento: Argomento }>) {
     const [textAreaContent, setTextAreaContent] = useState(argomento.content);
     const [edited, setEdited] = useState<boolean>(false);
     const [switchView, setSwitchView] = useState<boolean>(false);
     const [resizableSize, setResizableSize] = useState<number>(50);
+    const [history, setHistory] = useState<Snapshot[]>([]);
+    const [future, setFuture] = useState<Snapshot[]>([]);
 
     const textAreaRef = useRef<HTMLTextAreaElement>(null);
+    const isUndoRedoRef = useRef(false);
     const [selection, setSelection] = useState<Selection | null>(null);
 
     const handleApply = (newContent: string, cursorPos?: number) => {
@@ -39,15 +52,144 @@ export function EditorPage({ argomento }: Readonly<{ argomento: Argomento }>) {
         }
     };
 
+    const handleUndo = () => {
+        const prev = history.at(-2);
+        if (!prev) return;
+        const cursor = textAreaRef.current?.selectionStart ?? 0;
+        setHistory((h) => h.slice(0, -1));
+        setFuture((f) => [{ textAreaContent, cursor }, ...f]);
+        isUndoRedoRef.current = true;
+        handleApply(prev.textAreaContent, prev.cursor);
+        setSelection({ start: prev.cursor, end: prev.cursor, text: "" })
+    };
+
+    const handleRedo = () => {
+        if (future.length === 0) return;
+        const next = future[0];
+        setHistory((h) => [...h, next]);
+        setFuture((f) => f.slice(1));
+        isUndoRedoRef.current = true;
+        handleApply(next.textAreaContent, next.cursor);
+        setSelection({ start: next.cursor, end: next.cursor, text: "" })
+    };
+
+    useEffect(() => {
+        console.log(history)
+    }, [history])
+
+    useEffect(() => {
+        console.log(future)
+    }, [future])
+
+    useEffect(() => {
+        if (isUndoRedoRef.current) {
+            isUndoRedoRef.current = false;
+            return;
+        }
+
+        const timeout = setTimeout(() => {
+            const cursor = textAreaRef.current?.selectionStart ?? 0;
+            setHistory((prev) => {
+                if (prev.at(-1)?.textAreaContent === textAreaContent) return prev;
+                return [...prev, { textAreaContent, cursor }];
+            });
+            setFuture([]);
+        }, 500);
+
+        return () => clearTimeout(timeout);
+    }, [textAreaContent]);
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "z" && (e.ctrlKey || e.metaKey) && selection) {
+                e.preventDefault();
+                handleUndo();
+            }
+            if (e.key === "y" && (e.ctrlKey || e.metaKey) && selection) {
+                e.preventDefault();
+                handleRedo();
+            }
+        };
+        document.addEventListener("keydown", handleKeyDown);
+        return () => document.removeEventListener("keydown", handleKeyDown);
+    }, [handleUndo, handleRedo]);
+
     const toolbar = (
-        <EditorToolbar
-            switchView={switchView}
-            setSwitchView={setSwitchView}
-            editable={argomento.editable}
-            selection={selection}
-            textAreaContent={textAreaContent}
-            onApply={handleApply}
-        />
+        <div className="flex w-full border-b min-h-15">
+            <div className="flex gap-2 border-r items-center px-3">
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={handleUndo}
+                                onMouseDown={(e) => e.preventDefault()}
+                                disabled={history.length < 2 || selection === null}
+                            >
+                                <Undo2 size={16} />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className="pr-1.5">
+                            <div className="flex items-center gap-2">
+                                Undo
+                                <KbdGroup className="hidden md:flex">
+                                    <Kbd>Ctrl</Kbd>
+                                    <span>+</span>
+                                    <Kbd>Z</Kbd>
+                                </KbdGroup>
+                            </div>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={handleRedo}
+                                onMouseDown={(e) => e.preventDefault()}
+                                disabled={future.length <= 0 || selection === null}
+                            >
+                                <Redo2 size={16} />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className="pr-1.5">
+                            <div className="flex items-center gap-2">
+                                Redo
+                                <KbdGroup className="hidden md:flex">
+                                    <Kbd>Ctrl</Kbd>
+                                    <span>+</span>
+                                    <Kbd>Y</Kbd>
+                                </KbdGroup>
+                            </div>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+            </div>
+
+            <div className="flex flex-1 items-center p-3">
+                <FormattingBold
+                    textAreaContent={textAreaContent}
+                    selection={selection}
+                    onApply={handleApply}
+                />
+            </div>
+            {/* Desktop */}
+            <div className="flex md:hidden border-l items-center px-3">
+                <Button variant="outline" size="icon" onClick={() => setSwitchView((prev) => !prev)}>
+                    <ArrowRightLeft size={16} />
+                </Button>
+            </div>
+
+            {/* Mobile */}
+            <div className="hidden md:flex border-l items-center px-3">
+                <Toggle variant="outline" pressed={switchView} onClick={() => setSwitchView((prev) => !prev)}>
+                    {switchView ? <Eye size={16} /> : <EyeClosed size={16} />}
+                </Toggle>
+            </div>
+        </div>
     );
     const preview = <EditorPreview textAreaContent={textAreaContent} />;
     const input = argomento.editable && (
