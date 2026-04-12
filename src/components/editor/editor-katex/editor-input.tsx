@@ -95,7 +95,6 @@ export function EditorInput({
                 className="resize-none w-full h-full bg-primary/5 group-hover:bg-primary/8 outline-none p-3 font-mono text-xs duration-300"
                 value={textAreaContent}
                 onChange={handleChange}
-                onSelect={handleSelect}
                 onMouseUp={handleSelect}
                 onBlur={() => setSelection(null)}
             />

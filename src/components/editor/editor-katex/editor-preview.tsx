@@ -1,7 +1,7 @@
 "use client";
 
 import "katex/dist/katex.min.css";
-import { useId } from "react";
+import { useId, useMemo, memo } from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeKatex from "rehype-katex";
 import remarkBreaks from "remark-breaks";
@@ -9,17 +9,22 @@ import remarkMath from "remark-math";
 import { markdownComponents } from "./markdown-components";
 import remarkGfm from "remark-gfm";
 
-export function EditorPreview({ textAreaContent }: Readonly<{ textAreaContent: string }>) {
+const remarkPlugins = [remarkMath, remarkBreaks, remarkGfm];
+const rehypePlugins = [rehypeKatex];
+
+export const EditorPreview = memo(function EditorPreview({ markdownContent }: Readonly<{ markdownContent: string }>) {
     const patternId = `cross-${useId()}`;
 
-    const markdownContent = textAreaContent
-        .replaceAll(/\$\$([^\n]+?)\$\$/g, (_, math) => `\n$$\n${math}\n$$\n`); // formule block
+    const processedContent = useMemo(() =>
+        markdownContent.replaceAll(/\$\$([^\n]+?)\$\$/g, (_, math) => `\n$$\n${math}\n$$\n`),
+        [markdownContent]
+    );
 
     return (
         <div className="relative flex-1 h-full w-full min-w-fit">
-            <div className="p-5 min-h-full w-full leading-loose relative">
+            <div className="p-7 min-h-full w-full leading-loose relative">
                 <svg
-                    className="absolute inset-0 h-full w-full opacity-[0.10] pointer-events-none"
+                    className="absolute inset-0 h-full w-full opacity-[0.07] pointer-events-none"
                     xmlns="http://www.w3.org/2000/svg"
                     preserveAspectRatio="none"
                 >
@@ -31,13 +36,13 @@ export function EditorPreview({ textAreaContent }: Readonly<{ textAreaContent: s
                     <rect width="100%" height="100%" fill={`url(#${patternId})`} />
                 </svg>
                 <ReactMarkdown
-                    remarkPlugins={[remarkMath, remarkBreaks, remarkGfm]}
-                    rehypePlugins={[rehypeKatex]}
+                    remarkPlugins={remarkPlugins}
+                    rehypePlugins={rehypePlugins}
                     components={markdownComponents}
                 >
-                    {markdownContent}
+                    {processedContent}
                 </ReactMarkdown>
             </div>
         </div>
     );
-}
+});

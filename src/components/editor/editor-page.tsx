@@ -30,6 +30,7 @@ interface Snapshot {
 
 export function EditorPage({ argomento }: Readonly<{ argomento: Argomento }>) {
     const [textAreaContent, setTextAreaContent] = useState(argomento.content);
+    const [markdownContent, setMarkdownContent] = useState(argomento.content);
     const [edited, setEdited] = useState<boolean>(false);
     const [switchView, setSwitchView] = useState<boolean>(false);
     const [resizableSize, setResizableSize] = useState<number>(50);
@@ -74,14 +75,6 @@ export function EditorPage({ argomento }: Readonly<{ argomento: Argomento }>) {
     };
 
     useEffect(() => {
-        console.log(history)
-    }, [history])
-
-    useEffect(() => {
-        console.log(future)
-    }, [future])
-
-    useEffect(() => {
         if (isUndoRedoRef.current) {
             isUndoRedoRef.current = false;
             return;
@@ -98,6 +91,13 @@ export function EditorPage({ argomento }: Readonly<{ argomento: Argomento }>) {
 
         return () => clearTimeout(timeout);
     }, [textAreaContent]);
+
+    useEffect(() => {
+        if (edited) {
+            return;
+        }
+        setMarkdownContent(textAreaContent)
+    }, [edited]);
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -191,7 +191,7 @@ export function EditorPage({ argomento }: Readonly<{ argomento: Argomento }>) {
             </div>
         </div>
     );
-    const preview = <EditorPreview textAreaContent={textAreaContent} />;
+    const preview = <EditorPreview markdownContent={markdownContent} />;
     const input = argomento.editable && (
         <EditorInput
             textAreaRef={textAreaRef}
