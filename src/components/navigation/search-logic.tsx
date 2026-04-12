@@ -84,7 +84,7 @@ export function SearchLogic() {
                 setArgomenti([]);
                 setLoading(false)
             }
-        }, 1000)
+        }, 500)
 
         return () => clearTimeout(timeout)
     }, [search])
