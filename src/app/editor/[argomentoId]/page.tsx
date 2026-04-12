@@ -1,9 +1,7 @@
 import { EditorPage } from "@/src/components/editor/editor-page";
-import { FormularioSettings } from "@/src/components/home/formulario-settings";
 import { BreadcrumbLogic } from "@/src/components/navigation/breadcrumb-logic";
 import { Header } from "@/src/components/navigation/header";
 import { Skeleton } from "@/src/components/ui/skeleton";
-import { TypographyH4 } from "@/src/components/ui/typography";
 import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { getIronSession } from "iron-session";
@@ -64,14 +62,8 @@ export default async function Argomento({
             <Header />
             <div className="flex flex-1 flex-col gap-4 w-full px-2 md:px-6 pt-16 pb-5 overflow-hidden">
                 <BreadcrumbLogic items={breadcrumbs} />
-                <div className="flex justify-between items-center gap-4">
-                    <div className="flex items-center gap-4">
-                        <TypographyH4 className="truncate min-w-0 flex-1">{argomento.titolo}</TypographyH4>
-                    </div>
-                    <FormularioSettings formularioId={argomento.formularioId} />
-                </div>
                 <Suspense fallback={<Skeleton className="h-full w-full" />}>
-                    <EditorPage argomento={argomento} />
+                    <EditorPage argomento={argomento} formularioId={argomento.formularioId} />
                 </Suspense>
             </div>
         </div>

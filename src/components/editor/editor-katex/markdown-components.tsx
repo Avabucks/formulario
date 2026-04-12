@@ -36,9 +36,9 @@ export const markdownComponents: Components = {
   strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
   em: ({ children }) => <em className="italic">{children}</em>,
   del: ({ children }) => <del className="line-through">{children}</del>,
-  hr: () => <hr className="mb-4 border-0 h-0.5 bg-foreground/20 rounded" />,
+  hr: () => <hr className="mb-5 border-0 h-0.5 bg-foreground/20 rounded" />,
   blockquote: ({ children }) => (
-    <blockquote className="border-l-4 border-foreground/30 pl-4 py-2 my-4 text-foreground/70 bg-foreground/5 [&>p]:m-0 [&>p]:p-0 [&>p]:inline">
+    <blockquote className="border-l-4 border-foreground/30 pl-4 py-2 mb-5 text-foreground/70 bg-foreground/5 [&>p]:m-0 [&>p]:p-0 [&>p]:inline">
       {children}
     </blockquote>
   ),
@@ -55,6 +55,7 @@ export const markdownComponents: Components = {
           customStyle={{
             fontSize: "14px",
             borderRadius: "6px",
+            marginBottom: "calc(var(--spacing) * 5)",
           }}
         >
           {String(children).replace(/\n$/, "")}
@@ -67,7 +68,7 @@ export const markdownComponents: Components = {
 
     if (isBlock) {
       return (
-        <pre className="bg-foreground/8 rounded-[6px] text-[#e36209] dark:text-[#e3b341] p-2 text-[85%] font-mono overflow-x-auto my-2">
+        <pre className="bg-foreground/8 rounded-[6px] text-[#e36209] dark:text-[#e3b341] p-2 text-[85%] font-mono overflow-x-auto mb-5">
           <code>{children}</code>
         </pre>
       );

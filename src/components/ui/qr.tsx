@@ -86,7 +86,7 @@ export function Qr({ link, title }: Readonly<{ link: string, title: string }>) {
     }
 
     return (
-        <div className="flex mb-3 pl-2">
+        <div className="flex">
             <div className="flex flex-1 flex-col gap-4">
                 <Label>Condividi il tuo formulario</Label>
                 <div className="flex items-center gap-2 w-full">

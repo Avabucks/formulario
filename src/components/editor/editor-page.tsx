@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRightLeft, Eye, EyeClosed, Redo2, Undo2 } from "lucide-react";
+import { ArrowRightLeft, Eye, EyeClosed, Redo2, Undo2, PenOff } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "../ui/button";
 import { Kbd, KbdGroup } from "../ui/kbd";
@@ -10,6 +10,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/
 import { EditorInput } from "./editor-katex/editor-input";
 import { EditorPreview } from "./editor-katex/editor-preview";
 import { FormattingBold } from "./editor-katex/tools/formatting-bold";
+import { FormularioSettings } from "../home/formulario-settings";
 
 type Argomento = {
     id: string;
@@ -28,7 +29,7 @@ interface Snapshot {
     cursor: number;
 }
 
-export function EditorPage({ argomento }: Readonly<{ argomento: Argomento }>) {
+export function EditorPage({ argomento, formularioId }: Readonly<{ argomento: Argomento, formularioId: string }>) {
     const [textAreaContent, setTextAreaContent] = useState(argomento.content);
     const [markdownContent, setMarkdownContent] = useState(argomento.content);
     const [edited, setEdited] = useState<boolean>(false);
@@ -176,19 +177,25 @@ export function EditorPage({ argomento }: Readonly<{ argomento: Argomento }>) {
                     onApply={handleApply}
                 />
             </div>
-            {/* Desktop */}
-            <div className="flex md:hidden border-l items-center px-3">
+
+            {/* Mobile */}
+            <div className="flex md:hidden border-l items-center px-3 gap-2">
                 <Button variant="outline" size="icon" onClick={() => setSwitchView((prev) => !prev)}>
                     <ArrowRightLeft size={16} />
                 </Button>
             </div>
 
-            {/* Mobile */}
-            <div className="hidden md:flex border-l items-center px-3">
+            {/* Desktop */}
+            <div className="hidden md:flex border-l items-center px-3 gap-2">
                 <Toggle variant="outline" pressed={switchView} onClick={() => setSwitchView((prev) => !prev)}>
                     {switchView ? <Eye size={16} /> : <EyeClosed size={16} />}
                 </Toggle>
             </div>
+
+            <div className="flex border-l items-center px-3 gap-2">
+                <FormularioSettings formularioId={formularioId} />
+            </div>
+
         </div>
     );
     const preview = <EditorPreview markdownContent={markdownContent} />;
@@ -206,7 +213,19 @@ export function EditorPage({ argomento }: Readonly<{ argomento: Argomento }>) {
 
     return (
         <div className="flex flex-1 flex-col min-h-0 border rounded-lg overflow-hidden">
-            {argomento.editable && toolbar}
+            {argomento.editable ?
+                toolbar
+                : (
+                    <div className="flex w-full border-b min-h-15 justify-between items-center">
+                        <div className="flex items-center gap-1.5 px-4 text-sm text-muted-foreground">
+                            <PenOff size={16} />
+                            <span>"Aggiuni ai tuoi formulari" per poter modifcare</span>
+                        </div>
+                        <div className="flex border-l items-center px-3 gap-2 h-full">
+                            <FormularioSettings formularioId={formularioId} />
+                        </div>
+                    </div>
+                )}
 
             {/* Desktop */}
             <div className="hidden md:flex flex-1 min-h-0">

@@ -36,9 +36,9 @@ export async function POST(request: Request) {
         );
 
         await pool.query(
-            `INSERT INTO argomenti (beautiful_id, titolo, capitolo, sort_order)
-             VALUES ($1, $2, $3, $4)`,
-            [beautiful_id, titolo, capitoloId, rows[0].next_order]
+            `INSERT INTO argomenti (beautiful_id, titolo, capitolo, sort_order, content)
+             VALUES ($1, $2, $3, $4, $5)`,
+            [beautiful_id, titolo, capitoloId, rows[0].next_order, `# ${titolo}\n`]
         );
 
         revalidatePath(`/formulari/${capitoloId}`);
