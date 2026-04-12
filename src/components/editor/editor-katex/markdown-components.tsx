@@ -4,41 +4,41 @@ import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 export const markdownComponents: Components = {
   h1: ({ children }) => (
-    <h1 className="text-[1.9em] leading-12 font-bold">
+    <h1 className="text-[1.9em] font-bold leading-8 mb-6">
       {children}
     </h1>
   ),
   h2: ({ children }) => (
-    <h2 className="text-[1.5em] font-bold">
+    <h2 className="text-[1.5em] font-semibold leading-6 mb-6">
       {children}
     </h2>
   ),
   h3: ({ children }) => (
-    <h3 className="text-[1.2em] font-bold">{children}</h3>
+    <h3 className="text-[1.2em] font-semibold leading-5 mb-6">{children}</h3>
   ),
   h4: ({ children }) => (
-    <h4 className="text-[1em] font-bold">{children}</h4>
+    <h4 className="text-[1em] font-semibold leading-4 mb-6">{children}</h4>
   ),
   h5: ({ children }) => (
-    <h5 className="text-[0.875em] font-semibold">{children}</h5>
+    <h5 className="text-[0.875em] font-semibold leading-3 mb-6">{children}</h5>
   ),
   h6: ({ children }) => (
-    <h6 className="text-[0.85em] font-semibold text-[#59636e] dark:text-[#9198a1]">
+    <h6 className="text-[0.85em] font-semibold text-[#59636e] dark:text-[#9198a1] leading-3 mb-6">
       {children}
     </h6>
   ),
   p: ({ children }) => (
-    <p className="leading-normal text-base font-sans my-1.5">{children}</p>
+    <p className="leading-normal text-base font-sans mb-4">{children}</p>
   ),
-  ul: ({ children }) => <ul className="list-disc pl-9 mb-4 space-y-1">{children}</ul>,
-  ol: ({ children }) => <ol className="list-decimal pl-8 mb-4 space-y-1">{children}</ol>,
-  li: ({ children }) => <li className="leading-[1.75] text-[16px]">{children}</li>,
+  ul: ({ children }) => <ul className="list-disc pl-9 space-y-2 mb-4">{children}</ul>,
+  ol: ({ children }) => <ol className="list-decimal [&>li::marker]:font-bold pl-9 space-y-2 mb-4">{children}</ol>,
+  li: ({ children }) => <li className="leading-9 text-[1rem]">{children}</li>,
   strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
   em: ({ children }) => <em className="italic">{children}</em>,
   del: ({ children }) => <del className="line-through">{children}</del>,
-  hr: () => <hr className="my-4 border-0 h-0.5 bg-foreground/20 rounded" />,
+  hr: () => <hr className="mb-4 border-0 h-0.5 bg-foreground/20 rounded" />,
   blockquote: ({ children }) => (
-    <blockquote className="border-l-4 border-foreground/50 pl-4 py-1 my-4 text-foreground/50 bg-foreground/5">
+    <blockquote className="border-l-4 border-foreground/30 pl-4 py-2 my-4 text-foreground/70 bg-foreground/5 [&>p]:m-0 [&>p]:p-0 [&>p]:inline">
       {children}
     </blockquote>
   ),
@@ -86,7 +86,7 @@ export const markdownComponents: Components = {
   a: ({ href, children }) => (
     <span
       title={href}
-      className="text-muted-foreground cursor-not-allowed"
+      className="text-muted-foreground cursor-not-allowed mb-4"
     >
       {children}
     </span>
