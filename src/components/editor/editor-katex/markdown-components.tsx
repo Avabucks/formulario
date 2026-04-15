@@ -170,13 +170,21 @@ export const markdownComponents: Components = {
       {children}
     </tr>
   ),
-  th: ({ children }) => (
-    <th className="px-3.25 py-1.5 border border-[#d1d9e0] dark:border-[#3d444d] font-semibold text-left bg-[#f6f8fa] dark:bg-[#161b22]">
+  th: ({ children, ...props }) => (
+    <th
+      {...props}
+      className="px-3.25 py-1.5 border border-[#d1d9e0] dark:border-[#3d444d] font-semibold text-left bg-[#f6f8fa] dark:bg-[#161b22]"
+    >
       {children}
     </th>
   ),
-  td: ({ children }) => (
-    <td className="px-3.25 py-1.5 border border-[#d1d9e0] dark:border-[#3d444d]">{children}</td>
+  td: ({ children, ...props }) => (
+    <td
+      {...props}
+      className="px-3.25 py-1.5 border border-[#d1d9e0] dark:border-[#3d444d]"
+    >
+      {children}
+    </td>
   ),
 };
 
