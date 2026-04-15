@@ -11,19 +11,46 @@ function MermaidBlock({ code }: { code: string }) {
   const { resolvedTheme } = useTheme();
 
   useEffect(() => {
-    if (!ref.current) return;
-    mermaid.initialize({
-      startOnLoad: false,
-      theme: resolvedTheme === 'dark' ? 'dark' : 'default',
-    });
-    mermaid.render(`mermaid-${Date.now()}`, code).then(({ svg }) => {
-      if (ref.current) ref.current.innerHTML = svg;
-    });
+    // Funzione interna asincrona per gestire il rendering
+    const renderChart = async () => {
+      if (!ref.current) return;
+
+      ref.current.innerHTML = "";
+
+      try {
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: resolvedTheme === 'dark' ? 'dark' : 'default',
+        });
+
+        // 2. Controllo validità senza lanciare alert
+        const isValid = await mermaid.parse(code, { suppressErrors: true });
+
+        if (isValid) {
+          const id = `mermaid-svg-${Math.random().toString(36).substring(2, 9)}`;
+          const { svg } = await mermaid.render(id, code);
+
+          if (ref.current) {
+            ref.current.innerHTML = svg;
+          }
+        }
+      } catch (error: any) {
+        if (ref.current) {
+          ref.current.innerHTML = "";
+        }
+        console.warn("Mermaid non ha potuto renderizzare il grafico (codice incompleto o errato). " + error.message);
+      }
+    };
+
+    renderChart();
   }, [code, resolvedTheme]);
 
   return (
-    <div className="flex justify-center items-center bg-foreground/5 rounded-lg p-4 mb-5">
-      <div ref={ref} />
+    <div className="flex justify-center items-center bg-foreground/5 rounded-lg p-4 mb-5 w-full overflow-hidden">
+      <div
+        ref={ref}
+        className="flex justify-center w-full"
+      />
     </div>
   );
 }
