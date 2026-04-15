@@ -17,14 +17,26 @@ export function useFilters() {
         (updates: { sort?: SortOption; q?: string; page?: number }) => {
             const params = new URLSearchParams(searchParams.toString());
 
-            if (updates.sort !== undefined) params.set("sort", updates.sort);
-            if (updates.q !== undefined) params.set("q", updates.q);
-            if (updates.page !== undefined) params.set("page", updates.page.toString());
+            const newPage = updates.page ?? 1;
+            params.delete("page");
 
-            // Se page non è passato, resetta a 1
-            if (updates.page === undefined) params.set("page", "1");
+            if (updates.sort !== undefined) {
+                params.set("sort", updates.sort);
+            }
 
-            router.push(`${pathname.split("/page")[0]}/page/${params.get("page")}?${params.toString()}`);
+            if (updates.q !== undefined) {
+                if (updates.q.trim() === "") {
+                    params.delete("q");
+                } else {
+                    params.set("q", updates.q);
+                }
+            }
+
+            const queryString = params.toString();
+            const suffix = queryString ? `?${queryString}` : "";
+            const basePath = pathname.split("/page")[0] || "";
+
+            router.push(`${basePath}/page/${newPage}${suffix}`);
         },
         [searchParams, pathname, router]
     );
