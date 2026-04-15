@@ -8,7 +8,7 @@ import { useTheme } from 'next-themes';
 import { Spinner } from "../../ui/spinner";
 import { Button } from "../../ui/button";
 
-function MermaidBlock({ code }: { code: string }) {
+function MermaidBlock({ code }: Readonly<{ code: string }>) {
   const ref = useRef<HTMLDivElement>(null);
   const { resolvedTheme } = useTheme();
   const [loading, setLoading] = useState(true);
@@ -97,7 +97,7 @@ function MermaidBlock({ code }: { code: string }) {
   };
 
   return (
-    <div className="group relative flex flex-col items-center bg-foreground/5 rounded-lg p-4 mb-5 w-full overflow-hidden border border-foreground/10">
+    <div className="relative flex flex-col items-center bg-foreground/5 rounded-lg p-4 mb-5 w-full overflow-hidden border border-foreground/10">
       {loading && (
         <Spinner />
       )}
@@ -105,7 +105,7 @@ function MermaidBlock({ code }: { code: string }) {
       {!loading && (
         <Button
           onClick={handleDownload}
-          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100"
+          className="absolute top-2 right-2"
           size="icon"
           variant="outline"
         >
@@ -121,74 +121,88 @@ function MermaidBlock({ code }: { code: string }) {
   );
 }
 
-export const markdownComponents: Components = {
-  h1: ({ children }) => (
-    <div className="group relative">
-      <span className="absolute -left-7 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-50 transition-opacity">
-        <Heading1 size={23} />
+interface HeadingProps {
+  level: 1 | 2 | 3 | 4 | 5 | 6;
+  children: React.ReactNode;
+  icon: React.ElementType; // Per i componenti icona come Heading1, Heading2, ecc.
+  size: number;
+  className?: string;
+}
+
+const Heading = ({ 
+  level, 
+  children, 
+  icon: Icon, 
+  size, 
+  className = "" 
+}: HeadingProps) => {
+  const Tag = `h${level}` as any;
+  
+  const handleHover = (isEntering: any) => {
+    const elements = document.querySelectorAll(`[data-heading-level="h${level}"]`);
+    elements.forEach((el) => {
+      if (isEntering) {
+        el.classList.add("active-type");
+      } else {
+        el.classList.remove("active-type");
+      }
+    });
+  };
+
+  return (
+    <div 
+      className="group relative" 
+      data-heading-level={`h${level}`}
+      onMouseEnter={() => handleHover(true)}
+      onMouseLeave={() => handleHover(false)}
+    >
+      {/* Icona laterale */}
+      <span className="absolute -left-7 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-50 transition-opacity icon-indicator">
+        <Icon size={size} />
       </span>
-      <span className="absolute w-full h-px top-full mt-2 bg-foreground/50 opacity-0 group-hover:opacity-50 transition-opacity"></span>
-      <h1 className="text-[1.9em] font-bold leading-8 mb-6">
+      
+      {/* Sottolineatura */}
+      <span className="absolute w-full h-px top-full mt-2 bg-foreground/50 opacity-0 group-hover:opacity-50 transition-opacity underline-indicator"></span>
+      
+      <Tag className={`${className} mb-6`}>
         {children}
-      </h1>
+      </Tag>
     </div>
+  );
+};
+
+export const markdownComponents: Components = {
+h1: ({ children }) => (
+    <Heading level={1} icon={Heading1} size={23} className="text-[1.9em] font-bold leading-8">
+      {children}
+    </Heading>
   ),
   h2: ({ children }) => (
-    <div className="group relative">
-      <span className="absolute -left-7 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-50 transition-opacity">
-        <Heading2 size={22} />
-      </span>
-      <span className="absolute w-full h-px top-full mt-2 bg-foreground/50 opacity-0 group-hover:opacity-50 transition-opacity"></span>
-      <h2 className="text-[1.5em] font-semibold leading-6 mb-6">
-        {children}
-      </h2>
-    </div>
+    <Heading level={2} icon={Heading2} size={22} className="text-[1.5em] font-semibold leading-6">
+      {children}
+    </Heading>
   ),
   h3: ({ children }) => (
-    <div className="group relative">
-      <span className="absolute -left-7 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-50 transition-opacity">
-        <Heading3 size={21} />
-      </span>
-      <span className="absolute w-full h-px top-full mt-2 bg-foreground/50 opacity-0 group-hover:opacity-50 transition-opacity"></span>
-      <h3 className="text-[1.2em] font-semibold leading-5 mb-6">
-        {children}
-      </h3>
-    </div>
+    <Heading level={3} icon={Heading3} size={21} className="text-[1.2em] font-semibold leading-5">
+      {children}
+    </Heading>
   ),
   h4: ({ children }) => (
-    <div className="group relative">
-      <span className="absolute -left-7 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-50 transition-opacity">
-        <Heading4 size={19} />
-      </span>
-      <span className="absolute w-full h-px top-full mt-2 bg-foreground/50 opacity-0 group-hover:opacity-50 transition-opacity"></span>
-      <h4 className="text-[1em] font-semibold leading-4 mb-6">
-        {children}
-      </h4>
-    </div>
+    <Heading level={4} icon={Heading4} size={19} className="text-[1em] font-semibold leading-4">
+      {children}
+    </Heading>
   ),
   h5: ({ children }) => (
-    <div className="group relative">
-      <span className="absolute -left-7 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-50 transition-opacity">
-        <Heading5 size={18} />
-      </span>
-      <span className="absolute w-full h-px top-full mt-2 bg-foreground/50 opacity-0 group-hover:opacity-50 transition-opacity"></span>
-      <h5 className="text-[0.875em] font-semibold leading-3 mb-6">
-        {children}
-      </h5>
-    </div>
+    <Heading level={5} icon={Heading5} size={18} className="text-[0.875em] font-semibold leading-3">
+      {children}
+    </Heading>
   ),
   h6: ({ children }) => (
-    <div className="group relative">
-      <span className="absolute -left-7 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-50 transition-opacity">
-        <Heading6 size={18} />
-      </span>
-      <span className="absolute w-full h-px top-full mt-2 bg-foreground/50 opacity-0 group-hover:opacity-50 transition-opacity"></span>
-      <h6 className="text-[0.85em] font-semibold text-[#59636e] dark:text-[#9198a1] leading-3 mb-6">
-        {children}
-      </h6>
-    </div>
+    <Heading level={6} icon={Heading6} size={18} className="text-[0.85em] font-semibold text-[#59636e] dark:text-[#9198a1] leading-3">
+      {children}
+    </Heading>
   ),
-  p: ({ children }) => (
+    p: ({ children }) => (
     <p className="leading-normal text-base font-sans mb-4">{children}</p>
   ),
   ul: ({ children }) => <ul className="list-disc pl-9 space-y-2 mb-4">{children}</ul>,

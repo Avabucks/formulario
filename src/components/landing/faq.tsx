@@ -9,7 +9,7 @@ const faqs = [
   {
     question: "Come funziona l'editor?",
     answer:
-      "L'editor supporta la sintassi KaTeX per scrivere formule matematiche. Puoi usare formule inline con $...$ o in blocco con $$...$$, oltre a grassetto, corsivo, frazioni, radici, matrici e molto altro. L'anteprima è in tempo reale, tutto nel browser.",
+      "L'editor utilizza il linguaggio Markdown per la formattazione del testo e supporta pienamente le formule in LaTeX. Puoi inserire espressioni matematiche inline usando $ ... $ oppure in blocco con $$ ... $$. L'anteprima è istantanea e viene elaborata direttamente dal browser.",
   },
   {
     question: "Come funziona la condivisione via QR code?",

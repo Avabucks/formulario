@@ -1,0 +1,4 @@
+.active-type .icon-indicator,
+.active-type .underline-indicator {
+  opacity: 0.5 !important;
+}
