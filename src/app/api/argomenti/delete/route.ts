@@ -15,8 +15,12 @@ export async function DELETE(request: Request) {
 
     if (!argomentoId) return NextResponse.json({ error: "ID obbligatorio" }, { status: 400 });
 
+    const client = await pool.connect();
+
     try {
-        const { rows } = await pool.query(
+        await client.query("BEGIN");
+
+        const { rows } = await client.query(
             `SELECT a.sort_order, a.capitolo AS parent
              FROM argomenti a
              JOIN capitoli c ON c.beautiful_id = a.capitolo
@@ -25,21 +29,33 @@ export async function DELETE(request: Request) {
             [argomentoId, uid]
         );
 
-        if (rows.length === 0) return NextResponse.json({ error: "Argomento non trovato o non autorizzato" }, { status: 404 });
+        if (rows.length === 0) {
+            await client.query("ROLLBACK");
+            return NextResponse.json({ error: "Argomento non trovato o non autorizzato" }, { status: 404 });
+        }
 
         const { sort_order, parent } = rows[0];
 
-        await pool.query(`DELETE FROM argomenti WHERE beautiful_id = $1`, [argomentoId]);
+        await client.query(
+            `DELETE FROM argomenti WHERE beautiful_id = $1`,
+            [argomentoId]
+        );
 
-        await pool.query(
-            `UPDATE argomenti SET sort_order = sort_order - 1
+        await client.query(
+            `UPDATE argomenti
+             SET sort_order = sort_order - 1
              WHERE capitolo = $1 AND sort_order > $2`,
             [parent, sort_order]
         );
 
+        await client.query("COMMIT");
+
         return NextResponse.json({ success: true });
     } catch (error: unknown) {
+        await client.query("ROLLBACK");
         console.error(error instanceof Error ? error.message : error);
         return NextResponse.json({ error: "Errore nell'eliminazione dell'argomento" }, { status: 500 });
+    } finally {
+        client.release();
     }
 }
