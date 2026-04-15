@@ -92,7 +92,7 @@ export function EditorInput({
             <textarea
                 ref={textAreaRef}
                 placeholder="Scrivi qui..."
-                className="resize-none w-full h-full bg-primary/5 group-hover:bg-primary/8 outline-none p-3 font-mono text-xs duration-300"
+                className="resize-none w-full h-full bg-primary/5 group-hover:bg-primary/8 outline-none p-3 font-mono tracking-wider text-xs duration-300"
                 value={textAreaContent}
                 onChange={handleChange}
                 onMouseUp={handleSelect}
