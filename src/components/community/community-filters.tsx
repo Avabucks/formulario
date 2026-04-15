@@ -4,7 +4,7 @@ import { useDebouncedCallback } from "use-debounce";
 import { Button } from "../ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { Input } from "../ui/input";
-import { useFilters } from "@/src/hooks/useFilters"; // il nostro hook custom
+import { useFilters } from "@/src/hooks/useFilters";
 
 type SortOption = "trending" | "recent" | "popular";
 
