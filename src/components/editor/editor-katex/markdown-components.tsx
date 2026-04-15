@@ -1,31 +1,93 @@
+import { Heading1, Heading2, Heading3, Heading4, Heading5, Heading6 } from "lucide-react";
 import { Components } from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import mermaid from 'mermaid';
+import { useEffect, useRef } from "react";
+import { useTheme } from 'next-themes';
+
+function MermaidBlock({ code }: { code: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { resolvedTheme } = useTheme();
+
+  useEffect(() => {
+    if (!ref.current) return;
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: resolvedTheme === 'dark' ? 'dark' : 'default',
+    });
+    mermaid.render(`mermaid-${Date.now()}`, code).then(({ svg }) => {
+      if (ref.current) ref.current.innerHTML = svg;
+    });
+  }, [code, resolvedTheme]);
+
+  return (
+    <div className="flex justify-center items-center bg-foreground/5 rounded-lg p-4 mb-5">
+      <div ref={ref} />
+    </div>
+  );
+}
 
 export const markdownComponents: Components = {
   h1: ({ children }) => (
-    <h1 className="text-[1.9em] font-bold leading-8 mb-6">
-      {children}
-    </h1>
+    <div className="group relative">
+      <span className="absolute -left-7 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-50 transition-opacity">
+        <Heading1 size={23} />
+      </span>
+      <h1 className="text-[1.9em] font-bold leading-8 mb-6">
+        {children}
+      </h1>
+    </div>
   ),
   h2: ({ children }) => (
-    <h2 className="text-[1.5em] font-semibold leading-6 mb-6">
-      {children}
-    </h2>
+    <div className="group relative">
+      <span className="absolute -left-7 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-50 transition-opacity">
+        <Heading2 size={22} />
+      </span>
+      <h2 className="text-[1.5em] font-semibold leading-6 mb-6">
+        {children}
+      </h2>
+    </div>
   ),
   h3: ({ children }) => (
-    <h3 className="text-[1.2em] font-semibold leading-5 mb-6">{children}</h3>
+    <div className="group relative">
+      <span className="absolute -left-7 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-50 transition-opacity">
+        <Heading3 size={21} />
+      </span>
+      <h3 className="text-[1.2em] font-semibold leading-5 mb-6">
+        {children}
+      </h3>
+    </div>
   ),
   h4: ({ children }) => (
-    <h4 className="text-[1em] font-semibold leading-4 mb-6">{children}</h4>
+    <div className="group relative">
+      <span className="absolute -left-7 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-50 transition-opacity">
+        <Heading4 size={19} />
+      </span>
+      <h4 className="text-[1em] font-semibold leading-4 mb-6">
+        {children}
+      </h4>
+    </div>
   ),
   h5: ({ children }) => (
-    <h5 className="text-[0.875em] font-semibold leading-3 mb-6">{children}</h5>
+    <div className="group relative">
+      <span className="absolute -left-7 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-50 transition-opacity">
+        <Heading5 size={18} />
+      </span>
+      <h5 className="text-[0.875em] font-semibold leading-3 mb-6">
+        {children}
+      </h5>
+    </div>
   ),
   h6: ({ children }) => (
-    <h6 className="text-[0.85em] font-semibold text-[#59636e] dark:text-[#9198a1] leading-3 mb-6">
-      {children}
-    </h6>
+    <div className="group relative">
+      <span className="absolute -left-7 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-50 transition-opacity">
+        <Heading6 size={18} />
+      </span>
+      <h6 className="text-[0.85em] font-semibold text-[#59636e] dark:text-[#9198a1] leading-3 mb-6">
+        {children}
+      </h6>
+    </div>
   ),
   p: ({ children }) => (
     <p className="leading-normal text-base font-sans mb-4">{children}</p>
@@ -45,6 +107,10 @@ export const markdownComponents: Components = {
   code: ({ className, children, node, ...props }) => {
     const match = /language-(\w+)/.exec(className || "");
     const language = match ? match[1] : "";
+
+    if (language === 'mermaid') {
+      return <MermaidBlock code={String(children).replace(/\n$/, "")} />;
+    }
 
     // Blocco con linguaggio → SyntaxHighlighter
     if (language) {
