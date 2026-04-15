@@ -22,7 +22,7 @@ export const EditorPreview = memo(function EditorPreview({ markdownContent }: Re
 
     return (
         <div className="relative flex-1 h-full w-full min-w-fit">
-            <div className="p-7 min-h-full w-full leading-loose relative">
+            <div className="p-9 min-h-full w-full leading-loose relative">
                 <svg
                     className="absolute inset-0 h-full w-full opacity-[0.10] pointer-events-none"
                     xmlns="http://www.w3.org/2000/svg"
