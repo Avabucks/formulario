@@ -1,29 +1,32 @@
-import { Heading1, Heading2, Heading3, Heading4, Heading5, Heading6 } from "lucide-react";
+import { Check, Copy, Download, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6 } from "lucide-react";
 import { Components } from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import mermaid from 'mermaid';
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTheme } from 'next-themes';
+import { Spinner } from "../../ui/spinner";
+import { Button } from "../../ui/button";
 
 function MermaidBlock({ code }: { code: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const { resolvedTheme } = useTheme();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Funzione interna asincrona per gestire il rendering
     const renderChart = async () => {
       if (!ref.current) return;
 
+      setLoading(true);
       ref.current.innerHTML = "";
 
       try {
         mermaid.initialize({
           startOnLoad: false,
           theme: resolvedTheme === 'dark' ? 'dark' : 'default',
+          securityLevel: 'loose',
         });
 
-        // 2. Controllo validità senza lanciare alert
         const isValid = await mermaid.parse(code, { suppressErrors: true });
 
         if (isValid) {
@@ -35,21 +38,84 @@ function MermaidBlock({ code }: { code: string }) {
           }
         }
       } catch (error: any) {
-        if (ref.current) {
-          ref.current.innerHTML = "";
-        }
-        console.warn("Mermaid non ha potuto renderizzare il grafico (codice incompleto o errato). " + error.message);
+        console.warn("Mermaid error:", error.message);
+      } finally {
+        setLoading(false);
       }
     };
 
     renderChart();
   }, [code, resolvedTheme]);
 
+  const handleDownload = () => {
+    const svgElement = ref.current?.querySelector('svg');
+    if (!svgElement) return;
+
+    const clonedSvg = svgElement.cloneNode(true) as SVGSVGElement;
+
+    const width = svgElement.viewBox.baseVal.width || svgElement.clientWidth;
+    const height = svgElement.viewBox.baseVal.height || svgElement.clientHeight;
+    clonedSvg.setAttribute('width', width.toString());
+    clonedSvg.setAttribute('height', height.toString());
+
+    const svgData = new XMLSerializer().serializeToString(clonedSvg);
+
+    const uint8Array = new TextEncoder().encode(svgData);
+    const binString = Array.from(uint8Array, (byte) => String.fromCodePoint(byte)).join("");
+    const svgBase64 = btoa(binString);
+    const imgSource = `data:image/svg+xml;base64,${svgBase64}`;
+
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+
+    const scale = 2;
+    canvas.width = width * scale;
+    canvas.height = height * scale;
+
+    img.onload = () => {
+      if (ctx) {
+        ctx.fillStyle = resolvedTheme === 'dark' ? '#1a1a1a' : '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.scale(scale, scale);
+        ctx.drawImage(img, 0, 0, width, height);
+
+        try {
+          const pngUrl = canvas.toDataURL("image/png");
+          const downloadLink = document.createElement("a");
+          downloadLink.href = pngUrl;
+          downloadLink.download = `diagramma-${Date.now()}.png`;
+          downloadLink.click();
+        } catch (e) {
+          console.error("Errore durante l'esportazione: il canvas è ancora tainted.", e);
+        }
+      }
+    };
+
+    img.src = imgSource;
+  };
+
   return (
-    <div className="flex justify-center items-center bg-foreground/5 rounded-lg p-4 mb-5 w-full overflow-hidden">
+    <div className="group relative flex flex-col items-center bg-foreground/5 rounded-lg p-4 mb-5 w-full overflow-hidden border border-foreground/10">
+      {loading && (
+        <Spinner />
+      )}
+
+      {!loading && (
+        <Button
+          onClick={handleDownload}
+          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100"
+          size="icon"
+          variant="outline"
+        >
+          <Download size={18} />
+        </Button>
+      )}
+
       <div
         ref={ref}
-        className="flex justify-center w-full"
+        className="flex justify-center w-full overflow-x-auto"
       />
     </div>
   );
@@ -61,6 +127,7 @@ export const markdownComponents: Components = {
       <span className="absolute -left-7 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-50 transition-opacity">
         <Heading1 size={23} />
       </span>
+      <span className="absolute w-full h-px top-full mt-2 bg-foreground/50 opacity-0 group-hover:opacity-50 transition-opacity"></span>
       <h1 className="text-[1.9em] font-bold leading-8 mb-6">
         {children}
       </h1>
@@ -71,6 +138,7 @@ export const markdownComponents: Components = {
       <span className="absolute -left-7 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-50 transition-opacity">
         <Heading2 size={22} />
       </span>
+      <span className="absolute w-full h-px top-full mt-2 bg-foreground/50 opacity-0 group-hover:opacity-50 transition-opacity"></span>
       <h2 className="text-[1.5em] font-semibold leading-6 mb-6">
         {children}
       </h2>
@@ -81,6 +149,7 @@ export const markdownComponents: Components = {
       <span className="absolute -left-7 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-50 transition-opacity">
         <Heading3 size={21} />
       </span>
+      <span className="absolute w-full h-px top-full mt-2 bg-foreground/50 opacity-0 group-hover:opacity-50 transition-opacity"></span>
       <h3 className="text-[1.2em] font-semibold leading-5 mb-6">
         {children}
       </h3>
@@ -91,6 +160,7 @@ export const markdownComponents: Components = {
       <span className="absolute -left-7 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-50 transition-opacity">
         <Heading4 size={19} />
       </span>
+      <span className="absolute w-full h-px top-full mt-2 bg-foreground/50 opacity-0 group-hover:opacity-50 transition-opacity"></span>
       <h4 className="text-[1em] font-semibold leading-4 mb-6">
         {children}
       </h4>
@@ -101,6 +171,7 @@ export const markdownComponents: Components = {
       <span className="absolute -left-7 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-50 transition-opacity">
         <Heading5 size={18} />
       </span>
+      <span className="absolute w-full h-px top-full mt-2 bg-foreground/50 opacity-0 group-hover:opacity-50 transition-opacity"></span>
       <h5 className="text-[0.875em] font-semibold leading-3 mb-6">
         {children}
       </h5>
@@ -111,6 +182,7 @@ export const markdownComponents: Components = {
       <span className="absolute -left-7 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-50 transition-opacity">
         <Heading6 size={18} />
       </span>
+      <span className="absolute w-full h-px top-full mt-2 bg-foreground/50 opacity-0 group-hover:opacity-50 transition-opacity"></span>
       <h6 className="text-[0.85em] font-semibold text-[#59636e] dark:text-[#9198a1] leading-3 mb-6">
         {children}
       </h6>
@@ -141,18 +213,57 @@ export const markdownComponents: Components = {
 
     // Blocco con linguaggio → SyntaxHighlighter
     if (language) {
+      const [copied, setCopied] = useState(false);
+      const codeString = String(children).replace(/\n$/, "");
+
+      const handleCopy = async () => {
+        await navigator.clipboard.writeText(codeString);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      };
+
       return (
-        <SyntaxHighlighter
-          language={language}
-          style={oneDark}
-          customStyle={{
-            fontSize: "14px",
-            borderRadius: "6px",
-            marginBottom: "calc(var(--spacing) * 5)",
-          }}
-        >
-          {String(children).replace(/\n$/, "")}
-        </SyntaxHighlighter>
+        <div className="relative my-6 w-full rounded-lg border border-foreground/10 overflow-hidden group">
+          <div className="flex items-center justify-between px-4 py-1 border-b border-b-foreground/10 bg-foreground/7">
+            <span className="text-[12px] lowercase font-sans text-foreground/70 font-medium">
+              {language}
+            </span>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleCopy}
+            >
+              {copied ? (
+                <Check className="h-3.5 w-3.5" />
+              ) : (
+                <Copy className="h-3.5 w-3.5" />
+              )}
+              <span className="sr-only">Copy code</span>
+            </Button>
+          </div>
+
+          <div className="relative bg-foreground/7">
+            <SyntaxHighlighter
+              language={language}
+              style={oneDark}
+              customStyle={{
+                margin: 0,
+                padding: "1rem",
+                fontSize: "13px",
+                lineHeight: "1.6",
+                background: "transparent",
+              }}
+              codeTagProps={{
+                style: {
+                  textShadow: "none",
+                },
+                className: "font-mono",
+              }}
+            >
+              {codeString}
+            </SyntaxHighlighter>
+          </div>
+        </div>
       );
     }
 
@@ -161,7 +272,7 @@ export const markdownComponents: Components = {
 
     if (isBlock) {
       return (
-        <pre className="bg-foreground/8 rounded-[6px] text-[#e36209] dark:text-[#e3b341] p-2 text-[85%] font-mono overflow-x-auto mb-5">
+        <pre className="bg-foreground/8 border border-foreground/10 rounded-[6px] text-[#e36209] dark:text-[#e3b341] p-2 text-[85%] font-mono overflow-x-auto mb-5">
           <code>{children}</code>
         </pre>
       );
@@ -169,7 +280,7 @@ export const markdownComponents: Components = {
 
     return (
       <code
-        className="bg-foreground/8 text-[#e36209] dark:text-[#e3b341] px-1.5 py-0.5 rounded text-[85%] font-mono"
+        className="bg-foreground/8 border border-foreground/10 text-[#e36209] dark:text-[#e3b341] px-1.5 py-0.5 rounded text-[85%] font-mono"
         {...props}
       >
         {children}
