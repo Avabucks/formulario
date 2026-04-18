@@ -28,11 +28,6 @@ export function EditorInput({
     const { resolvedTheme } = useTheme();
 
     const save = (content: string) => {
-        setLoading(false)
-        setEdited(false)
-        return;
-
-        // FIXME
         setLoading(true)
         setError(false)
         fetch("/api/editor/save", {
