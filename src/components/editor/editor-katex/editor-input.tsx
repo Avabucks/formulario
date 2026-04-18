@@ -1,36 +1,38 @@
 "use client";
+import Editor, { Monaco } from '@monaco-editor/react';
 import { AlertTriangle, CheckCheck } from "lucide-react";
+import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { NavigationBlocker } from "../../navigation/navigation-blocker";
 import { Spinner } from "../../ui/spinner";
-
-interface Selection {
-    start: number;
-    end: number;
-    text: string;
-}
+import { editor } from 'monaco-editor';
 
 export function EditorInput({
-    textAreaRef,
     argomentoId,
     textAreaContent,
     setTextAreaContent,
-    setSelection,
     edited,
     setEdited,
+    handleEditorDidMount,
 }: Readonly<{
-    textAreaRef: React.RefObject<HTMLTextAreaElement | null>,
     argomentoId: string,
     textAreaContent: string,
     setTextAreaContent: (value: string) => void,
-    setSelection: (selection: Selection | null) => void,
     edited: boolean
     setEdited: (value: boolean) => void,
+    handleEditorDidMount: (editor: editor.IStandaloneCodeEditor, monaco: Monaco) => void;
 }>) {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(false)
 
+    const { resolvedTheme } = useTheme();
+
     const save = (content: string) => {
+        setLoading(false)
+        setEdited(false)
+        return;
+
+        // FIXME
         setLoading(true)
         setError(false)
         fetch("/api/editor/save", {
@@ -70,33 +72,27 @@ export function EditorInput({
         return () => clearTimeout(timeout)
     }, [textAreaContent])
 
-    const handleChange = (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
-        const target = e.currentTarget;
-        setTextAreaContent(target.value)
-        setEdited(true)
-    }
-
-    const handleSelect = (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
-        const target = e.target as HTMLTextAreaElement;
-
-        const start = target.selectionStart ?? 0;
-        const end = target.selectionEnd ?? 0;
-        const text = target.value.substring(start, end);
-
-        setSelection({ start, end, text });
-    }
+    const handleChange = (content = "") => {
+        setTextAreaContent(content);
+        setEdited(true);
+    };
 
     return (
         <div className="relative h-full overflow-hidden group">
             <NavigationBlocker blocked={loading} />
-            <textarea
-                ref={textAreaRef}
-                placeholder="Scrivi qui..."
-                className="resize-none w-full h-full bg-primary/5 group-hover:bg-primary/8 outline-none p-3 font-mono tracking-wider text-xs duration-300"
-                value={textAreaContent}
+            <Editor
+                defaultLanguage="markdown"
+                theme={resolvedTheme === "dark" ? "vs-dark" : "vs-light"}
+                defaultValue={textAreaContent}
+                onMount={handleEditorDidMount}
                 onChange={handleChange}
-                onMouseUp={handleSelect}
-                onBlur={() => setSelection(null)}
+                options={{
+                    links: false,
+                    minimap: { enabled: false },
+                    automaticLayout: true,
+                    wordWrap: "on",
+                }}
+                loading={<Spinner />}
             />
             {loading ? (
                 <div className="absolute right-3 bottom-3">
@@ -118,7 +114,7 @@ const SyncStatus = ({ error, loading }: { error: boolean, loading: boolean }) =>
     )
 
     return (
-        <div className="absolute right-3 bottom-3 flex items-center gap-1.5 bg-green-500/10 text-green-500 rounded-md px-2 py-1 text-xs group-hover:opacity-30 duration-300">
+        <div className="absolute right-3 bottom-3 flex items-center gap-1.5 bg-green-100 text-green-700 border border-green-200 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20 rounded-md px-2 py-1 text-xs group-hover:opacity-30 duration-300">
             <CheckCheck className="size-3.5" />
             <span>Modifiche sincronizzate</span>
         </div>

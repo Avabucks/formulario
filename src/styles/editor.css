@@ -2,3 +2,9 @@
 .active-type .underline-indicator {
   opacity: 0.5 !important;
 }
+
+body > [id^="dmermaid"], 
+body > [id^="mermaid-"] {
+  inset: 0 !important;
+  position: absolute !important;
+}

@@ -1,17 +1,105 @@
+"use client"
+
 import { Check, Copy, Download, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6 } from "lucide-react";
 import { Components } from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { oneDark, oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 import mermaid from 'mermaid';
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from 'next-themes';
 import { Spinner } from "../../ui/spinner";
 import { Button } from "../../ui/button";
+import { toast } from "sonner";
+
+export const CodeBlock = ({ className, children, node, ...props }: any) => {
+  const match = /language-(\w+)/.exec(className || "");
+  const language = match ? match[1] : "";
+  const codeString = String(children).replace(/\n$/, "");
+
+  // Caso 1: Mermaid
+  if (language === 'mermaid') {
+    return <MermaidBlock code={codeString} />;
+  }
+
+  // Caso 2: Blocco con linguaggio (SyntaxHighlighter)
+  if (language) {
+    return <SyntaxBlock language={language} codeString={codeString} />
+  }
+
+  // Caso 3: Blocco senza linguaggio (Multiriga)
+  const isBlock = node?.position?.start.line !== node?.position?.end.line || codeString.includes("\n");
+
+  if (isBlock) {
+    return (
+      <pre className="bg-foreground/8 border border-foreground/10 rounded-[6px] text-[#e36209] dark:text-[#e3b341] p-2 text-[85%] font-mono overflow-x-auto mb-5">
+        <code>{children}</code>
+      </pre>
+    );
+  }
+
+  // Caso 4: Inline code
+  return (
+    <code
+      className="bg-foreground/8 border border-foreground/10 text-[#e36209] dark:text-[#e3b341] px-1.5 py-0.5 rounded text-[85%] font-mono"
+      {...props}
+    >
+      {children}
+    </code>
+  );
+};
+
+function SyntaxBlock({ language, codeString }: Readonly<{ language: string, codeString: string }>) {
+  const { resolvedTheme } = useTheme();
+  const style = resolvedTheme === 'dark' ? oneDark : oneLight;
+
+  const [copied, setCopied] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(codeString);
+    setCopied(true);
+    toast.success("Codice copiato con successo.", { position: "bottom-center" });
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="relative my-6 w-full rounded-lg border border-foreground/10 overflow-hidden group">
+      <div className="flex items-center justify-between px-4 py-1 border-b border-b-foreground/10 bg-foreground/7">
+        <span className="text-[12px] lowercase font-mono">{language}</span>
+        <Button variant="ghost" size="icon" onClick={handleCopy}>
+          {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+          <span className="sr-only">Copy code</span>
+        </Button>
+      </div>
+      <div className="relative bg-foreground/7">
+        <SyntaxHighlighter
+          language={language}
+          style={mounted ? style : oneLight}
+          customStyle={{
+            margin: 0,
+            padding: "1rem",
+            fontSize: "13px",
+            lineHeight: "1.6",
+            background: "transparent",
+          }}
+          codeTagProps={{
+            style: { textShadow: "none" },
+            className: "font-mono",
+          }}
+        >
+          {codeString}
+        </SyntaxHighlighter>
+      </div>
+    </div>
+  );
+};
 
 function MermaidBlock({ code }: Readonly<{ code: string }>) {
   const ref = useRef<HTMLDivElement>(null);
-  const { resolvedTheme } = useTheme();
   const [loading, setLoading] = useState(true);
+  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
     const renderChart = async () => {
@@ -124,20 +212,20 @@ function MermaidBlock({ code }: Readonly<{ code: string }>) {
 interface HeadingProps {
   level: 1 | 2 | 3 | 4 | 5 | 6;
   children: React.ReactNode;
-  icon: React.ElementType; // Per i componenti icona come Heading1, Heading2, ecc.
+  icon: React.ElementType;
   size: number;
   className?: string;
 }
 
-const Heading = ({ 
-  level, 
-  children, 
-  icon: Icon, 
-  size, 
-  className = "" 
+const Heading = ({
+  level,
+  children,
+  icon: Icon,
+  size,
+  className = ""
 }: HeadingProps) => {
   const Tag = `h${level}` as any;
-  
+
   const handleHover = (isEntering: any) => {
     const elements = document.querySelectorAll(`[data-heading-level="h${level}"]`);
     elements.forEach((el) => {
@@ -150,8 +238,8 @@ const Heading = ({
   };
 
   return (
-    <div 
-      className="group relative" 
+    <div
+      className="group relative"
       data-heading-level={`h${level}`}
       onMouseEnter={() => handleHover(true)}
       onMouseLeave={() => handleHover(false)}
@@ -160,10 +248,10 @@ const Heading = ({
       <span className="absolute -left-7 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-50 transition-opacity icon-indicator">
         <Icon size={size} />
       </span>
-      
+
       {/* Sottolineatura */}
       <span className="absolute w-full h-px top-full mt-2 bg-foreground/50 opacity-0 group-hover:opacity-50 transition-opacity underline-indicator"></span>
-      
+
       <Tag className={`${className} mb-6`}>
         {children}
       </Tag>
@@ -172,7 +260,7 @@ const Heading = ({
 };
 
 export const markdownComponents: Components = {
-h1: ({ children }) => (
+  h1: ({ children }) => (
     <Heading level={1} icon={Heading1} size={23} className="text-[1.9em] font-bold leading-8">
       {children}
     </Heading>
@@ -202,7 +290,7 @@ h1: ({ children }) => (
       {children}
     </Heading>
   ),
-    p: ({ children }) => (
+  p: ({ children }) => (
     <p className="leading-normal text-base font-sans mb-4">{children}</p>
   ),
   ul: ({ children }) => <ul className="list-disc pl-9 space-y-2 mb-4">{children}</ul>,
@@ -217,90 +305,7 @@ h1: ({ children }) => (
       {children}
     </blockquote>
   ),
-  code: ({ className, children, node, ...props }) => {
-    const match = /language-(\w+)/.exec(className || "");
-    const language = match ? match[1] : "";
-
-    if (language === 'mermaid') {
-      return <MermaidBlock code={String(children).replace(/\n$/, "")} />;
-    }
-
-    // Blocco con linguaggio → SyntaxHighlighter
-    if (language) {
-      const [copied, setCopied] = useState(false);
-      const codeString = String(children).replace(/\n$/, "");
-
-      const handleCopy = async () => {
-        await navigator.clipboard.writeText(codeString);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      };
-
-      return (
-        <div className="relative my-6 w-full rounded-lg border border-foreground/10 overflow-hidden group">
-          <div className="flex items-center justify-between px-4 py-1 border-b border-b-foreground/10 bg-foreground/7">
-            <span className="text-[12px] lowercase font-sans text-foreground/70 font-medium">
-              {language}
-            </span>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleCopy}
-            >
-              {copied ? (
-                <Check className="h-3.5 w-3.5" />
-              ) : (
-                <Copy className="h-3.5 w-3.5" />
-              )}
-              <span className="sr-only">Copy code</span>
-            </Button>
-          </div>
-
-          <div className="relative bg-foreground/7">
-            <SyntaxHighlighter
-              language={language}
-              style={oneDark}
-              customStyle={{
-                margin: 0,
-                padding: "1rem",
-                fontSize: "13px",
-                lineHeight: "1.6",
-                background: "transparent",
-              }}
-              codeTagProps={{
-                style: {
-                  textShadow: "none",
-                },
-                className: "font-mono",
-              }}
-            >
-              {codeString}
-            </SyntaxHighlighter>
-          </div>
-        </div>
-      );
-    }
-
-    const isBlock = node?.position?.start.line !== node?.position?.end.line
-      || String(children).includes("\n");
-
-    if (isBlock) {
-      return (
-        <pre className="bg-foreground/8 border border-foreground/10 rounded-[6px] text-[#e36209] dark:text-[#e3b341] p-2 text-[85%] font-mono overflow-x-auto mb-5">
-          <code>{children}</code>
-        </pre>
-      );
-    }
-
-    return (
-      <code
-        className="bg-foreground/8 border border-foreground/10 text-[#e36209] dark:text-[#e3b341] px-1.5 py-0.5 rounded text-[85%] font-mono"
-        {...props}
-      >
-        {children}
-      </code>
-    );
-  },
+  code: CodeBlock,
   img: ({ src, alt }) => <img src={src} alt={alt} className="max-w-full my-4 rounded-[6px]" />,
   a: ({ href, children }) => (
     <span
