@@ -1,7 +1,9 @@
 "use client";
 
-import { ArrowRightLeft, Eye, EyeClosed, Redo2, Undo2, PenOff } from "lucide-react";
+import { Monaco } from '@monaco-editor/react';
+import { ArrowRightLeft, Eye, EyeClosed, PenOff, Redo2, Undo2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { FormularioSettings } from "../home/formulario-settings";
 import { Button } from "../ui/button";
 import { Kbd, KbdGroup } from "../ui/kbd";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "../ui/resizable";
@@ -9,8 +11,7 @@ import { Toggle } from "../ui/toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { EditorInput } from "./editor-katex/editor-input";
 import { EditorPreview } from "./editor-katex/editor-preview";
-import { FormattingBold } from "./editor-katex/tools/formatting-bold";
-import { FormularioSettings } from "../home/formulario-settings";
+import { useIsMobile } from '@/src/hooks/useIsMobile';
 
 type Argomento = {
     id: string;
@@ -18,80 +19,59 @@ type Argomento = {
     editable: boolean;
 }
 
-interface Selection {
-    start: number;
-    end: number;
-    text: string;
-}
-
-interface Snapshot {
-    textAreaContent: string;
-    cursor: number;
-}
-
 export function EditorPage({ argomento, formularioId }: Readonly<{ argomento: Argomento, formularioId: string }>) {
+    const isMobile = useIsMobile();
+
     const [textAreaContent, setTextAreaContent] = useState(argomento.content);
     const [markdownContent, setMarkdownContent] = useState(argomento.content);
     const [edited, setEdited] = useState<boolean>(false);
     const [switchView, setSwitchView] = useState<boolean>(false);
     const [resizableSize, setResizableSize] = useState<number>(50);
-    const [history, setHistory] = useState<Snapshot[]>([]);
-    const [future, setFuture] = useState<Snapshot[]>([]);
+    const [isFocused, setIsFocused] = useState(false);
 
-    const textAreaRef = useRef<HTMLTextAreaElement>(null);
-    const isUndoRedoRef = useRef(false);
-    const [selection, setSelection] = useState<Selection | null>(null);
+    const editorRef = useRef<any>(null);
+    const undoBtnRef = useRef<HTMLButtonElement>(null);
+    const redoBtnRef = useRef<HTMLButtonElement>(null);
 
-    const handleApply = (newContent: string, cursorPos?: number) => {
-        setEdited(true)
-        setTextAreaContent(newContent);
-        if (cursorPos !== undefined && textAreaRef.current) {
-            requestAnimationFrame(() => {
-                const ta = textAreaRef.current!;
-                ta.focus();
-                ta.setSelectionRange(cursorPos, cursorPos);
-            });
-        }
-    };
+    // FIXME: tasti undo e redo non devono essere enabled all'inizio
+    // TODO: tasti bold, ...
+
+    function handleEditorDidMount(editor: any, monaco: Monaco) {
+        editorRef.current = editor;
+
+        editor.onDidFocusEditorWidget(() => {
+            setIsFocused(true);
+        });
+
+        editor.onDidBlurEditorWidget(() => {
+            setIsFocused(false);
+        });
+
+        const updateButtons = () => {
+            const model = editor.getModel();
+
+            if (model) {
+                if (undoBtnRef.current) undoBtnRef.current.disabled = !model.canUndo();
+                if (redoBtnRef.current) redoBtnRef.current.disabled = !model.canRedo();
+            }
+        };
+
+        editor.onDidChangeModelContent(() => {
+            updateButtons();
+        });
+
+        updateButtons();
+        if (undoBtnRef.current) undoBtnRef.current.disabled = true;
+        if (redoBtnRef.current) redoBtnRef.current.disabled = true;
+    }
 
     const handleUndo = () => {
-        const prev = history.at(-2);
-        if (!prev) return;
-        const cursor = textAreaRef.current?.selectionStart ?? 0;
-        setHistory((h) => h.slice(0, -1));
-        setFuture((f) => [{ textAreaContent, cursor }, ...f]);
-        isUndoRedoRef.current = true;
-        handleApply(prev.textAreaContent, prev.cursor);
-        setSelection({ start: prev.cursor, end: prev.cursor, text: "" })
+        editorRef.current?.trigger('source', 'undo', null);
     };
 
     const handleRedo = () => {
-        if (future.length === 0) return;
-        const next = future[0];
-        setHistory((h) => [...h, next]);
-        setFuture((f) => f.slice(1));
-        isUndoRedoRef.current = true;
-        handleApply(next.textAreaContent, next.cursor);
-        setSelection({ start: next.cursor, end: next.cursor, text: "" })
+        editorRef.current?.trigger('source', 'redo', null);
     };
-
-    useEffect(() => {
-        if (isUndoRedoRef.current) {
-            isUndoRedoRef.current = false;
-            return;
-        }
-
-        const timeout = setTimeout(() => {
-            const cursor = textAreaRef.current?.selectionStart ?? 0;
-            setHistory((prev) => {
-                if (prev.at(-1)?.textAreaContent === textAreaContent) return prev;
-                return [...prev, { textAreaContent, cursor }];
-            });
-            setFuture([]);
-        }, 500);
-
-        return () => clearTimeout(timeout);
-    }, [textAreaContent]);
 
     useEffect(() => {
         if (edited) {
@@ -102,11 +82,11 @@ export function EditorPage({ argomento, formularioId }: Readonly<{ argomento: Ar
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "z" && (e.ctrlKey || e.metaKey) && selection) {
+            if (e.key === "z" && (e.ctrlKey || e.metaKey)) {
                 e.preventDefault();
                 handleUndo();
             }
-            if (e.key === "y" && (e.ctrlKey || e.metaKey) && selection) {
+            if (e.key === "y" && (e.ctrlKey || e.metaKey)) {
                 e.preventDefault();
                 handleRedo();
             }
@@ -122,11 +102,11 @@ export function EditorPage({ argomento, formularioId }: Readonly<{ argomento: Ar
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button
+                                ref={undoBtnRef}
                                 variant="outline"
                                 size="icon"
                                 onClick={handleUndo}
                                 onMouseDown={(e) => e.preventDefault()}
-                                disabled={history.length < 2 || selection === null}
                             >
                                 <Undo2 size={16} />
                             </Button>
@@ -147,11 +127,11 @@ export function EditorPage({ argomento, formularioId }: Readonly<{ argomento: Ar
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button
+                                ref={redoBtnRef}
                                 variant="outline"
                                 size="icon"
                                 onClick={handleRedo}
                                 onMouseDown={(e) => e.preventDefault()}
-                                disabled={future.length <= 0 || selection === null}
                             >
                                 <Redo2 size={16} />
                             </Button>
@@ -171,11 +151,7 @@ export function EditorPage({ argomento, formularioId }: Readonly<{ argomento: Ar
             </div>
 
             <div className="flex flex-1 items-center p-3">
-                <FormattingBold
-                    textAreaContent={textAreaContent}
-                    selection={selection}
-                    onApply={handleApply}
-                />
+
             </div>
 
             {/* Mobile */}
@@ -201,13 +177,12 @@ export function EditorPage({ argomento, formularioId }: Readonly<{ argomento: Ar
     const preview = <EditorPreview markdownContent={markdownContent} />;
     const input = argomento.editable && (
         <EditorInput
-            textAreaRef={textAreaRef}
             argomentoId={argomento.id}
             textAreaContent={textAreaContent}
             setTextAreaContent={setTextAreaContent}
-            setSelection={setSelection}
             edited={edited}
             setEdited={setEdited}
+            handleEditorDidMount={handleEditorDidMount}
         />
     );
 
@@ -227,26 +202,45 @@ export function EditorPage({ argomento, formularioId }: Readonly<{ argomento: Ar
                     </div>
                 )}
 
-            {/* Desktop */}
-            <div className="hidden md:flex flex-1 min-h-0">
-                <ResizablePanelGroup
-                    onLayoutChanged={(sizes) => { if (sizes.input) setResizableSize(sizes.input) }}
-                    orientation="horizontal"
-                >
-                    {(argomento.editable && !switchView) && (
-                        <>
-                            <ResizablePanel id="input" collapsedSize={resizableSize} minSize="20%" defaultSize="50%">{input}</ResizablePanel>
-                            <ResizableHandle className="focus-visible:ring-0" withHandle />
-                        </>
-                    )}
-                    <ResizablePanel id="preview" collapsedSize={100 - resizableSize} minSize="20%" defaultSize="50%">{preview}</ResizablePanel>
-                </ResizablePanelGroup>
-            </div>
-
-            {/* Mobile */}
-            <div className="md:hidden flex-1 min-h-0 overflow-auto">
-                {switchView ? input : preview}
-            </div>
+            {isMobile ? (
+                <div className="md:hidden flex-1 min-h-0 overflow-auto">
+                    <div className={switchView ? "block h-full" : "hidden"}>
+                        {input}
+                    </div>
+                    <div className={switchView ? "hidden" : "block h-full"}>
+                        {preview}
+                    </div>
+                </div>
+            ) : (
+                <div className="hidden md:flex flex-1 min-h-0">
+                    <ResizablePanelGroup
+                        onLayoutChanged={(sizes) => { if (sizes.input) setResizableSize(sizes.input) }}
+                        orientation="horizontal"
+                    >
+                        {(argomento.editable && !switchView) && (
+                            <>
+                                <ResizablePanel id="input" collapsedSize={resizableSize} minSize="20%" defaultSize="50%">{input}</ResizablePanel>
+                                <ResizableHandle className="focus-visible:ring-0" withHandle />
+                            </>
+                        )}
+                        <ResizablePanel id="preview" collapsedSize={100 - resizableSize} minSize="20%" defaultSize="50%">{preview}</ResizablePanel>
+                    </ResizablePanelGroup>
+                </div>
+            )}
         </div>
     );
 }
+
+// TODOs:
+// -- 6 HEADERS
+// -- BOLD
+// -- ITALIC
+// -- ORDERED LIST
+// -- UNORDERED LIST
+// -- QUOTE
+// -- DIVIDER
+// -- CODE
+// -- TABLE
+// -- INLINE MATH
+// -- BLOCK MATH
+// -- MERMAID
