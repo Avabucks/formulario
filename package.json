@@ -11,6 +11,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@monaco-editor/react": "^4.7.0",
     "@tailwindcss/postcss": "^4.2.2",
     "@uiw/react-codemirror": "^4.25.5",

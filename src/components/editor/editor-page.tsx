@@ -22,6 +22,7 @@ import { FormattingOrderedList } from './editor-katex/tools/formatting-ordered';
 import { FormattingQuote } from './editor-katex/tools/formatting-quote';
 import { FormattingUnorderedList } from './editor-katex/tools/formatting-unordered';
 import { Spinner } from '../ui/spinner';
+import { GeminiButton } from './editor-katex/tools/gemini-ai';
 
 export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ argomentoId: string, editable: boolean, formularioId: string }>) {
     const isMobile = useIsMobile();
@@ -225,6 +226,10 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
                     editorRef={editorRef}
                     isFocused={isFocused}
                 />
+
+                <Separator orientation="vertical" />
+
+                <GeminiButton prompt="Fammi un formulario sulla legge di Gauss" />
             </div>
 
             {/* Mobile */}
@@ -247,21 +252,18 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
 
         </div>
     );
-    const preview = markdownContent
-        ? <EditorPreview markdownContent={markdownContent} />
-        : <div className="flex h-full items-center justify-center"><Spinner /></div>;
-    const input = editable && (
-        textAreaContent ?
-            <EditorInput
-                argomentoId={argomentoId}
-                textAreaContent={textAreaContent}
-                setTextAreaContent={setTextAreaContent}
-                edited={edited}
-                setEdited={setEdited}
-                handleEditorDidMount={handleEditorDidMount}
-            />
-            :
-            <div className="flex h-full items-center justify-center"><Spinner /></div>
+    const preview = markdownContent === undefined
+        ? <div className="flex h-full items-center justify-center"><Spinner /></div>
+        : <EditorPreview markdownContent={markdownContent ?? ""} />;
+    const input = editable && textAreaContent !== undefined && (
+        <EditorInput
+            argomentoId={argomentoId}
+            textAreaContent={textAreaContent ?? ""}
+            setTextAreaContent={setTextAreaContent}
+            edited={edited}
+            setEdited={setEdited}
+            handleEditorDidMount={handleEditorDidMount}
+        />
     );
 
     return (
