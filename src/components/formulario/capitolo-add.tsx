@@ -32,7 +32,7 @@ export function CapitoloAdd({ formulario }: Readonly<{ formulario: Formulario }>
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "a" && (e.metaKey || e.ctrlKey)) {
+            if (e.key === "A" && (e.metaKey || e.ctrlKey) && e.shiftKey) {
                 e.preventDefault()
                 setOpen((prev) => !prev)
             }
@@ -87,6 +87,8 @@ export function CapitoloAdd({ formulario }: Readonly<{ formulario: Formulario }>
                             Aggiungi capitolo
                             <KbdGroup className="hidden md:flex">
                                 <Kbd>Ctrl</Kbd>
+                                <span>+</span>
+                                <Kbd>Shift</Kbd>
                                 <span>+</span>
                                 <Kbd>A</Kbd>
                             </KbdGroup>

@@ -27,7 +27,7 @@ export default function ForumlarioAdd({ allowKey = true }: Readonly<{ allowKey?:
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "a" && (e.metaKey || e.ctrlKey) && allowKey) {
+            if (e.key === "A" && (e.metaKey || e.ctrlKey) && e.shiftKey && allowKey) {
                 e.preventDefault()
                 setOpen((prev) => !prev)
             }
@@ -84,6 +84,8 @@ export default function ForumlarioAdd({ allowKey = true }: Readonly<{ allowKey?:
                             {allowKey && (
                                 <KbdGroup className="hidden md:flex">
                                     <Kbd>Ctrl</Kbd>
+                                    <span>+</span>
+                                    <Kbd>Shift</Kbd>
                                     <span>+</span>
                                     <Kbd>A</Kbd>
                                 </KbdGroup>
