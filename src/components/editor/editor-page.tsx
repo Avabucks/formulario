@@ -22,6 +22,7 @@ import { FormattingOrderedList } from './editor-katex/tools/formatting-ordered';
 import { FormattingQuote } from './editor-katex/tools/formatting-quote';
 import { FormattingUnorderedList } from './editor-katex/tools/formatting-unordered';
 import { Spinner } from '../ui/spinner';
+import { GeminiButton } from './editor-katex/tools/gemini-ai';
 
 export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ argomentoId: string, editable: boolean, formularioId: string }>) {
     const isMobile = useIsMobile();
@@ -228,6 +229,12 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
                     editorRef={editorRef}
                     isFocused={isFocused}
                 />
+
+                <Separator orientation="vertical" />
+
+                <GeminiButton
+                    editorRef={editorRef}
+                />
             </div>
 
             {/* Mobile */}
@@ -265,7 +272,6 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
             handleEditorDidMount={handleEditorDidMount}
         />
     );
-
 
     return (
         <div className="flex flex-1 flex-col min-h-0 border rounded-lg overflow-hidden">
