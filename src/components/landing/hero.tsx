@@ -1,6 +1,8 @@
+"use client"
+
 import Link from "next/link"
 import { Button } from "@/src/components/ui/button"
-import { ArrowRight, Sparkles } from "lucide-react"
+import { ArrowRight, Play, ScanEye, UsersRound } from "lucide-react"
 import packageJson from '@/package.json'
 
 export function Hero() {
@@ -41,11 +43,12 @@ export function Hero() {
               <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
-          <Button asChild variant="outline" size="lg" className="gap-2 px-8">
-            <Link href="/community/page/1">
-              <Sparkles className="h-5 w-5" />
-              Esplora la Community
-            </Link>
+          <Button
+            variant="secondary" size="lg" className="gap-2 px-8"
+            onClick={() => document.getElementById("demo")?.scrollIntoView({ behavior: "smooth" })}
+          >
+            <ScanEye className="h-5 w-5" />
+            Guarda la demo
           </Button>
         </div>
 

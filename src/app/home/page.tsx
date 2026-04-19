@@ -15,7 +15,7 @@ import { Skeleton } from "@/src/components/ui/skeleton";
 import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { getIronSession } from "iron-session";
-import { ArrowRight, BookOpen, Sparkles, Star, StarOff, Users } from "lucide-react";
+import { ArrowRight, BookOpen, UsersRound, Star, StarOff, Users } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -83,7 +83,7 @@ export default async function Home() {
             <EmptyContent className="flex-row justify-center gap-2">
                 <Button asChild variant="outline" size="lg" className="gap-2 px-8">
                     <Link href="/community/page/1">
-                        <Sparkles className="h-5 w-5" />
+                        <UsersRound className="h-5 w-5" />
                         Esplora la Community
                     </Link>
                 </Button>

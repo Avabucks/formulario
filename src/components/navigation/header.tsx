@@ -1,7 +1,7 @@
 import { Button } from "@/src/components/ui/button";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { getIronSession } from "iron-session";
-import { ArrowRight, Pi } from "lucide-react";
+import { ArrowRight, Pi, UsersRound } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { AvatarLogic } from "../auth/avatar-logic";
@@ -20,11 +20,18 @@ export async function Header() {
                 </Button>
             </Link>
             <div className="flex items-center gap-2">
-                {session.uid && (
+                {session.uid ? (
                     <>
                         <SearchLogic />
                         <div className="h-6 border-l"></div>
                     </>
+                ) : (
+                    <Button asChild variant="outline" className="gap-2 px-8">
+                        <Link href="/community/page/1">
+                            <UsersRound className="h-5 w-5" />
+                            Esplora la community
+                        </Link>
+                    </Button>
                 )}
                 <ModeToggle />
                 <div className="h-6 border-l"></div>
