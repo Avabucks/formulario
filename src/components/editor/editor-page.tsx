@@ -1,5 +1,6 @@
 "use client";
 
+import { useIsMobile } from '@/src/hooks/useIsMobile';
 import { Monaco } from '@monaco-editor/react';
 import { ArrowRightLeft, Eye, EyeClosed, PenOff, Redo2, Undo2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -7,11 +8,17 @@ import { FormularioSettings } from "../home/formulario-settings";
 import { Button } from "../ui/button";
 import { Kbd, KbdGroup } from "../ui/kbd";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "../ui/resizable";
+import { Separator } from '../ui/separator';
 import { Toggle } from "../ui/toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { EditorInput } from "./editor-katex/editor-input";
 import { EditorPreview } from "./editor-katex/editor-preview";
-import { useIsMobile } from '@/src/hooks/useIsMobile';
+import { FormattingBold } from './editor-katex/tools/formatting-bold';
+import { FormattingDivider } from './editor-katex/tools/formatting-divider';
+import { FormattingItalic } from './editor-katex/tools/formatting-italic';
+import { FormattingOrderedList } from './editor-katex/tools/formatting-ordered';
+import { FormattingQuote } from './editor-katex/tools/formatting-quote';
+import { FormattingUnorderedList } from './editor-katex/tools/formatting-unordered';
 
 type Argomento = {
     id: string;
@@ -150,8 +157,37 @@ export function EditorPage({ argomento, formularioId }: Readonly<{ argomento: Ar
                 </TooltipProvider>
             </div>
 
-            <div className="flex flex-1 items-center p-3">
+            <div className="flex flex-1 items-center gap-2 px-2">
+                <FormattingBold
+                    editorRef={editorRef}
+                    isFocused={isFocused}
+                />
+                <FormattingItalic
+                    editorRef={editorRef}
+                    isFocused={isFocused}
+                />
+                <FormattingQuote
+                    editorRef={editorRef}
+                    isFocused={isFocused}
+                />
 
+                <Separator orientation="vertical" />
+
+                <FormattingOrderedList
+                    editorRef={editorRef}
+                    isFocused={isFocused}
+                />
+                <FormattingUnorderedList
+                    editorRef={editorRef}
+                    isFocused={isFocused}
+                />
+
+                <Separator orientation="vertical" />
+
+                <FormattingDivider
+                    editorRef={editorRef}
+                    isFocused={isFocused}
+                />
             </div>
 
             {/* Mobile */}
@@ -232,15 +268,15 @@ export function EditorPage({ argomento, formularioId }: Readonly<{ argomento: Ar
 }
 
 // TODOs:
-// -- 6 HEADERS
-// -- BOLD
-// -- ITALIC
-// -- ORDERED LIST
-// -- UNORDERED LIST
-// -- QUOTE
-// -- DIVIDER
-// -- CODE
-// -- TABLE
-// -- INLINE MATH
-// -- BLOCK MATH
-// -- MERMAID
+// -- [ ] 6 HEADERS
+// -- [x] BOLD
+// -- [x] ITALIC
+// -- [x] ORDERED LIST
+// -- [x] UNORDERED LIST
+// -- [x] QUOTE
+// -- [x] DIVIDER
+// -- [ ] TABLE
+// -- [ ] CODE
+// -- [ ] MERMAID
+// -- [ ] INLINE MATH
+// -- [ ] BLOCK MATH

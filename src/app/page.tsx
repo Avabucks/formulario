@@ -22,15 +22,16 @@ export default function Home() {
 
 // - [EDITOR]
 // - toolbar (con regex), anche con kb e tooltip
-// - ctrl + c, ctrl + x funziona sulla parola o su tutta la linea se la selezione è vuota
-// - [FORSE] auto refactor che sistema spazi mentre scrivi (per evitare non ritorni a capi che)
 
 // - [GENERALI]
 // - seo
 // - report che manda mail a admin (mail nell'env) solo se la formula non è tua (in impostazioni)
+// - tasto rendi tuo anche nella toolbar quando !editable
+// - keyboard shortcuts list con anche quelle vscode
 // - aggiungere funzionalità di esportazione (pdf, markdown, ecc.)
 
 // - [NOVITA]
 // - image manager nelle impostazioni
 // - tree del formulario (accessibile da tasto di fianco a impostazioni e apre drawer laterale)
+// - console errori
 // - note protette da password
