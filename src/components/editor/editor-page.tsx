@@ -21,18 +21,13 @@ import { FormattingItalic } from './editor-katex/tools/formatting-italic';
 import { FormattingOrderedList } from './editor-katex/tools/formatting-ordered';
 import { FormattingQuote } from './editor-katex/tools/formatting-quote';
 import { FormattingUnorderedList } from './editor-katex/tools/formatting-unordered';
+import { Spinner } from '../ui/spinner';
 
-type Argomento = {
-    id: string;
-    content: string;
-    editable: boolean;
-}
-
-export function EditorPage({ argomento, formularioId }: Readonly<{ argomento: Argomento, formularioId: string }>) {
+export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ argomentoId: string, editable: boolean, formularioId: string }>) {
     const isMobile = useIsMobile();
 
-    const [textAreaContent, setTextAreaContent] = useState(argomento.content);
-    const [markdownContent, setMarkdownContent] = useState(argomento.content);
+    const [textAreaContent, setTextAreaContent] = useState<string | null>(null);
+    const [markdownContent, setMarkdownContent] = useState<string | null>(null);
     const [edited, setEdited] = useState<boolean>(false);
     const [switchView, setSwitchView] = useState<boolean>(false);
     const [resizableSize, setResizableSize] = useState<number>(50);
@@ -43,7 +38,6 @@ export function EditorPage({ argomento, formularioId }: Readonly<{ argomento: Ar
     const undoBtnRef = useRef<HTMLButtonElement>(null);
     const redoBtnRef = useRef<HTMLButtonElement>(null);
 
-    // FIXME: tasti undo e redo non devono essere enabled all'inizio
     // FIXME: tasti headers
     // TODO: tasti codice, latex, table
 
@@ -93,6 +87,23 @@ export function EditorPage({ argomento, formularioId }: Readonly<{ argomento: Ar
         editorRef.current?.trigger('source', 'redo', null);
     };
 
+    const fetchContent = async () => {
+        try {
+            const response = await fetch(`/api/argomenti/${argomentoId}`);
+            if (!response.ok) throw new Error("Errore nel caricamento");
+
+            const data = await response.json();
+            setTextAreaContent(data.content);
+            setMarkdownContent(data.content);
+        } catch (error: any) {
+            console.error(error.message);
+        }
+    };
+
+    useEffect(() => {
+        fetchContent();
+    }, [])
+
     useEffect(() => {
         if (edited) {
             return;
@@ -127,6 +138,7 @@ export function EditorPage({ argomento, formularioId }: Readonly<{ argomento: Ar
                                 size="icon"
                                 onClick={handleUndo}
                                 onMouseDown={(e) => e.preventDefault()}
+                                disabled={true}
                             >
                                 <Undo2 size={16} />
                             </Button>
@@ -152,6 +164,7 @@ export function EditorPage({ argomento, formularioId }: Readonly<{ argomento: Ar
                                 size="icon"
                                 onClick={handleRedo}
                                 onMouseDown={(e) => e.preventDefault()}
+                                disabled={true}
                             >
                                 <Redo2 size={16} />
                             </Button>
@@ -234,21 +247,26 @@ export function EditorPage({ argomento, formularioId }: Readonly<{ argomento: Ar
 
         </div>
     );
-    const preview = <EditorPreview markdownContent={markdownContent} />;
-    const input = argomento.editable && (
-        <EditorInput
-            argomentoId={argomento.id}
-            textAreaContent={textAreaContent}
-            setTextAreaContent={setTextAreaContent}
-            edited={edited}
-            setEdited={setEdited}
-            handleEditorDidMount={handleEditorDidMount}
-        />
+    const preview = markdownContent
+        ? <EditorPreview markdownContent={markdownContent} />
+        : <div className="flex h-full items-center justify-center"><Spinner /></div>;
+    const input = editable && (
+        textAreaContent ?
+            <EditorInput
+                argomentoId={argomentoId}
+                textAreaContent={textAreaContent}
+                setTextAreaContent={setTextAreaContent}
+                edited={edited}
+                setEdited={setEdited}
+                handleEditorDidMount={handleEditorDidMount}
+            />
+            :
+            <div className="flex h-full items-center justify-center"><Spinner /></div>
     );
 
     return (
         <div className="flex flex-1 flex-col min-h-0 border rounded-lg overflow-hidden">
-            {argomento.editable ?
+            {editable ?
                 toolbar
                 : (
                     <div className="flex w-full border-b min-h-15 justify-between items-center">
@@ -277,7 +295,7 @@ export function EditorPage({ argomento, formularioId }: Readonly<{ argomento: Ar
                         onLayoutChanged={(sizes) => { if (sizes.input) setResizableSize(sizes.input) }}
                         orientation="horizontal"
                     >
-                        {(argomento.editable && !switchView) && (
+                        {(editable && !switchView) && (
                             <>
                                 <ResizablePanel id="input" collapsedSize={resizableSize} minSize="20%" defaultSize="50%">{input}</ResizablePanel>
                                 <ResizableHandle className="focus-visible:ring-0" withHandle />

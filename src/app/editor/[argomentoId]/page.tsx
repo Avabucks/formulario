@@ -27,11 +27,9 @@ export default async function Argomento({
 
     // Check if user has access to the capitolo (owner or public)
     const { rows: argomentoRows, rowCount } = await pool.query(
-        `SELECT A.beautiful_id AS "id", A.titolo, A.capitolo,
-            F.titolo AS "formularioTitolo", F.owner_uid as "ownerUid", U_A.display_name AS "nomeAutore", F.beautiful_id AS "formularioId",
-            C.titolo AS "capitoloTitolo", C.beautiful_id AS "capitoloId",
-            A.content,
-            F.visibility
+        `SELECT A.beautiful_id AS "id", A.titolo,
+            F.titolo AS "formularioTitolo", F.owner_uid as "ownerUid", F.beautiful_id AS "formularioId",
+            C.titolo AS "capitoloTitolo", C.beautiful_id AS "capitoloId"
             FROM argomenti A
             JOIN capitoli C ON  A.capitolo = C.beautiful_id
             JOIN formulari F ON F.beautiful_id = C.formulario
@@ -63,7 +61,7 @@ export default async function Argomento({
             <div className="flex flex-1 flex-col gap-4 w-full px-2 md:px-6 pt-16 pb-5 overflow-hidden">
                 <BreadcrumbLogic items={breadcrumbs} />
                 <Suspense fallback={<Skeleton className="h-full w-full" />}>
-                    <EditorPage argomento={argomento} formularioId={argomento.formularioId} />
+                    <EditorPage argomentoId={argomento.id} editable={argomento.editable} formularioId={argomento.formularioId} />
                 </Suspense>
             </div>
         </div>
