@@ -5,15 +5,17 @@ import { Toggle } from "@/src/components/ui/toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/components/ui/tooltip";
 import { getIsActiveList, handleListToggle } from "@/src/lib/formatting-utils";
 import { List } from "lucide-react";
-import type { editor } from "monaco-editor";
+import type { editor, Selection } from "monaco-editor";
 import { useEffect } from "react";
 
 const getUnorderedListRegex = () => /^-\s/;
 
 export function FormattingUnorderedList({
+    _selection,
     editorRef,
     isFocused,
 }: Readonly<{
+    _selection: Selection | null;
     editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
     isFocused: boolean;
 }>) {
