@@ -27,8 +27,9 @@ import { GeminiButton } from './editor-katex/tools/gemini-ai';
 export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ argomentoId: string, editable: boolean, formularioId: string }>) {
     const isMobile = useIsMobile();
 
-    const [textAreaContent, setTextAreaContent] = useState<string | null>(null);
-    const [markdownContent, setMarkdownContent] = useState<string | null>(null);
+    const [textAreaContent, setTextAreaContent] = useState<string>("");
+    const [markdownContent, setMarkdownContent] = useState<string>("");
+    const [loading, setLoading] = useState<boolean>(true);
     const [edited, setEdited] = useState<boolean>(false);
     const [switchView, setSwitchView] = useState<boolean>(false);
     const [resizableSize, setResizableSize] = useState<number>(50);
@@ -98,6 +99,8 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
             setMarkdownContent(data.content);
         } catch (error: any) {
             console.error(error.message);
+        } finally {
+            setLoading(false)
         }
     };
 
@@ -254,11 +257,13 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
 
         </div>
     );
-    const preview = markdownContent === undefined
+    const preview = loading
         ? <div className="flex h-full items-center justify-center"><Spinner /></div>
         : <EditorPreview markdownContent={markdownContent ?? ""} />;
-    const input = editable && textAreaContent !== undefined && (
-        <EditorInput
+    const input = editable && (
+        loading
+        ? <div className="flex h-full items-center justify-center"><Spinner /></div>
+        : <EditorInput
             argomentoId={argomentoId}
             textAreaContent={textAreaContent ?? ""}
             setTextAreaContent={setTextAreaContent}
@@ -267,6 +272,7 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
             handleEditorDidMount={handleEditorDidMount}
         />
     );
+
 
     return (
         <div className="flex flex-1 flex-col min-h-0 border rounded-lg overflow-hidden">
