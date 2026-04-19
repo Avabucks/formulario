@@ -11,10 +11,10 @@ const genAI = new GoogleGenerativeAI(apiKey);
 const model = genAI.getGenerativeModel({ 
     model: "gemini-2.5-flash-lite",
     generationConfig: {
-        maxOutputTokens: 500,
-        temperature: 0.7,
+        maxOutputTokens: 1500,
+        temperature: 0.5,
     },
-    systemInstruction: "Agisci come un assistente accademico esperto in formulari universitari. Usa Markdown e LaTeX ($ per inline, $$ per display). Rispondi in modo conciso. Niente introduzioni come 'Certamente' o 'Ecco la risposta', devi generare un testo ready to use.",
+    systemInstruction: "Agisci come un assistente accademico esperto in formulari universitari. Usa Markdown e LaTeX ($ per inline, $$ per display). Rispondi in modo conciso. Niente introduzioni come 'Certamente' o 'Ecco la risposta', devi generare un testo ready to use. Entro i 500 tokens.",
 });
 export async function POST(req: NextRequest) {
     try {

@@ -229,7 +229,9 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
 
                 <Separator orientation="vertical" />
 
-                <GeminiButton prompt="Fammi un formulario sulla legge di Gauss" />
+                <GeminiButton
+                    editorRef={editorRef}
+                />
             </div>
 
             {/* Mobile */}
