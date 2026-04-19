@@ -49,7 +49,7 @@ export function FormattingQuote({
                         variant="outline"
                         onPressedChange={handleToggle}
                         onMouseDown={(e) => e.preventDefault()}
-                        aria-label="Quote"
+                        aria-label="Citazione"
                         pressed={isActive && isFocused}
                         disabled={!isFocused}
                     >
@@ -58,7 +58,7 @@ export function FormattingQuote({
                 </TooltipTrigger>
                 <TooltipContent className="pr-1.5">
                     <div className="flex items-center gap-2">
-                        Quote
+                        Citazione
                         <KbdGroup className="hidden md:flex">
                             <Kbd>Ctrl</Kbd>
                             <span>+</span>

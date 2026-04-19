@@ -73,7 +73,7 @@ export function FormattingDivider({
                         variant="outline"
                         onPressedChange={handleToggle}
                         onMouseDown={(e) => e.preventDefault()}
-                        aria-label="Divider"
+                        aria-label="Divisore"
                         pressed={false}
                         disabled={!isFocused}
                     >
@@ -82,7 +82,7 @@ export function FormattingDivider({
                 </TooltipTrigger>
                 <TooltipContent className="pr-1.5">
                     <div className="flex items-center gap-2">
-                        Divider
+                        Divisore
                         <KbdGroup className="hidden md:flex">
                             <Kbd>Ctrl</Kbd>
                             <span>+</span>

@@ -45,7 +45,7 @@ export function EditorPage({ argomento, formularioId }: Readonly<{ argomento: Ar
 
     // FIXME: tasti undo e redo non devono essere enabled all'inizio
     // FIXME: tasti headers
-    // TODO: tasti bold, ...
+    // TODO: tasti codice, latex, table
 
     const updateSelection = (editor: any) => {
         const sel = editor.getSelection();
@@ -116,8 +116,8 @@ export function EditorPage({ argomento, formularioId }: Readonly<{ argomento: Ar
     }, [handleUndo, handleRedo]);
 
     const toolbar = (
-        <div className="flex w-full border-b min-h-15">
-            <div className="flex gap-2 border-r items-center px-3">
+        <div className="flex w-full border-b min-h-15 overflow-x-auto">
+            <div className="flex gap-3 border-r items-center px-3">
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
@@ -133,7 +133,7 @@ export function EditorPage({ argomento, formularioId }: Readonly<{ argomento: Ar
                         </TooltipTrigger>
                         <TooltipContent className="pr-1.5">
                             <div className="flex items-center gap-2">
-                                Undo
+                                Annulla
                                 <KbdGroup className="hidden md:flex">
                                     <Kbd>Ctrl</Kbd>
                                     <span>+</span>
@@ -158,7 +158,7 @@ export function EditorPage({ argomento, formularioId }: Readonly<{ argomento: Ar
                         </TooltipTrigger>
                         <TooltipContent className="pr-1.5">
                             <div className="flex items-center gap-2">
-                                Redo
+                                Ripristina
                                 <KbdGroup className="hidden md:flex">
                                     <Kbd>Ctrl</Kbd>
                                     <span>+</span>
@@ -170,7 +170,7 @@ export function EditorPage({ argomento, formularioId }: Readonly<{ argomento: Ar
                 </TooltipProvider>
             </div>
 
-            <div className="flex flex-1 items-center gap-2 px-2">
+            <div className="flex flex-1 items-center gap-3 px-3">
                 <FormattingHeaders
                     _selection={selection}
                     editorRef={editorRef}
@@ -215,20 +215,20 @@ export function EditorPage({ argomento, formularioId }: Readonly<{ argomento: Ar
             </div>
 
             {/* Mobile */}
-            <div className="flex md:hidden border-l items-center px-3 gap-2">
+            <div className="flex md:hidden border-l items-center px-3 gap-3">
                 <Button variant="outline" size="icon" onClick={() => setSwitchView((prev) => !prev)}>
                     <ArrowRightLeft size={16} />
                 </Button>
             </div>
 
             {/* Desktop */}
-            <div className="hidden md:flex border-l items-center px-3 gap-2">
+            <div className="hidden md:flex border-l items-center px-3 gap-3">
                 <Toggle variant="outline" pressed={switchView} onClick={() => setSwitchView((prev) => !prev)}>
                     {switchView ? <Eye size={16} /> : <EyeClosed size={16} />}
                 </Toggle>
             </div>
 
-            <div className="flex border-l items-center px-3 gap-2">
+            <div className="flex border-l items-center px-3 gap-3">
                 <FormularioSettings formularioId={formularioId} />
             </div>
 
