@@ -11,7 +11,8 @@ export function Cta() {
           Pronto a organizzare le tue formule?
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-pretty text-muted-foreground">
-          Unisciti a migliaia di studenti e docenti che già usano {packageJson.displayName}. Inizia gratuitamente, nessuna carta di credito richiesta.
+          Crea il tuo primo formulario in meno di un minuto — con l'AI o da zero.
+          Nessuna carta di credito, nessuna configurazione.
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Button size="lg" asChild className="gap-2 px-8">
