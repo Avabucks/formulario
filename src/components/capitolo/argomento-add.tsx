@@ -35,7 +35,7 @@ export function ArgomentoAdd({ capitolo }: Readonly<{ capitolo: Capitolo }>) {
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "a" && (e.metaKey || e.ctrlKey)) {
+            if (e.key === "A" && (e.metaKey || e.ctrlKey) && e.shiftKey) {
                 e.preventDefault()
                 setOpen((prev) => !prev)
             }
@@ -90,6 +90,8 @@ export function ArgomentoAdd({ capitolo }: Readonly<{ capitolo: Capitolo }>) {
                             Aggiungi capitolo
                             <KbdGroup className="hidden md:flex">
                                 <Kbd>Ctrl</Kbd>
+                                <span>+</span>
+                                <Kbd>Shift</Kbd>
                                 <span>+</span>
                                 <Kbd>A</Kbd>
                             </KbdGroup>

@@ -12,15 +12,18 @@ import {
 } from "@/src/components/ui/dropdown-menu";
 import { auth } from "@/src/lib/firebase";
 import { signOut } from "firebase/auth";
-import { Book, Cookie, Handshake, LogOutIcon, Sparkles } from "lucide-react";
+import { Book, Cookie, Handshake, Keyboard, LogOutIcon, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { KbShortcuts } from "../navigation/kb-shortcuts";
 
 export function AvatarLogic() {
     const router = useRouter();
     const [name, setName] = useState<string | null>(null);
     const [photoURL, setPhotoURL] = useState<string | null>(null);
+
+    const [ppenKbShortcut, setOpenKbShortcut] = useState<boolean>(false);
 
     useEffect(() => {
         setName(localStorage.getItem("name"));
@@ -33,48 +36,58 @@ export function AvatarLogic() {
     };
 
     return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full">
-                    <Avatar>
-                        {photoURL && <AvatarImage src={photoURL} alt="foto profilo" />}
-                        <AvatarFallback>{name?.substring(0, 1).toUpperCase() || "U"}</AvatarFallback>
-                    </Avatar>
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-                <DropdownMenuLabel>{name}</DropdownMenuLabel>
-                <Link href="/home">
-                    <DropdownMenuItem>
-                        <Book />
-                        Visualizza i tuoi formulari
+        <>
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="rounded-full">
+                        <Avatar>
+                            {photoURL && <AvatarImage src={photoURL} alt="foto profilo" />}
+                            <AvatarFallback>{name?.substring(0, 1).toUpperCase() || "U"}</AvatarFallback>
+                        </Avatar>
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>{name}</DropdownMenuLabel>
+                    <Link href="/home">
+                        <DropdownMenuItem>
+                            <Book />
+                            Visualizza i tuoi formulari
+                        </DropdownMenuItem>
+                    </Link>
+                    <Link href="/community/page/1">
+                        <DropdownMenuItem>
+                            <Sparkles />
+                            Community
+                        </DropdownMenuItem>
+                    </Link>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onSelect={() => setOpenKbShortcut(true)}>
+                        <Keyboard />
+                        Scorciatoie da tastiera
                     </DropdownMenuItem>
-                </Link>
-                <Link href="/community/page/1">
-                    <DropdownMenuItem>
-                        <Sparkles />
-                        Community
+                    <Link href="/terms">
+                        <DropdownMenuItem>
+                            <Handshake />
+                            Termini e condizioni
+                        </DropdownMenuItem>
+                    </Link>
+                    <Link href="/privacy">
+                        <DropdownMenuItem>
+                            <Cookie />
+                            Privacy
+                        </DropdownMenuItem>
+                    </Link>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem variant="destructive" onClick={handleLogout}>
+                        <LogOutIcon />
+                        Sign Out
                     </DropdownMenuItem>
-                </Link>
-                <DropdownMenuSeparator />
-                <Link href="/terms">
-                    <DropdownMenuItem>
-                        <Handshake />
-                        Termini e condizioni
-                    </DropdownMenuItem>
-                </Link>
-                <Link href="/privacy">
-                    <DropdownMenuItem>
-                        <Cookie />
-                        Privacy
-                    </DropdownMenuItem>
-                </Link>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem variant="destructive" onClick={handleLogout}>
-                    <LogOutIcon />
-                    Sign Out
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
+                </DropdownMenuContent>
+            </DropdownMenu>
+            <KbShortcuts
+                setOpen={setOpenKbShortcut}
+                open={ppenKbShortcut}
+            />
+        </>
     )
 }

@@ -56,7 +56,7 @@ export function FormularioSettings({ formularioId }: Readonly<{ formularioId: st
         fetchFormulario()
 
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "o" && (e.metaKey || e.ctrlKey)) {
+            if (e.key === "I" && (e.metaKey || e.ctrlKey) && e.shiftKey) {
                 e.preventDefault()
                 setOpen((prev) => !prev)
             }
@@ -137,7 +137,9 @@ export function FormularioSettings({ formularioId }: Readonly<{ formularioId: st
                                 <KbdGroup className="hidden md:flex">
                                     <Kbd>Ctrl</Kbd>
                                     <span>+</span>
-                                    <Kbd>O</Kbd>
+                                    <Kbd>Shift</Kbd>
+                                    <span>+</span>
+                                    <Kbd>I</Kbd>
                                 </KbdGroup>
                             </div>
                         </TooltipContent>
