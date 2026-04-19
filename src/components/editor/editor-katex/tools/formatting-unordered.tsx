@@ -49,7 +49,7 @@ export function FormattingUnorderedList({
                         variant="outline"
                         onPressedChange={handleToggle}
                         onMouseDown={(e) => e.preventDefault()}
-                        aria-label="Unordered List"
+                        aria-label="Lista non ordinata"
                         pressed={isActive && isFocused}
                         disabled={!isFocused}
                     >
@@ -58,7 +58,7 @@ export function FormattingUnorderedList({
                 </TooltipTrigger>
                 <TooltipContent className="pr-1.5">
                     <div className="flex items-center gap-2">
-                        Unordered List
+                        Lista non ordinata
                         <KbdGroup className="hidden md:flex">
                             <Kbd>Ctrl</Kbd>
                             <span>+</span>

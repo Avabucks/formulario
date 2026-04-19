@@ -51,7 +51,7 @@ export function FormattingBold({
                         variant="outline"
                         onPressedChange={handleToggle}
                         onMouseDown={(e) => e.preventDefault()}
-                        aria-label="Bold"
+                        aria-label="Grassetto"
                         pressed={isActive && isFocused}
                         disabled={!isFocused}
                     >
@@ -60,7 +60,7 @@ export function FormattingBold({
                 </TooltipTrigger>
                 <TooltipContent className="pr-1.5">
                     <div className="flex items-center gap-2">
-                        Bold
+                        Grassetto
                         <KbdGroup className="hidden md:flex">
                             <Kbd>Ctrl</Kbd>
                             <span>+</span>

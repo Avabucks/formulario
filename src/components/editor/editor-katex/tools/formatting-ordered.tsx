@@ -49,7 +49,7 @@ export function FormattingOrderedList({
                         variant="outline"
                         onPressedChange={handleToggle}
                         onMouseDown={(e) => e.preventDefault()}
-                        aria-label="Ordered List"
+                        aria-label="Lista ordinata"
                         pressed={isActive && isFocused}
                         disabled={!isFocused}
                     >
@@ -58,7 +58,7 @@ export function FormattingOrderedList({
                 </TooltipTrigger>
                 <TooltipContent className="pr-1.5">
                     <div className="flex items-center gap-2">
-                        Ordered List
+                        Lista ordinata
                         <KbdGroup className="hidden md:flex">
                             <Kbd>Ctrl</Kbd>
                             <span>+</span>

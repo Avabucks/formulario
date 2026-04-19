@@ -51,7 +51,7 @@ export function FormattingItalic({
                         variant="outline"
                         onPressedChange={handleToggle}
                         onMouseDown={(e) => e.preventDefault()}
-                        aria-label="Italic"
+                        aria-label="Corsivo"
                         pressed={isActive && isFocused}
                         disabled={!isFocused}
                     >
@@ -60,7 +60,7 @@ export function FormattingItalic({
                 </TooltipTrigger>
                 <TooltipContent className="pr-1.5">
                     <div className="flex items-center gap-2">
-                        Italic
+                        Corsivo
                         <KbdGroup className="hidden md:flex">
                             <Kbd>Ctrl</Kbd>
                             <span>+</span>
