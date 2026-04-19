@@ -7,26 +7,36 @@ import {
 
 const faqs = [
   {
-    question: "Come funziona l'editor?",
+    question: "Come fa l'AI a creare un formulario per me?",
     answer:
-      "L'editor utilizza il linguaggio Markdown per la formattazione del testo e supporta pienamente le formule in LaTeX. Puoi inserire espressioni matematiche inline usando $ ... $ oppure in blocco con $$ ... $$. L'anteprima è istantanea e viene elaborata direttamente dal browser.",
+      "Ti basta inserire l'argomento — ad esempio 'Elettromagnetismo' — e l'AI genera istantaneamente una struttura completa. Otterrai capitoli organizzati, formule precise e descrizioni pronte all'uso. È la fine del 'foglio bianco': l'AI fa il lavoro pesante, tu rifinisci i dettagli.",
+  },
+  {
+    question: "Non conosco il linguaggio LaTeX. Posso usare FormulaBase?",
+    answer:
+      "Assolutamente sì. Non devi scrivere una riga di codice se non vuoi. L'AI si occupa della formattazione tecnica, mentre tu interagisci con un editor intuitivo.",
   },
   {
     question: "Come funziona la condivisione via QR code?",
     answer:
-      "Ogni formulario ha un QR code univoco generato automaticamente. Prima di condividere scegli la visibilità: privato (solo tu), pubblico con link (chiunque abbia il QR o l'URL) o community (visibile a tutti gli utenti di FormulaBase).",
+      "Ogni formulario ha un QR code univoco generato automaticamente. Prima di condividere scegli la visibilità: privato (solo tu), pubblico con link (chiunque abbia il QR o l'URL) o community (visibile a tutti gli utenti di FormulaBase). Stampalo direttamente o salvalo come immagine.",
   },
   {
     question: "Qual è la differenza tra privato, pubblico e community?",
     answer:
-      "Privato: visibile solo a te. Pubblico con link: accessibile a chiunque abbia il link o il QR code. Community: appare nella raccolta pubblica di FormulaBase e può essere trovato e duplicato da altri utenti.",
+      "Privato: visibile solo a te, ideale per i formulari in lavorazione. Pubblico con link: accessibile a chiunque abbia il link o il QR code — ottimo per condividere con la tua classe senza rendere tutto pubblico. Community: appare nella raccolta pubblica e può essere trovato e duplicato da altri utenti.",
   },
   {
-    question: "Posso modificare il formulario di qualcun altro?",
+    question: "Posso modificare un formulario creato da altri?",
     answer:
-      "Sì. Dalla community puoi rendere tuo qualsiasi formulario pubblico con un click. Viene creata una copia nel tuo account, con te come proprietario, che puoi modificare liberamente senza toccare l'originale.",
+      "Sì! Se trovi un formulario utile nella Community, puoi duplicarlo nel tuo profilo con un click. Otterrai una copia personale che potrai modificare, integrare o accorciare come preferisci, senza alterare il lavoro originale dell'autore.",
   },
-]
+  {
+    question: "È gratuito?",
+    answer:
+      "Sì, puoi iniziare gratuitamente senza carta di credito. Crei formulari, usi l'editor LaTeX e condividi via QR code o link da subito.",
+  },
+];
 
 export function Faq() {
   return (

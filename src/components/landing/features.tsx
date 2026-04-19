@@ -1,13 +1,19 @@
 import {
-  Search,
-  QrCode,
   BookOpen,
   Lock,
-  Share2,
+  QrCode,
   ScanLine,
+  Search,
+  Wand2
 } from "lucide-react"
 
 const features = [
+  {
+    icon: Wand2,
+    title: "Genera con l'AI",
+    description:
+      "Descrivi l'argomento e l'AI crea per te il formulario completo in LaTeX. Dalla cinematica alla chimica organica, in pochi secondi.",
+  },
   {
     icon: Search,
     title: "Ricerca Intelligente",
@@ -30,13 +36,7 @@ const features = [
     icon: QrCode,
     title: "Condivisione via QR Code",
     description:
-      "Genera un QR code per ogni formula. Perfetto per stampare e distribuire durante lezioni ed esami.",
-  },
-  {
-    icon: Share2,
-    title: "Link di Condivisione",
-    description:
-      "Condividi formulari pubblici con un semplice link. Imposta la visibilità: privato o pubblico.",
+      "Genera un QR code per ogni formulario. Perfetto per stampare e distribuire durante lezioni ed esami.",
   },
   {
     icon: Lock,
@@ -66,12 +66,12 @@ export function Features() {
           {features.map((feature) => (
             <div
               key={feature.title}
-              className="group rounded-xl border border-border bg-card p-8 transition-colors hover:border-muted-foreground/30"
+              className="group rounded-xl border p-8 transition-colors border-border bg-card hover:border-muted-foreground/30"
             >
               <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-secondary">
                 <feature.icon className="h-5 w-5 text-foreground" />
               </div>
-              <h3 className="mb-2 text-lg font-semibold text-foreground">
+              <h3 className="mb-2 flex items-center gap-2 text-lg font-semibold text-foreground">
                 {feature.title}
               </h3>
               <p className="text-sm leading-relaxed text-muted-foreground">
