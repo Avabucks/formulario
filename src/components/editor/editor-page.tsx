@@ -247,21 +247,18 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
 
         </div>
     );
-    const preview = markdownContent
-        ? <EditorPreview markdownContent={markdownContent} />
-        : <div className="flex h-full items-center justify-center"><Spinner /></div>;
-    const input = editable && (
-        textAreaContent ?
-            <EditorInput
-                argomentoId={argomentoId}
-                textAreaContent={textAreaContent}
-                setTextAreaContent={setTextAreaContent}
-                edited={edited}
-                setEdited={setEdited}
-                handleEditorDidMount={handleEditorDidMount}
-            />
-            :
-            <div className="flex h-full items-center justify-center"><Spinner /></div>
+    const preview = markdownContent === undefined
+        ? <div className="flex h-full items-center justify-center"><Spinner /></div>
+        : <EditorPreview markdownContent={markdownContent ?? ""} />;
+    const input = editable && textAreaContent !== undefined && (
+        <EditorInput
+            argomentoId={argomentoId}
+            textAreaContent={textAreaContent ?? ""}
+            setTextAreaContent={setTextAreaContent}
+            edited={edited}
+            setEdited={setEdited}
+            handleEditorDidMount={handleEditorDidMount}
+        />
     );
 
     return (
