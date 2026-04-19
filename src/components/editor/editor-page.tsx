@@ -3,6 +3,7 @@
 import { useIsMobile } from '@/src/hooks/useIsMobile';
 import { Monaco } from '@monaco-editor/react';
 import { ArrowRightLeft, Eye, EyeClosed, PenOff, Redo2, Undo2 } from "lucide-react";
+import type { Selection } from "monaco-editor";
 import { useEffect, useRef, useState } from "react";
 import { FormularioSettings } from "../home/formulario-settings";
 import { Button } from "../ui/button";
@@ -15,6 +16,7 @@ import { EditorInput } from "./editor-katex/editor-input";
 import { EditorPreview } from "./editor-katex/editor-preview";
 import { FormattingBold } from './editor-katex/tools/formatting-bold';
 import { FormattingDivider } from './editor-katex/tools/formatting-divider';
+import { FormattingHeaders } from './editor-katex/tools/formatting-headers';
 import { FormattingItalic } from './editor-katex/tools/formatting-italic';
 import { FormattingOrderedList } from './editor-katex/tools/formatting-ordered';
 import { FormattingQuote } from './editor-katex/tools/formatting-quote';
@@ -35,16 +37,27 @@ export function EditorPage({ argomento, formularioId }: Readonly<{ argomento: Ar
     const [switchView, setSwitchView] = useState<boolean>(false);
     const [resizableSize, setResizableSize] = useState<number>(50);
     const [isFocused, setIsFocused] = useState(false);
+    const [selection, setSelection] = useState<Selection | null>(null);
 
     const editorRef = useRef<any>(null);
     const undoBtnRef = useRef<HTMLButtonElement>(null);
     const redoBtnRef = useRef<HTMLButtonElement>(null);
 
     // FIXME: tasti undo e redo non devono essere enabled all'inizio
+    // FIXME: tasti headers
     // TODO: tasti bold, ...
+
+    const updateSelection = (editor: any) => {
+        const sel = editor.getSelection();
+        if (!sel) return;
+        setSelection(sel);
+    };
 
     function handleEditorDidMount(editor: any, monaco: Monaco) {
         editorRef.current = editor;
+
+        editor.onDidChangeCursorSelection(() => updateSelection(editor));
+        editor.onDidChangeCursorPosition(() => updateSelection(editor));
 
         editor.onDidFocusEditorWidget(() => {
             setIsFocused(true);
@@ -158,15 +171,23 @@ export function EditorPage({ argomento, formularioId }: Readonly<{ argomento: Ar
             </div>
 
             <div className="flex flex-1 items-center gap-2 px-2">
+                <FormattingHeaders
+                    _selection={selection}
+                    editorRef={editorRef}
+                    isFocused={isFocused}
+                />
                 <FormattingBold
+                    _selection={selection}
                     editorRef={editorRef}
                     isFocused={isFocused}
                 />
                 <FormattingItalic
+                    _selection={selection}
                     editorRef={editorRef}
                     isFocused={isFocused}
                 />
                 <FormattingQuote
+                    _selection={selection}
                     editorRef={editorRef}
                     isFocused={isFocused}
                 />
@@ -174,10 +195,12 @@ export function EditorPage({ argomento, formularioId }: Readonly<{ argomento: Ar
                 <Separator orientation="vertical" />
 
                 <FormattingOrderedList
+                    _selection={selection}
                     editorRef={editorRef}
                     isFocused={isFocused}
                 />
                 <FormattingUnorderedList
+                    _selection={selection}
                     editorRef={editorRef}
                     isFocused={isFocused}
                 />
@@ -185,6 +208,7 @@ export function EditorPage({ argomento, formularioId }: Readonly<{ argomento: Ar
                 <Separator orientation="vertical" />
 
                 <FormattingDivider
+                    _selection={selection}
                     editorRef={editorRef}
                     isFocused={isFocused}
                 />

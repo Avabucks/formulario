@@ -4,13 +4,15 @@ import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
 import { Toggle } from "@/src/components/ui/toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/components/ui/tooltip";
 import { Minus } from "lucide-react";
-import type { editor } from "monaco-editor";
+import type { editor, Selection } from "monaco-editor";
 import { useEffect } from "react";
 
 export function FormattingDivider({
+    _selection,
     editorRef,
     isFocused,
 }: Readonly<{
+    _selection: Selection | null;
     editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
     isFocused: boolean;
 }>) {

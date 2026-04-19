@@ -5,15 +5,17 @@ import { Toggle } from "@/src/components/ui/toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/components/ui/tooltip";
 import { getIsActive, handleFormattingToggle } from "@/src/lib/formatting-utils";
 import { Bold } from "lucide-react";
-import type { editor } from "monaco-editor";
+import type { editor, Selection } from "monaco-editor";
 import { useEffect } from "react";
 
 const getBoldRegex = () => /\*\*(.+?)\*\*/g;
 
 export function FormattingBold({
+    _selection,
     editorRef,
     isFocused,
 }: Readonly<{
+    _selection: Selection | null;
     editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
     isFocused: boolean;
 }>) {
