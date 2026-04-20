@@ -1,7 +1,7 @@
 "use client";
 
 import { useIsMobile } from '@/src/hooks/useIsMobile';
-import { Monaco } from '@monaco-editor/react';
+import { Editor, Monaco } from '@monaco-editor/react';
 import { ArrowRightLeft, Eye, EyeClosed, PenOff, Redo2, Undo2 } from "lucide-react";
 import type { Selection } from "monaco-editor";
 import { useEffect, useRef, useState } from "react";
@@ -23,9 +23,12 @@ import { FormattingQuote } from './editor-katex/tools/formatting-quote';
 import { FormattingUnorderedList } from './editor-katex/tools/formatting-unordered';
 import { Spinner } from '../ui/spinner';
 import { GeminiButton } from './editor-katex/tools/gemini-ai';
+import { useTheme } from 'next-themes';
+import { TakeFormulario } from '../home/take-formulario';
 
 export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ argomentoId: string, editable: boolean, formularioId: string }>) {
     const isMobile = useIsMobile();
+    const { resolvedTheme } = useTheme();
 
     const [textAreaContent, setTextAreaContent] = useState<string>("");
     const [markdownContent, setMarkdownContent] = useState<string>("");
@@ -107,6 +110,11 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
     useEffect(() => {
         fetchContent();
     }, [])
+
+    useEffect(() => {
+        if (isMobile) {setSwitchView(false)}
+        else if (!editable) setSwitchView(true)
+    }, [isMobile])
 
     useEffect(() => {
         if (edited) {
@@ -260,10 +268,8 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
     const preview = loading
         ? <div className="flex h-full items-center justify-center"><Spinner /></div>
         : <EditorPreview markdownContent={markdownContent ?? ""} />;
-    const input = editable && (
-        loading
-        ? <div className="flex h-full items-center justify-center"><Spinner /></div>
-        : <EditorInput
+    const editor = editable
+        ? <EditorInput
             argomentoId={argomentoId}
             textAreaContent={textAreaContent ?? ""}
             setTextAreaContent={setTextAreaContent}
@@ -271,7 +277,22 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
             setEdited={setEdited}
             handleEditorDidMount={handleEditorDidMount}
         />
-    );
+        : <Editor
+            defaultLanguage="markdown"
+            theme={resolvedTheme === "dark" ? "vs-dark" : "vs-light"}
+            defaultValue={textAreaContent}
+            options={{
+                readOnly: true,
+                links: false,
+                minimap: { enabled: false },
+                automaticLayout: true,
+                wordWrap: "on",
+            }}
+            loading={<Spinner />}
+        />
+    const input = loading
+        ? <div className="flex h-full items-center justify-center"><Spinner /></div>
+        : editor
 
     return (
         <div className="flex flex-1 flex-col min-h-0 border rounded-lg overflow-hidden">
@@ -279,10 +300,26 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
                 toolbar
                 : (
                     <div className="flex w-full border-b min-h-15 justify-between items-center">
-                        <div className="flex items-center gap-1.5 px-4 text-sm text-muted-foreground">
+                        <div className="flex flex-1 items-center gap-2 px-4 text-sm text-muted-foreground">
                             <PenOff size={16} />
-                            <span>"Aggiuni ai tuoi formulari" per poter modifcare</span>
+                            <TakeFormulario formularioId={formularioId} />
+                            <span className="hidden md:flex">per modifcare</span>
                         </div>
+
+                        {/* Mobile */}
+                        <div className="flex md:hidden border-l items-center px-3 gap-3 h-full">
+                            <Button variant="outline" size="icon" onClick={() => setSwitchView((prev) => !prev)}>
+                                <ArrowRightLeft size={16} />
+                            </Button>
+                        </div>
+
+                        {/* Desktop */}
+                        <div className="hidden md:flex border-l items-center px-3 gap-3 h-full">
+                            <Toggle variant="outline" pressed={switchView} onClick={() => setSwitchView((prev) => !prev)}>
+                                {switchView ? <Eye size={16} /> : <EyeClosed size={16} />}
+                            </Toggle>
+                        </div>
+
                         <div className="flex border-l items-center px-3 gap-2 h-full">
                             <FormularioSettings formularioId={formularioId} />
                         </div>
@@ -304,7 +341,7 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
                         onLayoutChanged={(sizes) => { if (sizes.input) setResizableSize(sizes.input) }}
                         orientation="horizontal"
                     >
-                        {(editable && !switchView) && (
+                        {(!switchView) && (
                             <>
                                 <ResizablePanel id="input" collapsedSize={resizableSize} minSize="20%" defaultSize="50%">{input}</ResizablePanel>
                                 <ResizableHandle className="focus-visible:ring-0" withHandle />

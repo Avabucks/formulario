@@ -29,7 +29,7 @@ export async function Header() {
                     <Button asChild variant="outline" className="gap-2 px-8">
                         <Link href="/community/page/1">
                             <UsersRound className="h-5 w-5" />
-                            Esplora la community
+                            Community
                         </Link>
                     </Button>
                 )}

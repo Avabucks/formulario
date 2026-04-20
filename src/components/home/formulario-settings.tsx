@@ -1,7 +1,7 @@
 "use client"
 
 import { cn, formatNumber } from "@/src/lib/utils";
-import { Calendar, CopyPlus, Download, Eye, GlobeIcon, Info, LinkIcon, LockIcon, Pencil, QrCode, Settings, Star, Trash2, UserRound, X } from "lucide-react";
+import { Calendar, Download, Eye, GlobeIcon, Info, LinkIcon, LockIcon, Pencil, QrCode, Settings, Star, Trash2, UserRound, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -16,6 +16,7 @@ import { Spinner } from "../ui/spinner";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { EditSection } from "./settings-sections/edit-section";
 import { StarFormulario } from "./star-formulario";
+import { TakeFormulario } from "./take-formulario";
 
 type Formulario = {
     titolo: string
@@ -66,30 +67,6 @@ export function FormularioSettings({ formularioId }: Readonly<{ formularioId: st
         return () => document.removeEventListener("keydown", handleKeyDown)
 
     }, []);
-
-    async function handleTake() {
-
-        toast.promise(
-            fetch("/api/formulari/take", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ formularioId: formularioId }),
-            }).then(async (res) => {
-                if (!res.ok) {
-                    const text = await res.text();
-                    throw new Error(text);
-                }
-                router.push("/home");
-            }),
-            {
-                loading: "Richiesta in corso...",
-                success: "Formulario ottenuto con successo!",
-                error: "Errore durante la richiesta del formulario.",
-                position: "bottom-center",
-            },
-        );
-
-    }
 
     async function handleDelete() {
 
@@ -309,7 +286,7 @@ export function FormularioSettings({ formularioId }: Readonly<{ formularioId: st
                                         </DialogContent>
                                     </Dialog>
                                 ) : (
-                                    <Button onClick={handleTake}><CopyPlus size={16} />Aggiungi ai miei formulari</Button>
+                                    <TakeFormulario formularioId={formularioId} />
                                 )}
                             </div>
                         </>

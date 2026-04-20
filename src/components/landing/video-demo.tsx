@@ -35,7 +35,7 @@ export function VideoDemo() {
   return (
     <section id="demo" className="relative py-24 md:py-32 overflow-hidden">
 
-      <div className="relative mx-auto max-w-6xl px-6">
+      <div className="relative mx-auto max-w-7xl px-6">
         {/* Heading */}
         <div className="mx-auto mb-12 max-w-2xl text-center">
           <p className="mb-3 text-sm font-medium uppercase tracking-widest text-muted-foreground">
