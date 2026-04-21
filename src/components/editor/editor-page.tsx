@@ -43,9 +43,6 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
     const undoBtnRef = useRef<HTMLButtonElement>(null);
     const redoBtnRef = useRef<HTMLButtonElement>(null);
 
-    // FIXME: tasti headers
-    // TODO: tasti codice, latex, table
-
     const updateSelection = (editor: any) => {
         const sel = editor.getSelection();
         if (!sel) return;
@@ -354,17 +351,3 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
         </div>
     );
 }
-
-// TODOs:
-// -- [ ] 6 HEADERS
-// -- [x] BOLD
-// -- [x] ITALIC
-// -- [x] ORDERED LIST
-// -- [x] UNORDERED LIST
-// -- [x] QUOTE
-// -- [x] DIVIDER
-// -- [ ] TABLE
-// -- [ ] CODE
-// -- [ ] MERMAID
-// -- [ ] INLINE MATH
-// -- [ ] BLOCK MATH

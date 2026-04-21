@@ -102,13 +102,13 @@ export function ArgomentoAdd({ capitolo }: Readonly<{ capitolo: Capitolo }>) {
             <DialogContent className="sm:max-w-md">
                 <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
                     <DialogHeader>
-                        <DialogTitle>Aggiungi nuovo capitolo</DialogTitle>
+                        <DialogTitle>Aggiungi nuovo argomento</DialogTitle>
                         <DialogDescription>
-                            <span>Crea un nuovo capitolo in {capitolo.titolo}.</span>
+                            <span>Crea un nuovo argomento in {capitolo.titolo}.</span>
                         </DialogDescription>
                     </DialogHeader>
                     <Field>
-                        <Label htmlFor="titolo-1">Titolo del nuovo capitolo</Label>
+                        <Label htmlFor="titolo-1">Titolo del nuovo argomento</Label>
                         <Input id="titolo-1" name="titolo" />
                     </Field>
                     <DialogFooter>
