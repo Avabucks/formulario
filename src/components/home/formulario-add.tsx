@@ -21,7 +21,7 @@ import { toast } from "sonner";
 import { Kbd, KbdGroup } from "../ui/kbd";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 
-export default function ForumlarioAdd({ allowKey = true }: Readonly<{ allowKey?: boolean }>) {
+export default function ForumlarioAdd({ allowKey = true, showLabel = false }: Readonly<{ allowKey?: boolean, showLabel?: boolean }>) {
     const router = useRouter();
     const [open, setOpen] = useState(false);
 
@@ -74,7 +74,7 @@ export default function ForumlarioAdd({ allowKey = true }: Readonly<{ allowKey?:
                         <DialogTrigger asChild>
                             <Button variant="default">
                                 <Plus size={16} />
-                                <div className="hidden md:flex">Aggiungi formulario</div>
+                                <div className={`${!showLabel && "hidden md:flex"}`}>Aggiungi formulario</div>
                             </Button>
                         </DialogTrigger>
                     </TooltipTrigger>

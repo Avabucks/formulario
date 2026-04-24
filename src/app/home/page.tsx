@@ -1,5 +1,6 @@
 import ForumlarioAdd from "@/src/components/home/formulario-add";
 import { FormularioCard } from "@/src/components/home/formulario-card";
+import { NewAccountPopup } from "@/src/components/home/new-account-popup";
 import { Header } from "@/src/components/navigation/header";
 import { Button } from "@/src/components/ui/button";
 import {
@@ -64,7 +65,7 @@ export default async function Home() {
                 </EmptyDescription>
             </EmptyHeader>
             <EmptyContent className="flex-row justify-center gap-2">
-                <ForumlarioAdd allowKey={false} />
+                <ForumlarioAdd allowKey={false} showLabel={true} />
             </EmptyContent>
         </Empty>
     )
@@ -180,6 +181,7 @@ export default async function Home() {
                     </div>
                 </Suspense>
             </div>
+            {formulari.length == 0 && <NewAccountPopup />}
         </>
     )
 }

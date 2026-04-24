@@ -9,7 +9,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Spinner } from "../ui/spinner";
 
-export default function deleteAccount() {
+export default function DeleteAccount() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
 
