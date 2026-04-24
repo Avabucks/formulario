@@ -61,14 +61,14 @@ export function NewAccountPopup() {
     const [open, setOpen] = useState(false)
 
     useEffect(() => {
-        const alreadyClosed = localStorage.getItem(STORAGE_KEY)
+        const alreadyClosed = sessionStorage.getItem(STORAGE_KEY)
         if (!alreadyClosed) {
             setOpen(true)
         }
     }, [])
 
     const handleClose = () => {
-        localStorage.setItem(STORAGE_KEY, "true")
+        sessionStorage.setItem(STORAGE_KEY, "true")
         setOpen(false)
     }
 

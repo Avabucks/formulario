@@ -72,7 +72,10 @@ export function LoginForm({
   };
 
   useEffect(() => {
-    signOut(auth).then(() => localStorage.clear())
+    signOut(auth).then(() => {
+      localStorage.clear();
+      sessionStorage.clear();
+    });
   }, [])
 
   return (
