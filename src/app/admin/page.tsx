@@ -10,9 +10,9 @@ import { DatePicker } from "@/src/components/admin/date-picker"
 import { formatNumber } from "@/src/lib/utils";
 
 export default async function Admin({
-  searchParams,
+    searchParams,
 }: Readonly<{
-  searchParams: Promise<{ date?: string }>
+    searchParams: Promise<{ date?: string }>
 }>) {
 
     const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
@@ -58,44 +58,48 @@ export default async function Admin({
                 <h2 className="text-xl font-semibold">Generali</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl">
                     <Card>
-                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                        Totale utenti
-                        </CardTitle>
-                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-foreground/10">
-                        <Users className="h-4 w-4 text-foreground/50" />
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="flex items-baseline gap-3">
-                        <p className="text-3xl font-medium">{formatNumber(users[0].total.toLocaleString("it-IT"))}</p>
-                        <Badge variant="secondary" className="bg-green-50 text-green-700 flex gap-1 items-center">
-                            <TrendingUp className="h-3 w-3" />
-                            {formatNumber(users[0].today)} nuovi
-                        </Badge>
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1">registrati in totale</p>
-                    </CardContent>
+                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                                Totale utenti
+                            </CardTitle>
+                            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-foreground/10">
+                                <Users className="h-4 w-4 text-foreground/50" />
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex items-baseline gap-3">
+                                <p className="text-3xl font-medium">{formatNumber(users[0].total.toLocaleString("it-IT"))}</p>
+                                {users[0].today > 0 && (
+                                    <Badge variant="secondary" className="bg-green-50 text-green-700 flex gap-1 items-center">
+                                        <TrendingUp className="h-3 w-3" />
+                                        {formatNumber(users[0].today)} nuovi
+                                    </Badge>
+                                )}
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">registrati in totale</p>
+                        </CardContent>
                     </Card>
                     <Card>
-                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                        Formulari
-                        </CardTitle>
-                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-foreground/10">
-                        <FileText className="h-4 w-4 text-foreground/50" />
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="flex items-baseline gap-3">
-                        <p className="text-3xl font-medium">{formatNumber(formulari[0].total.toLocaleString("it-IT"))}</p>
-                        <Badge variant="secondary" className="bg-green-50 text-green-700 flex gap-1 items-center">
-                            <TrendingUp className="h-3 w-3" />
-                            {formatNumber(formulari[0].today)} nuovi
-                        </Badge>
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1">creati complessivamente</p>
-                    </CardContent>
+                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                                Formulari
+                            </CardTitle>
+                            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-foreground/10">
+                                <FileText className="h-4 w-4 text-foreground/50" />
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex items-baseline gap-3">
+                                <p className="text-3xl font-medium">{formatNumber(formulari[0].total.toLocaleString("it-IT"))}</p>
+                                {formulari[0].today > 0 && (
+                                    <Badge variant="secondary" className="bg-green-50 text-green-700 flex gap-1 items-center">
+                                        <TrendingUp className="h-3 w-3" />
+                                        {formatNumber(formulari[0].today)} nuovi
+                                    </Badge>
+                                )}
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">creati complessivamente</p>
+                        </CardContent>
                     </Card>
                 </div>
 
