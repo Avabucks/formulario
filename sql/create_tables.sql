@@ -15,7 +15,8 @@ CREATE TABLE IF NOT EXISTS users (
   uid VARCHAR(255) NOT NULL UNIQUE,
   display_name VARCHAR(255) NOT NULL,
   email VARCHAR(255) NOT NULL,
-  foto_profilo VARCHAR(255) NOT NULL
+  foto_profilo VARCHAR(255) NOT NULL,
+  data_creazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 --
 -- Table structure for table 'formulari'
