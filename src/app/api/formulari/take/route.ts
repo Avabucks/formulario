@@ -38,9 +38,9 @@ export async function POST(request: Request) {
         const newFormularioId = slugify(formulario.titolo, { lower: true, strict: true }) + "-" + crypto.randomUUID();
 
         await client.query(
-            `INSERT INTO formulari (beautiful_id, titolo, owner_uid, author_uid, anno, descrizione, visibility)
-             VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-            [newFormularioId, formulario.titolo, uid, formulario.author_uid, formulario.anno, formulario.descrizione, 0]
+            `INSERT INTO formulari (beautiful_id, titolo, owner_uid, author_uid, data_creazione, data_modifica, descrizione, visibility)
+             VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP, $6, $7)`,
+            [newFormularioId, formulario.titolo, uid, formulario.author_uid, formulario.data_creazione, formulario.descrizione, 0]
         );
 
         const { rows: capitoli } = await client.query(

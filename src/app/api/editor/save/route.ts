@@ -31,6 +31,16 @@ export async function POST(request: Request) {
             [content, argomentoId]
         );
 
+        await pool.query(
+            `UPDATE formulari f
+            SET data_modifica = CURRENT_TIMESTAMP
+            FROM capitoli c
+            JOIN argomenti a ON a.capitolo = c.beautiful_id
+            WHERE a.beautiful_id = $1
+            AND c.formulario = f.beautiful_id`,
+            [argomentoId]
+        );
+
         return NextResponse.json({ success: true });
 
     } catch (error: any) {

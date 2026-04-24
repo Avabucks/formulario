@@ -31,6 +31,13 @@ export async function PUT(request: Request) {
 
         if (result.rowCount === 0) return NextResponse.json({ error: "Formulario non trovato o non autorizzato" }, { status: 404 });
 
+        await pool.query(
+            `UPDATE formulari
+            SET data_modifica = CURRENT_TIMESTAMP
+            WHERE beautiful_id = $1`,
+            [id]
+        );
+
         revalidatePath("/home");
         return NextResponse.json({ success: true });
     } catch (error: any) {

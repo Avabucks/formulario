@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     const formData = await request.formData();
     const titolo = formData.get("titolo") as string;
     const descrizione = formData.get("descrizione") as string;
-    const anno = new Date().getFullYear().toString();
+    const dataCreazione = new Date().toISOString();
 
     if (!titolo || !descrizione) return NextResponse.json({ error: "Campi obbligatori mancanti" }, { status: 400 });
 
@@ -23,9 +23,9 @@ export async function POST(request: Request) {
 
     try {
         await pool.query(
-            `INSERT INTO formulari (beautiful_id, titolo, descrizione, owner_uid, author_uid, anno)
+            `INSERT INTO formulari (beautiful_id, titolo, descrizione, owner_uid, author_uid, data_creazione)
             VALUES ($1, $2, $3, $4, $5, $6)`,
-            [beautiful_id, titolo, descrizione, uid, uid, anno]
+            [beautiful_id, titolo, descrizione, uid, uid, dataCreazione]
         );
 
         revalidatePath("/home");

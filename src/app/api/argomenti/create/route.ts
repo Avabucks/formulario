@@ -41,6 +41,15 @@ export async function POST(request: Request) {
             [beautiful_id, titolo, capitoloId, rows[0].next_order, `# ${titolo}\n`]
         );
 
+        await pool.query(
+            `UPDATE formulari f
+            SET data_modifica = CURRENT_TIMESTAMP
+            FROM capitoli c
+            WHERE c.formulario = f.beautiful_id
+            AND c.beautiful_id = $1`,
+            [capitoloId]
+        );
+
         revalidatePath(`/formulari/${capitoloId}`);
         return NextResponse.json({ success: true });
 

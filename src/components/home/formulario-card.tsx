@@ -13,7 +13,7 @@ type Formulario = {
     id: string
     titolo: string
     nomeAutore?: string
-    anno?: string
+    dataCreazione?: string
     descrizione?: string
     visibility: 0 | 1 | 2
     views: number
@@ -45,7 +45,7 @@ export async function FormularioCard({ formulario }: Readonly<{ formulario: Form
                     <Separator orientation="vertical" className="shrink-0" />
                     <span className="flex gap-1 items-center shrink-0">
                         <Calendar size={16} />
-                        <span>{formulario.anno}</span>
+                        <span>{new Date(formulario.dataCreazione ?? "").getFullYear()}</span>
                     </span>
                     {formulario.visibility > 0 && (
                         <>

@@ -27,6 +27,15 @@ export async function PUT(request: Request) {
 
         if (result.rowCount === 0) return NextResponse.json({ error: "Capitolo non trovato o non autorizzato" }, { status: 404 });
 
+        await pool.query(
+            `UPDATE formulari f
+            SET data_modifica = CURRENT_TIMESTAMP
+            FROM capitoli c
+            WHERE c.formulario = f.beautiful_id
+            AND c.beautiful_id = $1`,
+            [capitoloId]
+        );
+        
         return NextResponse.json({ success: true });
     } catch (error: any) {
         console.error(error.message);

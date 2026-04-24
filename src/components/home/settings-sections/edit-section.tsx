@@ -14,7 +14,7 @@ type Formulario = {
     titolo: string
     descrizione: string
     nomeAutore: string
-    anno: string
+    dataCreazione: string
     visibility: 0 | 1 | 2
     views: number
     likes: number

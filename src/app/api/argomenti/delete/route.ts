@@ -20,6 +20,16 @@ export async function DELETE(request: Request) {
     try {
         await client.query("BEGIN");
 
+        await client.query(
+            `UPDATE formulari f
+            SET data_modifica = CURRENT_TIMESTAMP
+            FROM capitoli c
+            JOIN argomenti a ON a.capitolo = c.beautiful_id
+            WHERE a.beautiful_id = $1
+            AND c.formulario = f.beautiful_id`,
+            [argomentoId]
+        );
+
         const { rows } = await client.query(
             `SELECT a.sort_order, a.capitolo AS parent
              FROM argomenti a

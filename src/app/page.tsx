@@ -47,6 +47,7 @@ export default function Home() {
 //    without passing Firebase’s recent-auth check.
 
 // - [EDITOR]
+// - undo non funziona quando lo schiacci (problema: disabled=true)
 // -- [ ] 6 HEADERS
 // -- [x] BOLD
 // -- [x] ITALIC
@@ -66,7 +67,7 @@ export default function Home() {
 // - aggiornare kb shortcuts e termini condizioni
 
 // - [PREMIUM]
-// - abbonamento a 1,99 che ti da accesso illimitato a creazione formulari e 200 crediti AI
+// - abbonamento a 1,99 che ti da accesso illimitato a creazione formulari e 200 crediti AI (senza crediti ma con tokens cosi e piu preciso ma senza scrivere il ilmite, semplicemente quando finiscono esce popup)
 
 // - [NOVITA]
 // - ⁠categorie per organizzare formulari

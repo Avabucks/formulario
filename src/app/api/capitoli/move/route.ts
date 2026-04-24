@@ -40,6 +40,15 @@ export async function POST(request: Request) {
         await pool.query(`UPDATE capitoli SET sort_order = $1 WHERE beautiful_id = $2`, [targetOrder, capitoloId]);
         await pool.query(`UPDATE capitoli SET sort_order = $1 WHERE beautiful_id = $2`, [sort_order, adjacent[0].beautiful_id]);
 
+        await pool.query(
+            `UPDATE formulari f
+            SET data_modifica = CURRENT_TIMESTAMP
+            FROM capitoli c
+            WHERE c.formulario = f.beautiful_id
+            AND c.beautiful_id = $1`,
+            [capitoloId]
+        );
+
         return NextResponse.json({ success: true });
     } catch (error: any) {
         console.error(error.message);

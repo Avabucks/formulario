@@ -30,6 +30,16 @@ export async function PUT(request: Request) {
 
         if (result.rowCount === 0) return NextResponse.json({ error: "Argomento non trovato o non autorizzato" }, { status: 404 });
 
+        await pool.query(
+            `UPDATE formulari f
+            SET data_modifica = CURRENT_TIMESTAMP
+            FROM capitoli c
+            JOIN argomenti a ON a.capitolo = c.beautiful_id
+            WHERE a.beautiful_id = $1
+            AND c.formulario = f.beautiful_id`,
+            [argomentoId]
+        );
+
         return NextResponse.json({ success: true });
     } catch (error: any) {
         console.error(error.message);
