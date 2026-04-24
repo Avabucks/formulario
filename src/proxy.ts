@@ -3,6 +3,7 @@ import { getIronSession } from "iron-session";
 import { sessionOptions, SessionData } from "@/src/lib/session";
 
 const protectedRoutes = ["/home", "/formulario", "/capitolo", "/editor"];
+const adminRoutes = ["/admin"];
 
 export async function proxy(req: NextRequest) {
   const res = NextResponse.next();
@@ -12,9 +13,15 @@ export async function proxy(req: NextRequest) {
     req.nextUrl.pathname.startsWith(route)
   );
 
-  if (isProtected && !session.uid) {
+  const isAdmin = adminRoutes.some(route =>
+    req.nextUrl.pathname.startsWith(route)
+  );
+
+  if ((isProtected || isAdmin) && !session.uid) {
     const loginUrl = new URL("/login", req.url);
-    loginUrl.searchParams.set("next", req.nextUrl.pathname);
+    if (!isAdmin) {
+      loginUrl.searchParams.set("next", req.nextUrl.pathname);
+    }
     return NextResponse.redirect(loginUrl);
   }
 
@@ -26,5 +33,5 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/home", "/formulario", "/capitolo", "/editor", "/formulario/:path*", "/capitolo/:path*", "/editor/:path*", "/login"],
+  matcher: ["/", "/home", "/formulario", "/capitolo", "/editor", "/formulario/:path*", "/capitolo/:path*", "/editor/:path*", "/login", "/admin"],
 };
