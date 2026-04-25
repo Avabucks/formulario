@@ -38,6 +38,7 @@ export function GeminiButton({
                 return;
             }
 
+            (globalThis as unknown as { umami?: any }).umami?.track('generated_ai');
             setResult(data.text);
         } catch (error: any) {
             console.error(error.message)

@@ -52,6 +52,7 @@ export default function ForumlarioAdd({ allowKey = true, showLabel = false }: Re
                     const text = await res.text();
                     throw new Error(text);
                 }
+                (globalThis as unknown as { umami?: any }).umami?.track('created_formulario');
                 router.refresh()
             }),
             {

@@ -1,11 +1,13 @@
+import packageJson from '@/package.json';
 import { Toaster } from "@/src/components/ui/sonner";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from 'next/script';
 import NextTopLoader from 'nextjs-toploader';
 import { ThemeProvider } from "../components/theme/theme-provider";
 import "../styles/editor.css";
 import "../styles/globals.css";
-import packageJson from '@/package.json'
+import { UmamiTracker } from '../components/analytics/umami-tracker';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -68,6 +70,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning >
+      <head>
+        <Script
+          src="https://cloud.umami.is/script.js"
+          data-website-id="9abb9d74-9441-448b-8b19-0c95429d510e"
+          strategy="afterInteractive"
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col h-screen overflow-y-auto`}
       >
@@ -86,6 +95,7 @@ export default function RootLayout({
             {children}
           </main>
           <Toaster />
+          <UmamiTracker />
         </ThemeProvider>
       </body>
     </html>

@@ -44,6 +44,7 @@ export function LoginForm({
     const next = searchParams.get("next") || "/home";
     router.refresh();
     router.push(next);
+    (globalThis as unknown as { umami?: any }).umami?.track('created_account');
   };
 
   const handleLoginGoogle = async () => {
