@@ -8,11 +8,13 @@ import Link from "next/link"
 import { Separator } from "../ui/separator"
 import { StarFormulario } from "./star-formulario"
 import { formatNumber } from "@/src/lib/utils"
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 
 type Formulario = {
     id: string
     titolo: string
     nomeAutore?: string
+    photoURL?: string
     dataCreazione?: string
     descrizione?: string
     visibility: 0 | 1 | 2
@@ -38,8 +40,11 @@ export async function FormularioCard({ formulario }: Readonly<{ formulario: Form
                     )}
                 </div>
                 <div className="flex h-5 gap-4 text-sm text-muted-foreground min-w-0">
-                    <span className="flex flex-1 gap-1 items-center min-w-0 overflow-hidden">
-                        <UserRound size={16} className="shrink-0" />
+                    <span className="flex flex-1 gap-2 items-center min-w-0">
+                        <Avatar size="sm">
+                            {formulario.photoURL && <AvatarImage src={formulario.photoURL} alt="foto profilo" />}
+                            <AvatarFallback>{formulario.nomeAutore?.substring(0, 1).toUpperCase() || "U"}</AvatarFallback>
+                        </Avatar>
                         <span className="truncate">{formulario.nomeAutore}</span>
                     </span>
                     <Separator orientation="vertical" className="shrink-0" />
