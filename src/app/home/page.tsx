@@ -1,3 +1,4 @@
+import packageJson from '@/package.json';
 import ForumlarioAdd from "@/src/components/home/formulario-add";
 import { FormularioCard } from "@/src/components/home/formulario-card";
 import { NewAccountPopup } from "@/src/components/home/new-account-popup";
@@ -16,11 +17,17 @@ import { Skeleton } from "@/src/components/ui/skeleton";
 import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { getIronSession } from "iron-session";
-import { ArrowRight, BookOpen, UsersRound, Star, StarOff, Users } from "lucide-react";
+import { ArrowRight, BookOpen, Star, StarOff, Users, UsersRound } from "lucide-react";
+import { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+
+export const metadata: Metadata = {
+  title: `Home - ${packageJson.displayName}`,
+  description: `Crea, organizza e condividi i tuoi formulari e cheat sheet con ${packageJson.displayName}. Usa l'editor avanzato e l'assistente AI per generare formule e appunti in pochi secondi.`,
+};
 
 export default async function Home() {
 

@@ -103,7 +103,12 @@ export function FormularioSettings({ formularioId }: Readonly<{ formularioId: st
                                 <Button variant="outline" size="icon" className="relative">
                                     <Settings size={16} />
                                     {edited && (
-                                        <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-primary" />
+                                        <div className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full">
+                                            <span className="relative flex size-2">
+                                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
+                                                <span className="relative inline-flex size-2 rounded-full bg-primary"></span>
+                                            </span>
+                                        </div>
                                     )}
                                 </Button>
                             </DialogTrigger>

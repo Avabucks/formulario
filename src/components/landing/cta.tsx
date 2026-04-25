@@ -1,7 +1,6 @@
-import Link from "next/link"
 import { Button } from "@/src/components/ui/button"
 import { ArrowRight } from "lucide-react"
-import packageJson from '@/package.json'
+import Link from "next/link"
 
 export function Cta() {
   return (
@@ -11,7 +10,7 @@ export function Cta() {
           Pronto a organizzare le tue formule?
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-pretty text-muted-foreground">
-          Crea il tuo primo formulario in meno di un minuto — con l'AI o da zero.
+          Crea il tuo primo formulario in meno di un minuto con l'AI o da zero.
           Nessuna carta di credito, nessuna configurazione.
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">

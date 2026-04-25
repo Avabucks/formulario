@@ -6,6 +6,12 @@ import { cookies } from "next/headers";
 import packageJson from '@/package.json'
 import { Footer } from "@/src/components/landing/footer";
 import { Button } from "@/src/components/ui/button";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: `Termini e condizioni - ${packageJson.displayName}`,
+  description: `Crea, organizza e condividi i tuoi formulari e cheat sheet con ${packageJson.displayName}. Usa l'editor avanzato e l'assistente AI per generare formule e appunti in pochi secondi.`,
+};
 
 export default async function TermsPage() {
   const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
@@ -16,7 +22,7 @@ export default async function TermsPage() {
       <div className="flex flex-col gap-4 w-full pt-16 px-2 md:px-6">
         <div className="max-w-3xl mx-auto w-full py-8 flex flex-col gap-8">
           <div className="flex flex-col gap-2">
-            <p className="text-xs text-muted-foreground uppercase tracking-widest">Ultimo aggiornamento: Febbraio 2026</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-widest">Ultimo aggiornamento: Aprile 2026</p>
             <h1 className="text-3xl font-bold">Termini di Servizio</h1>
             <p className="text-muted-foreground">Leggere attentamente i presenti termini prima di utilizzare la piattaforma.</p>
           </div>

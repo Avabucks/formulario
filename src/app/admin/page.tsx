@@ -1,13 +1,24 @@
+import packageJson from '@/package.json';
+import { DatePicker } from "@/src/components/admin/date-picker";
+import { Badge } from "@/src/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
+import { formatNumber } from "@/src/lib/utils";
 import { getIronSession } from "iron-session";
+import { FileText, TrendingUp, Users } from "lucide-react";
+import { Metadata } from "next";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
-import { Badge } from "@/src/components/ui/badge"
-import { Users, FileText, TrendingUp } from "lucide-react"
-import { DatePicker } from "@/src/components/admin/date-picker"
-import { formatNumber } from "@/src/lib/utils";
+
+export const metadata: Metadata = {
+  title: `Admin - ${packageJson.displayName}`,
+  description: `...`,
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default async function Admin({
     searchParams,

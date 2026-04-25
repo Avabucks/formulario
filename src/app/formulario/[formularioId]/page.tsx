@@ -1,5 +1,7 @@
-import { CapitoloItem } from "@/src/components/formulario/capitolo-item";
+import packageJson from '@/package.json';
 import { CapitoloAdd } from "@/src/components/formulario/capitolo-add";
+import { CapitoloItem } from "@/src/components/formulario/capitolo-item";
+import ViewTracker from "@/src/components/formulario/view-tracker";
 import { FormularioSettings } from "@/src/components/home/formulario-settings";
 import { BreadcrumbLogic } from "@/src/components/navigation/breadcrumb-logic";
 import { Header } from "@/src/components/navigation/header";
@@ -13,7 +15,50 @@ import { BookmarkX } from "lucide-react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import ViewTracker from "@/src/components/formulario/view-tracker";
+
+export async function generateMetadata({
+    params,
+}: {
+    params: Promise<{ formularioId: string }>
+}) {
+    const { formularioId } = await params;
+    const { rows: formularioRows, rowCount } = await pool.query(
+        `SELECT F.titolo, F.descrizione, F.visibility
+         FROM formulari F
+         WHERE F.beautiful_id = $1`,
+        [formularioId]
+    );
+
+    const formulario = rowCount && rowCount > 0 ? formularioRows[0] : null;
+
+    if (!formulario) {
+        return {
+            robots: { index: false, follow: false },
+        };
+    }
+
+    if (formulario.visibility <= 0) {
+        return {
+            title: `${formulario.titolo} - ${packageJson.displayName}`,
+            robots: { index: false, follow: false },
+        };
+    }
+
+    return {
+        title: `${formulario.titolo} - ${packageJson.displayName}`,
+        description: formulario.descrizione,
+        openGraph: {
+            title: `${formulario.titolo} - ${packageJson.displayName}`,
+            description: formulario.descrizione,
+            images: ["/social.png"],
+        },
+        twitter: {
+            card: 'summary',
+            title: `${formulario.titolo} - ${packageJson.displayName}`,
+            description: formulario.descrizione,
+        },
+    };
+}
 
 export default async function Formulario({
     params,

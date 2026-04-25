@@ -52,6 +52,7 @@
     "use-debounce": "^10.1.1"
   },
   "devDependencies": {
+    "@types/dompurify": "^3.0.5",
     "@types/katex": "^0.16.8",
     "@types/node": "^20",
     "@types/pg": "^8.16.0",

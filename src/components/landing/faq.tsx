@@ -9,7 +9,7 @@ const faqs = [
   {
     question: "Come fa l'AI a creare un formulario per me?",
     answer:
-      "Ti basta inserire l'argomento — ad esempio 'Elettromagnetismo' — e l'AI genera istantaneamente una struttura completa. Otterrai capitoli organizzati, formule precise e descrizioni pronte all'uso. È la fine del 'foglio bianco': l'AI fa il lavoro pesante, tu rifinisci i dettagli.",
+      "Ti basta inserire l'argomento, ad esempio 'Elettromagnetismo', e l'AI genera istantaneamente una struttura completa. Otterrai capitoli organizzati, formule precise e descrizioni pronte all'uso. È la fine del 'foglio bianco': l'AI fa il lavoro pesante, tu rifinisci i dettagli.",
   },
   {
     question: "Non conosco il linguaggio LaTeX. Posso usare FormulaBase?",
@@ -24,7 +24,7 @@ const faqs = [
   {
     question: "Qual è la differenza tra privato, pubblico e community?",
     answer:
-      "Privato: visibile solo a te, ideale per i formulari in lavorazione. Pubblico con link: accessibile a chiunque abbia il link o il QR code — ottimo per condividere con la tua classe senza rendere tutto pubblico. Community: appare nella raccolta pubblica e può essere trovato e duplicato da altri utenti.",
+      "Privato: visibile solo a te, ideale per i formulari in lavorazione. Pubblico con link: accessibile a chiunque abbia il link o il QR code, ottimo per condividere con la tua classe senza rendere tutto pubblico. Community: appare nella raccolta pubblica e può essere trovato e duplicato da altri utenti.",
   },
   {
     question: "Posso modificare un formulario creato da altri?",

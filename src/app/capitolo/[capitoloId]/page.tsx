@@ -1,3 +1,4 @@
+import packageJson from '@/package.json';
 import { ArgomentoAdd } from "@/src/components/capitolo/argomento-add";
 import { ArgomentoItem } from "@/src/components/capitolo/argomento-item";
 import { FormularioSettings } from "@/src/components/home/formulario-settings";
@@ -13,6 +14,51 @@ import { BookmarkX } from "lucide-react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+
+export async function generateMetadata({
+    params,
+}: {
+    params: Promise<{ capitoloId: string }>
+}) {
+    const { capitoloId } = await params;
+    const { rows: capitoloRows, rowCount } = await pool.query(
+        `SELECT C.titolo, F.descrizione, F.visibility
+         FROM capitoli C
+         JOIN formulari F ON F.beautiful_id = C.formulario
+         WHERE C.beautiful_id = $1`,
+        [capitoloId]
+    );
+
+    const capitolo = rowCount && rowCount > 0 ? capitoloRows[0] : null;
+
+    if (!capitolo) {
+        return {
+            robots: { index: false, follow: false },
+        };
+    }
+
+    if (capitolo.visibility <= 0) {
+        return {
+            title: `${capitolo.titolo} - ${packageJson.displayName}`,
+            robots: { index: false, follow: false },
+        };
+    }
+
+    return {
+        title: `${capitolo.titolo} - ${packageJson.displayName}`,
+        description: capitolo.descrizione,
+        openGraph: {
+            title: `${capitolo.titolo} - ${packageJson.displayName}`,
+            description: capitolo.descrizione,
+            images: ["/social.png"],
+        },
+        twitter: {
+            card: 'summary',
+            title: `${capitolo.titolo} - ${packageJson.displayName}`,
+            description: capitolo.descrizione,
+        },
+    };
+}
 
 export default async function Capitolo({
     params,
@@ -100,7 +146,7 @@ export default async function Capitolo({
                     <div className="flex justify-between items-center gap-4">
                         <TypographyH2 className="w-full">{capitolo.titolo}</TypographyH2>
                         <div className="flex gap-2 items-center">
-                            <FormularioSettings formularioId={capitolo.formularioId}/>
+                            <FormularioSettings formularioId={capitolo.formularioId} />
                             {capitolo.editable && (
                                 <ArgomentoAdd capitolo={capitolo} />
                             )}

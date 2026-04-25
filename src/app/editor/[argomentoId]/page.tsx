@@ -1,3 +1,4 @@
+import packageJson from '@/package.json';
 import { EditorPage } from "@/src/components/editor/editor-page";
 import { BreadcrumbLogic } from "@/src/components/navigation/breadcrumb-logic";
 import { Header } from "@/src/components/navigation/header";
@@ -8,6 +9,52 @@ import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+
+export async function generateMetadata({
+    params,
+}: {
+    params: Promise<{ argomentoId: string }>
+}) {
+    const { argomentoId } = await params;
+    const { rows: argomentoRows, rowCount } = await pool.query(
+        `SELECT A.titolo, F.descrizione, F.visibility
+         FROM argomenti A
+         JOIN capitoli C ON C.beautiful_id = A.capitolo
+         JOIN formulari F ON F.beautiful_id = C.formulario
+         WHERE A.beautiful_id = $1`,
+        [argomentoId]
+    );
+
+    const argomento = rowCount && rowCount > 0 ? argomentoRows[0] : null;
+
+    if (!argomento) {
+        return {
+            robots: { index: false, follow: false },
+        };
+    }
+
+    if (argomento.visibility <= 0) {
+        return {
+            title: `${argomento.titolo} - ${packageJson.displayName}`,
+            robots: { index: false, follow: false },
+        };
+    }
+
+    return {
+        title: `${argomento.titolo} - ${packageJson.displayName}`,
+        description: argomento.descrizione,
+        openGraph: {
+            title: `${argomento.titolo} - ${packageJson.displayName}`,
+            description: argomento.descrizione,
+            images: ["/social.png"],
+        },
+        twitter: {
+            card: 'summary',
+            title: `${argomento.titolo} - ${packageJson.displayName}`,
+            description: argomento.descrizione,
+        },
+    };
+}
 
 export default async function Argomento({
     params,

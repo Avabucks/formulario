@@ -1,9 +1,14 @@
 export const dynamic = "force-dynamic";
-
-import { Pi } from "lucide-react";
-
+import packageJson from '@/package.json';
 import { LoginForm } from "@/src/components/auth/login-form";
+import { Pi } from "lucide-react";
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: `Login - ${packageJson.displayName}`,
+  description: `Crea, organizza e condividi i tuoi formulari e cheat sheet con ${packageJson.displayName}. Usa l'editor avanzato e l'assistente AI per generare formule e appunti in pochi secondi.`,
+};
 
 export default function LoginPage() {
   return (

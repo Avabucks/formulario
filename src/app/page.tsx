@@ -23,20 +23,6 @@ export default function Home() {
 // TODOs:
 
 // - [FIX]
-// 1. High: Private formulari can be cloned by any authenticated user via direct
-//    object reference in src/app/api/formulari/take/route.ts:28. The route loads
-//    SELECT * FROM formulari WHERE beautiful_id = $1 and then copies all
-//    chapters and topics at lines 46-70 without checking owner_uid = session.uid
-//    or visibility > 0. If an attacker learns or guesses a private beautiful_id,
-//    they can exfiltrate the full private content by duplicating it into their
-//    own account.
-// 2. High: Stored XSS is possible through Mermaid blocks in src/components/
-//    editor/editor-katex/markdown-components.tsx:112. The preview initializes
-//    Mermaid with securityLevel: 'loose' at line 115, renders attacker-
-//    controlled diagram text, and injects the returned SVG with innerHTML at
-//    lines 109 and 125. That combination is unsafe for untrusted content and can
-//    let malicious markdown execute script or event-handler payloads when
-//    another user opens the page.
 // 3. Medium: Account deletion relies only on the session cookie server-side,
 //    bypassing the stronger “recent login” guarantee enforced in the client. The
 //    client does reauthentication before calling the API in src/components/auth/
@@ -62,7 +48,6 @@ export default function Home() {
 // -- [ ] TABLE
 
 // - [GENERALI]
-// - seo
 // - report che manda mail a admin (mail nell'env) solo se la formula non è tua (in impostazioni)
 // - aggiornare kb shortcuts e termini condizioni
 

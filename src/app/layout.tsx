@@ -18,8 +18,47 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://formulario-five.vercel.app'),
   title: `${packageJson.displayName} - Formulario digitale`,
-  description: "Formulario digitale",
+  description: `Crea, organizza e condividi i tuoi formulari e cheat sheet con ${packageJson.displayName}. Usa l'editor avanzato e l'assistente AI per generare formule e appunti in pochi secondi.`,
+  icons: {
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/web-app-manifest-192x192.png', sizes: '192x192', type: 'image/png' },
+    ],
+    shortcut: '/favicon.ico',
+    apple: [
+      { url: '/apple-icon.png', sizes: '180x180' },
+    ],
+    other: [
+      {
+        rel: 'icon',
+        url: '/web-app-manifest-512x512.png',
+        sizes: '512x512',
+        type: 'image/png',
+      },
+      {
+        rel: 'manifest',
+        url: '/manifest.json',
+      },
+    ],
+  },
+  openGraph: {
+    title: `${packageJson.displayName} - Formulario digitale`,
+    description: `Crea, organizza e condividi i tuoi formulari e cheat sheet con ${packageJson.displayName}. Usa l'editor avanzato e l'assistente AI per generare formule e appunti in pochi secondi.`,
+    images: ["/social.png"],
+  },
+  twitter: {
+    card: 'summary',
+    title: `${packageJson.displayName} - Formulario digitale`,
+    description: `Crea, organizza e condividi i tuoi formulari e cheat sheet con ${packageJson.displayName}. Usa l'editor avanzato e l'assistente AI per generare formule e appunti in pochi secondi.`,
+  },
+  appleWebApp: {
+    title: `${packageJson.displayName}`,
+    startupImage: [
+      '/apple-icon.png',
+    ],
+  },
 };
 
 export default function RootLayout({

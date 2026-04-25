@@ -1,15 +1,16 @@
+import packageJson from '@/package.json';
 import { CommunityFilters } from "@/src/components/community/community-filters";
 import { CtaCommunity } from "@/src/components/community/cta-community";
 import { FormularioCard } from "@/src/components/home/formulario-card";
 import { Footer } from "@/src/components/landing/footer";
 import { Header } from "@/src/components/navigation/header";
-import { Pagination, PaginationContent, PaginationItem, PaginationLink } from "@/src/components/ui/pagination";
+import { Pagination, PaginationContent, PaginationItem } from "@/src/components/ui/pagination";
 import { Separator } from "@/src/components/ui/separator";
 import { Toggle } from "@/src/components/ui/toggle";
 import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
-import { cn } from "@/src/lib/utils";
 import { getIronSession } from "iron-session";
+import { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 
@@ -17,6 +18,11 @@ const SORT_MAP = {
     trending: "views DESC",
     recent: "F.id DESC",
     popular: "likes DESC",
+};
+
+export const metadata: Metadata = {
+  title: `Community - ${packageJson.displayName}`,
+  description: `Crea, organizza e condividi i tuoi formulari e cheat sheet con ${packageJson.displayName}. Usa l'editor avanzato e l'assistente AI per generare formule e appunti in pochi secondi.`,
 };
 
 export default async function Capitolo({

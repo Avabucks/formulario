@@ -26,7 +26,7 @@ export async function POST(request: Request) {
         await client.query("BEGIN");
 
         const { rows: [formulario] } = await client.query(
-            `SELECT * FROM formulari WHERE beautiful_id = $1`,
+            `SELECT * FROM formulari WHERE beautiful_id = $1 AND visibility > 0`,
             [formularioId]
         );
 

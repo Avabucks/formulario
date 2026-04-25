@@ -112,7 +112,7 @@ function MermaidBlock({ code }: Readonly<{ code: string }>) {
         mermaid.initialize({
           startOnLoad: false,
           theme: resolvedTheme === 'dark' ? 'dark' : 'default',
-          securityLevel: 'loose',
+          securityLevel: 'strict',
         });
 
         const isValid = await mermaid.parse(code, { suppressErrors: true });

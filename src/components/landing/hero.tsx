@@ -20,9 +20,12 @@ export function Hero() {
 
       <div className="relative z-10 mx-auto max-w-4xl text-center">
         <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-4 py-1.5">
-          <span className="h-2 w-2 rounded-full bg-emerald-400" aria-hidden="true" />
+          <span className="relative flex size-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex size-2 rounded-full bg-emerald-400"></span>
+          </span>
           <span className="text-xs font-medium text-muted-foreground">
-            Ora disponibile — Versione {packageJson.version}
+            Ora disponibile v{packageJson.version}
           </span>
         </div>
 
