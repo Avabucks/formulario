@@ -1,3 +1,7 @@
+"use client"
+
+import { useRef } from "react"
+import { motion, useInView } from "framer-motion"
 import {
   Accordion,
   AccordionContent,
@@ -36,34 +40,63 @@ const faqs = [
     answer:
       "Sì, puoi iniziare gratuitamente senza carta di credito. Crei formulari, usi l'editor LaTeX e condividi via QR code o link da subito.",
   },
-];
+]
 
 export function Faq() {
+  const headingRef = useRef(null)
+  const headingInView = useInView(headingRef, { once: true, margin: "-80px" })
+
   return (
     <section id="faq" className="py-24 md:py-32">
       <div className="mx-auto max-w-3xl px-6">
-        <div className="mb-16 text-center">
+
+        {/* Heading */}
+        <motion.div
+          ref={headingRef}
+          initial={{ opacity: 0, y: 32 }}
+          animate={headingInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="mb-16 text-center"
+        >
           <p className="mb-3 text-sm font-medium uppercase tracking-widest text-muted-foreground">
             FAQ
           </p>
           <h2 className="text-balance text-3xl font-bold tracking-tight text-foreground md:text-4xl">
             Domande frequenti
           </h2>
-        </div>
+        </motion.div>
 
+        {/* Items */}
         <Accordion type="single" collapsible className="w-full">
           {faqs.map((faq, i) => (
-            <AccordionItem key={i} value={`item-${i}`} className="border-border">
-              <AccordionTrigger className="text-left text-sm font-medium text-foreground hover:no-underline">
-                {faq.question}
-              </AccordionTrigger>
-              <AccordionContent className="text-sm leading-relaxed text-muted-foreground">
-                {faq.answer}
-              </AccordionContent>
-            </AccordionItem>
+            <FaqItem key={i} faq={faq} index={i} />
           ))}
         </Accordion>
+
       </div>
     </section>
+  )
+}
+
+function FaqItem({ faq, index }: Readonly<{ faq: typeof faqs[number]; index: number }>) {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, margin: "-60px" })
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 20 }}
+      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: index * 0.07 }}
+    >
+      <AccordionItem value={`item-${index}`} className="border-border">
+        <AccordionTrigger className="text-left text-sm font-medium text-foreground hover:no-underline">
+          {faq.question}
+        </AccordionTrigger>
+        <AccordionContent className="text-sm leading-relaxed text-muted-foreground">
+          {faq.answer}
+        </AccordionContent>
+      </AccordionItem>
+    </motion.div>
   )
 }

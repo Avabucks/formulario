@@ -1,5 +1,6 @@
 "use client"
 
+import slides from "@/public/tutorial/slides.json"
 import { Button } from "@/src/components/ui/button"
 import {
     Dialog,
@@ -7,126 +8,134 @@ import {
     DialogContent,
     DialogTitle
 } from "@/src/components/ui/dialog"
-import { Code, FileText, FolderOpen, Lock, QrCode, Search, Sparkles } from "lucide-react"
-import { useEffect, useState } from "react"
-import ForumlarioAdd from "./formulario-add"
+import { cn } from "@/src/lib/utils"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
+import { ArrowLeft, ArrowRight, FileVideo } from "lucide-react"
+import { useState } from "react"
+import ForumlarioAdd from "./formulario-add"
 
 const STORAGE_KEY = "new-account-popup-closed"
 
-function FormulaPattern() {
-    return (
-        <svg
-            className="absolute inset-0 h-full w-full"
-            xmlns="http://www.w3.org/2000/svg"
-        >
-            <defs>
-                <pattern
-                    id="formula-pattern"
-                    x="0"
-                    y="0"
-                    width="240"
-                    height="120"
-                    patternUnits="userSpaceOnUse"
-                >
-
-                    {/* formule con rotazioni, dimensioni e opacità variabili */}
-                    <text x="12" y="28" fill="currentColor" opacity="0.09" fontSize="13" fontFamily="Georgia,serif" fontStyle="italic" transform="rotate(-6,12,28)">∫f(x)dx</text>
-                    <text x="130" y="18" fill="currentColor" opacity="0.06" fontSize="10" fontFamily="Georgia,serif">E = mc²</text>
-                    <text x="170" y="50" fill="currentColor" opacity="0.07" fontSize="18" fontFamily="Georgia,serif" transform="rotate(8,170,50)">∑</text>
-                    <text x="50" y="55" fill="currentColor" opacity="0.05" fontSize="9" fontFamily="Georgia,serif" fontStyle="italic" transform="rotate(-3,50,55)">ΔG = ΔH − TΔS</text>
-                    <text x="140" y="72" fill="currentColor" opacity="0.08" fontSize="11" fontFamily="Georgia,serif">PV = nRT</text>
-                    <text x="8" y="85" fill="currentColor" opacity="0.05" fontSize="12" fontFamily="Georgia,serif" fontStyle="italic" transform="rotate(4,8,85)">∇ × B = μ₀J</text>
-                    <text x="180" y="95" fill="currentColor" opacity="0.06" fontSize="9" fontFamily="Georgia,serif">λ = h/p</text>
-                    <text x="100" y="112" fill="currentColor" opacity="0.05" fontSize="8" fontFamily="Georgia,serif" fontStyle="italic">F = G·m₁m₂/r²</text>
-                    <text x="190" y="115" fill="currentColor" opacity="0.07" fontSize="15" fontFamily="Georgia,serif">π</text>
-                    <text x="22" y="118" fill="currentColor" opacity="0.04" fontSize="10" fontFamily="Georgia,serif">Schrödinger</text>
-                </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#formula-pattern)" />
-        </svg>
-    )
-}
-
-const features = [
-    { icon: Sparkles, text: "Genera con AI" },
-    { icon: Search, text: "Ricerca intelligente" },
-    { icon: FolderOpen, text: "Organizza in capitoli" },
-    { icon: Code, text: "Editor LaTeX" },
-    { icon: QrCode, text: "Condividi via QR" },
-    { icon: Lock, text: "Pubblico o privato" },
-]
-
-export function NewAccountPopup() {
-    const [open, setOpen] = useState(false)
-
-    useEffect(() => {
-        const alreadyClosed = sessionStorage.getItem(STORAGE_KEY)
-        if (!alreadyClosed) {
-            setOpen(true)
-        }
-    }, [])
+export function NewAccountPopup({
+    setOpen,
+    open,
+}: Readonly<{
+    setOpen: (value: boolean) => void,
+    open: boolean,
+}>) {
 
     const handleClose = () => {
-        sessionStorage.setItem(STORAGE_KEY, "true")
+        localStorage.setItem(STORAGE_KEY, "true")
         setOpen(false)
     }
+
+    const [current, setCurrent] = useState(0)
+    const isLast = current === slides.length - 1
+
+    const goTo = (n: number) => setCurrent(Math.max(0, Math.min(slides.length - 1, n)))
 
     return (
         <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) handleClose() }}>
             <DialogContent
                 onInteractOutside={(e) => e.preventDefault()}
-                className="sm:max-w-lg overflow-hidden p-0"
+                className="sm:max-w-2xl overflow-hidden p-0"
             >
                 <VisuallyHidden>
-                    <DialogTitle>Sticky Footer</DialogTitle>
+                    <DialogTitle>Scopri le funzionalità</DialogTitle>
                 </VisuallyHidden>
-                <div className="relative bg-primary/5 px-6 pt-6 pb-4 overflow-hidden">
-                    <FormulaPattern />
 
-                    <div className="relative z-10 text-center">
-                        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
-                            <FileText className="h-7 w-7" strokeWidth={1.5} />
-                        </div>
+                {/* Slider area */}
+                <div className="overflow-hidden">
+                    <div
+                        className="flex transition-transform duration-300 ease-in-out"
+                        style={{ transform: `translateX(-${current * 100}%)` }}
+                    >
+                        {slides.map((slide, i) => (
+                            <div key={i} className="min-w-full flex flex-col">
 
-                        <h2 className="text-xl font-semibold text-foreground">
-                            Crea il tuo primo formulario
-                        </h2>
-                    </div>
-                </div>
+                                {/* Video / placeholder */}
+                                <div className="relative bg-muted aspect-video flex items-center justify-center border-b border-border">
+                                    {slide.video ? (
+                                        <video
+                                            src={slide.video}
+                                            autoPlay
+                                            loop
+                                            muted
+                                            playsInline
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                                            <FileVideo className="h-8 w-8 opacity-30" />
+                                            <span className="text-xs opacity-40">video in arrivo</span>
+                                        </div>
+                                    )}
+                                </div>
 
-                <div className="px-6 pt-4">
-                    <p className="text-sm text-muted-foreground text-center leading-relaxed">
-                        Raccogli le tue formule in un unico posto. Dalla fisica alla chimica, tutto organizzato e sempre a portata di mano.
-                    </p>
-                </div>
+                                {/* Text */}
+                                <div className="px-6 pt-5 pb-2">
+                                    <p className="text-xs font-medium text-primary uppercase tracking-wide mb-1.5">
+                                        {slide.label}
+                                    </p>
+                                    <h2 className="text-base font-semibold text-foreground mb-2 leading-snug">
+                                        {slide.title}
+                                    </h2>
+                                    <p className="text-sm text-muted-foreground leading-relaxed">
+                                        {slide.description}
+                                    </p>
+                                </div>
 
-                <div className="px-6 pb-4 pt-4">
-                    <div className="flex flex-wrap justify-center gap-2">
-                        {features.map((feature) => (
-                            <div
-                                key={feature.text}
-                                className="inline-flex items-center gap-1.5 rounded-full bg-muted/60 px-3 py-1.5 text-xs font-medium text-muted-foreground"
-                            >
-                                <feature.icon className="h-3.5 w-3.5" />
-                                {feature.text}
                             </div>
                         ))}
                     </div>
                 </div>
 
-                <div className="flex flex-col md:flex-row md:justify-end pb-5 w-full px-5 gap-2">
-                    <DialogClose asChild>
-                        <Button variant="ghost" onClick={handleClose} className="order-2 md:order-1">
-                            Forse più tardi
-                        </Button>
-                    </DialogClose>
-                    <div className="flex flex-col order-1 md:order-2">
-                        <ForumlarioAdd allowKey={false} showLabel={true} />
+                {/* Footer */}
+                <div className="flex items-center justify-between px-6 py-4 border-t border-border gap-3">
+
+                    {/* Dots */}
+                    <div className="flex items-center gap-1.5">
+                        {slides.map((_, i) => (
+                            <button
+                                key={i}
+                                onClick={() => goTo(i)}
+                                className={cn(
+                                    "h-1.5 rounded-full transition-all duration-200 bg-muted-foreground/30",
+                                    i === current ? "w-5 bg-foreground" : "w-1.5"
+                                )}
+                            />
+                        ))}
                     </div>
+
+                    {/* Buttons */}
+                    <div className="flex items-center gap-2">
+                        {current === 0 ? (
+                            <DialogClose asChild>
+                                <Button variant="ghost" size="sm" onClick={handleClose}>
+                                    Salta
+                                </Button>
+                            </DialogClose>
+                        ) : (
+                            <Button variant="ghost" size="sm" onClick={() => goTo(current - 1)}>
+                                <ArrowLeft />
+                                Indietro
+                            </Button>
+                        )}
+
+                        {isLast ? (
+                            <div className="flex flex-col">
+                                <ForumlarioAdd allowKey={false} showLabel={true} />
+                            </div>
+                        ) : (
+                            <Button size="sm" onClick={() => goTo(current + 1)}>
+                                Avanti
+                                <ArrowRight />
+                            </Button>
+                        )}
+                    </div>
+
                 </div>
             </DialogContent>
-
         </Dialog>
     )
 }

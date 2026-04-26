@@ -1,10 +1,14 @@
+"use client"
+
+import { useRef } from "react"
+import { motion, useInView } from "framer-motion"
 import {
   BookOpen,
   Lock,
   QrCode,
   ScanLine,
   Search,
-  Wand2
+  Wand2,
 } from "lucide-react"
 
 const features = [
@@ -47,10 +51,21 @@ const features = [
 ]
 
 export function Features() {
+  const headingRef = useRef(null)
+  const headingInView = useInView(headingRef, { once: true, margin: "-80px" })
+
   return (
     <section id="features" className="py-24 md:py-32">
       <div className="mx-auto max-w-6xl px-6">
-        <div className="mx-auto mb-16 max-w-2xl text-center">
+
+        {/* Heading */}
+        <motion.div
+          ref={headingRef}
+          initial={{ opacity: 0, y: 32 }}
+          animate={headingInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="mx-auto mb-16 max-w-2xl text-center"
+        >
           <p className="mb-3 text-sm font-medium uppercase tracking-widest text-muted-foreground">
             Funzionalità
           </p>
@@ -60,27 +75,51 @@ export function Features() {
           <p className="mt-4 text-pretty text-muted-foreground">
             Uno strumento pensato per studenti, docenti e ricercatori. Meno confusione, più formule.
           </p>
-        </div>
+        </motion.div>
 
+        {/* Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {features.map((feature) => (
-            <div
-              key={feature.title}
-              className="group rounded-xl border p-8 transition-colors border-border bg-card hover:border-muted-foreground/30"
-            >
-              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-secondary">
-                <feature.icon className="h-5 w-5 text-foreground" />
-              </div>
-              <h3 className="mb-2 flex items-center gap-2 text-lg font-semibold text-foreground">
-                {feature.title}
-              </h3>
-              <p className="text-sm leading-relaxed text-muted-foreground">
-                {feature.description}
-              </p>
-            </div>
+          {features.map((feature, i) => (
+            <FeatureCard key={feature.title} feature={feature} index={i} />
           ))}
         </div>
+
       </div>
     </section>
+  )
+}
+
+function FeatureCard({
+  feature,
+  index,
+}: {
+  feature: typeof features[number]
+  index: number
+}) {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, margin: "-60px" })
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 32 }}
+      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      transition={{
+        duration: 0.5,
+        ease: [0.22, 1, 0.36, 1],
+        delay: (index % 3) * 0.08,
+      }}
+      className="group rounded-xl border p-8 transition-colors border-border bg-card hover:border-muted-foreground/30"
+    >
+      <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-secondary">
+        <feature.icon className="h-5 w-5 text-foreground" />
+      </div>
+      <h3 className="mb-2 text-lg font-semibold text-foreground">
+        {feature.title}
+      </h3>
+      <p className="text-sm leading-relaxed text-muted-foreground">
+        {feature.description}
+      </p>
+    </motion.div>
   )
 }

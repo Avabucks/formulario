@@ -25,8 +25,8 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
-  title: `Home - ${packageJson.displayName}`,
-  description: `Crea, organizza e condividi i tuoi formulari e cheat sheet con ${packageJson.displayName}. Usa l'editor avanzato e l'assistente AI per generare formule e appunti in pochi secondi.`,
+    title: `Home - ${packageJson.displayName}`,
+    description: `Crea, organizza e condividi i tuoi formulari e cheat sheet con ${packageJson.displayName}. Usa l'editor avanzato e l'assistente AI per generare formule e appunti in pochi secondi.`,
 };
 
 export default async function Home() {
@@ -129,7 +129,9 @@ export default async function Home() {
                             <Users className="h-5 w-5 text-foreground" />
                         </div>
                         <div>
-                            <p className="font-medium text-foreground">Esplora la Community</p>
+                            <Link href="/community/page/1" className="hover:underline">
+                                <p className="font-medium text-foreground">Esplora la Community</p>
+                            </Link>
                             <p className="text-sm text-muted-foreground">Una libreria collaborativa di formule, in costante espansione</p>
                         </div>
                     </div>
@@ -188,7 +190,6 @@ export default async function Home() {
                     </div>
                 </Suspense>
             </div>
-            {formulari.length == 0 && <NewAccountPopup />}
         </>
     )
 }

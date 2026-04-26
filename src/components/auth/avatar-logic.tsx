@@ -12,22 +12,30 @@ import {
 } from "@/src/components/ui/dropdown-menu";
 import { auth } from "@/src/lib/firebase";
 import { signOut } from "firebase/auth";
-import { Book, Cookie, Handshake, Keyboard, LogOutIcon, Sparkles } from "lucide-react";
+import { BadgeInfo, Book, Cookie, Handshake, Keyboard, LogOutIcon, Users } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { KbShortcuts } from "../navigation/kb-shortcuts";
+import { NewAccountPopup } from "../home/new-account-popup";
 
 export function AvatarLogic() {
     const router = useRouter();
     const [name, setName] = useState<string | null>(null);
     const [photoURL, setPhotoURL] = useState<string | null>(null);
 
-    const [ppenKbShortcut, setOpenKbShortcut] = useState<boolean>(false);
+    const [openOBPopup, setOpenOBPopup] = useState<boolean>(false);
+    const [openKbShortcut, setOpenKbShortcut] = useState<boolean>(false);
 
     useEffect(() => {
         setName(localStorage.getItem("name"));
         setPhotoURL(localStorage.getItem("photoURL"));
+
+        const alreadyClosed = localStorage.getItem("new-account-popup-closed")
+        if (!alreadyClosed) {
+            setOpenOBPopup(true)
+        }
+
     }, []);
 
     const handleLogout = async () => {
@@ -56,15 +64,20 @@ export function AvatarLogic() {
                     </Link>
                     <Link href="/community/page/1">
                         <DropdownMenuItem>
-                            <Sparkles />
+                            <Users />
                             Community
                         </DropdownMenuItem>
                     </Link>
                     <DropdownMenuSeparator />
+                    <DropdownMenuItem onSelect={() => setOpenOBPopup(true)}>
+                        <BadgeInfo />
+                        Scopri come funziona
+                    </DropdownMenuItem>
                     <DropdownMenuItem onSelect={() => setOpenKbShortcut(true)}>
                         <Keyboard />
                         Scorciatoie da tastiera
                     </DropdownMenuItem>
+                    <DropdownMenuSeparator />
                     <Link href="/terms">
                         <DropdownMenuItem>
                             <Handshake />
@@ -84,9 +97,13 @@ export function AvatarLogic() {
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
+            <NewAccountPopup
+                setOpen={setOpenOBPopup}
+                open={openOBPopup}
+            />
             <KbShortcuts
                 setOpen={setOpenKbShortcut}
-                open={ppenKbShortcut}
+                open={openKbShortcut}
             />
         </>
     )

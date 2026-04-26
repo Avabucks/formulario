@@ -1,0 +1,50 @@
+[
+    {
+        "id": "01",
+        "label": "01 - Crea formulario",
+        "title": "Raccogli le tue formule in un unico posto",
+        "description":
+            "Crea un formulario per ogni materia o esame. Dalla fisica alla chimica, tutto organizzato e sempre a portata di mano.",
+        "video": "/tutorial/01.mp4"
+    },
+    {
+        "id": "02",
+        "label": "02 - Crea capitolo",
+        "title": "Struttura il formulario in capitoli",
+        "description":
+            "Organizza le formule in capitoli tematici. Ad esempio \"Meccanica\", \"Termodinamica\", \"Elettromagnetismo\".",
+        "video": "/tutorial/02.mp4"
+    },
+    {
+        "id": "03",
+        "label": "03 - Crea argomento",
+        "title": "Raggruppa formule per argomento",
+        "description":
+            "Dentro ogni capitolo, crea argomenti specifici per tenere le formule organizzate.",
+        "video": "/tutorial/03.mp4"
+    },
+    {
+        "id": "04",
+        "label": "04 - L'editor",
+        "title": "Scrivi formule in LaTeX con anteprima live",
+        "description":
+            "Scrivi formule in LaTeX e visualizza l'anteprima in tempo reale mentre digiti; l'editor supporta anche testo normale, titoli, elenchi e altro.",
+        "video": "/tutorial/04.mp4"
+    },
+    {
+        "id": "05",
+        "label": "05 - Genera con AI",
+        "title": "Lascia che l'AI compili il formulario per te",
+        "description":
+            "Descrivi l'argomento e l'AI genera automaticamente le formule rilevanti con spiegazioni, pronte da aggiungere.",
+        "video": "/tutorial/05.mp4"
+    },
+    {
+        "id": "06",
+        "label": "06 - Condivisione QR",
+        "title": "Condividi il formulario con un QR code",
+        "description":
+            "Genera un QR code per il tuo formulario e condividilo con i compagni. Basta inquadrare con il telefono per aprirlo.",
+        "video": "/tutorial/06.mp4"
+    }
+]

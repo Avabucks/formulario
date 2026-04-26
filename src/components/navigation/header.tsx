@@ -7,6 +7,7 @@ import Link from "next/link";
 import { AvatarLogic } from "../auth/avatar-logic";
 import { ModeToggle } from "../theme/theme-toggler";
 import { SearchLogic } from "./search-logic";
+import { LandingMenu } from "./landing-menu";
 
 export async function Header() {
 
@@ -14,24 +15,27 @@ export async function Header() {
 
     return (
         <div className="fixed bg-background top-0 left-0 right-0 z-50 flex flex-row justify-between items-center py-3 px-2 md:px-6">
-            <Link href="/" className="flex gap-2 items-center">
-                <Button variant="ghost" size="icon">
-                    <Pi />
-                </Button>
-            </Link>
             <div className="flex items-center gap-2">
-                {session.uid ? (
+                <Button variant="ghost" size="icon" asChild>
+                    <Link href="/">
+                        <Pi />
+                    </Link>
+                </Button>
+                {!session.uid && (
+                    <LandingMenu />
+                )}
+                <Button asChild variant="ghost">
+                    <Link href="/community/page/1">
+                        Community
+                    </Link>
+                </Button>
+            </div>
+            <div className="flex items-center gap-2">
+                {session.uid && (
                     <>
                         <SearchLogic />
                         <div className="h-6 border-l"></div>
                     </>
-                ) : (
-                    <Button asChild variant="outline" className="gap-2 px-8">
-                        <Link href="/community/page/1">
-                            <UsersRound className="h-5 w-5" />
-                            Community
-                        </Link>
-                    </Button>
                 )}
                 <ModeToggle />
                 <div className="h-6 border-l"></div>
