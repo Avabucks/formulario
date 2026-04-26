@@ -2,7 +2,7 @@
   "name": "formulabase",
   "displayName": "FormulaBase",
   "email": "avabuckssociety@gmail.com",
-  "version": "3.3.7",
+  "version": "1.2.15",
   "private": true,
   "scripts": {
     "dev": "next dev",
