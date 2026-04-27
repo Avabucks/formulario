@@ -40,11 +40,11 @@ export default async function Home() {
     }
 
     const { rows: formulari } = await pool.query(`
-        SELECT F.beautiful_id AS "id", titolo, owner_uid AS "ownerUid", U_A.display_name AS "nomeAutore", U_A.foto_profilo AS "photoURL", F.data_creazione as "dataCreazione", descrizione, visibility, views,
+        SELECT F.beautiful_id AS "id", titolo, owner_uid AS "ownerUid", COALESCE(U_A.display_name, 'Utente eliminato') AS "nomeAutore", U_A.foto_profilo AS "photoURL", F.data_creazione as "dataCreazione", descrizione, visibility, views,
             EXISTS (SELECT 1 FROM preferiti P WHERE P.formulario_id = F.beautiful_id AND P.user_uid = $1) AS starred,
             (SELECT COUNT(*) FROM preferiti P2 WHERE P2.formulario_id = F.beautiful_id) AS likes
         FROM formulari F
-        JOIN users U_A ON F.author_uid = U_A.uid
+        LEFT JOIN users U_A ON F.author_uid = U_A.uid
         WHERE owner_uid = $1
         ORDER BY data_modifica DESC
     `, [session.uid]);

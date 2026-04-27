@@ -50,6 +50,7 @@ export default function Home() {
 // - [GENERALI]
 // - report che manda mail a admin (mail nell'env) solo se la formula non è tua (in impostazioni)
 // - aggiornare kb shortcuts e termini condizioni
+// - per eliminare l'account deve scrivere una parola chiave (es. ELIMINA) per confermare, e deve essere case sensitive (per evitare click accidentali) controllata sul server
 
 // - [PREMIUM]
 // - abbonamento a 1,99 che ti da accesso illimitato a creazione formulari e 200 crediti AI (senza crediti ma con tokens cosi e piu preciso ma senza scrivere il ilmite, semplicemente quando finiscono esce popup)
@@ -57,6 +58,7 @@ export default function Home() {
 // - [NOVITA]
 // - ⁠categorie per organizzare formulari
 // - aggiungere funzionalità di esportazione (pdf, markdown, ecc.)
+// - flashcards con ai per ogni argomento
 // - image manager nelle impostazioni
 // - tree del formulario (accessibile da tasto di fianco a impostazioni e apre drawer laterale)
 // - console errori

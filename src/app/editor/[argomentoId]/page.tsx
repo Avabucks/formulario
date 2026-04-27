@@ -80,7 +80,7 @@ export default async function Argomento({
             FROM argomenti A
             JOIN capitoli C ON  A.capitolo = C.beautiful_id
             JOIN formulari F ON F.beautiful_id = C.formulario
-            JOIN users U_A ON F.author_uid = U_A.uid
+            LEFT JOIN users U_A ON F.author_uid = U_A.uid
             WHERE A.beautiful_id = $1
             AND (F.owner_uid = $2 OR F.visibility > 0)`,
         [argomentoId, uid]

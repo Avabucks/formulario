@@ -81,7 +81,7 @@ export default async function Formulario({
         `SELECT F.beautiful_id AS "id", F.titolo, F.owner_uid as "ownerUid", U_A.display_name AS "nomeAutore", F.data_creazione as "dataCreazione",
                 F.visibility
          FROM formulari F
-         JOIN users U_A ON F.author_uid = U_A.uid
+         LEFT JOIN users U_A ON F.author_uid = U_A.uid
          WHERE F.beautiful_id = $1
            AND (F.owner_uid = $2 OR F.visibility > 0)`,
         [formularioId, uid]

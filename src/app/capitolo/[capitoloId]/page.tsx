@@ -82,7 +82,7 @@ export default async function Capitolo({
             F.titolo AS "formularioTitolo", F.owner_uid as "ownerUid", U_A.display_name AS "nomeAutore", F.beautiful_id AS "formularioId"
             FROM capitoli C
             JOIN formulari F ON F.beautiful_id = C.formulario
-            JOIN users U_A ON F.author_uid = U_A.uid
+            LEFT JOIN users U_A ON F.author_uid = U_A.uid
             WHERE C.beautiful_id = $1
             AND (F.owner_uid = $2 OR F.visibility > 0)`,
         [capitoloId, uid]
