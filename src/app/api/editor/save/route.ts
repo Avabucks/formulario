@@ -15,6 +15,9 @@ export async function POST(request: Request) {
     if (!argomentoId) return NextResponse.json({ error: "Argomento non specificato" }, { status: 400 });
     if (content === undefined) return NextResponse.json({ error: "Contenuto mancante" }, { status: 400 });
 
+    const MAX_CONTENT_SIZE = 500 * 1024; // 500kb
+    if (Buffer.byteLength(content, 'utf8') > MAX_CONTENT_SIZE) return NextResponse.json({ error: "Contenuto troppo grande (max 500KB)" }, { status: 413 });
+
     const { rows } = await pool.query(
         `SELECT a.beautiful_id FROM argomenti a
          JOIN capitoli c ON c.beautiful_id = a.capitolo
