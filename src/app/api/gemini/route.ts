@@ -33,13 +33,13 @@ if (!apiKey) {
 const genAI = new GoogleGenerativeAI(apiKey);
 
 const model = genAI.getGenerativeModel({
-    model: "gemini-2.5-flash-lite",
+    model: "gemma-3-27b-it",
     generationConfig: {
         // maxOutputTokens: 1500,
         temperature: 0.5,
     },
-    systemInstruction: "Agisci come un assistente accademico esperto in formulari universitari. Usa Markdown (usa per le liste il trattino - non l'asterisco) e LaTeX ($ per inline, $$ per display), suddividendo bene i paragrafi con gli headings. Rispondi in modo conciso. Niente introduzioni come 'Certamente' o 'Ecco la risposta', devi generare un testo ready to use.",
-    safetySettings,
+    // systemInstruction: "Agisci come un assistente accademico esperto in formulari universitari. Usa Markdown (usa per le liste il trattino - non l'asterisco) e LaTeX ($ per inline, $$ per display), suddividendo bene i paragrafi con gli headings. Rispondi in modo conciso. Niente introduzioni come 'Certamente' o 'Ecco la risposta', devi generare un testo ready to use.",
+    // safetySettings,
 });
 export async function POST(req: NextRequest) {
     const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
@@ -82,7 +82,9 @@ export async function POST(req: NextRequest) {
         //    return NextResponse.json({ error: "Crediti esauriti" }, { status: 403 });
         //}
 
-        const result = await model.generateContent(prompt);
+        const tmp_prompt = `ISTRUZIONI DI SISTEMA: Agisci come un assistente accademico esperto in formulari universitari. Usa Markdown (usa per le liste il trattino - non l’asterisco) e LaTeX ($ per inline, $$ per display), suddividendo bene i paragrafi con gli headings. Rispondi in modo conciso. Niente introduzioni come "Certamente" o "Ecco la risposta", devi generare un testo ready to use.\n\nDOMANDA: ${prompt}`;
+
+        const result = await model.generateContent(tmp_prompt);
 
         const response = result.response;
 
