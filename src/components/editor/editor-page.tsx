@@ -109,7 +109,7 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
     }, [])
 
     useEffect(() => {
-        if (isMobile) {setSwitchView(false)}
+        if (isMobile) { setSwitchView(false) }
         else if (!editable) setSwitchView(true)
     }, [isMobile])
 
@@ -192,54 +192,56 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
                 </TooltipProvider>
             </div>
 
-            <div className="flex flex-1 items-center gap-3 px-3">
-                <FormattingHeaders
-                    _selection={selection}
-                    editorRef={editorRef}
-                    isFocused={isFocused}
-                />
-                <FormattingBold
-                    _selection={selection}
-                    editorRef={editorRef}
-                    isFocused={isFocused}
-                />
-                <FormattingItalic
-                    _selection={selection}
-                    editorRef={editorRef}
-                    isFocused={isFocused}
-                />
-                <FormattingQuote
-                    _selection={selection}
-                    editorRef={editorRef}
-                    isFocused={isFocused}
-                />
+            <div className="flex flex-1 items-center">
+                <div className="flex flex-1 items-center gap-3 h-full px-3">
+                    <FormattingHeaders
+                        _selection={selection}
+                        editorRef={editorRef}
+                        isFocused={isFocused}
+                    />
+                    <FormattingBold
+                        _selection={selection}
+                        editorRef={editorRef}
+                        isFocused={isFocused}
+                    />
+                    <FormattingItalic
+                        _selection={selection}
+                        editorRef={editorRef}
+                        isFocused={isFocused}
+                    />
+                    <FormattingQuote
+                        _selection={selection}
+                        editorRef={editorRef}
+                        isFocused={isFocused}
+                    />
 
-                <Separator orientation="vertical" />
+                    <Separator orientation="vertical" />
 
-                <FormattingOrderedList
-                    _selection={selection}
-                    editorRef={editorRef}
-                    isFocused={isFocused}
-                />
-                <FormattingUnorderedList
-                    _selection={selection}
-                    editorRef={editorRef}
-                    isFocused={isFocused}
-                />
+                    <FormattingOrderedList
+                        _selection={selection}
+                        editorRef={editorRef}
+                        isFocused={isFocused}
+                    />
+                    <FormattingUnorderedList
+                        _selection={selection}
+                        editorRef={editorRef}
+                        isFocused={isFocused}
+                    />
 
-                <Separator orientation="vertical" />
+                    <Separator orientation="vertical" />
 
-                <FormattingDivider
-                    _selection={selection}
-                    editorRef={editorRef}
-                    isFocused={isFocused}
-                />
+                    <FormattingDivider
+                        _selection={selection}
+                        editorRef={editorRef}
+                        isFocused={isFocused}
+                    />
+                </div>
 
-                <Separator orientation="vertical" />
-
-                <GeminiButton
-                    editorRef={editorRef}
-                />
+                <div className="flex items-center border-l gap-3 px-3 h-full">
+                    <GeminiButton
+                        editorRef={editorRef}
+                    />
+                </div>
             </div>
 
             {/* Mobile */}

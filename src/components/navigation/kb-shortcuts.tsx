@@ -23,6 +23,7 @@ const sections = [
     {
         title: "Formattazione",
         shortcuts: [
+            { label: "Chiedi all'AI", keys: ["Alt", "A"] },
             { label: "Grassetto", keys: ["Ctrl", "B"] },
             { label: "Corsivo", keys: ["Ctrl", "Shift", "I"] },
             { label: "Citazione", keys: ["Ctrl", "Shift", "Q"] },
@@ -46,6 +47,7 @@ const sections = [
             { label: "Taglia", keys: ["Ctrl", "X"] },
             { label: "Copia", keys: ["Ctrl", "C"] },
             { label: "Seleziona tutto", keys: ["Ctrl", "A"] },
+            { label: "Cancella parola", keys: ["Ctrl", "⌫"] },
             { label: "Seleziona la prossima occorrenza", keys: ["Ctrl", "D"] },
             { label: "Inserisci cursore", keys: ["Alt", "Click"] },
             { label: "Sposta riga su", keys: ["Alt", "↑"] },

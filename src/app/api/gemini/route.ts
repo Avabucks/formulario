@@ -122,7 +122,7 @@ export async function POST(req: NextRequest) {
         }
 
         return NextResponse.json(
-            { error: "Errore durante la generazione: " + error.message },
+            { error: "Errore durante la generazione. Riprova più tardi." },
             { status: 500 },
         );
     }

@@ -118,7 +118,7 @@ export function NewAccountPopup({
                         ) : (
                             <Button variant="ghost" size="sm" onClick={() => goTo(current - 1)}>
                                 <ArrowLeft />
-                                Indietro
+                                <span className="hidden md:flex">Indietro</span>
                             </Button>
                         )}
 

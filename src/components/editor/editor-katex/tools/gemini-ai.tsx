@@ -2,13 +2,28 @@
 
 import { Button } from "@/src/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/src/components/ui/dialog";
-import { Textarea } from "@/src/components/ui/textarea";
-import { Spinner } from "@/src/components/ui/spinner";
-import { Check, Sparkles, X } from "lucide-react";
-import { useState } from "react";
-import type { editor } from "monaco-editor";
-import { toast } from "sonner";
+import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
 import { ScrollArea } from "@/src/components/ui/scroll-area";
+import { Spinner } from "@/src/components/ui/spinner";
+import { Textarea } from "@/src/components/ui/textarea";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/components/ui/tooltip";
+import { Check, Sparkles, X } from "lucide-react";
+import type { editor } from "monaco-editor";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+
+const loadingMessages = [
+    "L'AI sta elaborando la risposta...",
+    "Sto pensando a qualcosa di brillante...",
+    "Raccogliendo le idee migliori...",
+    "Quasi ci siamo...",
+    "Un momento di pazienza...",
+    "Sto scegliendo le parole giuste...",
+    "Elaborazione in corso...",
+    "Mettendo insieme i pezzi...",
+    "Sto dando il meglio di me...",
+    "Un secondo ancora...",
+];
 
 export function GeminiButton({
     editorRef,
@@ -19,6 +34,17 @@ export function GeminiButton({
     const [prompt, setPrompt] = useState("");
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState<string | null>(null);
+    const [loadingText, setLoadingText] = useState(loadingMessages[0]);
+
+    useEffect(() => {
+        if (!loading) return;
+        let i = 0;
+        const interval = setInterval(() => {
+            i = (i + 1) % loadingMessages.length;
+            setLoadingText(loadingMessages[i]);
+        }, 2000);
+        return () => clearInterval(interval);
+    }, [loading]);
 
     const handleGenerate = async () => {
         if (!prompt.trim()) return;
@@ -75,19 +101,49 @@ export function GeminiButton({
         setOpen(false);
     };
 
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.altKey && e.key === "a") {
+                e.preventDefault();
+                setOpen(true);
+            }
+            if (e.key === "Enter" && open && result && !loading) {
+                e.preventDefault();
+                handleAccept();
+            }
+        };
+        document.addEventListener("keydown", handleKeyDown);
+        return () => document.removeEventListener("keydown", handleKeyDown);
+    }, [open, result, loading]);
+
     return (
         <Dialog open={open} onOpenChange={(v) => { if (v) { setOpen(true); } else { handleClose(); } }}>
-            <DialogTrigger asChild>
-                <Button variant="outline">
-                    <Sparkles size={16} />
-                    Genera con AI
-                </Button>
-            </DialogTrigger>
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <DialogTrigger asChild>
+                            <Button variant="outline">
+                                <Sparkles size={16} />
+                                Chiedi all'AI
+                            </Button>
+                        </DialogTrigger>
+                    </TooltipTrigger>
+                    <TooltipContent className="pr-1.5">
+                        <div className="flex items-center gap-2">
+                            <KbdGroup className="hidden md:flex">
+                                <Kbd>Alt</Kbd>
+                                <span>+</span>
+                                <Kbd>A</Kbd>
+                            </KbdGroup>
+                        </div>
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
             <DialogContent className="md:max-w-2xl">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2 text-lg">
                         <Sparkles size={18} className="text-primary" />
-                        Genera con AI
+                        Chiedi all'AI
                     </DialogTitle>
                 </DialogHeader>
 
@@ -125,8 +181,8 @@ export function GeminiButton({
                     {loading && (
                         <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-dashed bg-muted/30">
                             <Spinner />
-                            <p className="text-sm text-muted-foreground">
-                                L'AI sta elaborando la risposta...
+                            <p className="text-sm text-muted-foreground transition-all duration-500 animate-pulse">
+                                {loadingText}
                             </p>
                         </div>
                     )}
@@ -147,8 +203,8 @@ export function GeminiButton({
                                 </div>
                             </ScrollArea>
                         </div>
-                    )}                </div>
-
+                    )}
+                </div>
                 <DialogFooter className="gap-2 sm:gap-2">
                     <Button variant="outline" onClick={handleClose} className="gap-2">
                         <X size={16} />
