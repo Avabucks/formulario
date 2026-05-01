@@ -34,19 +34,20 @@ export default function Home() {
 
 // - [EDITOR]
 // - undo non funziona quando lo schiacci (problema: disabled=true)
-// -- [X] 6 HEADERS
+// -- [x] 6 HEADERS
 // -- [x] BOLD
 // -- [x] ITALIC
 // -- [x] ORDERED LIST
 // -- [x] UNORDERED LIST
 // -- [x] QUOTE
 // -- [x] DIVIDER
-// -- [ ] CODE
+// -- [ ] INLINE CODE
+// -- [ ] BLOCK CODE (deve rimettere il focus e sistemare item attivo)
 // -- [ ] MERMAID
 // -- [ ] INLINE MATH
-// -- [ ] BLOCK MATH
-// -- [ ] TABLE
+// -- [ ] BLOCK MATH (deve rimettere il focus e sistemare items)
 // -- [ ] SIMBOLI
+// -- [ ] TABLE
 
 // - [GENERALI]
 // - report che manda mail a admin (mail nell'env) solo se la formula non è tua (in impostazioni)

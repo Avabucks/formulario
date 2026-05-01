@@ -25,6 +25,8 @@ import { Spinner } from '../ui/spinner';
 import { GeminiButton } from './editor-katex/tools/gemini-ai';
 import { useTheme } from 'next-themes';
 import { TakeFormulario } from '../home/take-formulario';
+import { FormattingCodeBlock } from './editor-katex/tools/formatting-code-block';
+import { FormattingLatexBlock } from './editor-katex/tools/formatting-latex-block';
 
 export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ argomentoId: string, editable: boolean, formularioId: string }>) {
     const isMobile = useIsMobile();
@@ -235,6 +237,23 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
                         editorRef={editorRef}
                         isFocused={isFocused}
                     />
+
+                    <Separator orientation="vertical" />
+
+                    <FormattingCodeBlock
+                        _selection={selection}
+                        editorRef={editorRef}
+                        isFocused={isFocused}
+                    />
+
+                    <Separator orientation="vertical" />
+
+                    <FormattingLatexBlock
+                        _selection={selection}
+                        editorRef={editorRef}
+                        isFocused={isFocused}
+                    />
+
                 </div>
 
                 <div className="flex items-center border-l gap-3 px-3 h-full">
