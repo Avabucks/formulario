@@ -34,7 +34,7 @@ export default function Home() {
 
 // - [EDITOR]
 // - undo non funziona quando lo schiacci (problema: disabled=true)
-// -- [ ] 6 HEADERS
+// -- [X] 6 HEADERS
 // -- [x] BOLD
 // -- [x] ITALIC
 // -- [x] ORDERED LIST
@@ -46,6 +46,7 @@ export default function Home() {
 // -- [ ] INLINE MATH
 // -- [ ] BLOCK MATH
 // -- [ ] TABLE
+// -- [ ] SIMBOLI
 
 // - [GENERALI]
 // - report che manda mail a admin (mail nell'env) solo se la formula non è tua (in impostazioni)
