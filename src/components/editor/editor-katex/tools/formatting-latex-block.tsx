@@ -15,12 +15,11 @@ import { Toggle } from "@/src/components/ui/toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/components/ui/tooltip";
 import {
     getIsActiveBlock,
-    getIsActiveLatexInline,
-    handleBlockToggle
+    getIsActiveLatexInline
 } from "@/src/lib/editor/formatting-utils";
 import katex from "katex";
 import "katex/dist/katex.min.css";
-import { Radical, SquareRadical, X } from "lucide-react";
+import { Radical, SquareRadical } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useEffect, useState } from "react";
 
@@ -32,13 +31,14 @@ const FORMULAS = [
     { value: "integrale", label: "Integrale", snippet: String.raw`\int_{a}^{b} f(x)\,dx` },
     { value: "limite", label: "Limite", snippet: String.raw`\lim_{x \to \infty} f(x)` },
     { value: "radice_quadrata", label: "Radice quadrata", snippet: String.raw`\sqrt{x}` },
-    { value: "matrice", label: "Matrice 2 per 2", snippet: String.raw`\begin{pmatrix} a & b \\ c & d \end{pmatrix}` },
+    { value: "matrice_2x2", label: "Matrice 2x2", snippet: String.raw`\begin{pmatrix} a & b \\ c & d \end{pmatrix}` },
     { value: "derivata", label: "Derivata", snippet: String.raw`\frac{d}{dx} f(x)` },
     { value: "derivata_parziale", label: "Derivata parziale", snippet: String.raw`\frac{\partial f}{\partial x}` },
     { value: "coefficiente_binomiale", label: "Coefficiente binomiale", snippet: String.raw`\binom{n}{k}` },
     { value: "norma", label: "Norma", snippet: String.raw`\|x\|` },
     { value: "esponenziale", label: "Esponenziale", snippet: String.raw`e^{x}` },
     { value: "potenza", label: "Potenza", snippet: String.raw`^{n}` },
+    { value: "pedice", label: "Pedice", snippet: String.raw`_{i}` },
     { value: "logaritmo", label: "Logaritmo", snippet: String.raw`\log_{b}(x)` },
     { value: "logaritmo_naturale", label: "Logaritmo naturale", snippet: String.raw`\ln(x)` },
     { value: "produttoria", label: "Produttoria", snippet: String.raw`\prod_{i=1}^{n} x_i` },
@@ -46,7 +46,8 @@ const FORMULAS = [
     { value: "parte_intera_superiore", label: "Parte intera superiore", snippet: String.raw`\lceil x \rceil` },
     { value: "vettore", label: "Vettore", snippet: String.raw`\vec{v}` },
     { value: "versore", label: "Versore", snippet: String.raw`\hat{u}` },
-    { value: "media", label: "Media", snippet: String.raw`\overline{x}` },
+    { value: "overline", label: "Overline", snippet: String.raw`\overline{x}` },
+    { value: "underline", label: "Underline", snippet: String.raw`\underline{x}` },
 ].sort((a, b) => a.label.localeCompare(b.label));
 
 const GREEK_LETTERS = [
@@ -178,36 +179,47 @@ export function FormattingLatexBlock({
             for (let l = sel.endLineNumber; l <= totalLines; l++) {
                 if (model.getLineContent(l).trim() === BLOCK_MARKER) { closeLine = l; break; }
             }
+
             if (openLine === -1 || closeLine === -1) return;
 
             const onOpenLine = sel.startLineNumber === openLine;
             const onCloseLine = sel.startLineNumber === closeLine;
 
-            // fix S3358: ternario annidato estratto (riga ~90)
-            function resolveInsertLine(): number {
-                if (onOpenLine) return openLine + 1;
-                if (onCloseLine) return closeLine;
-                return sel?.startLineNumber || openLine + 1;
+            let finalRange;
+
+            if (onOpenLine) {
+                finalRange = {
+                    startLineNumber: openLine + 1, startColumn: 1,
+                    endLineNumber: openLine + 1, endColumn: 1
+                };
+            } else if (onCloseLine) {
+                finalRange = {
+                    startLineNumber: closeLine, startColumn: 1,
+                    endLineNumber: closeLine, endColumn: 1
+                };
+            } else {
+                finalRange = sel;
             }
-            const insertLine = resolveInsertLine();
-            const insertCol = onOpenLine || onCloseLine ? 1 : sel.startColumn;
 
             model.pushEditOperations([], [{
-                range: { startLineNumber: insertLine, startColumn: insertCol, endLineNumber: insertLine, endColumn: insertCol },
+                range: finalRange,
                 text: (onOpenLine || onCloseLine) ? `${snippet}\n` : snippet,
             }], () => null);
+
         } else if (activeKind === 'single' || activeKind === 'double') {
             model.pushEditOperations([], [{
-                range: { startLineNumber: sel.startLineNumber, startColumn: sel.startColumn, endLineNumber: sel.startLineNumber, endColumn: sel.startColumn },
+                range: sel,
                 text: snippet,
             }], () => null);
         } else if (pendingKind === 'single') {
-            const startOffset = model.getOffsetAt({ lineNumber: sel.startLineNumber, column: sel.startColumn });
-            const endOffset = model.getOffsetAt({ lineNumber: sel.endLineNumber, column: sel.endColumn });
-            const selected = model.getValue().slice(startOffset, endOffset).trim() || snippet;
             model.pushEditOperations([], [{
-                range: { startLineNumber: sel.startLineNumber, startColumn: sel.startColumn, endLineNumber: sel.endLineNumber, endColumn: sel.endColumn },
-                text: `$${selected}$`,
+                range: {
+                    startLineNumber: sel.startLineNumber,
+                    startColumn: sel.startColumn,
+                    endLineNumber: sel.endLineNumber,
+                    endColumn: sel.endColumn
+                },
+                text: `$${snippet}$`,
             }], () => null);
         } else {
             const endLine = sel.endColumn === 1 && sel.endLineNumber > sel.startLineNumber
@@ -221,28 +233,6 @@ export function FormattingLatexBlock({
         }
 
         setTimeout(() => editorRef.current?.focus(), 0);
-    };
-
-    const handleRemove = () => {
-        setOpen(false);
-        if (activeKind === 'block') {
-            handleBlockToggle(editorRef, blockState, BLOCK_MARKER, BLOCK_MARKER);
-        } else if (inlineState) {
-            const ed = editorRef.current;
-            const model = ed?.getModel();
-            if (!ed || !model) return;
-
-            model.pushEditOperations([], [{
-                range: {
-                    startLineNumber: inlineState.lineNumber,
-                    startColumn: inlineState.matchIndex + 1,
-                    endLineNumber: inlineState.lineNumber,
-                    endColumn: inlineState.matchEnd + 1,
-                },
-                text: "",
-            }], () => null);
-            setTimeout(() => ed.focus(), 0);
-        }
     };
 
     useEffect(() => {
@@ -329,18 +319,6 @@ export function FormattingLatexBlock({
                     <CommandInput placeholder="Cerca formula o simbolo..." />
                     <CommandList>
                         <CommandEmpty>Nessun risultato.</CommandEmpty>
-
-                        {activeKind !== null && (
-                            <>
-                                <CommandGroup>
-                                    <CommandItem onSelect={handleRemove} className="text-destructive">
-                                        <X size={14} />
-                                        <span>Rimuovi formula</span>
-                                    </CommandItem>
-                                </CommandGroup>
-                                <CommandSeparator />
-                            </>
-                        )}
 
                         <CommandGroup heading="Formule">
                             {FORMULAS.map((f) => (
