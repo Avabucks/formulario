@@ -14,7 +14,7 @@ import {
 import { Toggle } from "@/src/components/ui/toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/components/ui/tooltip";
 import { getIsActiveBlock, handleBlockToggle } from "@/src/lib/editor/formatting-utils";
-import { SquareTerminal, X } from "lucide-react";
+import { Code, SquareTerminal, X } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useEffect, useState } from "react";
 
@@ -74,7 +74,7 @@ export function FormattingCodeBlock({
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "H" && isFocused) {
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "U" && isFocused) {
                 e.preventDefault();
                 setOpen((v) => !v);
             }
@@ -91,7 +91,7 @@ export function FormattingCodeBlock({
                         <Toggle
                             variant="outline"
                             onMouseDown={(e) => e.preventDefault()}
-                            aria-label="Blocco codice"
+                            aria-label="Codice in blocco"
                             pressed={isActive && isFocused}
                             disabled={!isFocused}
                             className="gap-1.5"
@@ -105,26 +105,32 @@ export function FormattingCodeBlock({
                     </TooltipTrigger>
                     <TooltipContent className="pr-1.5">
                         <div className="flex items-center gap-2">
-                            Blocco codice
+                            Codice in blocco
                             <KbdGroup className="hidden md:flex">
                                 <Kbd>Ctrl</Kbd>
                                 <span>+</span>
                                 <Kbd>Shift</Kbd>
                                 <span>+</span>
-                                <Kbd>H</Kbd>
+                                <Kbd>U</Kbd>
                             </KbdGroup>
                         </div>
                     </TooltipContent>
                 </Tooltip>
             </TooltipProvider>
-            <CommandDialog open={open} onOpenChange={setOpen}>
+            <CommandDialog
+                open={open}
+                onOpenChange={(v) => {
+                    setOpen(v);
+                    if (!v) setTimeout(() => editorRef.current?.focus(), 0);
+                }}
+            >
                 <Command>
                     <CommandInput placeholder="Cerca linguaggio..." />
                     <CommandList>
                         <CommandEmpty>Nessun risultato.</CommandEmpty>
                         <CommandGroup>
                             <CommandItem onSelect={() => handleSelect(null)}>
-                                <SquareTerminal size={14} />
+                                <Code size={14} />
                                 <span>Senza linguaggio</span>
                             </CommandItem>
                             {isActive && (

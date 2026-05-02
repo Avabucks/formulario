@@ -204,6 +204,7 @@ export function getIsActiveBlock(
     editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
     openMarker: string,
     closeMarker: string,
+    includeMarkers: boolean = true,
 ): { language: string | null } | null {
     if (!editorRef.current) return null;
     const model = editorRef.current.getModel();
@@ -253,7 +254,10 @@ export function getIsActiveBlock(
         const cursorOnCloseLine = cursorLine === close.line;
         const cursorInside = cursorLine > open.line && cursorLine < close.line;
 
-        if (cursorOnOpenLine || cursorOnCloseLine || cursorInside) {
+        if (
+            cursorInside ||
+            (includeMarkers && (cursorOnOpenLine || cursorOnCloseLine))
+        ) {
             return { language: open.language };
         }
     }
@@ -410,17 +414,17 @@ export function getIsActiveLatexInline(
     const cursorCol = sel.startColumn - 1; // 0-based
 
     // Cerca prima $$...$$ (doppio), poi $...$ (singolo) per non confonderli
-    const doubleRegex = /\$\$([^$]*?)\$\$/g;
+    const doubleRegex = /\$\$([^$]+?)\$\$/g;
     let match: RegExpExecArray | null;
     while ((match = doubleRegex.exec(lineContent)) !== null) {
-        if (cursorCol >= match.index && cursorCol <= match.index + match[0].length) {
+        if (cursorCol >= match.index + 2 && cursorCol <= match.index + match[0].length - 2) {
             return { kind: 'double', matchIndex: match.index, matchEnd: match.index + match[0].length, lineNumber };
         }
     }
 
-    const singleRegex = /\$([^$]+?)\$/g;
+    const singleRegex = /(?<!\$)\$([^$\n]+?)\$(?!\$)/g;
     while ((match = singleRegex.exec(lineContent)) !== null) {
-        if (cursorCol >= match.index && cursorCol <= match.index + match[0].length) {
+        if (cursorCol >= match.index + 1 && cursorCol <= match.index + match[0].length - 1) {
             return { kind: 'single', matchIndex: match.index, matchEnd: match.index + match[0].length, lineNumber };
         }
     }
