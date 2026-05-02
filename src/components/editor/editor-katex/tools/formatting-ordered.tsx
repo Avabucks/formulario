@@ -3,7 +3,7 @@
 import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
 import { Toggle } from "@/src/components/ui/toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/components/ui/tooltip";
-import { getIsActiveList, handleListToggle } from "@/src/lib/formatting-utils";
+import { getIsActiveList, handleListToggle } from "@/src/lib/editor/formatting-utils";
 import { ListOrdered } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useEffect } from "react";

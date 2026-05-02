@@ -13,14 +13,17 @@ import {
 } from "@/src/components/ui/command";
 import { Toggle } from "@/src/components/ui/toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/components/ui/tooltip";
-import { getIsActiveBlock, handleBlockToggle } from "@/src/lib/formatting-utils";
+import {
+    getIsActiveBlock,
+    getIsActiveLatexInline,
+    handleBlockToggle,
+    handleLatexInlineToggle,
+} from "@/src/lib/editor/formatting-utils";
 import { Pi, X } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useEffect, useState } from "react";
 
-const OPEN_MARKER = "$$";
-const CLOSE_MARKER = "$$";
-
+const BLOCK_MARKER = "$$";
 const FORMULAS = [
     { value: "fraction", label: "Frazione", snippet: "\\frac{a}{b}" },
     { value: "sum", label: "Sommatoria", snippet: "\\sum_{i=1}^{n} x_i" },
@@ -34,7 +37,7 @@ const FORMULAS = [
     { value: "norm", label: "Norma", snippet: "\\|x\\|" },
     { value: "arrow", label: "Freccia", snippet: "a \\rightarrow b" },
     { value: "equiv", label: "Equivalenza", snippet: "a \\equiv b \\pmod{n}" },
-];
+].sort((a, b) => a.label.localeCompare(b.label));
 
 export function FormattingLatexBlock({
     _selection,
@@ -46,10 +49,19 @@ export function FormattingLatexBlock({
     isFocused: boolean;
 }>) {
     const [open, setOpen] = useState(false);
-    const blockState = getIsActiveBlock(editorRef, OPEN_MARKER, CLOSE_MARKER);
-    const isActive = blockState !== null;
 
-    const handleSelect = (snippet: string) => {
+    const blockState = getIsActiveBlock(editorRef, BLOCK_MARKER, BLOCK_MARKER);
+    const inlineState = getIsActiveLatexInline(editorRef);
+
+    // Quale modalità è attiva (block ha priorità se il cursore è dentro un blocco $$)
+    const activeKind: 'block' | 'single' | 'double' | null =
+        blockState !== null ? 'block'
+            : inlineState?.kind === 'double' ? 'double'
+                : inlineState?.kind === 'single' ? 'single'
+                    : null;
+
+    // Quando è attivo uno dei due, apre il command per inserire formula
+    const handleFormulaSelect = (snippet: string) => {
         setOpen(false);
         if (!editorRef.current) return;
         const model = editorRef.current.getModel();
@@ -57,15 +69,17 @@ export function FormattingLatexBlock({
         const sel = editorRef.current.getSelection();
         if (!sel) return;
 
-        if (isActive) {
+        if (activeKind === 'block') {
+            // Inserisce alla posizione del cursore dentro il blocco
             const totalLines = model.getLineCount();
             let openLine = -1;
             for (let l = sel.startLineNumber; l >= 1; l--) {
-                if (model.getLineContent(l).trim() === OPEN_MARKER) { openLine = l; break; }
+                const c = model.getLineContent(l).trim();
+                if (c === BLOCK_MARKER) { openLine = l; break; }
             }
             let closeLine = -1;
             for (let l = sel.endLineNumber; l <= totalLines; l++) {
-                if (model.getLineContent(l).trim() === CLOSE_MARKER) { closeLine = l; break; }
+                if (model.getLineContent(l).trim() === BLOCK_MARKER) { closeLine = l; break; }
             }
             if (openLine === -1 || closeLine === -1) return;
 
@@ -75,38 +89,38 @@ export function FormattingLatexBlock({
             const insertCol = onOpenLine || onCloseLine ? 1 : sel.startColumn;
 
             model.pushEditOperations([], [{
-                range: {
-                    startLineNumber: insertLine,
-                    startColumn: insertCol,
-                    endLineNumber: insertLine,
-                    endColumn: insertCol,
-                },
-                text: onOpenLine || onCloseLine ? `${snippet}\n` : snippet,
+                range: { startLineNumber: insertLine, startColumn: insertCol, endLineNumber: insertLine, endColumn: insertCol },
+                text: (onOpenLine || onCloseLine) ? `${snippet}\n` : snippet,
+            }], () => null);
+        } else if (activeKind === 'single' || activeKind === 'double') {
+            // Inserisce il snippet alla posizione del cursore dentro l'inline
+            model.pushEditOperations([], [{
+                range: { startLineNumber: sel.startLineNumber, startColumn: sel.startColumn, endLineNumber: sel.startLineNumber, endColumn: sel.startColumn },
+                text: snippet,
             }], () => null);
         } else {
+            // Nessuno attivo: crea blocco $$ con lo snippet
             const endLine =
                 sel.endColumn === 1 && sel.endLineNumber > sel.startLineNumber
                     ? sel.endLineNumber - 1
                     : sel.endLineNumber;
             const endCol = model.getLineContent(endLine).length + 1;
-
             model.pushEditOperations([], [{
-                range: {
-                    startLineNumber: sel.startLineNumber,
-                    startColumn: 1,
-                    endLineNumber: endLine,
-                    endColumn: endCol,
-                },
-                text: `${OPEN_MARKER}\n${snippet}\n${CLOSE_MARKER}`,
+                range: { startLineNumber: sel.startLineNumber, startColumn: 1, endLineNumber: endLine, endColumn: endCol },
+                text: `${BLOCK_MARKER}\n${snippet}\n${BLOCK_MARKER}`,
             }], () => null);
         }
 
-        editorRef.current.focus();
+        setTimeout(() => editorRef.current?.focus(), 0);
     };
 
     const handleRemove = () => {
         setOpen(false);
-        handleBlockToggle(editorRef, blockState, OPEN_MARKER, CLOSE_MARKER);
+        if (activeKind === 'block') {
+            handleBlockToggle(editorRef, blockState, BLOCK_MARKER, BLOCK_MARKER);
+        } else {
+            handleLatexInlineToggle(editorRef, inlineState, '$');
+        }
     };
 
     useEffect(() => {
@@ -120,60 +134,100 @@ export function FormattingLatexBlock({
         return () => document.removeEventListener("keydown", handleKeyDown);
     }, [isFocused]);
 
+    // Quando uno è attivo mostra solo il toggle attivo + command
+    // Quando nessuno è attivo mostra entrambi i toggle ($  e $$)
     return (
         <>
-            <TooltipProvider>
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Toggle
-                            variant="outline"
-                            onMouseDown={(e) => e.preventDefault()}
-                            aria-label="Formula LaTeX"
-                            pressed={isActive && isFocused}
-                            disabled={!isFocused}
-                            onClick={() => setOpen((v) => !v)}
-                        >
-                            <Pi size={16} />
-                        </Toggle>
-                    </TooltipTrigger>
-                    <TooltipContent className="pr-1.5">
-                        <div className="flex items-center gap-2">
-                            Formula LaTeX
-                            <KbdGroup className="hidden md:flex">
-                                <Kbd>Ctrl</Kbd>
-                                <span>+</span>
-                                <Kbd>Shift</Kbd>
-                                <span>+</span>
-                                <Kbd>M</Kbd>
-                            </KbdGroup>
-                        </div>
-                    </TooltipContent>
-                </Tooltip>
-            </TooltipProvider>
-            <CommandDialog open={open} onOpenChange={setOpen}>
+            {/* Toggle $  — inline singolo, nascosto se block o double sono attivi */}
+            {activeKind !== 'block' && activeKind !== 'double' && (
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Toggle
+                                variant="outline"
+                                onMouseDown={(e) => e.preventDefault()}
+                                aria-label="Formula inline $"
+                                pressed={activeKind === 'single' && isFocused}
+                                disabled={!isFocused}
+                                onClick={() =>
+                                    activeKind === 'single'
+                                        ? setOpen(true)
+                                        : handleLatexInlineToggle(editorRef, null, '$')
+                                }
+                            >
+                                <Pi size={16} />
+                                <span className="text-xs font-mono leading-none">$</span>
+                            </Toggle>
+                        </TooltipTrigger>
+                        <TooltipContent className="pr-1.5">
+                            <div className="flex items-center gap-2">
+                                Formula inline
+                                <KbdGroup className="hidden md:flex">
+                                    <Kbd>Ctrl</Kbd><span>+</span><Kbd>Shift</Kbd><span>+</span><Kbd>D</Kbd>
+                                </KbdGroup>
+                            </div>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+            )}
+
+            {/* Toggle $$ — inline doppio o blocco, nascosto se single è attivo */}
+            {activeKind !== 'single' && (
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Toggle
+                                variant="outline"
+                                onMouseDown={(e) => e.preventDefault()}
+                                aria-label="Formula blocco $$"
+                                pressed={(activeKind === 'block' || activeKind === 'double') && isFocused}
+                                disabled={!isFocused}
+                                onClick={() => setOpen(true)}
+                            >
+                                <Pi size={16} />
+                                <span className="text-xs font-mono leading-none">$$</span>
+                            </Toggle>
+                        </TooltipTrigger>
+                        <TooltipContent className="pr-1.5">
+                            <div className="flex items-center gap-2">
+                                Formula blocco
+                                <KbdGroup className="hidden md:flex">
+                                    <Kbd>Ctrl</Kbd><span>+</span><Kbd>Shift</Kbd><span>+</span><Kbd>M</Kbd>
+                                </KbdGroup>
+                            </div>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+            )}
+
+            {/* Command dialog condiviso per la scelta formula */}
+            <CommandDialog
+                open={open}
+                onOpenChange={setOpen}
+            >
                 <Command>
                     <CommandInput placeholder="Cerca formula..." />
                     <CommandList>
                         <CommandEmpty>Nessun risultato.</CommandEmpty>
-                        <CommandGroup heading={isActive ? "Inserisci formula" : "Formule predefinite"}>
+                        <CommandGroup heading={activeKind !== null ? "Inserisci formula" : "Formule predefinite"}>
                             {FORMULAS.map((f) => (
                                 <CommandItem
                                     key={f.value}
                                     value={f.value}
-                                    onSelect={() => handleSelect(f.snippet)}
+                                    onSelect={() => handleFormulaSelect(f.snippet)}
                                 >
                                     <span>{f.label}</span>
                                     <span className="ml-auto font-mono text-xs opacity-50 truncate max-w-20">{f.snippet}</span>
                                 </CommandItem>
                             ))}
                         </CommandGroup>
-                        {isActive && (
+                        {activeKind !== null && (
                             <>
                                 <CommandSeparator />
                                 <CommandGroup>
                                     <CommandItem onSelect={handleRemove} className="text-destructive">
                                         <X size={14} />
-                                        <span>Rimuovi blocco</span>
+                                        <span>Rimuovi formula</span>
                                     </CommandItem>
                                 </CommandGroup>
                             </>

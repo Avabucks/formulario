@@ -13,8 +13,8 @@ import {
 } from "@/src/components/ui/command";
 import { Toggle } from "@/src/components/ui/toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/components/ui/tooltip";
-import { getIsActiveBlock, handleBlockToggle } from "@/src/lib/formatting-utils";
-import { Code, X } from "lucide-react";
+import { getIsActiveBlock, handleBlockToggle } from "@/src/lib/editor/formatting-utils";
+import { SquareTerminal, X } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useEffect, useState } from "react";
 
@@ -40,7 +40,8 @@ const LANGUAGES = [
     { value: "markdown", label: "Markdown" },
     { value: "xml", label: "XML" },
     { value: "dockerfile", label: "Dockerfile" },
-];
+    { value: "mermaid", label: "Mermaid" },
+].sort((a, b) => a.label.localeCompare(b.label));
 
 export function FormattingCodeBlock({
     _selection,
@@ -63,6 +64,7 @@ export function FormattingCodeBlock({
             const openWithLang = language ? `${OPEN_MARKER}${language}` : OPEN_MARKER;
             handleBlockToggle(editorRef, null, openWithLang, CLOSE_MARKER);
         }
+        setTimeout(() => editorRef.current?.focus(), 0);
     };
 
     const handleRemove = () => {
@@ -72,7 +74,7 @@ export function FormattingCodeBlock({
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "K" && isFocused) {
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "H" && isFocused) {
                 e.preventDefault();
                 setOpen((v) => !v);
             }
@@ -95,7 +97,7 @@ export function FormattingCodeBlock({
                             className="gap-1.5"
                             onClick={() => setOpen((v) => !v)}
                         >
-                            <Code size={16} />
+                            <SquareTerminal size={16} />
                             {isActive && isFocused && blockState.language && (
                                 <span className="text-xs font-mono">{blockState.language}</span>
                             )}
@@ -109,7 +111,7 @@ export function FormattingCodeBlock({
                                 <span>+</span>
                                 <Kbd>Shift</Kbd>
                                 <span>+</span>
-                                <Kbd>K</Kbd>
+                                <Kbd>H</Kbd>
                             </KbdGroup>
                         </div>
                     </TooltipContent>
@@ -120,25 +122,9 @@ export function FormattingCodeBlock({
                     <CommandInput placeholder="Cerca linguaggio..." />
                     <CommandList>
                         <CommandEmpty>Nessun risultato.</CommandEmpty>
-                        <CommandGroup heading="Linguaggi">
-                            {LANGUAGES.map((lang) => (
-                                <CommandItem
-                                    key={lang.value}
-                                    value={lang.value}
-                                    onSelect={() => handleSelect(lang.value)}
-                                    className="font-mono text-sm"
-                                >
-                                    {lang.label}
-                                    {blockState?.language === lang.value && (
-                                        <span className="ml-auto text-xs opacity-60">attivo</span>
-                                    )}
-                                </CommandItem>
-                            ))}
-                        </CommandGroup>
-                        <CommandSeparator />
                         <CommandGroup>
                             <CommandItem onSelect={() => handleSelect(null)}>
-                                <Code size={14} />
+                                <SquareTerminal size={14} />
                                 <span>Senza linguaggio</span>
                             </CommandItem>
                             {isActive && (
@@ -147,6 +133,22 @@ export function FormattingCodeBlock({
                                     <span>Rimuovi blocco</span>
                                 </CommandItem>
                             )}
+                        </CommandGroup>
+                        <CommandSeparator />
+                        <CommandGroup>
+                            {LANGUAGES.map((lang) => (
+                                <CommandItem
+                                    key={lang.value}
+                                    value={lang.value}
+                                    onSelect={() => handleSelect(lang.value)}
+                                    className="text-sm"
+                                >
+                                    {blockState?.language === lang.value && (
+                                        <span className="relative inline-flex size-2 rounded-full bg-primary"></span>
+                                    )}
+                                    {lang.label}
+                                </CommandItem>
+                            ))}
                         </CommandGroup>
                     </CommandList>
                 </Command>

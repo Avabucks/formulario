@@ -41,9 +41,9 @@ export default function Home() {
 // -- [x] UNORDERED LIST
 // -- [x] QUOTE
 // -- [x] DIVIDER
-// -- [ ] INLINE CODE
-// -- [ ] BLOCK CODE (deve rimettere il focus e sistemare item attivo)
-// -- [ ] MERMAID
+// -- [x] INLINE CODE
+// -- [x] BLOCK CODE (deve rimettere il focus e sistemare item attivo)
+// -- [x] MERMAID
 // -- [ ] INLINE MATH
 // -- [ ] BLOCK MATH (deve rimettere il focus e sistemare items)
 // -- [ ] SIMBOLI

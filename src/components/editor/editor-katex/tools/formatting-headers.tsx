@@ -4,7 +4,7 @@ import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
 import { Popover, PopoverContent, PopoverTrigger } from "@/src/components/ui/popover";
 import { Toggle } from "@/src/components/ui/toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/components/ui/tooltip";
-import { getIsActiveList, handleListToggle } from "@/src/lib/formatting-utils";
+import { getIsActiveList, handleListToggle } from "@/src/lib/editor/formatting-utils";
 import { Heading, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6 } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useEffect, useRef, useState } from "react";
