@@ -1,5 +1,5 @@
-.active-type .icon-indicator,
-.active-type .underline-indicator {
+.editor .active-type .icon-indicator,
+.editor .active-type .underline-indicator {
   opacity: 0.5 !important;
 }
 
@@ -7,4 +7,25 @@ body > [id^="dmermaid"],
 body > [id^="mermaid-"] {
   inset: 0 !important;
   position: absolute !important;
+}
+
+.editor ul { list-style-type: disc; }
+.editor ul ul { list-style-type: circle; }
+.editor ul ul ul { list-style-type: square; }
+
+.editor ul li::marker,
+.editor ul ul li::marker,
+.editor ul ul ul li::marker {
+  color: var(--editor-title);
+}
+
+.editor ol { list-style-type: decimal; }
+.editor ol ol { list-style-type: lower-alpha; }
+.editor ol ol ol { list-style-type: lower-roman; }
+
+.editor ol li::marker,
+.editor ol ol li::marker,
+.editor ol ol ol li::marker {
+  color: var(--editor-title);
+  font-weight: 600;
 }

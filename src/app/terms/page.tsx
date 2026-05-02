@@ -7,6 +7,7 @@ import packageJson from '@/package.json'
 import { Footer } from "@/src/components/landing/footer";
 import { Button } from "@/src/components/ui/button";
 import { Metadata } from "next";
+import { pool } from "@/src/lib/db";
 
 export const metadata: Metadata = {
   title: `Termini e condizioni - ${packageJson.displayName}`,
@@ -15,6 +16,8 @@ export const metadata: Metadata = {
 
 export default async function TermsPage() {
   const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
+
+  const { rows: users } = await pool.query(`SELECT display_name as "displayName" FROM users WHERE uid = $1`, [session.uid]);
 
   return (
     <>
@@ -61,7 +64,7 @@ export default async function TermsPage() {
             <p>L'utente può richiedere la cancellazione del proprio account in qualsiasi momento. A seguito della cancellazione, tutti i dati personali e i contenuti associati verranno eliminati entro 30 giorni, salvo obblighi di legge contrari.</p>
             <div>
               {session.uid && (
-                <DeleteAccount />
+                <DeleteAccount username={users[0]?.displayName} />
               )}
             </div>
           </Section>

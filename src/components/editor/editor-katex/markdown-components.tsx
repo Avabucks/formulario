@@ -261,47 +261,51 @@ const Heading = ({
 
 export const markdownComponents: Components = {
   h1: ({ children }) => (
-    <Heading level={1} icon={Heading1} size={23} className="text-[1.9em] font-bold leading-8">
+    <Heading level={1} icon={Heading1} size={23} className="text-(--editor-title) text-[2em] font-semibold leading-8">
       {children}
     </Heading>
   ),
   h2: ({ children }) => (
-    <Heading level={2} icon={Heading2} size={22} className="text-[1.5em] font-semibold leading-6">
+    <Heading level={2} icon={Heading2} size={22} className="text-(--editor-title) text-[1.5em] font-semibold leading-6">
       {children}
     </Heading>
   ),
   h3: ({ children }) => (
-    <Heading level={3} icon={Heading3} size={21} className="text-[1.2em] font-semibold leading-5">
+    <Heading level={3} icon={Heading3} size={21} className="text-(--editor-title) text-[1.2em] font-semibold leading-5">
       {children}
     </Heading>
   ),
   h4: ({ children }) => (
-    <Heading level={4} icon={Heading4} size={19} className="text-[1em] font-semibold leading-4">
+    <Heading level={4} icon={Heading4} size={19} className="text-(--editor-title) text-[1em] font-semibold leading-4">
       {children}
     </Heading>
   ),
   h5: ({ children }) => (
-    <Heading level={5} icon={Heading5} size={18} className="text-[0.875em] font-semibold leading-3">
+    <Heading level={5} icon={Heading5} size={18} className="text-(--editor-title) text-[0.875em] font-semibold leading-3">
       {children}
     </Heading>
   ),
   h6: ({ children }) => (
-    <Heading level={6} icon={Heading6} size={18} className="text-[0.85em] font-semibold text-[#59636e] dark:text-[#9198a1] leading-3">
+    <Heading level={6} icon={Heading6} size={18} className="text-(--editor-title)/60 text-[0.85em] font-semibold">
       {children}
     </Heading>
   ),
   p: ({ children }) => (
-    <p className="leading-normal text-base font-sans mb-4">{children}</p>
+    <p className="leading-[1.8] text-base font-sans mb-4">{children}</p>
   ),
-  ul: ({ children }) => <ul className="list-disc pl-9 space-y-2 mb-4">{children}</ul>,
-  ol: ({ children }) => <ol className="list-decimal [&>li::marker]:font-bold pl-9 space-y-2 mb-4">{children}</ol>,
+  ul: ({ children }) => (
+    <ul className="pl-9 space-y-2 mb-4">{children}</ul>
+  ),
+  ol: ({ children }) => (
+    <ol className="pl-9 space-y-2 mb-4">{children}</ol>
+  ),
   li: ({ children }) => <li className="leading-9 text-[1rem]">{children}</li>,
-  strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+  strong: ({ children }) => <strong className="text-(--editor-title) font-semibold">{children}</strong>,
   em: ({ children }) => <em className="italic">{children}</em>,
   del: ({ children }) => <del className="line-through">{children}</del>,
   hr: () => <hr className="mb-5 border-0 h-0.5 bg-foreground/20 rounded" />,
   blockquote: ({ children }) => (
-    <blockquote className="border-l-4 border-foreground/30 pl-4 py-2 mb-5 text-foreground/70 bg-foreground/5 [&>p]:m-0 [&>p]:p-0 [&>p]:inline">
+    <blockquote className="border-l-4 border-(--editor-title)/50 pl-4 py-2 mb-5 text-(--editor-title)/70 [&>p]:m-0 [&>p]:p-0 [&>p]:inline">
       {children}
     </blockquote>
   ),
@@ -323,14 +327,14 @@ export const markdownComponents: Components = {
   thead: ({ children }) => <thead>{children}</thead>,
   tbody: ({ children }) => <tbody>{children}</tbody>,
   tr: ({ children }) => (
-    <tr className="border-t border-[#d1d9e0] dark:border-[#3d444d]">
+    <tr className="border-t border-(--editor-title)/30">
       {children}
     </tr>
   ),
   th: ({ children, ...props }) => (
     <th
       {...props}
-      className="px-3.25 py-1.5 border border-[#d1d9e0] dark:border-[#3d444d] font-semibold text-left bg-[#f6f8fa] dark:bg-[#161b22]"
+      className="px-3.25 py-1.5 border border-(--editor-title)/30 font-semibold text-left bg-(--editor-title)/10"
     >
       {children}
     </th>
@@ -338,7 +342,7 @@ export const markdownComponents: Components = {
   td: ({ children, ...props }) => (
     <td
       {...props}
-      className="px-3.25 py-1.5 border border-[#d1d9e0] dark:border-[#3d444d]"
+      className="px-3.25 py-1.5 border border-(--editor-title)/30"
     >
       {children}
     </td>
