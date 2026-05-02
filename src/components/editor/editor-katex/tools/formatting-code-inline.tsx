@@ -3,14 +3,14 @@
 import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
 import { Toggle } from "@/src/components/ui/toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/components/ui/tooltip";
-import { getIsActiveList, handleListToggle } from "@/src/lib/editor/formatting-utils";
-import { List } from "lucide-react";
+import { getIsActive, handleFormattingToggle } from "@/src/lib/editor/formatting-utils";
+import { Terminal } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useEffect } from "react";
 
-const getUnorderedListRegex = () => /^-\s/;
+const getCodeRegex = () => /`(.+?)`/g;
 
-export function FormattingUnorderedList({
+export function FormattingCodeInline({
     _selection,
     editorRef,
     isFocused,
@@ -19,20 +19,22 @@ export function FormattingUnorderedList({
     editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
     isFocused: boolean;
 }>) {
-    const isActive = getIsActiveList(editorRef, getUnorderedListRegex);
+    const isActive = getIsActive(editorRef, getCodeRegex);
 
     const handleToggle = () =>
-        handleListToggle(
+        handleFormattingToggle(
             editorRef,
-            getIsActiveList(editorRef, getUnorderedListRegex),
-            getUnorderedListRegex,
-            (line) => `- ${line}`,
-            (line) => line.replace(/^-\s/, ""),
+            getIsActive(editorRef, getCodeRegex),
+            getCodeRegex,
+            (text) => `\`${text}\``,
+            (match) => match[1],
+            (trimStart, text) => trimStart + text.length + 2,
+            (matchIndex, match) => matchIndex + match[1].length,
         );
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.code === "Digit8" && (e.ctrlKey || e.metaKey) && e.shiftKey && isFocused) {
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "J" && isFocused) {
                 e.preventDefault();
                 handleToggle();
             }
@@ -49,22 +51,22 @@ export function FormattingUnorderedList({
                         variant="outline"
                         onPressedChange={handleToggle}
                         onMouseDown={(e) => e.preventDefault()}
-                        aria-label="Lista non ordinata"
+                        aria-label="Codice inline"
                         pressed={isActive && isFocused}
                         disabled={!isFocused}
                     >
-                        <List size={16} />
+                        <Terminal size={16} />
                     </Toggle>
                 </TooltipTrigger>
                 <TooltipContent className="pr-1.5">
                     <div className="flex items-center gap-2">
-                        Lista non ordinata
+                        Codice inline
                         <KbdGroup className="hidden md:flex">
                             <Kbd>Ctrl</Kbd>
                             <span>+</span>
                             <Kbd>Shift</Kbd>
                             <span>+</span>
-                            <Kbd>8</Kbd>
+                            <Kbd>J</Kbd>
                         </KbdGroup>
                     </div>
                 </TooltipContent>

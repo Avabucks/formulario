@@ -34,17 +34,19 @@ export default function Home() {
 
 // - [EDITOR]
 // - undo non funziona quando lo schiacci (problema: disabled=true)
-// -- [ ] 6 HEADERS
+// -- [x] 6 HEADERS
 // -- [x] BOLD
 // -- [x] ITALIC
 // -- [x] ORDERED LIST
 // -- [x] UNORDERED LIST
 // -- [x] QUOTE
 // -- [x] DIVIDER
-// -- [ ] CODE
-// -- [ ] MERMAID
-// -- [ ] INLINE MATH
-// -- [ ] BLOCK MATH
+// -- [x] INLINE CODE
+// -- [x] BLOCK CODE (deve rimettere il focus e sistemare item attivo)
+// -- [x] MERMAID
+// -- [x] INLINE MATH
+// -- [x] BLOCK MATH (deve rimettere il focus e sistemare items)
+// -- [x] SIMBOLI
 // -- [ ] TABLE
 
 // - [GENERALI]

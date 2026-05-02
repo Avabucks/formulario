@@ -25,6 +25,9 @@ import { Spinner } from '../ui/spinner';
 import { GeminiButton } from './editor-katex/tools/gemini-ai';
 import { useTheme } from 'next-themes';
 import { TakeFormulario } from '../home/take-formulario';
+import { FormattingCodeBlock } from './editor-katex/tools/formatting-code-block';
+import { FormattingLatexBlock } from './editor-katex/tools/formatting-latex-block';
+import { FormattingCodeInline } from './editor-katex/tools/formatting-code-inline';
 
 export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ argomentoId: string, editable: boolean, formularioId: string }>) {
     const isMobile = useIsMobile();
@@ -147,7 +150,6 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
                                 size="icon"
                                 onClick={handleUndo}
                                 onMouseDown={(e) => e.preventDefault()}
-                                disabled={true}
                             >
                                 <Undo2 size={16} />
                             </Button>
@@ -173,7 +175,6 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
                                 size="icon"
                                 onClick={handleRedo}
                                 onMouseDown={(e) => e.preventDefault()}
-                                disabled={true}
                             >
                                 <Redo2 size={16} />
                             </Button>
@@ -195,11 +196,6 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
             <div className="flex flex-1 items-center">
                 <div className="flex flex-1 items-center gap-3 h-full px-3">
                     <FormattingHeaders
-                        _selection={selection}
-                        editorRef={editorRef}
-                        isFocused={isFocused}
-                    />
-                    <FormattingBold
                         _selection={selection}
                         editorRef={editorRef}
                         isFocused={isFocused}
@@ -235,6 +231,28 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
                         editorRef={editorRef}
                         isFocused={isFocused}
                     />
+
+                    <Separator orientation="vertical" />
+
+                    <FormattingCodeInline
+                        _selection={selection}
+                        editorRef={editorRef}
+                        isFocused={isFocused}
+                    />
+                    <FormattingCodeBlock
+                        _selection={selection}
+                        editorRef={editorRef}
+                        isFocused={isFocused}
+                    />
+
+                    <Separator orientation="vertical" />
+
+                    <FormattingLatexBlock
+                        _selection={selection}
+                        editorRef={editorRef}
+                        isFocused={isFocused}
+                    />
+
                 </div>
 
                 <div className="flex items-center border-l gap-3 px-3 h-full">
