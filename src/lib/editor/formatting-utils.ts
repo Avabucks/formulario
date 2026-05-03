@@ -46,17 +46,17 @@ export function handleFormattingToggle(
     getRegex: () => RegExp,
     wrap: (text: string) => string,   // es. (t) => `**${t}**`
     unwrap: (match: RegExpExecArray) => string,  // es. (m) => m[1]
-    cursorOffsetAfterWrap: (trimStart: number, trimmedText: string) => number,
     cursorOffsetAfterUnwrap: (matchIndex: number, match: RegExpExecArray) => number,
 ) {
-    if (!editorRef.current) return false;
+    const editor = editorRef.current;
+    if (!editor) return false;
 
-    const model = editorRef.current.getModel();
+    const model = editor.getModel();
     if (!model) return;
 
     const fullText = model.getValue();
 
-    const sel = editorRef.current.getSelection();
+    const sel = editor.getSelection();
     if (!sel) return false;
 
     const startOffset = model.getOffsetAt({
@@ -73,6 +73,9 @@ export function handleFormattingToggle(
     const leadingSpaces = raw.length - raw.trimStart().length;
     const trimStart = startOffset + leadingSpaces;
     const trimEnd = trimStart + trimmedText.length;
+
+    const controller = editor.getContribution('snippetController2') as any;
+    if (!controller) return false;
 
     if (isActive) {
         const regex = getRegex();
@@ -95,42 +98,21 @@ export function handleFormattingToggle(
                     }],
                     () => null,
                 );
-                editorRef.current.setSelection({
+                editor.setSelection({
                     startLineNumber: cursorPos.lineNumber,
                     startColumn: cursorPos.column,
                     endLineNumber: cursorPos.lineNumber,
                     endColumn: cursorPos.column,
                 });
-                editorRef.current.focus();
+                editor.focus();
                 return;
             }
         }
-    } else {
-        if (trimmedText === "") return;
-        const trimStartPos = model.getPositionAt(trimStart);
-        const trimEndPos = model.getPositionAt(trimEnd);
-        model.pushEditOperations(
-            [],
-            [{
-                range: {
-                    startLineNumber: trimStartPos.lineNumber,
-                    startColumn: trimStartPos.column,
-                    endLineNumber: trimEndPos.lineNumber,
-                    endColumn: trimEndPos.column,
-                },
-                text: wrap(trimmedText),
-            }],
-            () => null,
-        );
-        const cursorPos = model.getPositionAt(cursorOffsetAfterWrap(trimStart, trimmedText));
-        editorRef.current.setSelection({
-            startLineNumber: cursorPos.lineNumber,
-            startColumn: cursorPos.column,
-            endLineNumber: cursorPos.lineNumber,
-            endColumn: cursorPos.column,
-        });
-        editorRef.current.focus();
     }
+    if (trimmedText === "") return false;
+    const text = wrap(trimmedText);
+    controller.insert(text);
+    setTimeout(() => editor.focus(), 0);
 }
 
 export function getIsActiveList(

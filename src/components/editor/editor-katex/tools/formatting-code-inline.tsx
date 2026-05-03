@@ -26,9 +26,8 @@ export function FormattingCodeInline({
             editorRef,
             getIsActive(editorRef, getCodeRegex),
             getCodeRegex,
-            (text) => `\`${text}\``,
+            (text) => `\`${text}$0\``,
             (match) => match[1],
-            (trimStart, text) => trimStart + text.length + 2,
             (matchIndex, match) => matchIndex + match[1].length,
         );
 

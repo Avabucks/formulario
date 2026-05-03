@@ -26,9 +26,8 @@ export function FormattingItalic({
             editorRef,
             getIsActive(editorRef, getItalicRegex),
             getItalicRegex,
-            (text) => `_${text}_`,
+            (text) => `_${text}$0_`,
             (match) => match[1],
-            (trimStart, text) => trimStart + text.length + 1,
             (matchIndex, match) => matchIndex + match[1].length,
         );
 

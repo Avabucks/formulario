@@ -26,9 +26,8 @@ export function FormattingBold({
             editorRef,
             getIsActive(editorRef, getBoldRegex),
             getBoldRegex,
-            (text) => `**${text}**`,
+            (text) => `**${text}$0**`,
             (match) => match[1],
-            (trimStart, text) => trimStart + text.length + 2,
             (matchIndex, match) => matchIndex + match[1].length,
         );
 

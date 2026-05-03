@@ -24,6 +24,7 @@ export default function Home() {
 
 // - [EDITOR]
 // -- [ ] TABLE
+// -- bug switch view smonta editor
 
 // - [GENERALI]
 // - report che manda mail a admin (mail nell'env) solo se la formula non è tua (in impostazioni)
