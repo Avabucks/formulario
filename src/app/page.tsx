@@ -24,7 +24,6 @@ export default function Home() {
 
 // - [EDITOR]
 // -- [ ] TABLE
-// -- fare in modo che si puo aggiungere anche una formula vuota
 
 // - [GENERALI]
 // - report che manda mail a admin (mail nell'env) solo se la formula non è tua (in impostazioni)
@@ -35,7 +34,7 @@ export default function Home() {
 // - abbonamento a 1,99 che ti da accesso illimitato a creazione formulari e 200 crediti AI (senza crediti ma con tokens cosi e piu preciso ma senza scrivere il ilmite, semplicemente quando finiscono esce popup)
 
 // - [NOVITA]
-// - ⁠categorie per organizzare formulari
+// - ⁠categorie per organizzare formulari + colori titoli
 // - aggiungere funzionalità di esportazione (pdf, markdown, ecc.)
 // - flashcards con ai per ogni argomento
 // - image manager nelle impostazioni

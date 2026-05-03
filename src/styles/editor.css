@@ -29,3 +29,18 @@ body > [id^="mermaid-"] {
   color: var(--editor-title);
   font-weight: 600;
 }
+
+.tab-latex .scrollbar-none {
+  scrollbar-width: none;
+}
+.tab-latex .scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.tab-latex button {
+  outline: none;
+}
+.tab-latex button:focus,
+.tab-latex button:focus-visible {
+  outline: none;
+  box-shadow: none;
+}

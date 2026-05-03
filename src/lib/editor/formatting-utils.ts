@@ -406,22 +406,40 @@ export function getIsActiveLatexInline(
     const sel = editorRef.current.getSelection();
     if (!sel) return null;
 
-    // Solo su una singola riga
     if (sel.startLineNumber !== sel.endLineNumber) return null;
 
     const lineNumber = sel.startLineNumber;
     const lineContent = model.getLineContent(lineNumber);
     const cursorCol = sel.startColumn - 1; // 0-based
 
-    // Cerca prima $$...$$ (doppio), poi $...$ (singolo) per non confonderli
-    const doubleRegex = /\$\$([^$]+?)\$\$/g;
+    // Doppio vuoto: $$$$ con cursore esattamente in mezzo (tra col+2 e col+2)
+    const doubleEmptyRegex = /\$\$\$\$/g;
     let match: RegExpExecArray | null;
+    while ((match = doubleEmptyRegex.exec(lineContent)) !== null) {
+        const mid = match.index + 2;
+        if (cursorCol === mid) {
+            return { kind: 'double', matchIndex: match.index, matchEnd: match.index + 4, lineNumber };
+        }
+    }
+
+    // Singolo vuoto: $$ con cursore esattamente in mezzo
+    const singleEmptyRegex = /(?<!\$)\$\$(?!\$)/g;
+    while ((match = singleEmptyRegex.exec(lineContent)) !== null) {
+        const mid = match.index + 1;
+        if (cursorCol === mid) {
+            return { kind: 'single', matchIndex: match.index, matchEnd: match.index + 2, lineNumber };
+        }
+    }
+
+    // Doppio con contenuto
+    const doubleRegex = /\$\$([^$]+?)\$\$/g;
     while ((match = doubleRegex.exec(lineContent)) !== null) {
         if (cursorCol >= match.index + 2 && cursorCol <= match.index + match[0].length - 2) {
             return { kind: 'double', matchIndex: match.index, matchEnd: match.index + match[0].length, lineNumber };
         }
     }
 
+    // Singolo con contenuto
     const singleRegex = /(?<!\$)\$([^$\n]+?)\$(?!\$)/g;
     while ((match = singleRegex.exec(lineContent)) !== null) {
         if (cursorCol >= match.index + 1 && cursorCol <= match.index + match[0].length - 1) {

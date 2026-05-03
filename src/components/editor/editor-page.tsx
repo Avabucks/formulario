@@ -200,6 +200,11 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
                         editorRef={editorRef}
                         isFocused={isFocused}
                     />
+                    <FormattingBold
+                        _selection={selection}
+                        editorRef={editorRef}
+                        isFocused={isFocused}
+                    />
                     <FormattingItalic
                         _selection={selection}
                         editorRef={editorRef}
