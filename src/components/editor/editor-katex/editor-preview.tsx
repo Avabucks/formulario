@@ -17,10 +17,25 @@ export const EditorPreview = memo(function EditorPreview({ markdownContent }: Re
     const patternId = `cross-${useId()}`;
     const [loading, setLoading] = useState(true)
 
-    const processedContent = useMemo(() =>
-        markdownContent.replaceAll(/\$\$([^\n]+?)\$\$/g, (_, math) => `\n$$\n${math}\n$$\n`),
-        [markdownContent]
-    );
+    const processedContent = useMemo(() => {
+        return markdownContent.replaceAll(
+            /(^[ \t]*)(\$\$)([\s\S]*?)(\$\$)/gm,
+            (_, indent, _open, math, _close) => {
+                const cleaned = math.trim();
+
+                const indentedMath = cleaned
+                    .split('\n')
+                    .map((line: string) => indent + '    ' + line) // 👈 aggiungi indent da lista
+                    .join('\n');
+
+                return (
+                    `${indent}$$\n` +
+                    `${indentedMath}\n` +
+                    `${indent}$$`
+                );
+            }
+        );
+    }, [markdownContent]);
 
     useEffect(() => setLoading(false))
     if (loading) return (
