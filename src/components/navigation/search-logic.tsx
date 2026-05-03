@@ -3,69 +3,72 @@ import { Button } from "@/src/components/ui/button";
 import {
     Command,
     CommandDialog,
+    CommandEmpty,
     CommandGroup,
     CommandInput,
     CommandItem,
     CommandList
 } from "@/src/components/ui/command";
 import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
-import { Book, Bookmark, ChevronRight, Search, TableOfContents } from "lucide-react";
+import { Book, Bookmark, ChevronRight, Clock, Search, TableOfContents, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Spinner } from "../ui/spinner";
 
-type Formulario = {
-    id: string
-    titolo: string
+const STORAGE_KEY = "search-history"
+const MAX_HISTORY = 8
+
+type Formulario = { id: string; titolo: string }
+type Capitolo = { id: string; titolo: string; formularioId: string; formularioTitolo?: string; sortOrder: number }
+type Argomento = { id: string; titolo: string; formularioId: string; formularioTitolo?: string; capitoloId: string; capitoloTitolo?: string; sortOrder: number; content: string }
+
+function loadHistory(): string[] {
+    try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]")
+    } catch {
+        return []
+    }
 }
 
-type Capitolo = {
-    id: string
-    titolo: string
-    formularioId: string
-    formularioTitolo?: string
-    sortOrder: number
+function saveToHistory(term: string) {
+    const trimmed = term.trim()
+    if (!trimmed) return
+    const prev = loadHistory().filter((t) => t !== trimmed)
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([trimmed, ...prev].slice(0, MAX_HISTORY)))
 }
 
-type Argomento = {
-    id: string
-    titolo: string
-    formularioId: string
-    formularioTitolo?: string
-    capitoloId: string
-    capitoloTitolo?: string
-    sortOrder: number
-    content: string
+function removeFromHistory(term: string) {
+    const updated = loadHistory().filter((t) => t !== term)
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
 }
 
 export function SearchLogic() {
-
-    const router = useRouter();
-    const [open, setOpen] = useState(false);
-
-    const [formulari, setFormulari] = useState<Formulario[]>([]);
-    const [capitoli, setCapitoli] = useState<Capitolo[]>([]);
-    const [argomenti, setArgomenti] = useState<Argomento[]>([]);
-
+    const router = useRouter()
+    const [open, setOpen] = useState(false)
+    const [formulari, setFormulari] = useState<Formulario[]>([])
+    const [capitoli, setCapitoli] = useState<Capitolo[]>([])
+    const [argomenti, setArgomenti] = useState<Argomento[]>([])
     const [search, setSearch] = useState("")
     const [loading, setLoading] = useState(false)
+    const [history, setHistory] = useState<string[]>([])
 
     useEffect(() => {
+        if (open) setHistory(loadHistory())
+    }, [open])
 
+    useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
                 e.preventDefault()
                 setOpen((prev) => !prev)
             }
         }
-
         document.addEventListener("keydown", handleKeyDown)
         return () => document.removeEventListener("keydown", handleKeyDown)
-    }, []);
+    }, [])
 
     useEffect(() => {
         setLoading(true)
-
         const timeout = setTimeout(() => {
             if (search.length > 0) {
                 Promise.all([
@@ -79,16 +82,42 @@ export function SearchLogic() {
                     setLoading(false)
                 })
             } else {
-                setFormulari([]);
-                setCapitoli([]);
-                setArgomenti([]);
+                setFormulari([])
+                setCapitoli([])
+                setArgomenti([])
                 setLoading(false)
             }
         }, 500)
-
         return () => clearTimeout(timeout)
     }, [search])
 
+    const handleOpenChange = useCallback((val: boolean) => {
+        if (!val && search.trim().length > 0) {
+            saveToHistory(search)
+            setHistory(loadHistory())
+        }
+        if (!val) setSearch("")
+        setOpen(val)
+    }, [search])
+
+    const handleNavigate = useCallback((path: string) => {
+        if (search.trim()) {
+            saveToHistory(search)
+            setHistory(loadHistory())
+        }
+        setOpen(false)
+        setSearch("")
+        router.push(path)
+    }, [search, router])
+
+    const handleRemoveHistory = (e: React.MouseEvent, term: string) => {
+        e.stopPropagation()
+        removeFromHistory(term)
+        setHistory(loadHistory())
+    }
+
+    const showHistory = search.length === 0 && history.length > 0
+    const hasResults = formulari.length > 0 || capitoli.length > 0 || argomenti.length > 0
 
     return (
         <div className="flex flex-col gap-4">
@@ -101,7 +130,7 @@ export function SearchLogic() {
                     <Kbd>K</Kbd>
                 </KbdGroup>
             </Button>
-            <CommandDialog open={open} onOpenChange={setOpen}>
+            <CommandDialog open={open} onOpenChange={handleOpenChange}>
                 <Command shouldFilter={false}>
                     <div className="relative">
                         <CommandInput
@@ -116,20 +145,50 @@ export function SearchLogic() {
                         )}
                     </div>
                     <CommandList>
-                        {formulari.length > 0 && (
+                        {/* Cronologia — visibile solo quando il campo è vuoto */}
+                        {showHistory && (
+                            <CommandGroup heading="Ricerche recenti">
+                                {history.map((term) => (
+                                    <CommandItem
+                                        key={term}
+                                        value={`history-${term}`}
+                                        onSelect={() => setSearch(term)}
+                                        className="flex items-center justify-between group [&_svg.lucide-check]:hidden"
+                                    >
+                                        <div className="flex items-center gap-2 flex-1">
+                                            <Clock className="h-4 w-4 text-muted-foreground" />
+                                            <span>{term}</span>
+                                        </div>
+                                        <button
+                                            onClick={(e) => handleRemoveHistory(e, term)}
+                                            aria-label={`Rimuovi "${term}" dalla cronologia`}
+                                        >
+                                            <X className="h-3 w-3 text-muted-foreground" />
+                                        </button>
+                                    </CommandItem>
+                                ))}
+                            </CommandGroup>
+                        )}
+
+                        {/* Empty state — solo se c'è testo ma nessun risultato */}
+                        {!showHistory && !hasResults && (
+                            <CommandEmpty>Nessun risultato trovato.</CommandEmpty>
+                        )}
+
+                        {formulari.length > 0 && search.length > 0 && (
                             <CommandGroup heading="Formulari">
                                 {formulari.map((f) => (
-                                    <CommandItem value={`f-${String(f.id)}`} key={f.id} onSelect={() => router.push(`/formulario/${f.id}`)}>
+                                    <CommandItem value={`f-${f.id}`} key={f.id} onSelect={() => handleNavigate(`/formulario/${f.id}`)}>
                                         <Book />
                                         <span>{f.titolo}</span>
                                     </CommandItem>
                                 ))}
                             </CommandGroup>
                         )}
-                        {capitoli.length > 0 && (
+                        {capitoli.length > 0 && search.length > 0 && (
                             <CommandGroup heading="Capitoli">
                                 {capitoli.map((c) => (
-                                    <CommandItem value={`c-${String(c.id)}`} key={c.id} onSelect={() => router.push(`/capitolo/${c.id}`)}>
+                                    <CommandItem value={`c-${c.id}`} key={c.id} onSelect={() => handleNavigate(`/capitolo/${c.id}`)}>
                                         <Bookmark />
                                         <div className="flex flex-col justify-center w-full">
                                             <span>{c.titolo}</span>
@@ -139,10 +198,10 @@ export function SearchLogic() {
                                 ))}
                             </CommandGroup>
                         )}
-                        {argomenti.length > 0 && (
+                        {argomenti.length > 0 && search.length > 0 && (
                             <CommandGroup heading="Argomenti">
                                 {argomenti.map((a) => (
-                                    <CommandItem value={`a-${String(a.id)}`} key={a.id} onSelect={() => router.push(`/editor/${a.id}`)}>
+                                    <CommandItem value={`a-${a.id}`} key={a.id} onSelect={() => handleNavigate(`/editor/${a.id}`)}>
                                         <TableOfContents />
                                         <div className="flex flex-col justify-center w-full">
                                             <span>{a.titolo}</span>

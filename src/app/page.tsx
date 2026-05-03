@@ -29,7 +29,7 @@ export default function Home() {
 // - [GENERALI]
 // - report che manda mail a admin (mail nell'env) solo se la formula non è tua (in impostazioni)
 // - video 04
-// - titolo come notion e sistemare <p>
+// - titolo come notion e sistemare <p> e quote
 
 // - [PREMIUM]
 // - abbonamento a 1,99 che ti da accesso illimitato a creazione formulari e 200 crediti AI (senza crediti ma con tokens cosi e piu preciso ma senza scrivere il ilmite, semplicemente quando finiscono esce popup)
@@ -42,3 +42,4 @@ export default function Home() {
 // - tree del formulario (accessibile da tasto di fianco a impostazioni e apre drawer laterale)
 // - console errori
 // - note protette da password
+// - supporto piu lingue
