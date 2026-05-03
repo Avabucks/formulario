@@ -36,6 +36,8 @@ const FORMULAS = [
     { value: "esponenziale", label: "Esponenziale", preview: String.raw`e^{x}`, snippet: String.raw`e^{$1}` },
     { value: "frazione", label: "Frazione", preview: String.raw`\frac{a}{b}`, snippet: String.raw`\frac{$1}{$2}` },
     { value: "integrale", label: "Integrale", preview: String.raw`\int_{a}^{b} f(x)\,dx`, snippet: String.raw`\int_{$1}^{$2} $3\,d$4` },
+    { value: "integrale_doppio", label: "Integrale doppio", preview: String.raw`\iint_{D} f(x,y)\,dx\,dy`, snippet: String.raw`\iint_{$1} $2\,d$3\,d$4` },
+    { value: "integrale_triplo", label: "Integrale triplo", preview: String.raw`\iiint_{V} f(x,y,z)\,dx\,dy\,dz`, snippet: String.raw`\iiint_{$1} $2\,d$3\,d$4\,d$5` },
     { value: "limite", label: "Limite", preview: String.raw`\lim_{x \to \infty} f(x)`, snippet: String.raw`\lim_{$1 \to \infty}$2` },
     { value: "logaritmo", label: "Logaritmo", preview: String.raw`\log_{b}(x)`, snippet: String.raw`\log_{$1}($2)` },
     { value: "logaritmo_naturale", label: "Logaritmo naturale", preview: String.raw`\ln(x)`, snippet: String.raw`\ln($1)` },
@@ -98,6 +100,12 @@ const LOGIC_SYMBOLS = [
     { value: "o_logico", label: "O logico", snippet: String.raw`\lor $0`, preview: String.raw`\lor ` },
     { value: "negazione", label: "Negazione", snippet: String.raw`\lnot $0`, preview: String.raw`\lnot ` },
     { value: "equivalenza_modulare", label: "Equivalenza modulare", snippet: String.raw` \equiv  \pmod{}`, preview: String.raw`a \equiv b \pmod{n}`, offset: -16 },
+    { value: "naturali", label: "Numeri naturali", snippet: String.raw`\mathbb{N} $0`, preview: String.raw`\mathbb{N}` },
+    { value: "interi", label: "Numeri interi", snippet: String.raw`\mathbb{Z} $0`, preview: String.raw`\mathbb{Z}` },
+    { value: "razionali", label: "Numeri razionali", snippet: String.raw`\mathbb{Q} $0`, preview: String.raw`\mathbb{Q}` },
+    { value: "reali", label: "Numeri reali", snippet: String.raw`\mathbb{R} $0`, preview: String.raw`\mathbb{R}` },
+    { value: "complessi", label: "Numeri complessi", snippet: String.raw`\mathbb{C} $0`, preview: String.raw`\mathbb{C}` },
+    { value: "irrazionali", label: "Numeri irrazionali", snippet: String.raw`\mathbb{R}\setminus\mathbb{Q} $0`, preview: String.raw`\mathbb{R}\setminus\mathbb{Q}` },
 ].sort((a, b) => a.label.localeCompare(b.label));
 
 const RELATION_SYMBOLS = [
@@ -213,6 +221,16 @@ export function FormattingLatexBlock({
             ])
         );
     }, [query]);
+
+    useEffect(() => {
+        if (!query) return;
+
+        const firstTabWithResults = tabs.find(t => tabCounts[t.id] > 0);
+
+        if (firstTabWithResults) {
+            setActiveTabAndScroll(firstTabWithResults.id);
+        }
+    }, [query, tabCounts]);
 
     const scroll = (dir: "left" | "right") => {
         tabsRef.current?.scrollBy({ left: dir === "left" ? -120 : 120, behavior: "smooth" });

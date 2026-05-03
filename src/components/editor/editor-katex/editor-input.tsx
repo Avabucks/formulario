@@ -86,6 +86,7 @@ export function EditorInput({
                     minimap: { enabled: false },
                     automaticLayout: true,
                     wordWrap: "on",
+                    quickSuggestions: false,
                 }}
                 loading={<Spinner />}
             />

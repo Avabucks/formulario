@@ -309,6 +309,7 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
                 minimap: { enabled: false },
                 automaticLayout: true,
                 wordWrap: "on",
+                quickSuggestions: false,
             }}
             loading={<Spinner />}
         />
