@@ -388,44 +388,59 @@ export function getIsActiveLatexInline(
     const sel = editorRef.current.getSelection();
     if (!sel) return null;
 
-    if (sel.startLineNumber !== sel.endLineNumber) return null;
+    const cursorLine = sel.startLineNumber;
+    const cursorCol = sel.startColumn; // 1-based (Monaco standard)
+    const lineContent = model.getLineContent(cursorLine);
 
-    const lineNumber = sel.startLineNumber;
-    const lineContent = model.getLineContent(lineNumber);
-    const cursorCol = sel.startColumn - 1; // 0-based
+    const inlinePatterns = [
+        { regex: /\$\$(?:[\s\S]*?)\$\$/g, kind: 'double' as const, delimiterLen: 2 },
+        { regex: /(?<!\$)\$(?!\$)(?:[\s\S]+?)(?<!\$)\$(?!\$)/g, kind: 'single' as const, delimiterLen: 1 },
+        { regex: /(?<!\$)\$\$(?!\$)/g, kind: 'single' as const, delimiterLen: 1 } // Caso vuoto $ $
+    ];
 
-    // Doppio vuoto: $$$$ con cursore esattamente in mezzo (tra col+2 e col+2)
-    const doubleEmptyRegex = /\$\$\$\$/g;
-    let match: RegExpExecArray | null;
-    while ((match = doubleEmptyRegex.exec(lineContent)) !== null) {
-        const mid = match.index + 2;
-        if (cursorCol === mid) {
-            return { kind: 'double', matchIndex: match.index, matchEnd: match.index + 4, lineNumber };
+    for (const pattern of inlinePatterns) {
+        let match: RegExpExecArray | null;
+        while ((match = pattern.regex.exec(lineContent)) !== null) {
+            const startCol = match.index + 1; // Converti in 1-based
+            const endCol = startCol + match[0].length;
+            
+            // Verifica: cursore DOPO i primi dollari e PRIMA degli ultimi
+            if (cursorCol > (startCol + pattern.delimiterLen - 1) && 
+                cursorCol <= (endCol - pattern.delimiterLen)) {
+                return { 
+                    kind: pattern.kind, 
+                    matchIndex: match.index, 
+                    matchEnd: match.index + match[0].length, 
+                    lineNumber: cursorLine 
+                };
+            }
         }
     }
 
-    // Singolo vuoto: $$ con cursore esattamente in mezzo
-    const singleEmptyRegex = /(?<!\$)\$\$(?!\$)/g;
-    while ((match = singleEmptyRegex.exec(lineContent)) !== null) {
-        const mid = match.index + 1;
-        if (cursorCol === mid) {
-            return { kind: 'single', matchIndex: match.index, matchEnd: match.index + 2, lineNumber };
-        }
-    }
+    const fullText = model.getValue();
+    const blockRegex = /\$\$([\s\S]*?)\$\$/g;
+    let blockMatch: RegExpExecArray | null;
 
-    // Doppio con contenuto
-    const doubleRegex = /\$\$([^$]+?)\$\$/g;
-    while ((match = doubleRegex.exec(lineContent)) !== null) {
-        if (cursorCol >= match.index + 2 && cursorCol <= match.index + match[0].length - 2) {
-            return { kind: 'double', matchIndex: match.index, matchEnd: match.index + match[0].length, lineNumber };
-        }
-    }
+    while ((blockMatch = blockRegex.exec(fullText)) !== null) {
+        const startOffset = blockMatch.index;
+        const endOffset = startOffset + blockMatch[0].length;
+        
+        const startPos = model.getPositionAt(startOffset);
+        const endPos = model.getPositionAt(endOffset);
 
-    // Singolo con contenuto
-    const singleRegex = /(?<!\$)\$([^$\n]+?)\$(?!\$)/g;
-    while ((match = singleRegex.exec(lineContent)) !== null) {
-        if (cursorCol >= match.index + 1 && cursorCol <= match.index + match[0].length - 1) {
-            return { kind: 'single', matchIndex: match.index, matchEnd: match.index + match[0].length, lineNumber };
+        const isStrictlyAfterStart = (cursorLine > startPos.lineNumber) || 
+                                     (cursorLine === startPos.lineNumber && cursorCol > startPos.column + 1);
+        
+        const isStrictlyBeforeEnd = (cursorLine < endPos.lineNumber) || 
+                                    (cursorLine === endPos.lineNumber && cursorCol <= endPos.column - 2);
+
+        if (isStrictlyAfterStart && isStrictlyBeforeEnd) {
+            return {
+                kind: 'double',
+                matchIndex: cursorLine === startPos.lineNumber ? startPos.column - 1 : 0,
+                matchEnd: cursorLine === endPos.lineNumber ? endPos.column - 1 : model.getLineContent(cursorLine).length,
+                lineNumber: cursorLine
+            };
         }
     }
 

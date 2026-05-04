@@ -14,7 +14,6 @@ import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
 import { Toggle } from "@/src/components/ui/toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/components/ui/tooltip";
 import {
-    getIsActiveBlock,
     getIsActiveLatexInline
 } from "@/src/lib/editor/formatting-utils";
 import katex from "katex";
@@ -149,7 +148,6 @@ export function FormattingLatexBlock({
     const [open, setOpen] = useState(false);
     const [pendingKind, setPendingKind] = useState<'single' | 'double'>('double');
 
-    const blockState = getIsActiveBlock(editorRef, BLOCK_MARKER, BLOCK_MARKER, false);
     const inlineState = getIsActiveLatexInline(editorRef);
 
     const [query, setQuery] = useState("");
@@ -198,7 +196,6 @@ export function FormattingLatexBlock({
     }, [query, activeTab]);
 
     function resolveActiveKind(): 'block' | 'single' | 'double' | null {
-        if (blockState !== null) return 'block';
         if (inlineState?.kind === 'double') return 'double';
         if (inlineState?.kind === 'single') return 'single';
         return null;
