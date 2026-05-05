@@ -31,15 +31,18 @@ export function FormattingQuote({
         );
 
     useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "Q" && (e.ctrlKey || e.metaKey) && e.shiftKey && isFocused) {
+        const editor = editorRef.current;
+        if (!editor) return;
+
+        const disposable = editor.onKeyDown((e) => {
+            if (e.code === "KeyQ" && (e.ctrlKey || e.metaKey) && e.shiftKey && isFocused) {
                 e.preventDefault();
+                e.stopPropagation();
                 handleToggle();
             }
-        };
-        document.addEventListener("keydown", handleKeyDown);
-        return () => document.removeEventListener("keydown", handleKeyDown);
-    }, [isFocused]);
+        });
+        return () => disposable.dispose();
+    }, [isFocused, editorRef.current]);
 
     return (
         <TooltipProvider>

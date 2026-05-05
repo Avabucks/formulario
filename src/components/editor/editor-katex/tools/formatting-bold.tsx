@@ -32,15 +32,18 @@ export function FormattingBold({
         );
 
     useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "b" && (e.ctrlKey || e.metaKey) && isFocused) {
+        const editor = editorRef.current;
+        if (!editor) return;
+
+        const disposable = editor.onKeyDown((e) => {
+            if ((e.ctrlKey || e.metaKey) && e.code === "KeyB" && isFocused) {
                 e.preventDefault();
+                e.stopPropagation();
                 handleToggle();
             }
-        };
-        document.addEventListener("keydown", handleKeyDown);
-        return () => document.removeEventListener("keydown", handleKeyDown);
-    }, [isFocused]);
+        });
+        return () => disposable.dispose();
+    }, [isFocused, editorRef.current]);
 
     return (
         <TooltipProvider>

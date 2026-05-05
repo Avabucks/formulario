@@ -3,10 +3,10 @@ import { cn } from "@/src/lib/utils"
 const isMac = typeof navigator !== "undefined" && /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
 
 const keyMap: Record<string, string> = {
-    Ctrl: isMac ? "⌘" : "Ctrl",
+    Ctrl: isMac ? "^" : "Ctrl",
     Alt: isMac ? "⌥" : "Alt",
     Shift: isMac ? "⇧" : "Shift",
-    Meta: isMac ? "⌘" : "Win",
+    Meta: isMac ? "⌘" : "Ctrl",
 };
 
 function resolveKey(key: string): string {

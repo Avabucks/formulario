@@ -27,8 +27,9 @@ export default function Home() {
 // -- bug switch view smonta editor
 
 // - [GENERALI]
+// - aggiungi argomento va direttamente nell'editor
 // - report che manda mail a admin (mail nell'env) solo se la formula non è tua (in impostazioni)
-// - video 04
+// - aggiornare video e formulario di benvenuto
 // - titolo come notion e sistemare <p> e quote
 
 // - [PREMIUM]

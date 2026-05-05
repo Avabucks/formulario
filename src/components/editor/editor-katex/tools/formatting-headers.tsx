@@ -7,7 +7,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/
 import { getIsActiveList, handleListToggle } from "@/src/lib/editor/formatting-utils";
 import { Heading, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6 } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 const getH1Regex = () => /^#\s(.+)$/gm;
 const getH2Regex = () => /^##\s(.+)$/gm;
@@ -37,8 +37,7 @@ function HeadingToggle({
 }>) {
     const isActive = getIsActiveList(editorRef, getRegex);
 
-    const handleToggleRef = useRef(() => { });
-    handleToggleRef.current = () => {
+    const handleToggle = () => {
         handleListToggle(
             editorRef,
             getIsActiveList(editorRef, getRegex),
@@ -50,19 +49,7 @@ function HeadingToggle({
             (line) => line.replace(new RegExp(String.raw`^${prefix}\s`), ""),
         );
         onToggle();
-    }
-
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            console.log(e.key)
-            if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === shortcut && isFocused) {
-                e.preventDefault();
-                handleToggleRef.current();
-            }
-        };
-        document.addEventListener("keydown", handleKeyDown);
-        return () => document.removeEventListener("keydown", handleKeyDown);
-    }, [isFocused]);
+    };
 
     return (
         <TooltipProvider>
@@ -70,7 +57,7 @@ function HeadingToggle({
                 <TooltipTrigger asChild>
                     <Toggle
                         variant="outline"
-                        onPressedChange={() => handleToggleRef.current()}
+                        onPressedChange={handleToggle}
                         onMouseDown={(e) => e.preventDefault()}
                         aria-label={label}
                         pressed={isActive && isFocused}
@@ -85,7 +72,7 @@ function HeadingToggle({
                         <KbdGroup className="hidden md:flex">
                             <Kbd>Ctrl</Kbd>
                             <span>+</span>
-                            <Kbd>Alt</Kbd>
+                            <Kbd>Shift</Kbd>
                             <span>+</span>
                             <Kbd>{shortcut}</Kbd>
                         </KbdGroup>
@@ -114,6 +101,42 @@ export function FormattingHeaders({
         getIsActiveList(editorRef, getH4Regex) ||
         getIsActiveList(editorRef, getH5Regex) ||
         getIsActiveList(editorRef, getH6Regex);
+
+    const triggerHeading = (getRegex: () => RegExp, prefix: string) => {
+        handleListToggle(
+            editorRef,
+            getIsActiveList(editorRef, getRegex),
+            getRegex,
+            (line) => `${prefix} ${line.replace(/^#{1,6}\s/, "")}`,
+            (line) => line.replace(new RegExp(String.raw`^${prefix}\s`), ""),
+        );
+        setOpen(false);
+    };
+
+    useEffect(() => {
+        const editor = editorRef.current;
+        if (!editor) return;
+
+        const disposable = editor.onKeyDown((e) => {
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && isFocused) {
+                const actions: Record<string, () => void> = {
+                    Digit1: () => triggerHeading(getH1Regex, "#"),
+                    Digit2: () => triggerHeading(getH2Regex, "##"),
+                    Digit3: () => triggerHeading(getH3Regex, "###"),
+                    Digit4: () => triggerHeading(getH4Regex, "####"),
+                    Digit5: () => triggerHeading(getH5Regex, "#####"),
+                    Digit6: () => triggerHeading(getH6Regex, "######"),
+                };
+                const action = actions[e.code];
+                if (action) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    action();
+                }
+            }
+        });
+        return () => disposable.dispose();
+    }, [isFocused, editorRef.current]);
 
     return (
         <Popover open={open} onOpenChange={setOpen}>

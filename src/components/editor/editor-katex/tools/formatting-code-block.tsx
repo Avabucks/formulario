@@ -73,15 +73,17 @@ export function FormattingCodeBlock({
     };
 
     useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "U" && isFocused) {
+        const editor = editorRef.current;
+        if (!editor) return;
+
+        const disposable = editor.onKeyDown((e) => {
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.code === "KeyU" && isFocused) {
                 e.preventDefault();
                 setOpen((v) => !v);
             }
-        };
-        document.addEventListener("keydown", handleKeyDown);
-        return () => document.removeEventListener("keydown", handleKeyDown);
-    }, [isFocused]);
+        });
+        return () => disposable.dispose();
+    }, [isFocused, editorRef.current]);
 
     return (
         <>

@@ -314,19 +314,24 @@ export function FormattingLatexBlock({
     };
 
     useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "G" && isFocused) {
+        const editor = editorRef.current;
+        if (!editor) return;
+
+        const disposable = editor.onKeyDown((e) => {
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.code === "KeyG" && isFocused) {
                 e.preventDefault();
+                e.stopPropagation();
                 openCommand('single')
             }
-            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "H" && isFocused) {
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.code === "KeyH" && isFocused) {
                 e.preventDefault();
+                e.stopPropagation();
                 openCommand('double')
             }
-        };
-        document.addEventListener("keydown", handleKeyDown);
-        return () => document.removeEventListener("keydown", handleKeyDown);
-    }, [isFocused]);
+        });
+        return () => disposable.dispose();
+    }, [isFocused, editorRef.current]);
+
 
     return (
         <>

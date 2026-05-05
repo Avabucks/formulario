@@ -32,15 +32,18 @@ export function FormattingItalic({
         );
 
     useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "I" && (e.ctrlKey || e.metaKey) && e.shiftKey && isFocused) {
+        const editor = editorRef.current;
+        if (!editor) return;
+
+        const disposable = editor.onKeyDown((e) => {
+            if ((e.ctrlKey || e.metaKey) && e.code === "KeyI" && isFocused) {
                 e.preventDefault();
+                e.stopPropagation();
                 handleToggle();
             }
-        };
-        document.addEventListener("keydown", handleKeyDown);
-        return () => document.removeEventListener("keydown", handleKeyDown);
-    }, [isFocused]);
+        });
+        return () => disposable.dispose();
+    }, [isFocused, editorRef.current]);
 
     return (
         <TooltipProvider>
@@ -62,8 +65,6 @@ export function FormattingItalic({
                         Corsivo
                         <KbdGroup className="hidden md:flex">
                             <Kbd>Ctrl</Kbd>
-                            <span>+</span>
-                            <Kbd>Shift</Kbd>
                             <span>+</span>
                             <Kbd>I</Kbd>
                         </KbdGroup>

@@ -78,7 +78,6 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
         editor.onDidChangeModelContent(() => {
             updateButtons();
         });
-
         updateButtons();
         if (undoBtnRef.current) undoBtnRef.current.disabled = true;
         if (redoBtnRef.current) redoBtnRef.current.disabled = true;

@@ -56,7 +56,7 @@ export function FormattingDivider({
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "D" && (e.ctrlKey || e.metaKey) && e.shiftKey) {
+            if (e.code === "Digit9" && (e.ctrlKey || e.metaKey) && e.shiftKey) {
                 e.preventDefault();
                 handleToggle();
             }
@@ -88,7 +88,7 @@ export function FormattingDivider({
                             <span>+</span>
                             <Kbd>Shift</Kbd>
                             <span>+</span>
-                            <Kbd>D</Kbd>
+                            <Kbd>9</Kbd>
                         </KbdGroup>
                     </div>
                 </TooltipContent>

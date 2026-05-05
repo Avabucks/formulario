@@ -51,6 +51,7 @@ export function EditorInput({
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === "s" && (e.ctrlKey || e.metaKey)) {
+                save(textAreaContent)
                 e.preventDefault()
             }
         }
