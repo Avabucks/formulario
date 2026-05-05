@@ -94,7 +94,7 @@ export function ArgomentoItem({ argomento }: Readonly<{ argomento: Argomento }>)
                     <span className="group-hover:underline">
                         {argomento.titolo || <span>Senza titolo</span>}
                     </span>
-                    {!argomento.titolo && (
+                    {!argomento.titolo && argomento.editable && (
                         <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger asChild>
