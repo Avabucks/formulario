@@ -11,11 +11,8 @@ export async function POST(request: Request) {
 
     if (!uid) return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
 
-    const formData = await request.formData();
-    const titolo = formData.get("titolo") as string;
-    const capitoloId = formData.get("capitoloId") as string;
+    const { capitoloId } = await request.json();
 
-    if (!titolo) return NextResponse.json({ error: "Campi obbligatori mancanti" }, { status: 400 });
     if (!capitoloId) return NextResponse.json({ error: "Capitolo non specificato" }, { status: 400 });
 
     const beautiful_id = crypto.randomUUID();
@@ -36,9 +33,9 @@ export async function POST(request: Request) {
         );
 
         await pool.query(
-            `INSERT INTO argomenti (beautiful_id, titolo, capitolo, sort_order, content)
-             VALUES ($1, $2, $3, $4, $5)`,
-            [beautiful_id, titolo, capitoloId, rows[0].next_order, `# ${titolo}\n`]
+            `INSERT INTO argomenti (beautiful_id, capitolo, sort_order)
+             VALUES ($1, $2, $3)`,
+            [beautiful_id, capitoloId, rows[0].next_order]
         );
 
         await pool.query(
@@ -51,7 +48,7 @@ export async function POST(request: Request) {
         );
 
         revalidatePath(`/formulari/${capitoloId}`);
-        return NextResponse.json({ success: true });
+        return NextResponse.json({ beautifulId: beautiful_id });
 
     } catch (error: any) {
         console.error(error.message);

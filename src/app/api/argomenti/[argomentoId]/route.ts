@@ -20,7 +20,6 @@ export async function GET(
         const { rows, rowCount } = await pool.query(
             `SELECT 
                 a.beautiful_id AS id, 
-                a.titolo, 
                 a.content, 
                 a.sort_order,
                 a.capitolo AS "capitoloId"

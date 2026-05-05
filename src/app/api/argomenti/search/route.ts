@@ -16,13 +16,18 @@ export async function GET(request: Request) {
     if (!titolo) return NextResponse.json({ error: "Titolo obbligatorio" }, { status: 400 });
 
     const { rows } = await pool.query(
-        `SELECT A.beautiful_id AS "id", A.titolo, A.capitolo AS "capitoloId", C.titolo AS "capitoloTitolo", C.formulario AS "formularioId", F.titolo AS "formularioTitolo", similarity(A.titolo, $1) AS similarity
-         FROM argomenti A JOIN capitoli C ON A.capitolo = C.beautiful_id JOIN formulari F ON C.formulario = F.beautiful_id
-         WHERE F.owner_uid = $2 AND (similarity(A.titolo, $1) > 0.2 OR A.content ILIKE $3)
-         ORDER BY similarity DESC, A.titolo DESC
-         LIMIT 4`,
-        [titolo, uid, `%${titolo}%`]
+        `SELECT A.beautiful_id AS "id", A.capitolo AS "capitoloId", C.titolo AS "capitoloTitolo", C.formulario AS "formularioId", F.titolo AS "formularioTitolo", A.content AS "content"
+        FROM argomenti A JOIN capitoli C ON A.capitolo = C.beautiful_id JOIN formulari F ON C.formulario = F.beautiful_id
+        WHERE F.owner_uid = $2 AND A.content ILIKE $1
+        LIMIT 4`,
+        [`%${titolo}%`, uid]
     );
 
-    return NextResponse.json(rows);
+    const result = rows.map(({ content, ...row }) => {
+        const firstLine = content?.split("\n")[0] ?? "";
+        const title = firstLine.startsWith("#") ? firstLine.replace(/^#+\s*/, "") : "Senza titolo";
+        return { ...row, titolo: title };
+    });
+
+    return NextResponse.json(result);
 }

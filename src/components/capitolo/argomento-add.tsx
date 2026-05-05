@@ -46,21 +46,18 @@ export function ArgomentoAdd({ capitolo }: Readonly<{ capitolo: Capitolo }>) {
 
     }, [open])
 
-    async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
-        e.preventDefault();
-        const formData = new FormData(e.currentTarget);
-        formData.append("capitoloId", capitolo.id);
+    async function handleSubmit() {
 
         toast.promise(
             fetch("/api/argomenti/create", {
                 method: "POST",
-                body: formData,
+                body: JSON.stringify({ capitoloId: capitolo.id }),
             }).then(async (res) => {
                 if (!res.ok) {
                     const text = await res.text();
                     throw new Error(text);
                 }
-                router.refresh()
+                router.push(`/editor/` + (await res.json()).beautifulId)
             }),
             {
                 loading: "Creazione in corso...",
@@ -78,16 +75,14 @@ export function ArgomentoAdd({ capitolo }: Readonly<{ capitolo: Capitolo }>) {
             <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <DialogTrigger asChild>
-                            <Button variant="default">
-                                <Plus size={16} />
-                                <div className="hidden md:flex">Aggiungi argomento</div>
-                            </Button>
-                        </DialogTrigger>
+                        <Button variant="default" onClick={handleSubmit}>
+                            <Plus size={16} />
+                            <div className="hidden md:flex">Aggiungi argomento</div>
+                        </Button>
                     </TooltipTrigger>
                     <TooltipContent className="pr-1.5">
                         <div className="flex items-center gap-2">
-                            Aggiungi capitolo
+                            Aggiungi argomento
                             <KbdGroup className="hidden md:flex">
                                 <Kbd>Ctrl</Kbd>
                                 <span>+</span>
@@ -99,26 +94,6 @@ export function ArgomentoAdd({ capitolo }: Readonly<{ capitolo: Capitolo }>) {
                     </TooltipContent>
                 </Tooltip>
             </TooltipProvider>
-            <DialogContent className="sm:max-w-md">
-                <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
-                    <DialogHeader>
-                        <DialogTitle>Aggiungi nuovo argomento</DialogTitle>
-                        <DialogDescription>
-                            <span>Crea un nuovo argomento in {capitolo.titolo}.</span>
-                        </DialogDescription>
-                    </DialogHeader>
-                    <Field>
-                        <Label htmlFor="titolo-1">Titolo del nuovo argomento</Label>
-                        <Input id="titolo-1" name="titolo" />
-                    </Field>
-                    <DialogFooter>
-                        <DialogClose asChild>
-                            <Button variant="outline">Chiudi</Button>
-                        </DialogClose>
-                        <Button type="submit">Salva</Button>
-                    </DialogFooter>
-                </form>
-            </DialogContent>
         </Dialog>
     )
 }

@@ -107,13 +107,19 @@ export default async function Capitolo({
     const { rows: argomenti } = await pool.query(
         `SELECT
         a.beautiful_id AS "id",
-        a.titolo,
-        a.sort_order   AS "sortOrder"
+        a.sort_order   AS "sortOrder",
+        a.content      AS "content"
         FROM argomenti a
         WHERE a.capitolo = $1
         ORDER BY a.sort_order ASC`,
         [capitoloId]
     );
+
+    const argomentiRes = argomenti.map(({ content, ...row }) => {
+        const firstLine = content?.split("\n")[0] ?? "";
+        const title = firstLine.startsWith("#") ? firstLine.replace(/^#+\s*/, "") : null;
+        return { ...row, titolo: title };
+    });
 
     const renderEmpty = () => (
         <Empty className="border border-dashed">
@@ -155,11 +161,11 @@ export default async function Capitolo({
                 </div>
                 <Suspense fallback={renderLoadingSkeleton()}>
                     <div className="flex flex-col gap-4 w-full">
-                        {argomenti.length == 0 ?
+                        {argomentiRes.length == 0 ?
                             renderEmpty()
                             :
-                            argomenti.map((a, index) => (
-                                <ArgomentoItem key={a.id} argomento={{ ...a, editable: capitolo.editable, argomentiCount: argomenti.length }} />
+                            argomentiRes.map((a, index) => (
+                                <ArgomentoItem key={a.id} argomento={{ ...a, editable: capitolo.editable, argomentiCount: argomentiRes.length }} />
                             ))
                         }
                     </div>

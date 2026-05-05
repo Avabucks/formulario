@@ -14,15 +14,14 @@ import {
     ItemMedia,
     ItemTitle,
 } from "@/src/components/ui/item"
-import { ArrowDown, ArrowUp, Check, ChevronRightIcon, EllipsisVertical, PenLine, TableOfContents, Trash2, X } from "lucide-react"
+import { ArrowDown, ArrowUp, ChevronRightIcon, EllipsisVertical, Info, TableOfContents, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
 import { Button } from "../ui/button"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog"
-import { Field } from "../ui/field"
-import { Input } from "../ui/input"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip"
 
 type Argomento = {
     id: string;
@@ -34,35 +33,7 @@ type Argomento = {
 
 export function ArgomentoItem({ argomento }: Readonly<{ argomento: Argomento }>) {
     const router = useRouter();
-    const [isEditing, setIsEditing] = useState(false);
     const [deleteOpen, setDeleteOpen] = useState(false);
-
-    async function handleRename(e: React.SubmitEvent<HTMLFormElement>) {
-        e.preventDefault();
-        const formData = new FormData(e.currentTarget);
-        formData.append("argomentoId", argomento.id);
-
-        toast.promise(
-            fetch("/api/argomenti/update", {
-                method: "PUT",
-                body: formData,
-            }).then(async (res) => {
-                if (!res.ok) {
-                    const text = await res.text();
-                    throw new Error(text);
-                }
-                router.refresh()
-            }),
-            {
-                loading: "Modifica in corso...",
-                success: "Argomento rinominato con successo!",
-                error: "Errore durante la modifica dell'argomento.",
-                position: "bottom-center",
-            },
-        );
-
-        setIsEditing(false);
-    }
 
     async function handleDelete() {
         const formData = new FormData();
@@ -118,33 +89,35 @@ export function ArgomentoItem({ argomento }: Readonly<{ argomento: Argomento }>)
             <ItemMedia>
                 <TableOfContents size={16} />
             </ItemMedia>
-            <ItemContent>
-                {isEditing ? (
-                    <Field>
-                        <Input id="titolo-1" name="titolo" defaultValue={argomento.titolo} />
-                    </Field>
-                ) : (
-                    <ItemTitle>
-                        <span className="group-hover:underline">
-                            {argomento.titolo}
-                        </span>
-                    </ItemTitle>
-                )}
+            <ItemContent className={`${!argomento.editable && "py-2"}`}>
+                <ItemTitle>
+                    <span className="group-hover:underline">
+                        {argomento.titolo || <span>Senza titolo</span>}
+                    </span>
+                    {!argomento.titolo && (
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Info size={14} className="text-muted-foreground cursor-default shrink-0" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Per aggiungere un titolo, inizia la prima riga con <code>#</code></p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    )}
+                </ItemTitle>
             </ItemContent>
         </>
     )
 
     return (
-        <Item className={`${!isEditing && "hover:bg-muted/50 cursor-pointer"}`} variant="outline" size="sm">
-            <form className="flex w-full gap-2 items-center group" onSubmit={handleRename}>
-                {isEditing ? (
-                    <>{content}</>
-                ) : (
-                    <Link href={`/editor/${argomento.id}`} onClick={(e: any) => { e.preventDefault(); router.push(`/editor/${argomento.id}`) }} className="flex w-full gap-2 items-center">
-                        {content}
-                    </Link>
-                )}
-                {argomento.editable && !isEditing && (
+        <Item className="hover:bg-muted/50 cursor-pointer" variant="outline" size="sm">
+            <div className="flex w-full gap-2 items-center group">
+                <Link href={`/editor/${argomento.id}`} onClick={(e: any) => { e.preventDefault(); router.push(`/editor/${argomento.id}`) }} className="flex w-full gap-2 items-center">
+                    {content}
+                </Link>
+                {argomento.editable && (
                     <>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -165,13 +138,7 @@ export function ArgomentoItem({ argomento }: Readonly<{ argomento: Argomento }>)
                                         Sposta Giu
                                     </DropdownMenuItem>
                                 )}
-                                <DropdownMenuItem onSelect={(e) => {
-                                    setIsEditing(true);
-                                }}>
-                                    <PenLine />
-                                    Rinomina
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
+                                {argomento.sortOrder > 1 && argomento.sortOrder < argomento.argomentiCount && <DropdownMenuSeparator />}
                                 <DropdownMenuItem variant="destructive" onSelect={() => setDeleteOpen(true)}>
                                     <Trash2 />
                                     Elimina
@@ -184,7 +151,7 @@ export function ArgomentoItem({ argomento }: Readonly<{ argomento: Argomento }>)
                                     <DialogTitle>Elimina</DialogTitle>
                                 </DialogHeader>
                                 <DialogDescription>
-                                    Sei sicuro di voler eliminare "{argomento.titolo}"? Questa azione non è reversibile.
+                                    Sei sicuro di voler eliminare "{argomento.titolo || "Senza titolo"}"? Questa azione non è reversibile.
                                 </DialogDescription>
                                 <DialogFooter>
                                     <DialogClose asChild>
@@ -203,17 +170,7 @@ export function ArgomentoItem({ argomento }: Readonly<{ argomento: Argomento }>)
                         <ChevronRightIcon size={16} />
                     </ItemActions>
                 )}
-                {argomento.editable && isEditing && (
-                    <div className="flex gap-2">
-                        <Button variant="outline" size="icon" onClick={() => setIsEditing(false)}>
-                            <X />
-                        </Button>
-                        <Button variant="default" size="icon" type="submit">
-                            <Check />
-                        </Button>
-                    </div>
-                )}
-            </form>
+            </div>
         </Item>
     )
 }

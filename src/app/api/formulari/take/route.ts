@@ -64,9 +64,9 @@ export async function POST(request: Request) {
 
             for (const argomento of argomenti) {
                 await client.query(
-                    `INSERT INTO argomenti (beautiful_id, titolo, capitolo, sort_order, content)
-                     VALUES ($1, $2, $3, $4, $5)`,
-                    [crypto.randomUUID(), argomento.titolo, newCapitoloId, argomento.sort_order, argomento.content]
+                    `INSERT INTO argomenti (beautiful_id, capitolo, sort_order, content)
+                     VALUES ($1, $2, $3, $4)`,
+                    [crypto.randomUUID(), newCapitoloId, argomento.sort_order, argomento.content]
                 );
             }
         }

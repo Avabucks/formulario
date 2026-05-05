@@ -17,15 +17,20 @@ export async function generateMetadata({
 }) {
     const { argomentoId } = await params;
     const { rows: argomentoRows, rowCount } = await pool.query(
-        `SELECT A.titolo, F.descrizione, F.visibility
-         FROM argomenti A
-         JOIN capitoli C ON C.beautiful_id = A.capitolo
-         JOIN formulari F ON F.beautiful_id = C.formulario
-         WHERE A.beautiful_id = $1`,
+        `SELECT F.descrizione, F.visibility, A.content AS "content"
+     FROM argomenti A
+     JOIN capitoli C ON C.beautiful_id = A.capitolo
+     JOIN formulari F ON F.beautiful_id = C.formulario
+     WHERE A.beautiful_id = $1`,
         [argomentoId]
     );
 
-    const argomento = rowCount && rowCount > 0 ? argomentoRows[0] : null;
+    const argomento = rowCount && rowCount > 0 ? (() => {
+        const { content, ...rest } = argomentoRows[0];
+        const firstLine = content?.split("\n")[0] ?? "";
+        const titolo = firstLine.startsWith("#") ? firstLine.replace(/^#+\s*/, "") : "Senza titolo";
+        return { ...rest, titolo };
+    })() : null;
 
     if (!argomento) {
         return {
@@ -74,7 +79,8 @@ export default async function Argomento({
 
     // Check if user has access to the capitolo (owner or public)
     const { rows: argomentoRows, rowCount } = await pool.query(
-        `SELECT A.beautiful_id AS "id", A.titolo,
+        `SELECT A.beautiful_id AS "id",
+            A.content AS "content",
             F.titolo AS "formularioTitolo", F.owner_uid as "ownerUid", F.beautiful_id AS "formularioId",
             C.titolo AS "capitoloTitolo", C.beautiful_id AS "capitoloId"
             FROM argomenti A
@@ -90,8 +96,13 @@ export default async function Argomento({
         redirect('/home');
     }
 
+    const { content, ...argomentoData } = argomentoRows[0];
+    const firstLine = content?.split("\n")[0] ?? "";
+    const titolo = firstLine.startsWith("#") ? firstLine.replace(/^#+\s*/, "") : "Senza titolo";
+
     const argomento = {
-        ...argomentoRows[0],
+        ...argomentoData,
+        titolo,
         editable: argomentoRows[0].ownerUid === uid,
     };
 
