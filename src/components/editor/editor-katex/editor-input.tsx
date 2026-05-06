@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { NavigationBlocker } from "../../navigation/navigation-blocker";
 import { Spinner } from "../../ui/spinner";
 import { editor } from 'monaco-editor';
+import { useRouter } from "next/navigation";
 
 export function EditorInput({
     argomentoId,
@@ -22,6 +23,8 @@ export function EditorInput({
     setEdited: (value: boolean) => void,
     handleEditorDidMount: (editor: editor.IStandaloneCodeEditor, monaco: Monaco) => void;
 }>) {
+    const router = useRouter();
+
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(false)
 
@@ -40,6 +43,7 @@ export function EditorInput({
                 const text = await res.text()
                 throw new Error(text)
             }
+            router.refresh();
         })
             .catch(() => setError(true))
             .finally(() => {
