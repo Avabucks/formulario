@@ -24,12 +24,14 @@ export default function Home() {
 
 // - [EDITOR]
 // -- [ ] TABLE
-// -- bug switch view smonta editor
+// - bug switch view smonta editorù
+// - bug code cursor nel prefix finale aggiunge il linguaggio alla fine
+// - titoli come notion con "scaletta"
+// - sistemare preview <p>, quote, code, ...
 
 // - [GENERALI]
 // - report che manda mail a admin (mail nell'env) solo se la formula non è tua (in impostazioni)
 // - aggiornare video e formulario di benvenuto
-// - titolo come notion e sistemare <p> e quote
 
 // - [PREMIUM]
 // - abbonamento a 1,99 che ti da accesso illimitato a creazione formulari e 200 crediti AI (senza crediti ma con tokens cosi e piu preciso ma senza scrivere il ilmite, semplicemente quando finiscono esce popup)
@@ -37,9 +39,9 @@ export default function Home() {
 // - [NOVITA]
 // - ⁠categorie per organizzare formulari + colori titoli
 // - aggiungere funzionalità di esportazione (pdf, markdown, ecc.)
-// - flashcards con ai per ogni argomento
+// - supporto piu lingue
 // - image manager nelle impostazioni
 // - tree del formulario (accessibile da tasto di fianco a impostazioni e apre drawer laterale)
-// - console errori
+// - flashcards con ai per ogni argomento
+// - console errori della preview
 // - note protette da password
-// - supporto piu lingue
