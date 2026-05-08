@@ -1,8 +1,10 @@
 "use client";
 
 import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
+import { Separator } from "@/src/components/ui/separator";
 import { Toggle } from "@/src/components/ui/toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/components/ui/tooltip";
+import { checkActiveLatexOrCode } from "@/src/lib/editor/formatting-utils";
 import { Minus } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useEffect } from "react";
@@ -65,34 +67,39 @@ export function FormattingDivider({
         return () => document.removeEventListener("keydown", handleKeyDown);
     }, [isFocused]);
 
+    if (checkActiveLatexOrCode(editorRef)) return null;
+
     return (
-        <TooltipProvider>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <Toggle
-                        variant="outline"
-                        onPressedChange={handleToggle}
-                        onMouseDown={(e) => e.preventDefault()}
-                        aria-label="Divisore"
-                        pressed={false}
-                        disabled={!isFocused}
-                    >
-                        <Minus size={16} />
-                    </Toggle>
-                </TooltipTrigger>
-                <TooltipContent className="pr-1.5">
-                    <div className="flex items-center gap-2">
-                        Divisore
-                        <KbdGroup className="hidden md:flex">
-                            <Kbd>Ctrl</Kbd>
-                            <span>+</span>
-                            <Kbd>Shift</Kbd>
-                            <span>+</span>
-                            <Kbd>9</Kbd>
-                        </KbdGroup>
-                    </div>
-                </TooltipContent>
-            </Tooltip>
-        </TooltipProvider>
+        <>
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Toggle
+                            variant="outline"
+                            onPressedChange={handleToggle}
+                            onMouseDown={(e) => e.preventDefault()}
+                            aria-label="Divisore"
+                            pressed={false}
+                            disabled={!isFocused}
+                        >
+                            <Minus size={16} />
+                        </Toggle>
+                    </TooltipTrigger>
+                    <TooltipContent className="pr-1.5">
+                        <div className="flex items-center gap-2">
+                            Divisore
+                            <KbdGroup className="hidden md:flex">
+                                <Kbd>Ctrl</Kbd>
+                                <span>+</span>
+                                <Kbd>Shift</Kbd>
+                                <span>+</span>
+                                <Kbd>9</Kbd>
+                            </KbdGroup>
+                        </div>
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
+            <Separator orientation="vertical" />
+        </>
     );
 }

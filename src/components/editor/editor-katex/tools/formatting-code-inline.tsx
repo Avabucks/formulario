@@ -3,7 +3,7 @@
 import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
 import { Toggle } from "@/src/components/ui/toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/components/ui/tooltip";
-import { getIsActive, handleFormattingToggle } from "@/src/lib/editor/formatting-utils";
+import { checkActiveLatexOrCode, getIsActive, handleFormattingToggle } from "@/src/lib/editor/formatting-utils";
 import { Terminal } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useEffect } from "react";
@@ -24,7 +24,7 @@ export function FormattingCodeInline({
     const handleToggle = () =>
         handleFormattingToggle(
             editorRef,
-            getIsActive(editorRef, getCodeRegex),
+            isActive,
             getCodeRegex,
             (text) => `\`${text}$0\``,
             (match) => match[1],
@@ -44,6 +44,8 @@ export function FormattingCodeInline({
         });
         return () => disposable.dispose();
     }, [isFocused, editorRef.current]);
+
+    if (checkActiveLatexOrCode(editorRef)) return null;
 
     return (
         <TooltipProvider>

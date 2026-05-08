@@ -4,7 +4,7 @@ import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
 import { Popover, PopoverContent, PopoverTrigger } from "@/src/components/ui/popover";
 import { Toggle } from "@/src/components/ui/toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/components/ui/tooltip";
-import { getIsActiveList, handleListToggle } from "@/src/lib/editor/formatting-utils";
+import { checkActiveLatexOrCode, getIsActiveList, handleListToggle } from "@/src/lib/editor/formatting-utils";
 import { Heading, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6 } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useEffect, useState } from "react";
@@ -40,7 +40,7 @@ function HeadingToggle({
     const handleToggle = () => {
         handleListToggle(
             editorRef,
-            getIsActiveList(editorRef, getRegex),
+            isActive,
             getRegex,
             (line) => {
                 const stripped = line.replace(/^#{1,6}\s/, "");
@@ -50,6 +50,8 @@ function HeadingToggle({
         );
         onToggle();
     };
+
+    if (checkActiveLatexOrCode(editorRef)) return null;
 
     return (
         <TooltipProvider>
@@ -105,7 +107,7 @@ export function FormattingHeaders({
     const triggerHeading = (getRegex: () => RegExp, prefix: string) => {
         handleListToggle(
             editorRef,
-            getIsActiveList(editorRef, getRegex),
+            anyActive,
             getRegex,
             (line) => `${prefix} ${line.replace(/^#{1,6}\s/, "")}`,
             (line) => line.replace(new RegExp(String.raw`^${prefix}\s`), ""),
@@ -137,6 +139,8 @@ export function FormattingHeaders({
         });
         return () => disposable.dispose();
     }, [isFocused, editorRef.current]);
+
+    if (checkActiveLatexOrCode(editorRef)) return null;
 
     return (
         <Popover open={open} onOpenChange={setOpen}>

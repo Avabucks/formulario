@@ -13,10 +13,11 @@ import {
 } from "@/src/components/ui/command";
 import { Toggle } from "@/src/components/ui/toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/components/ui/tooltip";
-import { getIsActiveBlock, handleBlockToggle } from "@/src/lib/editor/formatting-utils";
+import { getIsActiveBlock, getIsActiveLatexInline, handleBlockToggle } from "@/src/lib/editor/formatting-utils";
 import { Code, SquareTerminal, X } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useEffect, useState } from "react";
+import { Separator } from "@/src/components/ui/separator";
 
 const OPEN_MARKER = "```";
 const CLOSE_MARKER = "```";
@@ -53,7 +54,7 @@ export function FormattingCodeBlock({
     isFocused: boolean;
 }>) {
     const [open, setOpen] = useState(false);
-    const blockState = getIsActiveBlock(editorRef, OPEN_MARKER, CLOSE_MARKER);
+    const blockState = getIsActiveBlock(editorRef);
     const isActive = blockState !== null;
 
     const handleSelect = (language: string | null) => {
@@ -84,6 +85,8 @@ export function FormattingCodeBlock({
         });
         return () => disposable.dispose();
     }, [isFocused, editorRef.current]);
+
+    if (getIsActiveLatexInline(editorRef)) return null;
 
     return (
         <>
@@ -161,6 +164,7 @@ export function FormattingCodeBlock({
                     </CommandList>
                 </Command>
             </CommandDialog>
+            <Separator orientation="vertical" />
         </>
     );
 }

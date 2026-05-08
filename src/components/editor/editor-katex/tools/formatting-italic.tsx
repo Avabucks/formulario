@@ -3,7 +3,7 @@
 import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
 import { Toggle } from "@/src/components/ui/toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/components/ui/tooltip";
-import { getIsActive, handleFormattingToggle } from "@/src/lib/editor/formatting-utils";
+import { checkActiveLatexOrCode, getIsActive, handleFormattingToggle } from "@/src/lib/editor/formatting-utils";
 import { Italic } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useEffect } from "react";
@@ -24,7 +24,7 @@ export function FormattingItalic({
     const handleToggle = () =>
         handleFormattingToggle(
             editorRef,
-            getIsActive(editorRef, getItalicRegex),
+            isActive,
             getItalicRegex,
             (text) => `_${text}$0_`,
             (match) => match[1],
@@ -44,6 +44,8 @@ export function FormattingItalic({
         });
         return () => disposable.dispose();
     }, [isFocused, editorRef.current]);
+
+    if (checkActiveLatexOrCode(editorRef)) return null;
 
     return (
         <TooltipProvider>

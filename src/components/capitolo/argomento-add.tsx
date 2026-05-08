@@ -34,7 +34,7 @@ export function ArgomentoAdd({ capitolo }: Readonly<{ capitolo: Capitolo }>) {
 
         document.addEventListener("keydown", handleKeyDown);
         return () => document.removeEventListener("keydown", handleKeyDown);
-    }, [open]);
+    });
 
     async function handleSubmit() {
 

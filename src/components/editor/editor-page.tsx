@@ -4,30 +4,29 @@ import { useIsMobile } from '@/src/hooks/useIsMobile';
 import { Editor, Monaco } from '@monaco-editor/react';
 import { ArrowRightLeft, Eye, EyeClosed, PenOff, Redo2, Undo2 } from "lucide-react";
 import type { Selection } from "monaco-editor";
+import { useTheme } from 'next-themes';
 import { useEffect, useRef, useState } from "react";
 import { FormularioSettings } from "../home/formulario-settings";
+import { TakeFormulario } from '../home/take-formulario';
 import { Button } from "../ui/button";
 import { Kbd, KbdGroup } from "../ui/kbd";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "../ui/resizable";
-import { Separator } from '../ui/separator';
+import { Spinner } from '../ui/spinner';
 import { Toggle } from "../ui/toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { EditorInput } from "./editor-katex/editor-input";
 import { EditorPreview } from "./editor-katex/editor-preview";
 import { FormattingBold } from './editor-katex/tools/formatting-bold';
+import { FormattingCodeBlock } from './editor-katex/tools/formatting-code-block';
+import { FormattingCodeInline } from './editor-katex/tools/formatting-code-inline';
 import { FormattingDivider } from './editor-katex/tools/formatting-divider';
 import { FormattingHeaders } from './editor-katex/tools/formatting-headers';
 import { FormattingItalic } from './editor-katex/tools/formatting-italic';
+import { FormattingLatexBlock } from './editor-katex/tools/formatting-latex-block';
 import { FormattingOrderedList } from './editor-katex/tools/formatting-ordered';
 import { FormattingQuote } from './editor-katex/tools/formatting-quote';
 import { FormattingUnorderedList } from './editor-katex/tools/formatting-unordered';
-import { Spinner } from '../ui/spinner';
 import { GeminiButton } from './editor-katex/tools/gemini-ai';
-import { useTheme } from 'next-themes';
-import { TakeFormulario } from '../home/take-formulario';
-import { FormattingCodeBlock } from './editor-katex/tools/formatting-code-block';
-import { FormattingLatexBlock } from './editor-katex/tools/formatting-latex-block';
-import { FormattingCodeInline } from './editor-katex/tools/formatting-code-inline';
 
 export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ argomentoId: string, editable: boolean, formularioId: string }>) {
     const isMobile = useIsMobile();
@@ -64,6 +63,12 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
 
         editor.onDidBlurEditorWidget(() => {
             setIsFocused(false);
+            editor.setSelection({
+                startLineNumber: 1,
+                startColumn: 1,
+                endLineNumber: 1,
+                endColumn: 1,
+            });
         });
 
         const updateButtons = () => {
@@ -99,10 +104,9 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
             const data = await response.json();
             setTextAreaContent(data.content);
             setMarkdownContent(data.content);
+            setLoading(false)
         } catch (error: any) {
             console.error(error.message);
-        } finally {
-            setLoading(false)
         }
     };
 
@@ -139,153 +143,145 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
 
     const toolbar = (
         loading ? <div className="flex h-full items-center justify-center"><Spinner /></div> :
-        <div className="flex w-full border-b min-h-15 overflow-x-auto">
-            <div className="flex gap-3 border-r items-center px-3">
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button
-                                ref={undoBtnRef}
-                                variant="outline"
-                                size="icon"
-                                onClick={handleUndo}
-                                onMouseDown={(e) => e.preventDefault()}
-                            >
-                                <Undo2 size={16} />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent className="pr-1.5">
-                            <div className="flex items-center gap-2">
-                                Annulla
-                                <KbdGroup className="hidden md:flex">
-                                    <Kbd>Ctrl</Kbd>
-                                    <span>+</span>
-                                    <Kbd>Z</Kbd>
-                                </KbdGroup>
-                            </div>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button
-                                ref={redoBtnRef}
-                                variant="outline"
-                                size="icon"
-                                onClick={handleRedo}
-                                onMouseDown={(e) => e.preventDefault()}
-                            >
-                                <Redo2 size={16} />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent className="pr-1.5">
-                            <div className="flex items-center gap-2">
-                                Ripristina
-                                <KbdGroup className="hidden md:flex">
-                                    <Kbd>Ctrl</Kbd>
-                                    <span>+</span>
-                                    <Kbd>Y</Kbd>
-                                </KbdGroup>
-                            </div>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
-            </div>
-
-            <div className="flex flex-1 items-center">
-                <div className="flex flex-1 items-center gap-3 h-full px-3">
-                    <FormattingHeaders
-                        _selection={selection}
-                        editorRef={editorRef}
-                        isFocused={isFocused}
-                    />
-                    <FormattingBold
-                        _selection={selection}
-                        editorRef={editorRef}
-                        isFocused={isFocused}
-                    />
-                    <FormattingItalic
-                        _selection={selection}
-                        editorRef={editorRef}
-                        isFocused={isFocused}
-                    />
-                    <FormattingQuote
-                        _selection={selection}
-                        editorRef={editorRef}
-                        isFocused={isFocused}
-                    />
-
-                    <Separator orientation="vertical" />
-
-                    <FormattingOrderedList
-                        _selection={selection}
-                        editorRef={editorRef}
-                        isFocused={isFocused}
-                    />
-                    <FormattingUnorderedList
-                        _selection={selection}
-                        editorRef={editorRef}
-                        isFocused={isFocused}
-                    />
-
-                    <Separator orientation="vertical" />
-
-                    <FormattingDivider
-                        _selection={selection}
-                        editorRef={editorRef}
-                        isFocused={isFocused}
-                    />
-
-                    <Separator orientation="vertical" />
-
-                    <FormattingCodeInline
-                        _selection={selection}
-                        editorRef={editorRef}
-                        isFocused={isFocused}
-                    />
-                    <FormattingCodeBlock
-                        _selection={selection}
-                        editorRef={editorRef}
-                        isFocused={isFocused}
-                    />
-
-                    <Separator orientation="vertical" />
-
-                    <FormattingLatexBlock
-                        _selection={selection}
-                        editorRef={editorRef}
-                        isFocused={isFocused}
-                    />
-
+            <div className="flex w-full border-b min-h-15 overflow-x-auto">
+                <div className="flex gap-3 border-r items-center px-3">
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    ref={undoBtnRef}
+                                    variant="outline"
+                                    size="icon"
+                                    onClick={handleUndo}
+                                    onMouseDown={(e) => e.preventDefault()}
+                                >
+                                    <Undo2 size={16} />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent className="pr-1.5">
+                                <div className="flex items-center gap-2">
+                                    Annulla
+                                    <KbdGroup className="hidden md:flex">
+                                        <Kbd>Ctrl</Kbd>
+                                        <span>+</span>
+                                        <Kbd>Z</Kbd>
+                                    </KbdGroup>
+                                </div>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    ref={redoBtnRef}
+                                    variant="outline"
+                                    size="icon"
+                                    onClick={handleRedo}
+                                    onMouseDown={(e) => e.preventDefault()}
+                                >
+                                    <Redo2 size={16} />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent className="pr-1.5">
+                                <div className="flex items-center gap-2">
+                                    Ripristina
+                                    <KbdGroup className="hidden md:flex">
+                                        <Kbd>Ctrl</Kbd>
+                                        <span>+</span>
+                                        <Kbd>Y</Kbd>
+                                    </KbdGroup>
+                                </div>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
                 </div>
 
-                <div className="flex items-center border-l gap-3 px-3 h-full">
-                    <GeminiButton
-                        editorRef={editorRef}
-                    />
+                <div className="flex flex-1 items-center">
+                    <div className="flex flex-1 items-center gap-3 h-full px-3">
+                        <FormattingHeaders
+                            _selection={selection}
+                            editorRef={editorRef}
+                            isFocused={isFocused}
+                        />
+                        <FormattingBold
+                            _selection={selection}
+                            editorRef={editorRef}
+                            isFocused={isFocused}
+                        />
+                        <FormattingItalic
+                            _selection={selection}
+                            editorRef={editorRef}
+                            isFocused={isFocused}
+                        />
+                        <FormattingQuote
+                            _selection={selection}
+                            editorRef={editorRef}
+                            isFocused={isFocused}
+                        />
+
+                        <FormattingOrderedList
+                            _selection={selection}
+                            editorRef={editorRef}
+                            isFocused={isFocused}
+                        />
+                        <FormattingUnorderedList
+                            _selection={selection}
+                            editorRef={editorRef}
+                            isFocused={isFocused}
+                        />
+
+                        <FormattingDivider
+                            _selection={selection}
+                            editorRef={editorRef}
+                            isFocused={isFocused}
+                        />
+
+                        <FormattingCodeInline
+                            _selection={selection}
+                            editorRef={editorRef}
+                            isFocused={isFocused}
+                        />
+                        <FormattingCodeBlock
+                            _selection={selection}
+                            editorRef={editorRef}
+                            isFocused={isFocused}
+                        />
+
+                        <FormattingLatexBlock
+                            _selection={selection}
+                            editorRef={editorRef}
+                            isFocused={isFocused}
+                        />
+
+                    </div>
+
+                    <div className="flex items-center border-l gap-3 px-3 h-full">
+                        <GeminiButton
+                            editorRef={editorRef}
+                        />
+                    </div>
                 </div>
-            </div>
 
-            {/* Mobile */}
-            <div className="flex md:hidden border-l items-center px-3 gap-3">
-                <Button variant="outline" size="icon" onClick={() => setSwitchView((prev) => !prev)}>
-                    <ArrowRightLeft size={16} />
-                </Button>
-            </div>
+                {/* Mobile */}
+                <div className="flex md:hidden border-l items-center px-3 gap-3">
+                    <Button variant="outline" size="icon" onClick={() => setSwitchView((prev) => !prev)}>
+                        <ArrowRightLeft size={16} />
+                    </Button>
+                </div>
 
-            {/* Desktop */}
-            <div className="hidden md:flex border-l items-center px-3 gap-3">
-                <Toggle variant="outline" pressed={switchView} onClick={() => setSwitchView((prev) => !prev)}>
-                    {switchView ? <Eye size={16} /> : <EyeClosed size={16} />}
-                </Toggle>
-            </div>
+                {/* Desktop */}
+                <div className="hidden md:flex border-l items-center px-3 gap-3">
+                    <Toggle variant="outline" pressed={switchView} onClick={() => setSwitchView((prev) => !prev)}>
+                        {switchView ? <Eye size={16} /> : <EyeClosed size={16} />}
+                    </Toggle>
+                </div>
 
-            <div className="flex border-l items-center px-3 gap-3">
-                <FormularioSettings formularioId={formularioId} />
-            </div>
+                <div className="flex border-l items-center px-3 gap-3">
+                    <FormularioSettings formularioId={formularioId} />
+                </div>
 
-        </div>
+            </div>
     );
     const preview = !loading && <EditorPreview markdownContent={markdownContent ?? ""} />;
     const editor = editable

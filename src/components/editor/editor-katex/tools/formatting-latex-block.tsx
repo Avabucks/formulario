@@ -14,6 +14,7 @@ import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
 import { Toggle } from "@/src/components/ui/toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/components/ui/tooltip";
 import {
+    getIsActiveBlock,
     getIsActiveLatexInline
 } from "@/src/lib/editor/formatting-utils";
 import katex from "katex";
@@ -362,6 +363,7 @@ export function FormattingLatexBlock({
         return () => disposable.dispose();
     }, [isFocused, editorRef.current]);
 
+    if (getIsActiveBlock(editorRef)) return null;
 
     return (
         <>

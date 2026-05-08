@@ -1,9 +1,10 @@
 "use client";
 
 import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
+import { Separator } from "@/src/components/ui/separator";
 import { Toggle } from "@/src/components/ui/toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/components/ui/tooltip";
-import { getIsActiveList, handleListToggle } from "@/src/lib/editor/formatting-utils";
+import { checkActiveLatexOrCode, getIsActiveList, handleListToggle } from "@/src/lib/editor/formatting-utils";
 import { Quote } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useEffect } from "react";
@@ -24,7 +25,7 @@ export function FormattingQuote({
     const handleToggle = () =>
         handleListToggle(
             editorRef,
-            getIsActiveList(editorRef, getQuoteRegex),
+            isActive,
             getQuoteRegex,
             (line) => `> ${line}`,
             (line) => line.replace(/^>\s/, ""),
@@ -44,34 +45,39 @@ export function FormattingQuote({
         return () => disposable.dispose();
     }, [isFocused, editorRef.current]);
 
+    if (checkActiveLatexOrCode(editorRef)) return null;
+
     return (
-        <TooltipProvider>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <Toggle
-                        variant="outline"
-                        onPressedChange={handleToggle}
-                        onMouseDown={(e) => e.preventDefault()}
-                        aria-label="Citazione"
-                        pressed={isActive && isFocused}
-                        disabled={!isFocused}
-                    >
-                        <Quote size={16} />
-                    </Toggle>
-                </TooltipTrigger>
-                <TooltipContent className="pr-1.5">
-                    <div className="flex items-center gap-2">
-                        Citazione
-                        <KbdGroup className="hidden md:flex">
-                            <Kbd>Ctrl</Kbd>
-                            <span>+</span>
-                            <Kbd>Shift</Kbd>
-                            <span>+</span>
-                            <Kbd>Q</Kbd>
-                        </KbdGroup>
-                    </div>
-                </TooltipContent>
-            </Tooltip>
-        </TooltipProvider>
+        <>
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Toggle
+                            variant="outline"
+                            onPressedChange={handleToggle}
+                            onMouseDown={(e) => e.preventDefault()}
+                            aria-label="Citazione"
+                            pressed={isActive && isFocused}
+                            disabled={!isFocused}
+                        >
+                            <Quote size={16} />
+                        </Toggle>
+                    </TooltipTrigger>
+                    <TooltipContent className="pr-1.5">
+                        <div className="flex items-center gap-2">
+                            Citazione
+                            <KbdGroup className="hidden md:flex">
+                                <Kbd>Ctrl</Kbd>
+                                <span>+</span>
+                                <Kbd>Shift</Kbd>
+                                <span>+</span>
+                                <Kbd>Q</Kbd>
+                            </KbdGroup>
+                        </div>
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
+            <Separator orientation="vertical" />
+        </>
     );
 }

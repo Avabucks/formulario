@@ -5,6 +5,7 @@ export function getIsActive(
     getRegex: () => RegExp,
 ): boolean {
     if (!editorRef.current) return false;
+
     const model = editorRef.current.getModel();
     if (!model) return false;
 
@@ -120,6 +121,7 @@ export function getIsActiveList(
     getLineRegex: () => RegExp,
 ): boolean {
     if (!editorRef.current) return false;
+    
     const model = editorRef.current.getModel();
     if (!model) return false;
 
@@ -184,64 +186,35 @@ export function handleListToggle(
 
 export function getIsActiveBlock(
     editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
-    openMarker: string,
-    closeMarker: string,
-    includeMarkers: boolean = true,
 ): { language: string | null } | null {
     if (!editorRef.current) return null;
     const model = editorRef.current.getModel();
     if (!model) return null;
-
     const sel = editorRef.current.getSelection();
     if (!sel) return null;
 
-    const totalLines = model.getLineCount();
     const cursorLine = sel.startLineNumber;
+    let blockStart: number | null = null;
+    let language: string | null = null;
 
-    // Raccoglie tutti i marker nell'ordine in cui appaiono nel documento
-    const markers: { line: number; language: string | null; isOpen: boolean }[] = [];
-
-    let insideBlock = false;
-    for (let l = 1; l <= totalLines; l++) {
+    for (let l = 1; l <= model.getLineCount(); l++) {
         const content = model.getLineContent(l).trim();
 
-        if (!insideBlock) {
-            // Cerca un marker di apertura (con o senza linguaggio)
-            if (content === openMarker) {
-                markers.push({ line: l, language: null, isOpen: true });
-                insideBlock = true;
-            } else if (content.startsWith(openMarker) && content.length > openMarker.length) {
-                const suffix = content.slice(openMarker.length).trim();
-                if (/^\S+$/.test(suffix)) {
-                    markers.push({ line: l, language: suffix, isOpen: true });
-                    insideBlock = true;
-                }
+        if (blockStart === null) {
+            if (content.startsWith("```")) {
+                const suffix = content.slice(3).trim();
+                language = suffix.length > 0 ? suffix : null;
+                blockStart = l;
             }
         } else {
-            // Dentro un blocco: cerca solo la chiusura esatta
-            if (content === closeMarker) {
-                markers.push({ line: l, language: null, isOpen: false });
-                insideBlock = false;
+            if (content === "```") {
+                if (cursorLine >= blockStart && cursorLine < l) return { language };
+                blockStart = null;
+                language = null;
             }
         }
-    }
 
-    // Trova il blocco che contiene il cursore
-    for (let i = 0; i < markers.length - 1; i++) {
-        const open = markers[i];
-        const close = markers[i + 1];
-        if (!open.isOpen || close.isOpen) continue;
-
-        const cursorOnOpenLine = cursorLine === open.line;
-        const cursorOnCloseLine = cursorLine === close.line;
-        const cursorInside = cursorLine > open.line && cursorLine < close.line;
-
-        if (
-            cursorInside ||
-            (includeMarkers && (cursorOnOpenLine || cursorOnCloseLine))
-        ) {
-            return { language: open.language };
-        }
+        if (l > cursorLine && blockStart === null) break;
     }
 
     return null;
@@ -445,4 +418,10 @@ export function getIsActiveLatexInline(
     }
 
     return null;
+}
+
+export function checkActiveLatexOrCode(editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>) {
+    const code = getIsActiveBlock(editorRef);
+    const latex = getIsActiveLatexInline(editorRef);
+    if (latex || code) return true
 }
