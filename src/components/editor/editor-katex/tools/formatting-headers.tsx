@@ -4,17 +4,10 @@ import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
 import { Popover, PopoverContent, PopoverTrigger } from "@/src/components/ui/popover";
 import { Toggle } from "@/src/components/ui/toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/components/ui/tooltip";
-import { checkActiveLatexOrCode, getIsActiveList, handleListToggle } from "@/src/lib/editor/formatting-utils";
+import { checkActiveLatexOrCode, getH1Regex, getH2Regex, getH3Regex, getH4Regex, getH5Regex, getH6Regex, getIsActiveList, handleListToggle } from "@/src/lib/editor/formatting-utils";
 import { Heading, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6 } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useEffect, useState } from "react";
-
-const getH1Regex = () => /^#\s(.+)$/gm;
-const getH2Regex = () => /^##\s(.+)$/gm;
-const getH3Regex = () => /^###\s(.+)$/gm;
-const getH4Regex = () => /^####\s(.+)$/gm;
-const getH5Regex = () => /^#####\s(.+)$/gm;
-const getH6Regex = () => /^######\s(.+)$/gm;
 
 function HeadingToggle({
     editorRef,
@@ -51,7 +44,7 @@ function HeadingToggle({
         onToggle();
     };
 
-    if (checkActiveLatexOrCode(editorRef)) return null;
+    if (checkActiveLatexOrCode(editorRef) && isFocused) return null;
 
     return (
         <TooltipProvider>
@@ -140,7 +133,7 @@ export function FormattingHeaders({
         return () => disposable.dispose();
     }, [isFocused, editorRef.current]);
 
-    if (checkActiveLatexOrCode(editorRef)) return null;
+    if (checkActiveLatexOrCode(editorRef) && isFocused) return null;
 
     return (
         <Popover open={open} onOpenChange={setOpen}>

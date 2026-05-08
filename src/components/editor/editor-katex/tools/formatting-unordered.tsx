@@ -4,12 +4,10 @@ import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
 import { Separator } from "@/src/components/ui/separator";
 import { Toggle } from "@/src/components/ui/toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/components/ui/tooltip";
-import { checkActiveLatexOrCode, getIsActiveList, handleListToggle } from "@/src/lib/editor/formatting-utils";
+import { checkActiveLatexOrCode, getIsActiveList, getUnorderedListRegex, handleListToggle } from "@/src/lib/editor/formatting-utils";
 import { List } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useEffect } from "react";
-
-const getUnorderedListRegex = () => /^-\s/;
 
 export function FormattingUnorderedList({
     _selection,
@@ -45,7 +43,7 @@ export function FormattingUnorderedList({
         return () => disposable.dispose();
     }, [isFocused, editorRef.current]);
 
-    if (checkActiveLatexOrCode(editorRef)) return null;
+    if (checkActiveLatexOrCode(editorRef) && isFocused) return null;
 
     return (
         <>

@@ -1,6 +1,23 @@
 import type { editor } from "monaco-editor";
 
-export function getIsActive(
+// REGEX
+export const getH1Regex = () => /^#\s(.+)$/gm;
+export const getH2Regex = () => /^##\s(.+)$/gm;
+export const getH3Regex = () => /^###\s(.+)$/gm;
+export const getH4Regex = () => /^####\s(.+)$/gm;
+export const getH5Regex = () => /^#####\s(.+)$/gm;
+export const getH6Regex = () => /^######\s(.+)$/gm;
+
+export const getBoldRegex = () => /\*\*(.+?)\*\*/g;
+export const getItalicRegex = () => /_(.+?)_/g;
+export const getQuoteRegex = () => /^>\s/;
+
+export const getOrderedListRegex = () => /^\d+\.\s/;
+export const getUnorderedListRegex = () => /^-\s/;
+
+export const getCodeInlineRegex = () => /`(.+?)`/g;
+
+export function getIsActiveWord(
     editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
     getRegex: () => RegExp,
 ): boolean {
@@ -41,7 +58,7 @@ export function getIsActive(
     return false;
 }
 
-export function handleFormattingToggle(
+export function handleWordToggle(
     editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
     isActive: boolean,
     getRegex: () => RegExp,
@@ -184,7 +201,7 @@ export function handleListToggle(
     editorRef.current.focus();
 }
 
-export function getIsActiveBlock(
+export function getIsActiveCode(
     editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
 ): { language: string | null } | null {
     if (!editorRef.current) return null;
@@ -351,7 +368,7 @@ export function handleBlockToggle(
 
 }
 
-export function getIsActiveLatexInline(
+export function getIsActiveLatex(
     editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
 ): { kind: 'single' | 'double'; matchIndex: number; matchEnd: number; lineNumber: number } | null {
     if (!editorRef.current) return null;
@@ -421,7 +438,7 @@ export function getIsActiveLatexInline(
 }
 
 export function checkActiveLatexOrCode(editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>) {
-    const code = getIsActiveBlock(editorRef);
-    const latex = getIsActiveLatexInline(editorRef);
-    if (latex || code) return true
+    const code = getIsActiveCode(editorRef);
+    const latex = getIsActiveLatex(editorRef);
+    if ((latex?.kind === 'double') || code) return true
 }

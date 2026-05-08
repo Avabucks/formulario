@@ -13,7 +13,7 @@ import {
 } from "@/src/components/ui/command";
 import { Toggle } from "@/src/components/ui/toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/components/ui/tooltip";
-import { getIsActiveBlock, getIsActiveLatexInline, handleBlockToggle } from "@/src/lib/editor/formatting-utils";
+import { getCodeInlineRegex, getIsActiveCode, getIsActiveLatex, getIsActiveWord, handleBlockToggle } from "@/src/lib/editor/formatting-utils";
 import { Code, SquareTerminal, X } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useEffect, useState } from "react";
@@ -54,7 +54,7 @@ export function FormattingCodeBlock({
     isFocused: boolean;
 }>) {
     const [open, setOpen] = useState(false);
-    const blockState = getIsActiveBlock(editorRef);
+    const blockState = getIsActiveCode(editorRef);
     const isActive = blockState !== null;
 
     const handleSelect = (language: string | null) => {
@@ -86,7 +86,7 @@ export function FormattingCodeBlock({
         return () => disposable.dispose();
     }, [isFocused, editorRef.current]);
 
-    if (getIsActiveLatexInline(editorRef)) return null;
+    if ((getIsActiveLatex(editorRef) || getIsActiveWord(editorRef, getCodeInlineRegex) && !isActive) && isFocused) return null;
 
     return (
         <>
@@ -104,7 +104,7 @@ export function FormattingCodeBlock({
                         >
                             <SquareTerminal size={16} />
                             {isActive && isFocused && blockState.language && (
-                                <span className="text-xs font-mono">{blockState.language}</span>
+                                <span>{blockState.language}</span>
                             )}
                         </Toggle>
                     </TooltipTrigger>

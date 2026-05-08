@@ -23,16 +23,12 @@ export default function Home() {
 // TODOs:
 
 // - [EDITOR]
-// -- [ ] TABLE
 // - bug switch view smonta editor
-// - bug code cursor nel prefix finale aggiunge il linguaggio alla fine
 // - titoli come notion con "scaletta"
 // - sistemare preview <p>, quote, code, ...
-// - se isActive (es. code, latex) visualizzare solo toggle (es. code, latex) e non tutti i toggle
 // - refactor formatting-utils
 
 // - [GENERALI]
-// - mettere i json fuori (provare a fare scrociatoie da tastiera dinamiche)
 // - report che manda mail a admin (mail nell'env) solo se la formula non è tua (in impostazioni)
 // - aggiornare video e formulario di benvenuto
 

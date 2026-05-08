@@ -1,0 +1,127 @@
+{
+    "sections": [
+        {
+            "id": "formule",
+            "label": "Formule",
+            "items": [
+                { "value": "coefficiente_binomiale", "label": "Coefficiente binomiale", "preview": "\\binom{n}{k}", "snippet": "\\binom{$1}{$2}" },
+                { "value": "derivata", "label": "Derivata", "preview": "\\frac{d}{dx} f(x)", "snippet": "\\frac{d}{d$1} $2" },
+                { "value": "derivata_parziale", "label": "Derivata parziale", "preview": "\\frac{\\partial f}{\\partial x}", "snippet": "\\frac{\\partial $1}{\\partial $2}" },
+                { "value": "esponenziale", "label": "Esponenziale", "preview": "e^{x}", "snippet": "e^{$1}" },
+                { "value": "frazione", "label": "Frazione", "preview": "\\frac{a}{b}", "snippet": "\\frac{$1}{$2}" },
+                { "value": "integrale", "label": "Integrale", "preview": "\\int_{a}^{b} f(x)\\,dx", "snippet": "\\int_{$1}^{$2} $3\\,d$4" },
+                { "value": "integrale_doppio", "label": "Integrale doppio", "preview": "\\iint_{D} f(x,y)\\,dx\\,dy", "snippet": "\\iint_{$1} $2\\,d$3\\,d$4" },
+                { "value": "integrale_triplo", "label": "Integrale triplo", "preview": "\\iiint_{V} f(x,y,z)\\,dx\\,dy\\,dz", "snippet": "\\iiint_{$1} $2\\,d$3\\,d$4\\,d$5" },
+                { "value": "limite", "label": "Limite", "preview": "\\lim_{x \\to \\infty} f(x)", "snippet": "\\lim_{$1 \\to \\infty}$2" },
+                { "value": "logaritmo", "label": "Logaritmo", "preview": "\\log_{b}(x)", "snippet": "\\log_{$1}($2)" },
+                { "value": "logaritmo_naturale", "label": "Logaritmo naturale", "preview": "\\ln(x)", "snippet": "\\ln($1)" },
+                { "value": "matrice_2x2", "label": "Matrice 2x2", "preview": "\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}", "snippet": "\\begin{pmatrix} $1 & $2 \\\\ $3 & $4 \\end{pmatrix}" },
+                { "value": "norma", "label": "Norma", "preview": "\\|x\\|", "snippet": "\\|$1\\|" },
+                { "value": "overline", "label": "Overline", "preview": "\\overline{x}", "snippet": "\\overline{$1}" },
+                { "value": "parte_intera_inferiore", "label": "Parte intera inferiore", "preview": "\\lfloor x \\rfloor", "snippet": "\\lfloor $1 \\rfloor" },
+                { "value": "parte_intera_superiore", "label": "Parte intera superiore", "preview": "\\lceil x \\rceil", "snippet": "\\lceil $1 \\rceil" },
+                { "value": "pedice", "label": "Pedice", "preview": "x_{i}", "snippet": "$1_{$2}" },
+                { "value": "potenza", "label": "Potenza", "preview": "x^{n}", "snippet": "$1^{$2}" },
+                { "value": "produttoria", "label": "Produttoria", "preview": "\\prod_{i=1}^{n} x_i", "snippet": "\\prod_{$1}^{$2} $3" },
+                { "value": "radice_quadrata", "label": "Radice quadrata", "preview": "\\sqrt{x}", "snippet": "\\sqrt{$1}" },
+                { "value": "sommatoria", "label": "Sommatoria", "preview": "\\sum_{i=1}^{n} x_i", "snippet": "\\sum_{$1}^{$2} $3" },
+                { "value": "underline", "label": "Underline", "preview": "\\underline{x}", "snippet": "\\underline{$1}" },
+                { "value": "versore", "label": "Versore", "preview": "\\hat{u}", "snippet": "\\hat{$1}" },
+                { "value": "vettore", "label": "Vettore", "preview": "\\vec{v}", "snippet": "\\vec{$1}" }
+            ]
+        },
+        {
+            "id": "relazioni",
+            "label": "Relazioni e operatori",
+            "items": [
+                { "value": "circa_uguale", "label": "Circa uguale", "preview": "\\approx ", "snippet": "\\approx $1" },
+                { "value": "diverso", "label": "Diverso", "preview": "\\neq ", "snippet": "\\neq $1" },
+                { "value": "infinito", "label": "Infinito", "preview": "\\infty ", "snippet": "\\infty $1" },
+                { "value": "maggiore_uguale", "label": "Maggiore o uguale", "preview": "\\geq ", "snippet": "\\geq $1" },
+                { "value": "minore_uguale", "label": "Minore o uguale", "preview": "\\leq ", "snippet": "\\leq $1" },
+                { "value": "molto_maggiore", "label": "Molto maggiore", "preview": "\\gg ", "snippet": "\\gg $1" },
+                { "value": "molto_minore", "label": "Molto minore", "preview": "\\ll ", "snippet": "\\ll $1" },
+                { "value": "piu_meno", "label": "Più o meno", "preview": "\\pm ", "snippet": "\\pm $1" },
+                { "value": "prodotto_cartesiano", "label": "Prodotto cartesiano", "preview": "\\times ", "snippet": "\\times $1" },
+                { "value": "prodotto_scalare", "label": "Prodotto scalare", "preview": "\\cdot ", "snippet": "\\cdot $1" },
+                { "value": "proporzionale", "label": "Proporzionale", "preview": "\\propto ", "snippet": "\\propto $1" },
+                { "value": "simile", "label": "Simile", "preview": "\\sim ", "snippet": "\\sim $1" },
+                { "value": "simile_uguale", "label": "Simile o uguale", "preview": "\\simeq ", "snippet": "\\simeq $1" }
+            ]
+        },
+        {
+            "id": "logica",
+            "label": "Logica e insiemi",
+            "items": [
+                { "value": "appartiene", "label": "Appartiene", "preview": "\\in ", "snippet": "\\in $1" },
+                { "value": "complessi", "label": "Numeri complessi", "preview": "\\mathbb{C}", "snippet": "\\mathbb{C} $1" },
+                { "value": "e_logico", "label": "E logico", "preview": "\\land ", "snippet": "\\land $1" },
+                { "value": "equivalenza_modulare", "label": "Equivalenza modulare", "preview": "a \\equiv b \\pmod{n}", "snippet": " \\equiv  \\pmod{}", "offset": -16 },
+                { "value": "esiste", "label": "Esiste", "preview": "\\exists ", "snippet": "\\exists $1" },
+                { "value": "insieme_vuoto", "label": "Insieme vuoto", "preview": "\\emptyset ", "snippet": "\\emptyset $1" },
+                { "value": "interi", "label": "Numeri interi", "preview": "\\mathbb{Z}", "snippet": "\\mathbb{Z} $1" },
+                { "value": "intersezione", "label": "Intersezione", "preview": "\\cap ", "snippet": "\\cap $1" },
+                { "value": "irrazionali", "label": "Numeri irrazionali", "preview": "\\mathbb{R}\\setminus\\mathbb{Q}", "snippet": "\\mathbb{R}\\setminus\\mathbb{Q} $1" },
+                { "value": "naturali", "label": "Numeri naturali", "preview": "\\mathbb{N}", "snippet": "\\mathbb{N} $1" },
+                { "value": "negazione", "label": "Negazione", "preview": "\\lnot ", "snippet": "\\lnot $1" },
+                { "value": "non_appartiene", "label": "Non appartiene", "preview": "\\notin ", "snippet": "\\notin $1" },
+                { "value": "non_esiste", "label": "Non esiste", "preview": "\\nexists ", "snippet": "\\nexists $1" },
+                { "value": "o_logico", "label": "O logico", "preview": "\\lor ", "snippet": "\\lor $1" },
+                { "value": "per_ogni", "label": "Per ogni", "preview": "\\forall ", "snippet": "\\forall $1" },
+                { "value": "razionali", "label": "Numeri razionali", "preview": "\\mathbb{Q}", "snippet": "\\mathbb{Q} $1" },
+                { "value": "reali", "label": "Numeri reali", "preview": "\\mathbb{R}", "snippet": "\\mathbb{R} $1" },
+                { "value": "sottoinsieme", "label": "Sottoinsieme", "preview": "\\subset ", "snippet": "\\subset $1" },
+                { "value": "sottoinsieme_uguale", "label": "Sottoinsieme o uguale", "preview": "\\subseteq ", "snippet": "\\subseteq $1" },
+                { "value": "unione", "label": "Unione", "preview": "\\cup ", "snippet": "\\cup $1" }
+            ]
+        },
+        {
+            "id": "frecce",
+            "label": "Frecce e implicazioni",
+            "items": [
+                { "value": "freccia_diagonale", "label": "Freccia diagonale", "preview": "\\nearrow ", "snippet": "\\nearrow $1" },
+                { "value": "freccia_doppia", "label": "Freccia doppia", "preview": "\\leftrightarrow ", "snippet": "\\leftrightarrow $1" },
+                { "value": "freccia_destra", "label": "Freccia destra", "preview": "\\to ", "snippet": "\\to $1" },
+                { "value": "freccia_giu", "label": "Freccia giù", "preview": "\\downarrow ", "snippet": "\\downarrow $1" },
+                { "value": "freccia_sinistra", "label": "Freccia sinistra", "preview": "\\leftarrow ", "snippet": "\\leftarrow $1" },
+                { "value": "freccia_su", "label": "Freccia su", "preview": "\\uparrow ", "snippet": "\\uparrow $1" },
+                { "value": "implica", "label": "Implica", "preview": "\\Rightarrow ", "snippet": "\\Rightarrow $1" },
+                { "value": "implica_sinistra", "label": "Implica sinistra", "preview": "\\Leftarrow ", "snippet": "\\Leftarrow $1" },
+                { "value": "mappa_a", "label": "Mappa a", "preview": "\\mapsto ", "snippet": "\\mapsto $1" },
+                { "value": "se_e_solo_se", "label": "Se e solo se", "preview": "\\Leftrightarrow ", "snippet": "\\Leftrightarrow $1" }
+            ]
+        },
+        {
+            "id": "greche",
+            "label": "Lettere greche",
+            "items": [
+                { "value": "alfa", "label": "Alfa", "preview": "\\alpha ", "snippet": "\\alpha $1" },
+                { "value": "beta", "label": "Beta", "preview": "\\beta ", "snippet": "\\beta $1" },
+                { "value": "chi", "label": "Chi", "preview": "\\chi ", "snippet": "\\chi $1" },
+                { "value": "delta", "label": "Delta", "preview": "\\delta ", "snippet": "\\delta $1" },
+                { "value": "delta_maiuscola", "label": "Delta maiuscola", "preview": "\\Delta ", "snippet": "\\Delta $1" },
+                { "value": "epsilon", "label": "Epsilon", "preview": "\\varepsilon ", "snippet": "\\varepsilon $1" },
+                { "value": "eta", "label": "Eta", "preview": "\\eta ", "snippet": "\\eta $1" },
+                { "value": "gamma", "label": "Gamma", "preview": "\\gamma ", "snippet": "\\gamma $1" },
+                { "value": "gamma_maiuscola", "label": "Gamma maiuscola", "preview": "\\Gamma ", "snippet": "\\Gamma $1" },
+                { "value": "lambda", "label": "Lambda", "preview": "\\lambda ", "snippet": "\\lambda $1" },
+                { "value": "mu", "label": "Mu", "preview": "\\mu ", "snippet": "\\mu $1" },
+                { "value": "nu", "label": "Nu", "preview": "\\nu ", "snippet": "\\nu $1" },
+                { "value": "omega", "label": "Omega", "preview": "\\omega ", "snippet": "\\omega $1" },
+                { "value": "omega_maiuscola", "label": "Omega maiuscola", "preview": "\\Omega ", "snippet": "\\Omega $1" },
+                { "value": "phi", "label": "Phi", "preview": "\\varphi ", "snippet": "\\varphi $1" },
+                { "value": "phi_maiuscola", "label": "Phi maiuscola", "preview": "\\Phi ", "snippet": "\\Phi $1" },
+                { "value": "pi", "label": "Pi greco", "preview": "\\pi ", "snippet": "\\pi $1" },
+                { "value": "psi", "label": "Psi", "preview": "\\psi ", "snippet": "\\psi $1" },
+                { "value": "rho", "label": "Rho", "preview": "\\rho ", "snippet": "\\rho $1" },
+                { "value": "sigma", "label": "Sigma", "preview": "\\sigma ", "snippet": "\\sigma $1" },
+                { "value": "sigma_maiuscola", "label": "Sigma maiuscola", "preview": "\\Sigma ", "snippet": "\\Sigma $1" },
+                { "value": "tau", "label": "Tau", "preview": "\\tau ", "snippet": "\\tau $1" },
+                { "value": "teta", "label": "Teta", "preview": "\\theta ", "snippet": "\\theta $1" },
+                { "value": "teta_maiuscola", "label": "Teta maiuscola", "preview": "\\Theta ", "snippet": "\\Theta $1" },
+                { "value": "xi", "label": "Xi", "preview": "\\xi ", "snippet": "\\xi $1" },
+                { "value": "zeta", "label": "Zeta", "preview": "\\zeta ", "snippet": "\\zeta $1" }
+            ]
+        }
+    ]
+}

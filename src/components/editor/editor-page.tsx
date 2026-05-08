@@ -22,11 +22,12 @@ import { FormattingCodeInline } from './editor-katex/tools/formatting-code-inlin
 import { FormattingDivider } from './editor-katex/tools/formatting-divider';
 import { FormattingHeaders } from './editor-katex/tools/formatting-headers';
 import { FormattingItalic } from './editor-katex/tools/formatting-italic';
-import { FormattingLatexBlock } from './editor-katex/tools/formatting-latex-block';
+import { FormattingLatex } from './editor-katex/tools/formatting-latex';
 import { FormattingOrderedList } from './editor-katex/tools/formatting-ordered';
 import { FormattingQuote } from './editor-katex/tools/formatting-quote';
 import { FormattingUnorderedList } from './editor-katex/tools/formatting-unordered';
 import { GeminiButton } from './editor-katex/tools/gemini-ai';
+import { FormattingTable } from './editor-katex/tools/formatting-table';
 
 export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ argomentoId: string, editable: boolean, formularioId: string }>) {
     const isMobile = useIsMobile();
@@ -57,18 +58,12 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
         editor.onDidChangeCursorSelection(() => updateSelection(editor));
         editor.onDidChangeCursorPosition(() => updateSelection(editor));
 
-        editor.onDidFocusEditorWidget(() => {
-            setIsFocused(true);
-        });
-
         editor.onDidBlurEditorWidget(() => {
             setIsFocused(false);
-            editor.setSelection({
-                startLineNumber: 1,
-                startColumn: 1,
-                endLineNumber: 1,
-                endColumn: 1,
-            });
+        });
+
+        editor.onDidFocusEditorWidget(() => {
+            setIsFocused(true);
         });
 
         const updateButtons = () => {
@@ -231,6 +226,11 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
                             isFocused={isFocused}
                         />
 
+                        <FormattingTable
+                            _selection={selection}
+                            editorRef={editorRef}
+                            isFocused={isFocused}
+                        />
                         <FormattingDivider
                             _selection={selection}
                             editorRef={editorRef}
@@ -248,7 +248,7 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
                             isFocused={isFocused}
                         />
 
-                        <FormattingLatexBlock
+                        <FormattingLatex
                             _selection={selection}
                             editorRef={editorRef}
                             isFocused={isFocused}
@@ -256,7 +256,7 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
 
                     </div>
 
-                    <div className="flex items-center border-l gap-3 px-3 h-full">
+                    <div className="flex items-center gap-3 px-3 h-full">
                         <GeminiButton
                             editorRef={editorRef}
                         />

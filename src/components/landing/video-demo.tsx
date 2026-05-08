@@ -3,7 +3,7 @@
 import { useRef } from "react"
 import { motion, useInView } from "framer-motion"
 import { FileVideo } from "lucide-react"
-import slides from "@/public/tutorial/slides.json"
+import slides from "@/src/data/slides.json"
 
 function SlideRow({ slide, index }: Readonly<{ slide: typeof slides[number]; index: number }>) {
   const ref = useRef(null)
