@@ -53,16 +53,24 @@ export function EditorInput({
     }
 
     useEffect(() => {
+        let timeout: ReturnType<typeof setTimeout> | null = null;
+
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === "s" && (e.ctrlKey || e.metaKey)) {
-                save(textAreaContent)
-                e.preventDefault()
+                e.preventDefault();
+                e.stopPropagation();
+                if (timeout) return;
+                timeout = setTimeout(() => { timeout = null; }, 1000);
+                save(textAreaContent);
             }
-        }
+        };
 
-        document.addEventListener("keydown", handleKeyDown)
-        return () => document.removeEventListener("keydown", handleKeyDown)
-    }, [])
+        document.addEventListener("keydown", handleKeyDown);
+        return () => {
+            document.removeEventListener("keydown", handleKeyDown);
+            if (timeout) clearTimeout(timeout);
+        };
+    }, []);
 
     useEffect(() => {
         if (!edited) return

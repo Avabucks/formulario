@@ -32,6 +32,7 @@ export default function Home() {
 // - refactor formatting-utils
 
 // - [GENERALI]
+// - mettere i json fuori (provare a fare scrociatoie da tastiera dinamiche)
 // - report che manda mail a admin (mail nell'env) solo se la formula non è tua (in impostazioni)
 // - aggiornare video e formulario di benvenuto
 
@@ -39,6 +40,7 @@ export default function Home() {
 // - abbonamento a 1,99 che ti da accesso illimitato a creazione formulari e 200 crediti AI (senza crediti ma con tokens cosi e piu preciso ma senza scrivere il ilmite, semplicemente quando finiscono esce popup)
 
 // - [NOVITA]
+// - docs
 // - ⁠categorie per organizzare formulari + colori titoli
 // - aggiungere funzionalità di esportazione (pdf, markdown, ecc.)
 // - supporto piu lingue

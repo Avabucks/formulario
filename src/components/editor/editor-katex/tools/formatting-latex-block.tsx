@@ -21,12 +21,15 @@ import "katex/dist/katex.min.css";
 import { ChevronLeft, ChevronRight, Radical, SquareRadical } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 
 type SnippetController = {
     insert: (snippet: string) => void;
 };
 
 const BLOCK_MARKER = "$$";
+
+const FORMULA_FIRST_USE_KEY = "formula_first_use_shown";
 
 const FORMULAS = [
     { value: "coefficiente_binomiale", label: "Coefficiente binomiale", preview: String.raw`\binom{n}{k}`, snippet: String.raw`\binom{$1}{$2}` },
@@ -310,6 +313,33 @@ export function FormattingLatexBlock({
             insertInline(snippet);
         } else {
             insertNew(snippet, pendingKind);
+        }
+
+        if (!localStorage.getItem(FORMULA_FIRST_USE_KEY)) {
+            const toastId = toast(
+                <span className="leading-6 flex flex-col md:flex-row gap-2 md:text-nowrap md:flex-nowrap">
+                    <span>
+                        Usa <Kbd>Tab</Kbd> per spostarti tra i campi della formula
+                        e <Kbd>Shift</Kbd> + <Kbd>Tab</Kbd> per tornare indietro.
+                    </span>
+                    <button
+                        className="text-xs text-muted-foreground underline text-left w-fit cursor-pointer"
+                        onClick={() => {
+                            localStorage.setItem(FORMULA_FIRST_USE_KEY, "true");
+                            toast.dismiss(toastId);
+                        }}
+                    >
+                        Non mostrare più
+                    </button>
+                </span>,
+                {
+                    position: "bottom-center",
+                    duration: 5000,
+                    classNames: {
+                        toast: "md:!min-w-fit md:!left-1/2 md:!-translate-x-1/2",
+                    },
+                }
+            );
         }
     };
 
