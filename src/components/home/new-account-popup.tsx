@@ -1,6 +1,6 @@
 "use client"
 
-import slides from "@/public/tutorial/slides.json"
+import slides from "@/src/data/slides.json"
 import { Button } from "@/src/components/ui/button"
 import {
     Dialog,

@@ -4,7 +4,7 @@ import { ArgomentoItem } from "@/src/components/capitolo/argomento-item";
 import { FormularioSettings } from "@/src/components/home/formulario-settings";
 import { BreadcrumbLogic } from "@/src/components/navigation/breadcrumb-logic";
 import { Header } from "@/src/components/navigation/header";
-import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/src/components/ui/empty";
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/src/components/ui/empty";
 import { Skeleton } from "@/src/components/ui/skeleton";
 import { TypographyH2 } from "@/src/components/ui/typography";
 import { pool } from "@/src/lib/db";
@@ -132,6 +132,11 @@ export default async function Capitolo({
                     {`Non ci sono capitoli da mostrare in "${capitolo.titolo}".`}
                 </EmptyDescription>
             </EmptyHeader>
+            <EmptyContent className="flex-row justify-center gap-2">
+                {capitolo.editable && (
+                    <ArgomentoAdd capitolo={capitolo} />
+                )}
+            </EmptyContent>
         </Empty>
     )
 

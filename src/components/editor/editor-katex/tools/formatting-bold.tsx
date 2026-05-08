@@ -3,12 +3,10 @@
 import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
 import { Toggle } from "@/src/components/ui/toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/components/ui/tooltip";
-import { getIsActive, handleFormattingToggle } from "@/src/lib/editor/formatting-utils";
+import { checkActiveLatexOrCode, getBoldRegex, getCodeInlineRegex, getIsActiveLatex, getIsActiveWord, handleWordToggle } from "@/src/lib/editor/formatting-utils";
 import { Bold } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useEffect } from "react";
-
-const getBoldRegex = () => /\*\*(.+?)\*\*/g;
 
 export function FormattingBold({
     _selection,
@@ -19,12 +17,12 @@ export function FormattingBold({
     editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
     isFocused: boolean;
 }>) {
-    const isActive = getIsActive(editorRef, getBoldRegex);
+    const isActive = getIsActiveWord(editorRef, getBoldRegex);
 
     const handleToggle = () =>
-        handleFormattingToggle(
+        handleWordToggle(
             editorRef,
-            getIsActive(editorRef, getBoldRegex),
+            isActive,
             getBoldRegex,
             (text) => `**${text}$0**`,
             (match) => match[1],
@@ -44,6 +42,8 @@ export function FormattingBold({
         });
         return () => disposable.dispose();
     }, [isFocused, editorRef.current]);
+    
+    if ((checkActiveLatexOrCode(editorRef) || getIsActiveLatex(editorRef) || getIsActiveWord(editorRef, getCodeInlineRegex)) && isFocused) return null;
 
     return (
         <TooltipProvider>

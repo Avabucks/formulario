@@ -7,7 +7,7 @@ import { ScrollArea } from "@/src/components/ui/scroll-area";
 import { Spinner } from "@/src/components/ui/spinner";
 import { Textarea } from "@/src/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/components/ui/tooltip";
-import { Check, Sparkles, X } from "lucide-react";
+import { Check, Wand2, X } from "lucide-react";
 import type { editor } from "monaco-editor";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -123,7 +123,7 @@ export function GeminiButton({
                     <TooltipTrigger asChild>
                         <DialogTrigger asChild>
                             <Button variant="outline">
-                                <Sparkles size={16} />
+                                <Wand2 size={16} />
                                 Chiedi all'AI
                             </Button>
                         </DialogTrigger>
@@ -142,7 +142,7 @@ export function GeminiButton({
             <DialogContent className="md:max-w-2xl">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2 text-lg">
-                        <Sparkles size={18} className="text-primary" />
+                        <Wand2 size={18} className="text-primary" />
                         Chiedi all'AI
                     </DialogTitle>
                 </DialogHeader>
@@ -170,7 +170,7 @@ export function GeminiButton({
                                 disabled={loading || !prompt.trim()}
                                 className="absolute bottom-2 right-2 size-8"
                             >
-                                {loading ? <Spinner /> : <Sparkles size={14} />}
+                                {loading ? <Spinner /> : <Wand2 size={14} />}
                             </Button>
                         </div>
                         <span className="text-xs text-muted-foreground self-end">

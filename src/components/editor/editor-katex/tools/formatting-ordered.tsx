@@ -3,12 +3,10 @@
 import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
 import { Toggle } from "@/src/components/ui/toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/components/ui/tooltip";
-import { getIsActiveList, handleListToggle } from "@/src/lib/editor/formatting-utils";
+import { checkActiveLatexOrCode, getIsActiveList, getOrderedListRegex, handleListToggle } from "@/src/lib/editor/formatting-utils";
 import { ListOrdered } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useEffect } from "react";
-
-const getOrderedListRegex = () => /^\d+\.\s/;
 
 export function FormattingOrderedList({
     _selection,
@@ -24,7 +22,7 @@ export function FormattingOrderedList({
     const handleToggle = () =>
         handleListToggle(
             editorRef,
-            getIsActiveList(editorRef, getOrderedListRegex),
+            isActive,
             getOrderedListRegex,
             (line, index) => `${index + 1}. ${line}`,
             (line) => line.replace(/^\d+\.\s/, ""),
@@ -44,6 +42,7 @@ export function FormattingOrderedList({
         return () => disposable.dispose();
     }, [isFocused, editorRef.current]);
 
+    if (checkActiveLatexOrCode(editorRef) && isFocused) return null;
 
     return (
         <TooltipProvider>

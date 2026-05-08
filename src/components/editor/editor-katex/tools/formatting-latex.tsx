@@ -11,16 +11,22 @@ import {
     CommandList
 } from "@/src/components/ui/command";
 import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
+import { Separator } from "@/src/components/ui/separator";
 import { Toggle } from "@/src/components/ui/toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/components/ui/tooltip";
 import {
-    getIsActiveLatexInline
+    getCodeInlineRegex,
+    getIsActiveCode,
+    getIsActiveLatex,
+    getIsActiveWord
 } from "@/src/lib/editor/formatting-utils";
 import katex from "katex";
 import "katex/dist/katex.min.css";
 import { ChevronLeft, ChevronRight, Radical, SquareRadical } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
+import formulasData from "@/src/data/formulas.json";
 
 type SnippetController = {
     insert: (snippet: string) => void;
@@ -28,115 +34,9 @@ type SnippetController = {
 
 const BLOCK_MARKER = "$$";
 
-const FORMULAS = [
-    { value: "coefficiente_binomiale", label: "Coefficiente binomiale", preview: String.raw`\binom{n}{k}`, snippet: String.raw`\binom{$1}{$2}` },
-    { value: "derivata", label: "Derivata", preview: String.raw`\frac{d}{dx} f(x)`, snippet: String.raw`\frac{d}{d$1} $2` },
-    { value: "derivata_parziale", label: "Derivata parziale", preview: String.raw`\frac{\partial f}{\partial x}`, snippet: String.raw`\frac{\partial $1}{\partial $2}` },
-    { value: "esponenziale", label: "Esponenziale", preview: String.raw`e^{x}`, snippet: String.raw`e^{$1}` },
-    { value: "frazione", label: "Frazione", preview: String.raw`\frac{a}{b}`, snippet: String.raw`\frac{$1}{$2}` },
-    { value: "integrale", label: "Integrale", preview: String.raw`\int_{a}^{b} f(x)\,dx`, snippet: String.raw`\int_{$1}^{$2} $3\,d$4` },
-    { value: "integrale_doppio", label: "Integrale doppio", preview: String.raw`\iint_{D} f(x,y)\,dx\,dy`, snippet: String.raw`\iint_{$1} $2\,d$3\,d$4` },
-    { value: "integrale_triplo", label: "Integrale triplo", preview: String.raw`\iiint_{V} f(x,y,z)\,dx\,dy\,dz`, snippet: String.raw`\iiint_{$1} $2\,d$3\,d$4\,d$5` },
-    { value: "limite", label: "Limite", preview: String.raw`\lim_{x \to \infty} f(x)`, snippet: String.raw`\lim_{$1 \to \infty}$2` },
-    { value: "logaritmo", label: "Logaritmo", preview: String.raw`\log_{b}(x)`, snippet: String.raw`\log_{$1}($2)` },
-    { value: "logaritmo_naturale", label: "Logaritmo naturale", preview: String.raw`\ln(x)`, snippet: String.raw`\ln($1)` },
-    { value: "matrice_2x2", label: "Matrice 2x2", preview: String.raw`\begin{pmatrix} a & b \\ c & d \end{pmatrix}`, snippet: String.raw`\begin{pmatrix} $1 & $2 \\\ $3 & $4 \end{pmatrix}` },
-    { value: "norma", label: "Norma", preview: String.raw`\|x\|`, snippet: String.raw`\|$1\|` },
-    { value: "overline", label: "Overline", preview: String.raw`\overline{x}`, snippet: String.raw`\overline{$1}` },
-    { value: "parte_intera_inferiore", label: "Parte intera inferiore", preview: String.raw`\lfloor x \rfloor`, snippet: String.raw`\lfloor $1 \rfloor` },
-    { value: "parte_intera_superiore", label: "Parte intera superiore", preview: String.raw`\lceil x \rceil`, snippet: String.raw`\lceil $1 \rceil` },
-    { value: "pedice", label: "Pedice", preview: String.raw`x_{i}`, snippet: String.raw`$1_{$2}` },
-    { value: "potenza", label: "Potenza", preview: String.raw`x^{n}`, snippet: String.raw`$1^{$2}` },
-    { value: "produttoria", label: "Produttoria", preview: String.raw`\prod_{i=1}^{n} x_i`, snippet: String.raw`\prod_{$1}^{$2} $3` },
-    { value: "radice_quadrata", label: "Radice quadrata", preview: String.raw`\sqrt{x}`, snippet: String.raw`\sqrt{$1}` },
-    { value: "sommatoria", label: "Sommatoria", preview: String.raw`\sum_{i=1}^{n} x_i`, snippet: String.raw`\sum_{$1}^{$2} $3` },
-    { value: "underline", label: "Underline", preview: String.raw`\underline{x}`, snippet: String.raw`\underline{$1}` },
-    { value: "versore", label: "Versore", preview: String.raw`\hat{u}`, snippet: String.raw`\hat{$1}` },
-    { value: "vettore", label: "Vettore", preview: String.raw`\vec{v}`, snippet: String.raw`\vec{$1}` },
-].sort((a, b) => a.label.localeCompare(b.label));
+const FORMULA_FIRST_USE_KEY = "formula_first_use_shown";
 
-const GREEK_LETTERS = [
-    { value: "alfa", label: "Alfa", snippet: String.raw`\alpha $1`, preview: String.raw`\alpha ` },
-    { value: "beta", label: "Beta", snippet: String.raw`\beta $1`, preview: String.raw`\beta ` },
-    { value: "gamma", label: "Gamma", snippet: String.raw`\gamma $1`, preview: String.raw`\gamma ` },
-    { value: "gamma_maiuscola", label: "Gamma maiuscola", snippet: String.raw`\Gamma $1`, preview: String.raw`\Gamma ` },
-    { value: "delta", label: "Delta", snippet: String.raw`\delta $1`, preview: String.raw`\delta ` },
-    { value: "delta_maiuscola", label: "Delta maiuscola", snippet: String.raw`\Delta $1`, preview: String.raw`\Delta ` },
-    { value: "epsilon", label: "Epsilon", snippet: String.raw`\varepsilon $1`, preview: String.raw`\varepsilon ` },
-    { value: "zeta", label: "Zeta", snippet: String.raw`\zeta $1`, preview: String.raw`\zeta ` },
-    { value: "eta", label: "Eta", snippet: String.raw`\eta $1`, preview: String.raw`\eta ` },
-    { value: "teta", label: "Teta", snippet: String.raw`\theta $1`, preview: String.raw`\theta ` },
-    { value: "teta_maiuscola", label: "Teta maiuscola", snippet: String.raw`\Theta $1`, preview: String.raw`\Theta ` },
-    { value: "lambda", label: "Lambda", snippet: String.raw`\lambda $1`, preview: String.raw`\lambda ` },
-    { value: "mu", label: "Mu", snippet: String.raw`\mu $1`, preview: String.raw`\mu ` },
-    { value: "nu", label: "Nu", snippet: String.raw`\nu $1`, preview: String.raw`\nu ` },
-    { value: "xi", label: "Xi", snippet: String.raw`\xi $1`, preview: String.raw`\xi ` },
-    { value: "pi", label: "Pi greco", snippet: String.raw`\pi $1`, preview: String.raw`\pi ` },
-    { value: "rho", label: "Rho", snippet: String.raw`\rho $1`, preview: String.raw`\rho ` },
-    { value: "sigma", label: "Sigma", snippet: String.raw`\sigma $1`, preview: String.raw`\sigma ` },
-    { value: "sigma_maiuscola", label: "Sigma maiuscola", snippet: String.raw`\Sigma $1`, preview: String.raw`\Sigma ` },
-    { value: "tau", label: "Tau", snippet: String.raw`\tau $1`, preview: String.raw`\tau ` },
-    { value: "phi", label: "Phi", snippet: String.raw`\varphi $1`, preview: String.raw`\varphi ` },
-    { value: "phi_maiuscola", label: "Phi maiuscola", snippet: String.raw`\Phi $1`, preview: String.raw`\Phi ` },
-    { value: "chi", label: "Chi", snippet: String.raw`\chi $1`, preview: String.raw`\chi ` },
-    { value: "psi", label: "Psi", snippet: String.raw`\psi $1`, preview: String.raw`\psi ` },
-    { value: "omega", label: "Omega", snippet: String.raw`\omega $1`, preview: String.raw`\omega ` },
-    { value: "omega_maiuscola", label: "Omega maiuscola", snippet: String.raw`\Omega $1`, preview: String.raw`\Omega ` },
-].sort((a, b) => a.label.localeCompare(b.label));
-
-const LOGIC_SYMBOLS = [
-    { value: "per_ogni", label: "Per ogni", snippet: String.raw`\forall $1`, preview: String.raw`\forall ` },
-    { value: "esiste", label: "Esiste", snippet: String.raw`\exists $1`, preview: String.raw`\exists ` },
-    { value: "non_esiste", label: "Non esiste", snippet: String.raw`\nexists $1`, preview: String.raw`\nexists ` },
-    { value: "appartiene", label: "Appartiene", snippet: String.raw`\in $1`, preview: String.raw`\in ` },
-    { value: "non_appartiene", label: "Non appartiene", snippet: String.raw`\notin $1`, preview: String.raw`\notin ` },
-    { value: "sottoinsieme", label: "Sottoinsieme", snippet: String.raw`\subset $1`, preview: String.raw`\subset ` },
-    { value: "sottoinsieme_uguale", label: "Sottoinsieme o uguale", snippet: String.raw`\subseteq $1`, preview: String.raw`\subseteq ` },
-    { value: "unione", label: "Unione", snippet: String.raw`\cup $1`, preview: String.raw`\cup ` },
-    { value: "intersezione", label: "Intersezione", snippet: String.raw`\cap $1`, preview: String.raw`\cap ` },
-    { value: "insieme_vuoto", label: "Insieme vuoto", snippet: String.raw`\emptyset $1`, preview: String.raw`\emptyset ` },
-    { value: "e_logico", label: "E logico", snippet: String.raw`\land $1`, preview: String.raw`\land ` },
-    { value: "o_logico", label: "O logico", snippet: String.raw`\lor $1`, preview: String.raw`\lor ` },
-    { value: "negazione", label: "Negazione", snippet: String.raw`\lnot $1`, preview: String.raw`\lnot ` },
-    { value: "equivalenza_modulare", label: "Equivalenza modulare", snippet: String.raw` \equiv  \pmod{}`, preview: String.raw`a \equiv b \pmod{n}`, offset: -16 },
-    { value: "naturali", label: "Numeri naturali", snippet: String.raw`\mathbb{N} $1`, preview: String.raw`\mathbb{N}` },
-    { value: "interi", label: "Numeri interi", snippet: String.raw`\mathbb{Z} $1`, preview: String.raw`\mathbb{Z}` },
-    { value: "razionali", label: "Numeri razionali", snippet: String.raw`\mathbb{Q} $1`, preview: String.raw`\mathbb{Q}` },
-    { value: "reali", label: "Numeri reali", snippet: String.raw`\mathbb{R} $1`, preview: String.raw`\mathbb{R}` },
-    { value: "complessi", label: "Numeri complessi", snippet: String.raw`\mathbb{C} $1`, preview: String.raw`\mathbb{C}` },
-    { value: "irrazionali", label: "Numeri irrazionali", snippet: String.raw`\mathbb{R}\setminus\mathbb{Q} $1`, preview: String.raw`\mathbb{R}\setminus\mathbb{Q}` },
-].sort((a, b) => a.label.localeCompare(b.label));
-
-const RELATION_SYMBOLS = [
-    { value: "diverso", label: "Diverso", snippet: String.raw`\neq $1`, preview: String.raw`\neq ` },
-    { value: "minore_uguale", label: "Minore o uguale", snippet: String.raw`\leq $1`, preview: String.raw`\leq ` },
-    { value: "maggiore_uguale", label: "Maggiore o uguale", snippet: String.raw`\geq $1`, preview: String.raw`\geq ` },
-    { value: "molto_minore", label: "Molto minore", snippet: String.raw`\ll $1`, preview: String.raw`\ll ` },
-    { value: "molto_maggiore", label: "Molto maggiore", snippet: String.raw`\gg $1`, preview: String.raw`\gg ` },
-    { value: "circa_uguale", label: "Circa uguale", snippet: String.raw`\approx $1`, preview: String.raw`\approx ` },
-    { value: "simile", label: "Simile", snippet: String.raw`\sim $1`, preview: String.raw`\sim ` },
-    { value: "simile_uguale", label: "Simile o uguale", snippet: String.raw`\simeq $1`, preview: String.raw`\simeq ` },
-    { value: "proporzionale", label: "Proporzionale", snippet: String.raw`\propto $1`, preview: String.raw`\propto ` },
-    { value: "piu_meno", label: "Più o meno", snippet: String.raw`\pm $1`, preview: String.raw`\pm ` },
-    { value: "prodotto_cartesiano", label: "Prodotto cartesiano", snippet: String.raw`\times $1`, preview: String.raw`\times ` },
-    { value: "prodotto_scalare", label: "Prodotto scalare", snippet: String.raw`\cdot $1`, preview: String.raw`\cdot ` },
-    { value: "infinito", label: "Infinito", snippet: String.raw`\infty $1`, preview: String.raw`\infty ` },
-].sort((a, b) => a.label.localeCompare(b.label));
-
-const ARROW_SYMBOLS = [
-    { value: "freccia_destra", label: "Freccia destra", snippet: String.raw`\to $1`, preview: String.raw`\to ` },
-    { value: "freccia_sinistra", label: "Freccia sinistra", snippet: String.raw`\leftarrow $1`, preview: String.raw`\leftarrow ` },
-    { value: "freccia_doppia", label: "Freccia doppia", snippet: String.raw`\leftrightarrow $1`, preview: String.raw`\leftrightarrow ` },
-    { value: "implica", label: "Implica", snippet: String.raw`\Rightarrow $1`, preview: String.raw`\Rightarrow ` },
-    { value: "implica_sinistra", label: "Implica sinistra", snippet: String.raw`\Leftarrow $1`, preview: String.raw`\Leftarrow ` },
-    { value: "se_e_solo_se", label: "Se e solo se", snippet: String.raw`\Leftrightarrow $1`, preview: String.raw`\Leftrightarrow ` },
-    { value: "mappa_a", label: "Mappa a", snippet: String.raw`\mapsto $1`, preview: String.raw`\mapsto ` },
-    { value: "freccia_su", label: "Freccia su", snippet: String.raw`\uparrow $1`, preview: String.raw`\uparrow ` },
-    { value: "freccia_giu", label: "Freccia giù", snippet: String.raw`\downarrow $1`, preview: String.raw`\downarrow ` },
-    { value: "freccia_diagonale", label: "Freccia diagonale", snippet: String.raw`\nearrow $1`, preview: String.raw`\nearrow ` },
-].sort((a, b) => a.label.localeCompare(b.label));
-
-export function FormattingLatexBlock({
+export function FormattingLatex({
     _selection,
     editorRef,
     isFocused,
@@ -148,7 +48,7 @@ export function FormattingLatexBlock({
     const [open, setOpen] = useState(false);
     const [pendingKind, setPendingKind] = useState<'single' | 'double'>('double');
 
-    const inlineState = getIsActiveLatexInline(editorRef);
+    const inlineState = getIsActiveLatex(editorRef);
 
     const [query, setQuery] = useState("");
     const [activeTab, setActiveTab] = useState("formule");
@@ -161,30 +61,16 @@ export function FormattingLatexBlock({
         };
     };
 
-    const renderedFormulas = useMemo(() =>
-        FORMULAS.map(f => ({ ...f, rendered: renderLatex(f.preview) })), []);
-
-    const renderedGreek = useMemo(() =>
-        GREEK_LETTERS.map(s => ({ ...s, rendered: renderLatex(s.preview) })), []);
-
-    const renderedLogic = useMemo(() =>
-        LOGIC_SYMBOLS.map(s => ({ ...s, rendered: renderLatex(s.preview) })), []);
-
-    const renderedRelations = useMemo(() =>
-        RELATION_SYMBOLS.map(s => ({ ...s, rendered: renderLatex(s.preview) })), []);
-
-    const renderedArrows = useMemo(() =>
-        ARROW_SYMBOLS.map(s => ({ ...s, rendered: renderLatex(s.preview) })), []);
-
     const MAX_VISIBLE = 0;
 
-    const tabs = [
-        { id: "formule", label: "Formule", data: renderedFormulas },
-        { id: "relazioni", label: "Relazioni e operatori", data: renderedRelations },
-        { id: "logica", label: "Logica e insiemi", data: renderedLogic },
-        { id: "frecce", label: "Frecce e implicazioni", data: renderedArrows },
-        { id: "greche", label: "Lettere greche", data: renderedGreek },
-    ];
+    const tabs = useMemo(() =>
+        formulasData.sections.map(section => ({
+            id: section.id,
+            label: section.label,
+            data: [...section.items]
+                .sort((a, b) => a.label.localeCompare(b.label))
+                .map(f => ({ ...f, rendered: renderLatex(f.preview) })),
+        })), []);
 
     const activeData = useMemo(() => {
         const tab = tabs.find(t => t.id === activeTab);
@@ -217,7 +103,7 @@ export function FormattingLatexBlock({
                 q ? t.data.filter(f => f.label.toLowerCase().includes(q)).length : t.data.length
             ])
         );
-    }, [query]);
+    }, [query, tabs]);
 
     useEffect(() => {
         if (!query) return;
@@ -236,7 +122,7 @@ export function FormattingLatexBlock({
     const setActiveTabAndScroll = (id: string) => {
         setActiveTab(id);
         setTimeout(() => {
-            const activeBtn = tabsRef.current?.querySelector(`[data-tab="${id}"]`) as HTMLElement;
+            const activeBtn = tabsRef.current?.querySelector(`[data-tab="${id}"]`);
             activeBtn?.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "smooth" });
         }, 0);
     };
@@ -311,6 +197,33 @@ export function FormattingLatexBlock({
         } else {
             insertNew(snippet, pendingKind);
         }
+
+        if (!localStorage.getItem(FORMULA_FIRST_USE_KEY)) {
+            const toastId = toast(
+                <span className="leading-6 flex flex-col md:flex-row gap-2 md:text-nowrap md:flex-nowrap">
+                    <span>
+                        Usa <Kbd>Tab</Kbd> per spostarti tra i campi della formula
+                        e <Kbd>Shift</Kbd> + <Kbd>Tab</Kbd> per tornare indietro.
+                    </span>
+                    <button
+                        className="text-xs text-muted-foreground underline text-left w-fit cursor-pointer"
+                        onClick={() => {
+                            localStorage.setItem(FORMULA_FIRST_USE_KEY, "true");
+                            toast.dismiss(toastId);
+                        }}
+                    >
+                        Non mostrare più
+                    </button>
+                </span>,
+                {
+                    position: "bottom-center",
+                    duration: 5000,
+                    classNames: {
+                        toast: "md:!min-w-fit md:!left-1/2 md:!-translate-x-1/2",
+                    },
+                }
+            );
+        }
     };
 
     useEffect(() => {
@@ -332,11 +245,12 @@ export function FormattingLatexBlock({
         return () => disposable.dispose();
     }, [isFocused, editorRef.current]);
 
+    if ((getIsActiveCode(editorRef) || getIsActiveWord(editorRef, getCodeInlineRegex)) && isFocused) return null;
 
     return (
         <>
             {/* Toggle $ — nascosto se block o double attivi */}
-            {activeKind !== 'block' && activeKind !== 'double' && (
+            {(!isFocused || (activeKind !== 'block' && activeKind !== 'double')) && (
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
@@ -349,6 +263,9 @@ export function FormattingLatexBlock({
                                 onClick={() => openCommand('single')}
                             >
                                 <Radical size={16} />
+                                {activeKind == 'single' && isFocused && (
+                                    <span>Aggiungi alla formula</span>
+                                )}
                             </Toggle>
                         </TooltipTrigger>
                         <TooltipContent className="pr-1.5">
@@ -364,7 +281,7 @@ export function FormattingLatexBlock({
             )}
 
             {/* Toggle $$ — nascosto se single attivo */}
-            {activeKind !== 'single' && (
+            {(!isFocused || activeKind !== 'single') && (
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
@@ -377,6 +294,9 @@ export function FormattingLatexBlock({
                                 onClick={() => openCommand('double')}
                             >
                                 <SquareRadical size={16} />
+                                {activeKind == 'double' && isFocused && (
+                                    <span>Aggiungi alla formula</span>
+                                )}
                             </Toggle>
                         </TooltipTrigger>
                         <TooltipContent className="pr-1.5">
@@ -518,6 +438,7 @@ export function FormattingLatexBlock({
                     </CommandList>
                 </Command>
             </CommandDialog>
+            <Separator orientation="vertical" />
         </>
     );
 }

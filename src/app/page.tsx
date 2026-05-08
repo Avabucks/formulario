@@ -23,12 +23,10 @@ export default function Home() {
 // TODOs:
 
 // - [EDITOR]
-// -- [ ] TABLE
 // - bug switch view smonta editor
-// - bug code cursor nel prefix finale aggiunge il linguaggio alla fine
 // - titoli come notion con "scaletta"
 // - sistemare preview <p>, quote, code, ...
-// - se isActive (es. code, latex) visualizzare solo toggle (es. code, latex) e non tutti i toggle
+// - refactor formatting-utils
 
 // - [GENERALI]
 // - report che manda mail a admin (mail nell'env) solo se la formula non è tua (in impostazioni)
@@ -38,6 +36,8 @@ export default function Home() {
 // - abbonamento a 1,99 che ti da accesso illimitato a creazione formulari e 200 crediti AI (senza crediti ma con tokens cosi e piu preciso ma senza scrivere il ilmite, semplicemente quando finiscono esce popup)
 
 // - [NOVITA]
+// - user settings
+// - link share solo con chi selezioni
 // - ⁠categorie per organizzare formulari + colori titoli
 // - aggiungere funzionalità di esportazione (pdf, markdown, ecc.)
 // - supporto piu lingue

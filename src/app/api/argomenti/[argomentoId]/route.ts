@@ -14,6 +14,7 @@ export async function GET(
     // Controllo autenticazione
     if (!uid) return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
 
+
     const { argomentoId } = await params;
 
     try {

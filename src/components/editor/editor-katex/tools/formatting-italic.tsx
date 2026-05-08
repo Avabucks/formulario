@@ -3,12 +3,10 @@
 import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
 import { Toggle } from "@/src/components/ui/toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/src/components/ui/tooltip";
-import { getIsActive, handleFormattingToggle } from "@/src/lib/editor/formatting-utils";
+import { checkActiveLatexOrCode, getCodeInlineRegex, getIsActiveLatex, getIsActiveWord, getItalicRegex, handleWordToggle } from "@/src/lib/editor/formatting-utils";
 import { Italic } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useEffect } from "react";
-
-const getItalicRegex = () => /_(.+?)_/g;
 
 export function FormattingItalic({
     _selection,
@@ -19,12 +17,12 @@ export function FormattingItalic({
     editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
     isFocused: boolean;
 }>) {
-    const isActive = getIsActive(editorRef, getItalicRegex);
+    const isActive = getIsActiveWord(editorRef, getItalicRegex);
 
     const handleToggle = () =>
-        handleFormattingToggle(
+        handleWordToggle(
             editorRef,
-            getIsActive(editorRef, getItalicRegex),
+            isActive,
             getItalicRegex,
             (text) => `_${text}$0_`,
             (match) => match[1],
@@ -44,6 +42,8 @@ export function FormattingItalic({
         });
         return () => disposable.dispose();
     }, [isFocused, editorRef.current]);
+
+    if ((checkActiveLatexOrCode(editorRef) || getIsActiveLatex(editorRef) || getIsActiveWord(editorRef, getCodeInlineRegex)) && isFocused) return null;
 
     return (
         <TooltipProvider>

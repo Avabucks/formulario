@@ -187,7 +187,7 @@ export function CapitoloItem({ capitolo }: Readonly<{ capitolo: Capitolo }>) {
                                     <DialogTitle>Elimina</DialogTitle>
                                 </DialogHeader>
                                 <DialogDescription>
-                                    Sei sicuro di voler eliminare "{capitolo.titolo}"? Questa azione non è reversibile.
+                                    Sei sicuro di voler eliminare "{capitolo.titolo}" e tutti i suoi argomenti? Questa azione non è reversibile.
                                 </DialogDescription>
                                 <DialogFooter>
                                     <DialogClose asChild>
