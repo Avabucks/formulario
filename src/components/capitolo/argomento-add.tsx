@@ -37,7 +37,7 @@ export function ArgomentoAdd({ capitolo }: Readonly<{ capitolo: Capitolo }>) {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === "A" && (e.metaKey || e.ctrlKey) && e.shiftKey) {
                 e.preventDefault()
-                setOpen((prev) => !prev)
+                handleSubmit()
             }
         }
 

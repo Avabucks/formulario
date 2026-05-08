@@ -138,6 +138,7 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
     }, [handleUndo, handleRedo]);
 
     const toolbar = (
+        loading ? <div className="flex h-full items-center justify-center"><Spinner /></div> :
         <div className="flex w-full border-b min-h-15 overflow-x-auto">
             <div className="flex gap-3 border-r items-center px-3">
                 <TooltipProvider>
@@ -286,9 +287,7 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
 
         </div>
     );
-    const preview = loading
-        ? <div className="flex h-full items-center justify-center"><Spinner /></div>
-        : <EditorPreview markdownContent={markdownContent ?? ""} />;
+    const preview = !loading && <EditorPreview markdownContent={markdownContent ?? ""} />;
     const editor = editable
         ? <EditorInput
             argomentoId={argomentoId}
@@ -312,9 +311,7 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
             }}
             loading={<Spinner />}
         />
-    const input = loading
-        ? <div className="flex h-full items-center justify-center"><Spinner /></div>
-        : editor
+    const input = !loading && editor
 
     return (
         <div className="flex flex-1 flex-col min-h-0 border rounded-lg overflow-hidden">
