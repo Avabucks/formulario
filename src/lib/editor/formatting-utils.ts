@@ -9,11 +9,11 @@ export const getH5Regex = () => /^#####\s(.+)$/gm;
 export const getH6Regex = () => /^######\s(.+)$/gm;
 
 export const getBoldRegex = () => /\*\*(.+?)\*\*/g;
-export const getItalicRegex = () => /_(.+?)_/g;
+export const getItalicRegex = () => /([_*])(.+?)\1/g;
 export const getQuoteRegex = () => /^>\s/;
 
-export const getOrderedListRegex = () => /^\d+\.\s/;
-export const getUnorderedListRegex = () => /^-\s/;
+export const getOrderedListRegex = () => /^\s*\d+\.\s/;
+export const getUnorderedListRegex = () => /^\s*[-*]\s/;
 
 export const getCodeInlineRegex = () => /`(.+?)`/g;
 

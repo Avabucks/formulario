@@ -43,6 +43,9 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
     const [selection, setSelection] = useState<Selection | null>(null);
 
     const editorRef = useRef<any>(null);
+    const monacoRef = useRef<Monaco | null>(null);
+    const [monacoReady, setMonacoReady] = useState(false);
+
     const undoBtnRef = useRef<HTMLButtonElement>(null);
     const redoBtnRef = useRef<HTMLButtonElement>(null);
 
@@ -54,6 +57,36 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
 
     function handleEditorDidMount(editor: any, monaco: Monaco) {
         editorRef.current = editor;
+        monacoRef.current = monaco;
+        setMonacoReady(true);
+
+        monaco.languages.register({ id: "markdown-math" });
+
+        monaco.languages.setMonarchTokensProvider("markdown-math", {
+            tokenizer: {
+                root: [
+                    [/\$\$/, { token: "math.display", next: "@mathDisplay" }],
+                    [/\$/, { token: "math.inline", next: "@mathInline" }],
+                    [/^#{1,6}\s.*$/, "keyword"],
+                    [/^\s*>.*$/, "markdown.blockquote"],
+                    [/\*\*[^*]+\*\*/, "strong"],
+                    [/^(`{3,}).*$/, { token: "markdown.code.block", next: "@codeBlock" }],
+                    [/`[^`]+`/, "markdown.code.inline"],
+                ],
+                mathDisplay: [
+                    [/[^$]+/, "math.content"],
+                    [/\$\$/, { token: "math.display", next: "@pop" }],
+                ],
+                mathInline: [
+                    [/[^$]+/, "math.content"],
+                    [/\$/, { token: "math.inline", next: "@pop" }],
+                ],
+                codeBlock: [
+                    [/^`{3,}$/, { token: "markdown.code.block", next: "@pop" }],
+                    [/.*$/, "markdown.code.block"],
+                ],
+            },
+        });
 
         editor.onDidChangeCursorSelection(() => updateSelection(editor));
         editor.onDidChangeCursorPosition(() => updateSelection(editor));
@@ -135,6 +168,41 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
         document.addEventListener("keydown", handleKeyDown);
         return () => document.removeEventListener("keydown", handleKeyDown);
     }, [handleUndo, handleRedo]);
+
+    useEffect(() => {
+        if (!monacoRef.current) return;
+
+        const darkRules = [
+            { token: "math.display", foreground: "4EC9B0" },
+            { token: "math.inline", foreground: "4EC9B0" },
+            { token: "math.content", foreground: "CE9178" },
+            { token: "markdown.blockquote", foreground: "6A9955" },
+            { token: "markdown.code.inline", foreground: "D7BA7D" },
+            { token: "markdown.code.block", foreground: "D7BA7D" },
+            { token: "strong", foreground: "E06C75" },
+            { token: "markup.bold.italic", foreground: "E06C75" },
+        ];
+
+        const lightRules = [
+            { token: "math.display", foreground: "267F99" },
+            { token: "math.inline", foreground: "267F99" },
+            { token: "math.content", foreground: "A31515" },
+            { token: "markdown.blockquote", foreground: "008000" },
+            { token: "markdown.code.inline", foreground: "795E26" },
+            { token: "markdown.code.block", foreground: "795E26" },
+            { token: "strong", foreground: "C0392B" },
+            { token: "markup.bold.italic", foreground: "C0392B" },
+        ];
+
+        monacoRef.current.editor.defineTheme("markdown-math-theme", {
+            base: resolvedTheme === "dark" ? "vs-dark" : "vs",
+            inherit: true,
+            rules: resolvedTheme === "dark" ? darkRules : lightRules,
+            colors: {},
+        });
+
+        monacoRef.current.editor.setTheme("markdown-math-theme");
+    }, [resolvedTheme, monacoReady]);
 
     const toolbar = (
         <div className="flex w-full border-b min-h-15 overflow-x-auto">

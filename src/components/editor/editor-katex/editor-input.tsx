@@ -1,12 +1,11 @@
 "use client";
 import Editor, { Monaco } from '@monaco-editor/react';
 import { AlertTriangle, CheckCheck } from "lucide-react";
-import { useTheme } from "next-themes";
+import { editor } from 'monaco-editor';
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { NavigationBlocker } from "../../navigation/navigation-blocker";
 import { Spinner } from "../../ui/spinner";
-import { editor } from 'monaco-editor';
-import { useRouter } from "next/navigation";
 
 export function EditorInput({
     argomentoId,
@@ -27,8 +26,6 @@ export function EditorInput({
 
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(false)
-
-    const { resolvedTheme } = useTheme();
 
     const save = (content: string) => {
         setLoading(true)
@@ -89,8 +86,7 @@ export function EditorInput({
         <div className="relative h-full overflow-hidden group">
             <NavigationBlocker blocked={loading} />
             <Editor
-                defaultLanguage="markdown"
-                theme={resolvedTheme === "dark" ? "vs-dark" : "vs-light"}
+                defaultLanguage="markdown-math"
                 defaultValue={textAreaContent}
                 onMount={handleEditorDidMount}
                 onChange={handleChange}
