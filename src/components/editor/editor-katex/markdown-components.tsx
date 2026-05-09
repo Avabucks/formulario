@@ -83,9 +83,15 @@ function SyntaxBlock({ language, codeString }: Readonly<{ language: string, code
             fontSize: "13px",
             lineHeight: "1.6",
             background: "transparent",
+            whiteSpace: "pre-wrap",
+            wordBreak: "break-word",
           }}
           codeTagProps={{
-            style: { textShadow: "none" },
+            style: {
+              textShadow: "none",
+              whiteSpace: "pre-wrap",
+              wordBreak: "break-word",
+            },
             className: "font-mono",
           }}
         >
@@ -212,16 +218,12 @@ function MermaidBlock({ code }: Readonly<{ code: string }>) {
 interface HeadingProps {
   level: 1 | 2 | 3 | 4 | 5 | 6;
   children: React.ReactNode;
-  icon: React.ElementType;
-  size: number;
   className?: string;
 }
 
 const Heading = ({
   level,
   children,
-  icon: Icon,
-  size,
   className = ""
 }: HeadingProps) => {
   const Tag = `h${level}` as any;
@@ -244,10 +246,6 @@ const Heading = ({
       onMouseEnter={() => handleHover(true)}
       onMouseLeave={() => handleHover(false)}
     >
-      {/* Icona laterale */}
-      <span className="absolute -left-7 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-50 transition-opacity icon-indicator">
-        <Icon size={size} />
-      </span>
 
       {/* Sottolineatura */}
       <span className="absolute w-full h-px top-full mt-2 bg-foreground/50 opacity-0 group-hover:opacity-50 transition-opacity underline-indicator"></span>
@@ -261,32 +259,32 @@ const Heading = ({
 
 export const markdownComponents: Components = {
   h1: ({ children }) => (
-    <Heading level={1} icon={Heading1} size={23} className="text-(--editor-title) text-[2em] font-semibold leading-8">
+    <Heading level={1} className="text-(--editor-title) text-[2em] font-semibold leading-8">
       {children}
     </Heading>
   ),
   h2: ({ children }) => (
-    <Heading level={2} icon={Heading2} size={22} className="text-(--editor-title) text-[1.5em] font-semibold leading-6">
+    <Heading level={2} className="text-(--editor-title) text-[1.5em] font-semibold leading-6">
       {children}
     </Heading>
   ),
   h3: ({ children }) => (
-    <Heading level={3} icon={Heading3} size={21} className="text-(--editor-title) text-[1.2em] font-semibold leading-5">
+    <Heading level={3} className="text-(--editor-title) text-[1.2em] font-semibold leading-5">
       {children}
     </Heading>
   ),
   h4: ({ children }) => (
-    <Heading level={4} icon={Heading4} size={19} className="text-(--editor-title) text-[1em] font-semibold leading-4">
+    <Heading level={4} className="text-(--editor-title) text-[1em] font-semibold leading-4">
       {children}
     </Heading>
   ),
   h5: ({ children }) => (
-    <Heading level={5} icon={Heading5} size={18} className="text-(--editor-title) text-[0.875em] font-semibold leading-3">
+    <Heading level={5} className="text-(--editor-title) text-[0.875em] font-semibold leading-3">
       {children}
     </Heading>
   ),
   h6: ({ children }) => (
-    <Heading level={6} icon={Heading6} size={18} className="text-(--editor-title)/60 text-[0.85em] font-semibold">
+    <Heading level={6} className="text-(--editor-title)/60 text-[0.85em] font-semibold">
       {children}
     </Heading>
   ),

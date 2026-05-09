@@ -137,151 +137,150 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
     }, [handleUndo, handleRedo]);
 
     const toolbar = (
-        loading ? <div className="flex h-full items-center justify-center"><Spinner /></div> :
-            <div className="flex w-full border-b min-h-15 overflow-x-auto">
-                <div className="flex gap-3 border-r items-center px-3">
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    ref={undoBtnRef}
-                                    variant="outline"
-                                    size="icon"
-                                    onClick={handleUndo}
-                                    onMouseDown={(e) => e.preventDefault()}
-                                >
-                                    <Undo2 size={16} />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent className="pr-1.5">
-                                <div className="flex items-center gap-2">
-                                    Annulla
-                                    <KbdGroup className="hidden md:flex">
-                                        <Kbd>Ctrl</Kbd>
-                                        <span>+</span>
-                                        <Kbd>Z</Kbd>
-                                    </KbdGroup>
-                                </div>
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    ref={redoBtnRef}
-                                    variant="outline"
-                                    size="icon"
-                                    onClick={handleRedo}
-                                    onMouseDown={(e) => e.preventDefault()}
-                                >
-                                    <Redo2 size={16} />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent className="pr-1.5">
-                                <div className="flex items-center gap-2">
-                                    Ripristina
-                                    <KbdGroup className="hidden md:flex">
-                                        <Kbd>Ctrl</Kbd>
-                                        <span>+</span>
-                                        <Kbd>Y</Kbd>
-                                    </KbdGroup>
-                                </div>
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
-                </div>
-
-                <div className="flex flex-1 items-center">
-                    <div className="flex flex-1 items-center gap-3 h-full px-3">
-                        <FormattingHeaders
-                            _selection={selection}
-                            editorRef={editorRef}
-                            isFocused={isFocused}
-                        />
-                        <FormattingBold
-                            _selection={selection}
-                            editorRef={editorRef}
-                            isFocused={isFocused}
-                        />
-                        <FormattingItalic
-                            _selection={selection}
-                            editorRef={editorRef}
-                            isFocused={isFocused}
-                        />
-                        <FormattingQuote
-                            _selection={selection}
-                            editorRef={editorRef}
-                            isFocused={isFocused}
-                        />
-
-                        <FormattingOrderedList
-                            _selection={selection}
-                            editorRef={editorRef}
-                            isFocused={isFocused}
-                        />
-                        <FormattingUnorderedList
-                            _selection={selection}
-                            editorRef={editorRef}
-                            isFocused={isFocused}
-                        />
-
-                        <FormattingTable
-                            _selection={selection}
-                            editorRef={editorRef}
-                            isFocused={isFocused}
-                        />
-                        <FormattingDivider
-                            _selection={selection}
-                            editorRef={editorRef}
-                            isFocused={isFocused}
-                        />
-
-                        <FormattingCodeInline
-                            _selection={selection}
-                            editorRef={editorRef}
-                            isFocused={isFocused}
-                        />
-                        <FormattingCodeBlock
-                            _selection={selection}
-                            editorRef={editorRef}
-                            isFocused={isFocused}
-                        />
-
-                        <FormattingLatex
-                            _selection={selection}
-                            editorRef={editorRef}
-                            isFocused={isFocused}
-                        />
-
-                    </div>
-
-                    <div className="flex items-center gap-3 px-3 h-full">
-                        <GeminiButton
-                            editorRef={editorRef}
-                        />
-                    </div>
-                </div>
-
-                {/* Mobile */}
-                <div className="flex md:hidden border-l items-center px-3 gap-3">
-                    <Button variant="outline" size="icon" onClick={() => setSwitchView((prev) => !prev)}>
-                        <ArrowRightLeft size={16} />
-                    </Button>
-                </div>
-
-                {/* Desktop */}
-                <div className="hidden md:flex border-l items-center px-3 gap-3">
-                    <Toggle variant="outline" pressed={switchView} onClick={() => setSwitchView((prev) => !prev)}>
-                        {switchView ? <Eye size={16} /> : <EyeClosed size={16} />}
-                    </Toggle>
-                </div>
-
-                <div className="flex border-l items-center px-3 gap-3">
-                    <FormularioSettings formularioId={formularioId} />
-                </div>
-
+        <div className="flex w-full border-b min-h-15 overflow-x-auto">
+            <div className="flex gap-3 border-r items-center px-3">
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                ref={undoBtnRef}
+                                variant="outline"
+                                size="icon"
+                                onClick={handleUndo}
+                                onMouseDown={(e) => e.preventDefault()}
+                            >
+                                <Undo2 size={16} />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className="pr-1.5">
+                            <div className="flex items-center gap-2">
+                                Annulla
+                                <KbdGroup className="hidden md:flex">
+                                    <Kbd>Ctrl</Kbd>
+                                    <span>+</span>
+                                    <Kbd>Z</Kbd>
+                                </KbdGroup>
+                            </div>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                ref={redoBtnRef}
+                                variant="outline"
+                                size="icon"
+                                onClick={handleRedo}
+                                onMouseDown={(e) => e.preventDefault()}
+                            >
+                                <Redo2 size={16} />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className="pr-1.5">
+                            <div className="flex items-center gap-2">
+                                Ripristina
+                                <KbdGroup className="hidden md:flex">
+                                    <Kbd>Ctrl</Kbd>
+                                    <span>+</span>
+                                    <Kbd>Y</Kbd>
+                                </KbdGroup>
+                            </div>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
             </div>
+
+            <div className="flex flex-1 items-center">
+                <div className="flex flex-1 items-center gap-3 h-full px-3">
+                    <FormattingHeaders
+                        _selection={selection}
+                        editorRef={editorRef}
+                        isFocused={isFocused}
+                    />
+                    <FormattingBold
+                        _selection={selection}
+                        editorRef={editorRef}
+                        isFocused={isFocused}
+                    />
+                    <FormattingItalic
+                        _selection={selection}
+                        editorRef={editorRef}
+                        isFocused={isFocused}
+                    />
+                    <FormattingQuote
+                        _selection={selection}
+                        editorRef={editorRef}
+                        isFocused={isFocused}
+                    />
+
+                    <FormattingOrderedList
+                        _selection={selection}
+                        editorRef={editorRef}
+                        isFocused={isFocused}
+                    />
+                    <FormattingUnorderedList
+                        _selection={selection}
+                        editorRef={editorRef}
+                        isFocused={isFocused}
+                    />
+
+                    <FormattingTable
+                        _selection={selection}
+                        editorRef={editorRef}
+                        isFocused={isFocused}
+                    />
+                    <FormattingDivider
+                        _selection={selection}
+                        editorRef={editorRef}
+                        isFocused={isFocused}
+                    />
+
+                    <FormattingCodeInline
+                        _selection={selection}
+                        editorRef={editorRef}
+                        isFocused={isFocused}
+                    />
+                    <FormattingCodeBlock
+                        _selection={selection}
+                        editorRef={editorRef}
+                        isFocused={isFocused}
+                    />
+
+                    <FormattingLatex
+                        _selection={selection}
+                        editorRef={editorRef}
+                        isFocused={isFocused}
+                    />
+
+                </div>
+
+                <div className="flex items-center gap-3 px-3 h-full">
+                    <GeminiButton
+                        editorRef={editorRef}
+                    />
+                </div>
+            </div>
+
+            {/* Mobile */}
+            <div className="flex md:hidden border-l items-center px-3 gap-3">
+                <Button variant="outline" size="icon" onClick={() => setSwitchView((prev) => !prev)}>
+                    <ArrowRightLeft size={16} />
+                </Button>
+            </div>
+
+            {/* Desktop */}
+            <div className="hidden md:flex border-l items-center px-3 gap-3">
+                <Toggle variant="outline" pressed={switchView} onClick={() => setSwitchView((prev) => !prev)}>
+                    {switchView ? <Eye size={16} /> : <EyeClosed size={16} />}
+                </Toggle>
+            </div>
+
+            <div className="flex border-l items-center px-3 gap-3">
+                <FormularioSettings formularioId={formularioId} />
+            </div>
+
+        </div>
     );
     const preview = !loading && <EditorPreview markdownContent={markdownContent ?? ""} />;
     const editor = editable
@@ -311,35 +310,39 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
 
     return (
         <div className="flex flex-1 flex-col min-h-0 border rounded-lg overflow-hidden">
-            {editable ?
-                toolbar
-                : (
-                    <div className="flex w-full border-b min-h-15 justify-between items-center">
-                        <div className="flex flex-1 items-center gap-2 px-4 text-sm text-muted-foreground">
-                            <PenOff size={16} />
-                            <TakeFormulario formularioId={formularioId} />
-                            <span className="hidden md:flex">per modifcare</span>
-                        </div>
+            {loading ? <div className="flex h-full items-center justify-center"><Spinner /></div> : (
+                <>
+                    {editable ?
+                        toolbar
+                        : (
+                            <div className="flex w-full border-b min-h-15 justify-between items-center">
+                                <div className="flex flex-1 items-center gap-2 px-4 text-sm text-muted-foreground">
+                                    <PenOff size={16} />
+                                    <TakeFormulario formularioId={formularioId} />
+                                    <span className="hidden md:flex">per modifcare</span>
+                                </div>
 
-                        {/* Mobile */}
-                        <div className="flex md:hidden border-l items-center px-3 gap-3 h-full">
-                            <Button variant="outline" size="icon" onClick={() => setSwitchView((prev) => !prev)}>
-                                <ArrowRightLeft size={16} />
-                            </Button>
-                        </div>
+                                {/* Mobile */}
+                                <div className="flex md:hidden border-l items-center px-3 gap-3 h-full">
+                                    <Button variant="outline" size="icon" onClick={() => setSwitchView((prev) => !prev)}>
+                                        <ArrowRightLeft size={16} />
+                                    </Button>
+                                </div>
 
-                        {/* Desktop */}
-                        <div className="hidden md:flex border-l items-center px-3 gap-3 h-full">
-                            <Toggle variant="outline" pressed={switchView} onClick={() => setSwitchView((prev) => !prev)}>
-                                {switchView ? <Eye size={16} /> : <EyeClosed size={16} />}
-                            </Toggle>
-                        </div>
+                                {/* Desktop */}
+                                <div className="hidden md:flex border-l items-center px-3 gap-3 h-full">
+                                    <Toggle variant="outline" pressed={switchView} onClick={() => setSwitchView((prev) => !prev)}>
+                                        {switchView ? <Eye size={16} /> : <EyeClosed size={16} />}
+                                    </Toggle>
+                                </div>
 
-                        <div className="flex border-l items-center px-3 gap-2 h-full">
-                            <FormularioSettings formularioId={formularioId} />
-                        </div>
-                    </div>
-                )}
+                                <div className="flex border-l items-center px-3 gap-2 h-full">
+                                    <FormularioSettings formularioId={formularioId} />
+                                </div>
+                            </div>
+                        )}
+                </>
+            )}
 
             {isMobile ? (
                 <div className="md:hidden flex-1 min-h-0 overflow-auto">
