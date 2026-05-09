@@ -18,31 +18,12 @@ import { Code, SquareTerminal, X } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useEffect, useState } from "react";
 import { Separator } from "@/src/components/ui/separator";
+import languages from "@/src/data/languages.json";
 
 const OPEN_MARKER = "```";
 const CLOSE_MARKER = "```";
 
-const LANGUAGES = [
-    { value: "typescript", label: "TypeScript" },
-    { value: "javascript", label: "JavaScript" },
-    { value: "python", label: "Python" },
-    { value: "rust", label: "Rust" },
-    { value: "go", label: "Go" },
-    { value: "java", label: "Java" },
-    { value: "cpp", label: "C++" },
-    { value: "c", label: "C" },
-    { value: "csharp", label: "C#" },
-    { value: "html", label: "HTML" },
-    { value: "css", label: "CSS" },
-    { value: "sql", label: "SQL" },
-    { value: "bash", label: "Bash" },
-    { value: "json", label: "JSON" },
-    { value: "yaml", label: "YAML" },
-    { value: "markdown", label: "Markdown" },
-    { value: "xml", label: "XML" },
-    { value: "dockerfile", label: "Dockerfile" },
-    { value: "mermaid", label: "Mermaid" },
-].sort((a, b) => a.label.localeCompare(b.label));
+const LANGUAGES = languages.toSorted((a, b) => a.label.localeCompare(b.label));
 
 export function FormattingCodeBlock({
     _selection,

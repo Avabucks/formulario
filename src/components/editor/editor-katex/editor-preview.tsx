@@ -17,6 +17,7 @@ const remarkPlugins = [remarkMath, remarkBreaks, remarkGfm];
 const rehypePlugins = [rehypeKatex];
 
 const A4_WIDTH_PX = 794;
+const A4_HEIGHT_PX = 1123;
 const ZOOM_STEP = 0.1;
 const ZOOM_MIN = 0.3;
 const ZOOM_MAX = 3;
@@ -122,14 +123,16 @@ export const EditorPreview = memo(function EditorPreview({
                         <div
                             style={{
                                 width: A4_WIDTH_PX,
+                                height: A4_HEIGHT_PX,
+                                paddingBottom: 48,
                                 transform: `scale(${scale})`,
-                                transformOrigin: "top left", // ← top left, non center
+                                transformOrigin: "top left",
                                 position: "absolute",
                                 top: 0,
                                 left: 0,
                             }}
                         >
-                            <div className="relative w-full min-h-full bg-background border border-border mb-20 overflow-hidden">
+                            <div className="relative w-full min-h-full bg-background border border-border overflow-hidden">
                                 {/* Grid pattern */}
                                 <svg
                                     className="absolute inset-0 h-full w-full opacity-[0.08] pointer-events-none"
