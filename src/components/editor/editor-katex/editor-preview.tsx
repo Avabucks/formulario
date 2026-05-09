@@ -109,7 +109,7 @@ export const EditorPreview = memo(function EditorPreview({
                 style={{ backgroundColor: "hsl(var(--sidebar-background, var(--secondary)))" }}
             >
                 <div
-                    className="py-10 pb-24"
+                    className="py-10"
                     style={{ minWidth: A4_WIDTH_PX * scale }}
                 >
                     <div
@@ -123,7 +123,6 @@ export const EditorPreview = memo(function EditorPreview({
                         <div
                             style={{
                                 width: A4_WIDTH_PX,
-                                height: A4_HEIGHT_PX,
                                 paddingBottom: 48,
                                 transform: `scale(${scale})`,
                                 transformOrigin: "top left",
@@ -132,7 +131,10 @@ export const EditorPreview = memo(function EditorPreview({
                                 left: 0,
                             }}
                         >
-                            <div className="relative w-full min-h-full bg-background border border-border overflow-hidden">
+                            <div
+                                className="relative w-full bg-background border border-border overflow-hidden"
+                                style={{ minHeight: A4_HEIGHT_PX * scale }}
+                            >
                                 {/* Grid pattern */}
                                 <svg
                                     className="absolute inset-0 h-full w-full opacity-[0.08] pointer-events-none"
