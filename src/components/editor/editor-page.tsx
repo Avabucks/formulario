@@ -38,7 +38,7 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
     const [loading, setLoading] = useState<boolean>(true);
     const [edited, setEdited] = useState<boolean>(false);
     const [switchView, setSwitchView] = useState<boolean>(false);
-    const [resizableSize, setResizableSize] = useState<number>(50);
+    const [resizableSize, setResizableSize] = useState<number>(40);
     const [isFocused, setIsFocused] = useState(false);
     const [selection, setSelection] = useState<Selection | null>(null);
 
@@ -361,11 +361,11 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
                     >
                         {(!switchView) && (
                             <>
-                                <ResizablePanel id="input" collapsedSize={resizableSize} minSize="20%" defaultSize="50%">{input}</ResizablePanel>
+                                <ResizablePanel id="input" collapsedSize={resizableSize} minSize="20%" defaultSize="40%">{input}</ResizablePanel>
                                 <ResizableHandle className="focus-visible:ring-0" withHandle />
                             </>
                         )}
-                        <ResizablePanel id="preview" collapsedSize={100 - resizableSize} minSize="20%" defaultSize="50%">{preview}</ResizablePanel>
+                        <ResizablePanel id="preview" collapsedSize={100 - resizableSize} minSize="20%" defaultSize="60%">{preview}</ResizablePanel>
                     </ResizablePanelGroup>
                 </div>
             )}

@@ -65,7 +65,18 @@ export const EditorPreview = memo(function EditorPreview({
     }, [fitMode, computeFitScale]);
 
     useEffect(() => {
-        handleFitWidth();
+        const init = () => {
+            const width = containerRef.current?.getBoundingClientRect().width ?? 0;
+            if (width === 0) return;
+            if (A4_WIDTH_PX > width) {
+                handleFitWidth();
+            } else {
+                setScale(1);
+                setFitMode("manual");
+            }
+        };
+
+        requestAnimationFrame(() => requestAnimationFrame(init));
     }, []);
 
     const handleZoomOut = () => {
