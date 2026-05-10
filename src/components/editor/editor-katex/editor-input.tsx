@@ -14,6 +14,7 @@ export function EditorInput({
     edited,
     setEdited,
     handleEditorDidMount,
+    editable,
 }: Readonly<{
     argomentoId: string,
     textAreaContent: string,
@@ -21,6 +22,7 @@ export function EditorInput({
     edited: boolean
     setEdited: (value: boolean) => void,
     handleEditorDidMount: (editor: editor.IStandaloneCodeEditor, monaco: Monaco) => void;
+    editable: boolean;
 }>) {
     const router = useRouter();
 
@@ -91,6 +93,7 @@ export function EditorInput({
                 onMount={handleEditorDidMount}
                 onChange={handleChange}
                 options={{
+                    readOnly: !editable,
                     links: false,
                     minimap: { enabled: false },
                     automaticLayout: true,

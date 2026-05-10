@@ -1,7 +1,7 @@
 "use client";
 
 import { useIsMobile } from '@/src/hooks/useIsMobile';
-import { Editor, Monaco } from '@monaco-editor/react';
+import { Monaco } from '@monaco-editor/react';
 import { ArrowRightLeft, Eye, EyeClosed, PenOff, Redo2, Undo2 } from "lucide-react";
 import type { Selection } from "monaco-editor";
 import { useTheme } from 'next-themes';
@@ -69,18 +69,10 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
                     [/\$\$/, { token: "math.display", next: "@mathDisplay" }],
                     [/\$/, { token: "math.inline", next: "@mathInline" }],
                     [/^#{1,6}\s.*$/, "keyword"],
-                    [/^\s*>/, { token: "markdown.blockquote", next: "@blockquote" }],
+                    [/^\s*>.*$/, "markdown.blockquote"],
                     [/\*\*[^*]+\*\*/, "strong"],
                     [/^(`{3,}).*$/, { token: "markdown.code.block", next: "@codeBlock" }],
                     [/`[^`]+`/, "markdown.code.inline"],
-                ],
-                blockquote: [
-                    [/(\$\$)([^$]+)(\$\$)/, ["math.display", "math.content", "math.display"]],
-                    [/(\$)([^$]+)(\$)/, ["math.inline", "math.content", "math.inline"]],
-                    [/\*\*[^*]+\*\*/, "strong"],
-                    [/`[^`]+`/, "markdown.code.inline"],
-                    [/[^$*`\n]+/, "markdown.blockquote"],
-                    [/$/, { token: "", next: "@pop" }],
                 ],
                 mathDisplay: [
                     [/[^$]+/, "math.content"],
@@ -188,7 +180,7 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
             { token: "markdown.blockquote", foreground: "6A9955" },
             { token: "markdown.code.inline", foreground: "D7BA7D" },
             { token: "markdown.code.block", foreground: "D7BA7D" },
-            { token: "strong", foreground: "E06C75" },
+            { token: "strong", foreground: "C586C0" },
             { token: "markup.bold.italic", foreground: "E06C75" },
         ];
 
@@ -199,7 +191,7 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
             { token: "markdown.blockquote", foreground: "008000" },
             { token: "markdown.code.inline", foreground: "795E26" },
             { token: "markdown.code.block", foreground: "795E26" },
-            { token: "strong", foreground: "C0392B" },
+            { token: "strong", foreground: "7B2FBE" },
             { token: "markup.bold.italic", foreground: "C0392B" },
         ];
 
@@ -360,29 +352,16 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
         </div>
     );
     const preview = !loading && <EditorPreview markdownContent={markdownContent ?? ""} />;
-    const editor = editable
-        ? <EditorInput
-            argomentoId={argomentoId}
-            textAreaContent={textAreaContent ?? ""}
-            setTextAreaContent={setTextAreaContent}
-            edited={edited}
-            setEdited={setEdited}
-            handleEditorDidMount={handleEditorDidMount}
-        />
-        : <Editor
-            defaultLanguage="markdown"
-            theme={resolvedTheme === "dark" ? "vs-dark" : "vs-light"}
-            defaultValue={textAreaContent}
-            options={{
-                readOnly: true,
-                links: false,
-                minimap: { enabled: false },
-                automaticLayout: true,
-                wordWrap: "on",
-                quickSuggestions: false,
-            }}
-            loading={<Spinner />}
-        />
+    const editor = <EditorInput
+        argomentoId={argomentoId}
+        textAreaContent={textAreaContent ?? ""}
+        setTextAreaContent={setTextAreaContent}
+        edited={edited}
+        setEdited={setEdited}
+        handleEditorDidMount={handleEditorDidMount}
+        editable={editable}
+    />
+
     const input = !loading && editor
 
     return (
