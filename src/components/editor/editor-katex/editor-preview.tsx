@@ -202,7 +202,7 @@ export const EditorPreview = memo(function EditorPreview({
                             <ZoomIn className="h-3.5 w-3.5" />
                         </Button>
 
-                        <Separator orientation="vertical" className="mx-0.5 h-4" />
+                        <Separator orientation="vertical" className="mx-0.5 h-4!" />
 
                         {/* Fit / 100% — toggles mutuamente esclusivi */}
                         <Toggle
