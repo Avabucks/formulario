@@ -146,6 +146,8 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
     useEffect(() => {
         if (isMobile) { setSwitchView(false) }
         else if (!editable) setSwitchView(true)
+
+            setMonacoReady(false);
     }, [isMobile])
 
     useEffect(() => {
