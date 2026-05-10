@@ -33,13 +33,13 @@ if (!apiKey) {
 const genAI = new GoogleGenerativeAI(apiKey);
 
 const model = genAI.getGenerativeModel({
-    model: "gemma-3-27b-it",
+    model: "gemini-2.5-flash",
     generationConfig: {
-        // maxOutputTokens: 1500,
+        maxOutputTokens: 1500,
         temperature: 0.5,
     },
-    // systemInstruction: "Agisci come un assistente accademico esperto in formulari universitari. Usa Markdown (usa per le liste il trattino - non l'asterisco) e LaTeX ($ per inline, $$ per display), suddividendo bene i paragrafi con gli headings. Rispondi in modo conciso. Niente introduzioni come 'Certamente' o 'Ecco la risposta', devi generare un testo ready to use.",
-    // safetySettings,
+    systemInstruction: "Agisci come un assistente accademico esperto in formulari universitari. Usa Markdown (usa per le liste il trattino - non l'asterisco) e LaTeX ($ per inline, $$ per display), suddividendo bene i paragrafi con gli headings. Rispondi in modo conciso. Niente introduzioni come 'Certamente' o 'Ecco la risposta', devi generare un testo ready to use.",
+    safetySettings,
 });
 export async function POST(req: NextRequest) {
     const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
@@ -64,12 +64,12 @@ export async function POST(req: NextRequest) {
         const { totalTokens } = await model.countTokens(prompt);
         const INPUT_LIMIT = 500;
 
-        // if (totalTokens > INPUT_LIMIT) {
-        //     return NextResponse.json(
-        //         { error: `Prompt troppo lungo (${totalTokens} token). Il limite è ${INPUT_LIMIT}.` },
-        //         { status: 400 }
-        //     );
-        // }
+        if (totalTokens > INPUT_LIMIT) {
+            return NextResponse.json(
+                { error: `Prompt troppo lungo (${totalTokens} token). Il limite è ${INPUT_LIMIT}.` },
+                { status: 400 }
+            );
+        }
 
         // TODO:
         //const { rows: updated } = await pool.query(
