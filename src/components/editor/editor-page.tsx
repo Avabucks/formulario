@@ -10,7 +10,8 @@ import { FormularioSettings } from "../home/formulario-settings";
 import { TakeFormulario } from '../home/take-formulario';
 import { Button } from "../ui/button";
 import { Kbd, KbdGroup } from "../ui/kbd";
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "../ui/resizable";
+import { ResizablePanel, ResizablePanelGroup } from "../ui/resizable";
+import { Separator } from '../ui/separator';
 import { Spinner } from '../ui/spinner';
 import { Toggle } from "../ui/toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
@@ -25,9 +26,9 @@ import { FormattingItalic } from './editor-katex/tools/formatting-italic';
 import { FormattingLatex } from './editor-katex/tools/formatting-latex';
 import { FormattingOrderedList } from './editor-katex/tools/formatting-ordered';
 import { FormattingQuote } from './editor-katex/tools/formatting-quote';
+import { FormattingTable } from './editor-katex/tools/formatting-table';
 import { FormattingUnorderedList } from './editor-katex/tools/formatting-unordered';
 import { GeminiButton } from './editor-katex/tools/gemini-ai';
-import { FormattingTable } from './editor-katex/tools/formatting-table';
 
 export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ argomentoId: string, editable: boolean, formularioId: string }>) {
     const isMobile = useIsMobile();
@@ -68,10 +69,18 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
                     [/\$\$/, { token: "math.display", next: "@mathDisplay" }],
                     [/\$/, { token: "math.inline", next: "@mathInline" }],
                     [/^#{1,6}\s.*$/, "keyword"],
-                    [/^\s*>.*$/, "markdown.blockquote"],
+                    [/^\s*>/, { token: "markdown.blockquote", next: "@blockquote" }],
                     [/\*\*[^*]+\*\*/, "strong"],
                     [/^(`{3,}).*$/, { token: "markdown.code.block", next: "@codeBlock" }],
                     [/`[^`]+`/, "markdown.code.inline"],
+                ],
+                blockquote: [
+                    [/(\$\$)([^$]+)(\$\$)/, ["math.display", "math.content", "math.display"]],
+                    [/(\$)([^$]+)(\$)/, ["math.inline", "math.content", "math.inline"]],
+                    [/\*\*[^*]+\*\*/, "strong"],
+                    [/`[^`]+`/, "markdown.code.inline"],
+                    [/[^$*`\n]+/, "markdown.blockquote"],
+                    [/$/, { token: "", next: "@pop" }],
                 ],
                 mathDisplay: [
                     [/[^$]+/, "math.content"],
@@ -427,12 +436,10 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
                         onLayoutChanged={(sizes) => { if (sizes.input) setResizableSize(sizes.input) }}
                         orientation="horizontal"
                     >
-                        {(!switchView) && (
-                            <>
-                                <ResizablePanel id="input" collapsedSize={resizableSize} minSize="20%" defaultSize="40%">{input}</ResizablePanel>
-                                <ResizableHandle className="focus-visible:ring-0" withHandle />
-                            </>
-                        )}
+                        <div style={{ display: switchView ? 'none' : 'contents' }}>
+                            <ResizablePanel id="input" collapsedSize={resizableSize} minSize="20%" defaultSize="40%">{input}</ResizablePanel>
+                            <Separator orientation="vertical" />
+                        </div>
                         <ResizablePanel id="preview" collapsedSize={100 - resizableSize} minSize="20%" defaultSize="60%">{preview}</ResizablePanel>
                     </ResizablePanelGroup>
                 </div>

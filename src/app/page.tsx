@@ -23,7 +23,6 @@ export default function Home() {
 // TODOs:
 
 // - [EDITOR]
-// - bug switch view smonta editor
 // - titoli come notion con "scaletta"
 // - sistemare preview <p>, quote, code, ...
 // - refactor formatting-utils
