@@ -1,15 +1,15 @@
 "use client"
 
-import { Check, Copy, Download, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6 } from "lucide-react";
+import { Check, Copy, Download, Lightbulb } from "lucide-react";
+import mermaid from 'mermaid';
+import { useTheme } from 'next-themes';
+import { useEffect, useRef, useState } from "react";
 import { Components } from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark, oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
-import mermaid from 'mermaid';
-import { useEffect, useRef, useState } from "react";
-import { useTheme } from 'next-themes';
-import { Spinner } from "../../ui/spinner";
-import { Button } from "../../ui/button";
 import { toast } from "sonner";
+import { Button } from "../../ui/button";
+import { Spinner } from "../../ui/spinner";
 
 export const CodeBlock = ({ className, children, node, ...props }: any) => {
   const match = /language-(\w+)/.exec(className || "");
@@ -250,7 +250,7 @@ const Heading = ({
       {/* Sottolineatura */}
       <span className="absolute w-full h-px top-full mt-2 bg-foreground/50 opacity-0 group-hover:opacity-50 transition-opacity underline-indicator"></span>
 
-      <Tag className={`${className} mb-6`}>
+      <Tag className={`${className}`}>
         {children}
       </Tag>
     </div>
@@ -259,43 +259,43 @@ const Heading = ({
 
 export const markdownComponents: Components = {
   h1: ({ children }) => (
-    <Heading level={1} className="text-(--editor-title) text-[2em] font-semibold leading-8">
+    <Heading level={1} className="text-(--editor-title) text-[2em] font-semibold leading-9 mb-7">
       {children}
     </Heading>
   ),
   h2: ({ children }) => (
-    <Heading level={2} className="text-(--editor-title) text-[1.5em] font-semibold leading-6">
+    <Heading level={2} className="text-(--editor-title) text-[1.5em] font-semibold leading-6 mb-6">
       {children}
     </Heading>
   ),
   h3: ({ children }) => (
-    <Heading level={3} className="text-(--editor-title) text-[1.2em] font-semibold leading-5">
+    <Heading level={3} className="text-(--editor-title) text-[1.2em] font-semibold leading-5 mb-3">
       {children}
     </Heading>
   ),
   h4: ({ children }) => (
-    <Heading level={4} className="text-(--editor-title) text-[1em] font-semibold leading-4">
+    <Heading level={4} className="text-(--editor-title) text-[1em] font-semibold leading-4 mb-3">
       {children}
     </Heading>
   ),
   h5: ({ children }) => (
-    <Heading level={5} className="text-(--editor-title) text-[0.875em] font-semibold leading-3">
+    <Heading level={5} className="text-(--editor-title) text-[0.875em] font-semibold leading-3 mb-3">
       {children}
     </Heading>
   ),
   h6: ({ children }) => (
-    <Heading level={6} className="text-(--editor-title)/60 text-[0.85em] font-semibold">
+    <Heading level={6} className="text-(--editor-title)/60 text-[0.85em] font-semibold mb-3">
       {children}
     </Heading>
   ),
   p: ({ children }) => (
-    <p className="leading-[1.8] text-base font-sans mb-4">{children}</p>
+    <p className="leading-[1.8] text-base font-sans mb-5">{children}</p>
   ),
   ul: ({ children }) => (
-    <ul className="pl-9 space-y-2 mb-4">{children}</ul>
+    <ul className="pl-9 space-y-2 mb-5">{children}</ul>
   ),
   ol: ({ children }) => (
-    <ol className="pl-9 space-y-2 mb-4">{children}</ol>
+    <ol className="pl-9 space-y-2 mb-5">{children}</ol>
   ),
   li: ({ children }) => <li className="leading-9 text-[1rem]">{children}</li>,
   strong: ({ children }) => <strong className="text-(--editor-title) font-semibold">{children}</strong>,
@@ -303,8 +303,11 @@ export const markdownComponents: Components = {
   del: ({ children }) => <del className="line-through">{children}</del>,
   hr: () => <hr className="mb-5 border-0 h-0.5 bg-foreground/20 rounded" />,
   blockquote: ({ children }) => (
-    <blockquote className="border-l-4 border-(--editor-title)/50 pl-4 py-2 mb-5 text-(--editor-title)/70 [&>p]:m-0 [&>p]:p-0 [&>p]:inline">
-      {children}
+    <blockquote className="flex gap-5 border-l-4 border-primary pl-4 pt-4 mb-5 bg-primary/5 rounded-r-md [&>p]:m-0 [&>p]:p-0 [&>p]:inline">
+      <span className="flex items-center mt-[-1] mb-4">
+        <Lightbulb className="fill-primary" size={18} />
+      </span>
+      <span className="text-foreground">{children}</span>
     </blockquote>
   ),
   code: CodeBlock,
@@ -312,13 +315,13 @@ export const markdownComponents: Components = {
   a: ({ href, children }) => (
     <span
       title={href}
-      className="text-muted-foreground cursor-not-allowed mb-4"
+      className="text-muted-foreground cursor-not-allowed mb-5"
     >
       {children}
     </span>
   ),
   table: ({ children }) => (
-    <div className="overflow-auto mb-4">
+    <div className="overflow-auto mb-5">
       <table className="w-full border-collapse text-[16px]">{children}</table>
     </div>
   ),

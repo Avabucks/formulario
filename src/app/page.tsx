@@ -24,7 +24,7 @@ export default function Home() {
 
 // - [EDITOR]
 // - titoli come notion con "scaletta"
-// - sistemare preview <p>, quote, code, ...
+// - sistemare preview <p>, code, ...
 // - refactor formatting-utils
 
 // - [GENERALI]
