@@ -303,8 +303,8 @@ export const markdownComponents: Components = {
   del: ({ children }) => <del className="line-through">{children}</del>,
   hr: () => <hr className="mb-5 border-0 h-0.5 bg-foreground/20 rounded" />,
   blockquote: ({ children }) => (
-    <blockquote className="flex gap-5 border-l-4 border-primary pl-4 pt-4 mb-5 bg-primary/5 rounded-r-md [&>p]:m-0 [&>p]:p-0 [&>p]:inline">
-      <span className="flex items-center mt-[-1] mb-4">
+    <blockquote className="flex gap-5 border-l-4 border-primary px-4 pt-5 mb-5 bg-primary/5 rounded-r-md [&>p]:m-0 [&>p]:p-0 [&>p]:inline">
+      <span className="flex items-center mt-[-1] mb-5">
         <Lightbulb className="fill-primary" size={18} />
       </span>
       <span className="text-foreground">{children}</span>
