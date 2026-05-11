@@ -14,7 +14,6 @@ export async function PUT(request: Request) {
     const titolo = formData.get("titolo") as string;
     const capitoloId = formData.get("capitoloId") as string;
 
-    if (!titolo) return NextResponse.json({ error: "Titolo obbligatorio" }, { status: 400 });
     if (!capitoloId) return NextResponse.json({ error: "ID obbligatorio" }, { status: 400 });
 
     try {
@@ -22,7 +21,7 @@ export async function PUT(request: Request) {
             `UPDATE capitoli SET titolo = $1
              WHERE beautiful_id = $2
              AND formulario IN (SELECT beautiful_id AS "id" FROM formulari WHERE owner_uid = $3)`,
-            [titolo, capitoloId, uid]
+            [titolo == '' ? null : titolo, capitoloId, uid]
         );
 
         if (result.rowCount === 0) return NextResponse.json({ error: "Capitolo non trovato o non autorizzato" }, { status: 404 });

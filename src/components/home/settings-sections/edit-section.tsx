@@ -70,6 +70,7 @@ export function EditSection(
                         <Input
                             id="titolo-1"
                             name="titolo"
+                            placeholder="Titolo del formulario"
                             value={formulario.titolo}
                             onInput={(e) => { setFormulario({ ...formulario, titolo: (e.target as HTMLInputElement).value }); setEdited(true) }}
                             maxLength={30}
@@ -80,6 +81,7 @@ export function EditSection(
                         <Textarea
                             id="descrizione-1"
                             name="descrizione"
+                            placeholder="Descrivi il formulario"
                             value={formulario.descrizione}
                             onInput={(e) => { setFormulario({ ...formulario, descrizione: (e.target as HTMLTextAreaElement).value }); setEdited(true) }}
                         />

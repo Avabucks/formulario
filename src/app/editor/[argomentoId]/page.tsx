@@ -82,7 +82,7 @@ export default async function Argomento({
         `SELECT A.beautiful_id AS "id",
             A.content AS "content",
             F.titolo AS "formularioTitolo", F.owner_uid as "ownerUid", F.beautiful_id AS "formularioId",
-            C.titolo AS "capitoloTitolo", C.beautiful_id AS "capitoloId"
+            COALESCE(C.titolo, 'Senza titolo') AS "capitoloTitolo", C.beautiful_id AS "capitoloId"
             FROM argomenti A
             JOIN capitoli C ON  A.capitolo = C.beautiful_id
             JOIN formulari F ON F.beautiful_id = C.formulario

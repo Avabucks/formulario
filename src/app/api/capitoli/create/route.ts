@@ -15,10 +15,7 @@ export async function POST(request: Request) {
     const titolo = formData.get("titolo") as string;
     const formularioId = formData.get("formularioId") as string;
 
-    if (!titolo) return NextResponse.json({ error: "Campi obbligatori mancanti" }, { status: 400 });
     if (!formularioId) return NextResponse.json({ error: "Formulario non specificato" }, { status: 400 });
-
-    const beautiful_id = crypto.randomUUID();
 
     const { rows: formularioRows } = await pool.query(
         `SELECT id FROM formulari WHERE beautiful_id = $1 AND owner_uid = $2`,
@@ -27,30 +24,46 @@ export async function POST(request: Request) {
 
     if (!formularioRows.length) return NextResponse.json({ error: "Formulario non trovato" }, { status: 404 });
 
+    const capitolo_id = crypto.randomUUID();
+    const argomento_id = crypto.randomUUID();
+
+    const client = await pool.connect();
+
     try {
-        const { rows } = await pool.query(
+        await client.query("BEGIN");
+
+        const { rows } = await client.query(
             `SELECT COALESCE(MAX(sort_order), 0) + 1 AS next_order FROM capitoli WHERE formulario = $1`,
             [formularioId]
         );
 
-        await pool.query(
+        await client.query(
             `INSERT INTO capitoli (beautiful_id, titolo, formulario, sort_order)
              VALUES ($1, $2, $3, $4)`,
-            [beautiful_id, titolo, formularioId, rows[0].next_order]
+            [capitolo_id, titolo == '' ? null : titolo, formularioId, rows[0].next_order]
         );
 
-        await pool.query(
-            `UPDATE formulari
-            SET data_modifica = CURRENT_TIMESTAMP
-            WHERE beautiful_id = $1`,
+        await client.query(
+            `INSERT INTO argomenti (beautiful_id, capitolo, sort_order, content)
+             VALUES ($1, $2, 0, '')`,
+            [argomento_id, capitolo_id]
+        );
+
+        await client.query(
+            `UPDATE formulari SET data_modifica = CURRENT_TIMESTAMP WHERE beautiful_id = $1`,
             [formularioId]
         );
+
+        await client.query("COMMIT");
 
         revalidatePath(`/formulari/${formularioId}`);
         return NextResponse.json({ success: true });
 
     } catch (error: any) {
+        await client.query("ROLLBACK");
         console.error(error.message);
         return NextResponse.json({ error: "Errore nel salvataggio del capitolo" }, { status: 500 });
+    } finally {
+        client.release();
     }
 }

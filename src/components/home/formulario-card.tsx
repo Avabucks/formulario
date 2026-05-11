@@ -73,7 +73,11 @@ export async function FormularioCard({ formulario }: Readonly<{ formulario: Form
                 </div>
             </CardHeader>
             <CardContent>
-                <p className="line-clamp-3">{formulario.descrizione}</p>
+                {formulario.descrizione == '' ? (
+                    <p className="text-sm text-muted-foreground">Nessuna descrizione</p>
+                ) : (
+                    <p className="line-clamp-3">{formulario.descrizione}</p>
+                )}
             </CardContent>
             <CardFooter>
                 <div className="flex flex-1 items-center gap-2">

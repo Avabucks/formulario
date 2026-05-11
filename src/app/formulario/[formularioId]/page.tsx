@@ -105,7 +105,7 @@ export default async function Formulario({
     const { rows: capitoli } = await pool.query(
         `SELECT
             c.beautiful_id        AS "id",
-            c.titolo,
+            COALESCE(c.titolo, 'Senza titolo') AS "titolo",
             COUNT(a.beautiful_id) AS "argomentiCount",
             c.sort_order          AS "sortOrder"
          FROM capitoli c

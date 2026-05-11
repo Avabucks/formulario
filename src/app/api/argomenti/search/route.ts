@@ -16,10 +16,9 @@ export async function GET(request: Request) {
     if (!titolo) return NextResponse.json({ error: "Titolo obbligatorio" }, { status: 400 });
 
     const { rows } = await pool.query(
-        `SELECT A.beautiful_id AS "id", A.capitolo AS "capitoloId", C.titolo AS "capitoloTitolo", C.formulario AS "formularioId", F.titolo AS "formularioTitolo", A.content AS "content"
+        `SELECT A.beautiful_id AS "id", A.capitolo AS "capitoloId", COALESCE(C.titolo, 'Senza titolo') AS "capitoloTitolo", C.formulario AS "formularioId", F.titolo AS "formularioTitolo", A.content AS "content"
         FROM argomenti A JOIN capitoli C ON A.capitolo = C.beautiful_id JOIN formulari F ON C.formulario = F.beautiful_id
-        WHERE F.owner_uid = $2 AND A.content ILIKE $1
-        LIMIT 4`,
+        WHERE F.owner_uid = $2 AND A.content ILIKE $1`,
         [`%${titolo}%`, uid]
     );
 

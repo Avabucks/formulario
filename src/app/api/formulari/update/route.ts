@@ -18,7 +18,7 @@ export async function PUT(request: Request) {
     const visibility = Number(formData.get("visibility")) as 0 | 1 | 2;
 
     if (!id) return NextResponse.json({ error: "ID mancante" }, { status: 400 });
-    if (!titolo || !descrizione) return NextResponse.json({ error: "Campi obbligatori mancanti" }, { status: 400 });
+    if (!titolo) return NextResponse.json({ error: "Campi obbligatori mancanti" }, { status: 400 });
     if (![0, 1, 2].includes(visibility)) return NextResponse.json({ error: "Visibility non valida" }, { status: 400 });
 
     try {

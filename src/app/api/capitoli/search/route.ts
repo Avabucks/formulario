@@ -16,10 +16,10 @@ export async function GET(request: Request) {
     if (!titolo) return NextResponse.json({ error: "Titolo obbligatorio" }, { status: 400 });
 
     const { rows } = await pool.query(
-        `SELECT C.beautiful_id AS "id", C.titolo, C.formulario AS "formularioId", F.titolo AS "formularioTitolo", similarity(C.titolo, $1) AS similarity
+        `SELECT C.beautiful_id AS "id", COALESCE(C.titolo, 'Senza titolo') AS "titolo", C.formulario AS "formularioId", F.titolo AS "formularioTitolo", similarity(COALESCE(C.titolo, 'Senza titolo'), $1) AS similarity
          FROM capitoli C JOIN formulari F ON C.formulario = F.beautiful_id
-         WHERE F.owner_uid = $2 AND similarity(C.titolo, $1) > 0.2
-         ORDER BY similarity DESC, C.titolo DESC
+         WHERE F.owner_uid = $2 AND similarity(COALESCE(C.titolo, 'Senza titolo'), $1) > 0.2
+         ORDER BY similarity DESC, COALESCE(C.titolo, 'Senza titolo') DESC
          LIMIT 4`,
         [titolo, uid]
     );

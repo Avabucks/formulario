@@ -126,19 +126,19 @@ export function ArgomentoItem({ argomento }: Readonly<{ argomento: Argomento }>)
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                {argomento.sortOrder > 1 && (
+                                {argomento.sortOrder > 0 && (
                                     <DropdownMenuItem onSelect={() => handleMove("up")}>
                                         <ArrowUp />
                                         Sposta Su
                                     </DropdownMenuItem>
                                 )}
-                                {argomento.sortOrder < argomento.argomentiCount && (
+                                {argomento.sortOrder < argomento.argomentiCount - 1 && (
                                     <DropdownMenuItem onSelect={() => handleMove("down")}>
                                         <ArrowDown />
                                         Sposta Giu
                                     </DropdownMenuItem>
                                 )}
-                                {argomento.sortOrder > 1 && argomento.sortOrder < argomento.argomentiCount && <DropdownMenuSeparator />}
+                                {argomento.argomentiCount > 1 && <DropdownMenuSeparator />}
                                 <DropdownMenuItem variant="destructive" onSelect={() => setDeleteOpen(true)}>
                                     <Trash2 />
                                     Elimina
