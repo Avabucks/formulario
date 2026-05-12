@@ -45,7 +45,7 @@ export async function POST(request: Request) {
 
         await client.query(
             `INSERT INTO argomenti (beautiful_id, capitolo, sort_order, content)
-             VALUES ($1, $2, 0, '')`,
+             VALUES ($1, $2, 1, '')`,
             [argomento_id, capitolo_id]
         );
 

@@ -126,13 +126,13 @@ export function ArgomentoItem({ argomento }: Readonly<{ argomento: Argomento }>)
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                {argomento.sortOrder > 0 && (
+                                {argomento.sortOrder > 1 && (
                                     <DropdownMenuItem onSelect={() => handleMove("up")}>
                                         <ArrowUp />
                                         Sposta Su
                                     </DropdownMenuItem>
                                 )}
-                                {argomento.sortOrder < argomento.argomentiCount - 1 && (
+                                {argomento.sortOrder < argomento.argomentiCount && (
                                     <DropdownMenuItem onSelect={() => handleMove("down")}>
                                         <ArrowDown />
                                         Sposta Giu

@@ -156,13 +156,13 @@ export function CapitoloItem({ capitolo }: Readonly<{ capitolo: Capitolo }>) {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                {capitolo.sortOrder > 0 && (
+                                {capitolo.sortOrder > 1 && (
                                     <DropdownMenuItem onSelect={() => handleMove("up")}>
                                         <ArrowUp />
                                         Sposta Su
                                     </DropdownMenuItem>
                                 )}
-                                {capitolo.sortOrder < capitolo.capitoliCount - 1 && (
+                                {capitolo.sortOrder < capitolo.capitoliCount && (
                                     <DropdownMenuItem onSelect={() => handleMove("down")}>
                                         <ArrowDown />
                                         Sposta Giu
