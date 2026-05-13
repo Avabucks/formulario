@@ -19,8 +19,8 @@ export async function POST(request: Request) {
     if (!titolo) return NextResponse.json({ error: "Campi obbligatori mancanti" }, { status: 400 });
 
     const beautiful_id = slugify(titolo, { lower: true, strict: true }) + "-" + crypto.randomUUID();
-    const capitolo_id = "capitolo-" + crypto.randomUUID();
-    const argomento_id = "argomento-" + crypto.randomUUID();
+    const capitolo_id = crypto.randomUUID();
+    const argomento_id = crypto.randomUUID();
 
     const client = await pool.connect();
 
