@@ -5,10 +5,12 @@ import { Features } from "../components/landing/features";
 import { Footer } from "../components/landing/footer";
 import { Hero } from "../components/landing/hero";
 import { VideoDemo } from "../components/landing/video-demo";
+import { GoogleOneTap } from "../components/auth/google-one-tap";
 
 export default function Home() {
   return (
     <>
+      <GoogleOneTap />
       <Header />
       <Hero />
       <VideoDemo />
