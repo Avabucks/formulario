@@ -3,6 +3,7 @@ import { auth } from "@/src/lib/firebase";
 import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import { useRouter, useSearchParams } from "next/navigation";
 import Script from "next/script";
+import { Suspense } from "react";
 
 type User = {
   email: string | null;
@@ -16,7 +17,7 @@ declare global {
     }
 }
 
-export function GoogleOneTap() {
+export function GoogleOneTapInner() {
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -71,5 +72,13 @@ export function GoogleOneTap() {
             defer
             onLoad={handleGoogle}
         />
+    );
+}
+
+export function GoogleOneTap() {
+    return (
+        <Suspense fallback={null}>
+            <GoogleOneTapInner />
+        </Suspense>
     );
 }
