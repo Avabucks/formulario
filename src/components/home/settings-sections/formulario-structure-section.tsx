@@ -1,89 +1,21 @@
 "use client"
 
 import { cn } from "@/src/lib/utils";
-import { AlertCircle, BookOpen, ChevronDown, ChevronRight, FileText, Search } from "lucide-react";
+import { BookOpen, ChevronDown, ChevronRight, FileText, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
-import { Spinner } from "../../ui/spinner";
+import { useMemo, useState } from "react";
 import { Input } from "../../ui/input";
 import { Badge } from "../../ui/badge";
+import { FormularioStructure } from "./types";
 
-type StructureArgomento = {
-    id: string
-    titolo: string
-    empty: boolean
-    sortOrder: number
-}
-
-type StructureCapitolo = {
-    id: string
-    titolo: string
-    sortOrder: number
-    argomenti: StructureArgomento[]
-}
-
-type FormularioStructure = {
-    capitoli: StructureCapitolo[]
-    stats: {
-        capitoliCount: number
-        argomentiCount: number
-        emptyCapitoliCount: number
-        emptyArgomentiCount: number
-        untitledArgomentiCount: number
-    }
-}
-
-export function FormularioStructureSection({ formularioId }: Readonly<{ formularioId: string }>) {
+export function FormularioStructureSection({ structure }: Readonly<{ structure: FormularioStructure }>) {
     const router = useRouter();
-    const [structure, setStructure] = useState<FormularioStructure>();
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string>();
     const [query, setQuery] = useState("");
-    const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-
-    useEffect(() => {
-        let ignore = false;
-
-        async function fetchStructure() {
-            setLoading(true);
-            setError(undefined);
-
-            try {
-                const response = await fetch(`/api/formulari/${formularioId}/structure`);
-
-                if (!response.ok) {
-                    const { error: responseError } = await response.json();
-                    throw new Error(responseError);
-                }
-
-                const data = await response.json();
-                if (ignore) return;
-
-                setStructure(data);
-                setExpanded(
-                    Object.fromEntries(
-                        data.capitoli.map((capitolo: StructureCapitolo) => [capitolo.id, true])
-                    )
-                );
-            } catch (err) {
-                if (!ignore) {
-                    setError(err instanceof Error ? err.message : "Errore durante il caricamento della struttura.");
-                }
-            } finally {
-                if (!ignore) setLoading(false);
-            }
-        }
-
-        fetchStructure();
-
-        return () => {
-            ignore = true;
-        };
-    }, [formularioId]);
+    const [expanded, setExpanded] = useState<Record<string, boolean>>(
+        Object.fromEntries(structure.capitoli.map((capitolo) => [capitolo.id, true]))
+    );
 
     const filteredCapitoli = useMemo(() => {
-        if (!structure) return [];
-
         const normalizedQuery = query.trim().toLowerCase();
         if (!normalizedQuery) return structure.capitoli;
 
@@ -98,25 +30,6 @@ export function FormularioStructureSection({ formularioId }: Readonly<{ formular
             })
             .filter((capitolo) => capitolo.titolo.toLowerCase().includes(normalizedQuery) || capitolo.argomenti.length > 0);
     }, [query, structure]);
-
-    if (loading) {
-        return (
-            <div className="flex min-h-60 items-center justify-center">
-                <Spinner />
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="flex min-h-60 flex-col items-center justify-center gap-2 text-center text-sm text-muted-foreground">
-                <AlertCircle size={20} />
-                <p>{error}</p>
-            </div>
-        );
-    }
-
-    if (!structure) return null;
 
     return (
         <div className="flex flex-col gap-5">

@@ -9,19 +9,7 @@ import { Input } from "../../ui/input";
 import { Label } from "../../ui/label";
 import { Switch } from "../../ui/switch";
 import { Textarea } from "../../ui/textarea";
-
-type Formulario = {
-    titolo: string
-    descrizione: string
-    nomeAutore: string
-    photoURL: string
-    dataCreazione: string
-    visibility: 0 | 1 | 2
-    views: number
-    likes: number
-    starred: boolean
-    editable: boolean
-}
+import { Formulario } from "./types";
 
 export function EditSection(
     { formularioId, formulario, setFormulario, edited, setEdited }:
