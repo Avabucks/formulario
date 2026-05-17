@@ -64,16 +64,6 @@ export default async function Home() {
         ORDER BY titolo
     `, [session.uid]);
 
-    const { rows: formulariStats } = await pool.query(
-        `SELECT 
-            COUNT(*) FILTER (
-                WHERE data_creazione::date = CURRENT_DATE
-            )::int AS today
-        FROM formulari
-        WHERE owner_uid = $1`,
-        [session.uid]
-    );
-
     const totalFormulari = formulari.length;
     const totalPreferiti = preferiti.length;
     const displayName = users[0].displayName;
