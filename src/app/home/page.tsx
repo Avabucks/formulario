@@ -184,7 +184,7 @@ export default async function Home() {
                                 La tua raccolta
                             </h2>
                         </div>
-                        <TabsList className="w-full sm:w-fit">
+                        <TabsList variant="line" className="w-full sm:w-fit">
                             <TabsTrigger value="formulari" className="gap-2 px-3">
                                 <FileText className="h-4 w-4" />
                                 Formulari
