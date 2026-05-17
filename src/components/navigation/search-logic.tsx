@@ -172,7 +172,13 @@ export function SearchLogic() {
 
                         {/* Empty state — solo se c'è testo ma nessun risultato */}
                         {!showHistory && !hasResults && (
-                            <CommandEmpty>Nessun risultato trovato.</CommandEmpty>
+                            <>
+                                {loading ? (
+                                    <CommandEmpty className="flex justify-center items-center gap-2"><Spinner />Caricamento in corso...</CommandEmpty>
+                                ) : (
+                                    <CommandEmpty>Nessun risultato trovato.</CommandEmpty>
+                                )}
+                            </>
                         )}
 
                         {formulari.length > 0 && search.length > 0 && (

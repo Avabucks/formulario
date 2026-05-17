@@ -105,7 +105,7 @@ export const EditorPreview = memo(function EditorPreview({
 
             <div
                 ref={containerRef}
-                className="flex-1 overflow-auto"
+                className="group flex-1 overflow-auto"
                 style={{ backgroundColor: "hsl(var(--sidebar-background, var(--secondary)))" }}
             >
                 <div
@@ -133,7 +133,7 @@ export const EditorPreview = memo(function EditorPreview({
                         >
                             <div
                                 className="relative w-full bg-background border border-border overflow-hidden"
-                                style={{ minHeight: A4_HEIGHT_PX * scale }}
+                                style={{ minHeight: A4_HEIGHT_PX }}
                             >
                                 {/* Grid pattern */}
                                 <svg
@@ -173,7 +173,7 @@ export const EditorPreview = memo(function EditorPreview({
                     </div>
                 </div>
                 {/* Floating zoom toolbar — bottom center */}
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <div className="pointer-events-auto flex items-center gap-1 px-2 py-1.5 rounded-lg border bg-background/90 backdrop-blur-sm">
                         {/* Zoom controls */}
                         <Button
