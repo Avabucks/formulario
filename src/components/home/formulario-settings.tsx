@@ -129,10 +129,15 @@ export function FormularioSettings({ formularioId }: Readonly<{ formularioId: st
                                     edited={edited}
                                     setEdited={setEdited}
                                 />
-                            )}
-                            {activeSection === "structure" && (
-                                <FormularioStructureSection key={formularioId} structure={structure} />
-                            )}
+                                        )}
+                                        {activeSection === "structure" && (
+                                            <FormularioStructureSection
+                                                key={formularioId}
+                                                editable={formulario.editable}
+                                                structure={structure}
+                                                onStructureChange={setStructure}
+                                            />
+                                        )}
                             {activeSection === "qr" && formulario.visibility !== 0 && (
                                 <ShareSection link={shareUrl} title={formulario.titolo} />
                             )}
