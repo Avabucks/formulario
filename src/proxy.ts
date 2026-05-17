@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getIronSession } from "iron-session";
 import { sessionOptions, SessionData } from "@/src/lib/session";
 
-const protectedRoutes = ["/home", "/formulario", "/capitolo", "/editor"];
+const protectedRoutes = ["/home", "/formulario", "/capitolo", "/editor", "/settings"];
 const adminRoutes = ["/admin"];
 
 export async function proxy(req: NextRequest) {
@@ -33,5 +33,5 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/home", "/formulario", "/capitolo", "/editor", "/formulario/:path*", "/capitolo/:path*", "/editor/:path*", "/login", "/admin"],
+  matcher: ["/", "/home", "/formulario", "/capitolo", "/editor", "/formulario/:path*", "/capitolo/:path*", "/editor/:path*", "/login", "/admin", "/settings", "/settings/:path*"],
 };
