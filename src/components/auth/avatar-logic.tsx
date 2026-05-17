@@ -57,7 +57,7 @@ export function AvatarLogic() {
                 <DropdownMenuContent align="end">
                     <Link href="/settings">
                         <DropdownMenuItem>
-                            <Avatar size="sm">
+                            <Avatar size="sm" className="mt-0.5">
                                 {photoURL && <AvatarImage src={photoURL} alt="foto profilo" />}
                                 <AvatarFallback>{name?.substring(0, 1).toUpperCase() || "U"}</AvatarFallback>
                             </Avatar>
