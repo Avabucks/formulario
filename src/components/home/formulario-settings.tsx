@@ -17,11 +17,13 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/
 import { EditSection } from "./settings-sections/edit-section";
 import { StarFormulario } from "./star-formulario";
 import { TakeFormulario } from "./take-formulario";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 type Formulario = {
     titolo: string
     descrizione: string
     nomeAutore: string
+    photoURL: string
     dataCreazione: string
     visibility: 0 | 1 | 2
     views: number
@@ -133,18 +135,23 @@ export function FormularioSettings({ formularioId }: Readonly<{ formularioId: st
                         <>
                             <DialogHeader className="px-6 py-4 border-b shrink-0">
                                 <DialogTitle>
-                                    <div className="flex gap-2 items-center">
-                                        {formulario.titolo}
-                                        <div className="text-muted-foreground">
-                                            <VisibilityIcon visibility={formulario.visibility} />
+                                    <div className="flex gap-2 justify-between items-center">
+                                        <div className="flex gap-2 items-center">
+                                            {formulario.titolo}
+                                            <div className="text-muted-foreground">
+                                                <VisibilityIcon visibility={formulario.visibility} />
+                                            </div>
                                         </div>
                                         <StarFormulario formularioId={formularioId} isStarred={formulario.starred} />
                                     </div>
                                 </DialogTitle>
                                 <DialogDescription asChild>
                                     <div className="flex h-5 gap-4 text-sm text-muted-foreground min-w-0">
-                                        <span className="flex gap-1 items-center min-w-0 overflow-hidden">
-                                            <UserRound size={16} />
+                                        <span className="flex flex-1 gap-2 items-center min-w-0">
+                                            <Avatar size="sm">
+                                                {formulario.photoURL && <AvatarImage src={formulario.photoURL} alt="foto profilo" />}
+                                                <AvatarFallback>{formulario.nomeAutore?.substring(0, 1).toUpperCase() || "U"}</AvatarFallback>
+                                            </Avatar>
                                             <span className="truncate">{formulario.nomeAutore}</span>
                                         </span>
                                         <Separator orientation="vertical" />

@@ -14,6 +14,7 @@ type Formulario = {
     titolo: string
     descrizione: string
     nomeAutore: string
+    photoURL: string
     dataCreazione: string
     visibility: 0 | 1 | 2
     views: number

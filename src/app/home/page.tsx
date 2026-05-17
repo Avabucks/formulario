@@ -2,6 +2,7 @@ import packageJson from '@/package.json';
 import ForumlarioAdd from "@/src/components/home/formulario-add";
 import { FormularioCard } from "@/src/components/home/formulario-card";
 import { Header } from "@/src/components/navigation/header";
+import { Avatar, AvatarFallback, AvatarImage } from '@/src/components/ui/avatar';
 import { Badge } from '@/src/components/ui/badge';
 import { Button } from "@/src/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/components/ui/card';
@@ -15,11 +16,12 @@ import {
 } from "@/src/components/ui/empty";
 import { Separator } from "@/src/components/ui/separator";
 import { Skeleton } from "@/src/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs";
 import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { formatNumber } from '@/src/lib/utils';
 import { getIronSession } from "iron-session";
-import { ArrowRight, BookOpen, Eye, FileText, Globe2, Library, Star, StarOff, UsersRound } from "lucide-react";
+import { ArrowRight, BookOpen, FileText, Library, Star, StarOff, UsersRound } from "lucide-react";
 import { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -35,7 +37,7 @@ export default async function Home() {
 
     const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
 
-    const { rows: users } = await pool.query(`SELECT id, display_name as "displayName" FROM users WHERE uid = $1`, [session.uid]);
+    const { rows: users } = await pool.query(`SELECT id, display_name as "displayName", foto_profilo as "photoURL" FROM users WHERE uid = $1`, [session.uid]);
 
     if (users.length === 0) {
         redirect('/api/auth/logout')
@@ -62,39 +64,20 @@ export default async function Home() {
         ORDER BY titolo
     `, [session.uid]);
 
+    const { rows: formulariStats } = await pool.query(
+        `SELECT 
+            COUNT(*) FILTER (
+                WHERE data_creazione::date = CURRENT_DATE
+            )::int AS today
+        FROM formulari
+        WHERE owner_uid = $1`,
+        [session.uid]
+    );
+
     const totalFormulari = formulari.length;
     const totalPreferiti = preferiti.length;
-    const formulariPubblici = formulari.filter((formulario) => formulario.visibility === 2).length;
-    const totalVisualizzazioni = formulari.reduce((acc, formulario) => acc + Number(formulario.views ?? 0), 0);
-    const totalLike = formulari.reduce((acc, formulario) => acc + Number(formulario.likes ?? 0), 0);
     const displayName = users[0].displayName;
-
-    const stats = [
-        {
-            label: "Formulari",
-            value: formatNumber(totalFormulari),
-            description: totalFormulari === 1 ? "Formulario personale" : "Formulari personali",
-            icon: FileText,
-        },
-        {
-            label: "Preferiti",
-            value: formatNumber(totalPreferiti),
-            description: "Raccolti dalla community",
-            icon: Star,
-        },
-        {
-            label: "Pubblici",
-            value: formatNumber(formulariPubblici),
-            description: "Visibili a tutti",
-            icon: Globe2,
-        },
-        {
-            label: "Visualizzazioni",
-            value: formatNumber(totalVisualizzazioni),
-            description: `${formatNumber(totalLike)} like ricevuti`,
-            icon: Eye,
-        },
-    ];
+    const photoURL = users[0].photoURL;
 
     const renderEmptyFormulari = () => (
         <Empty className="border border-dashed">
@@ -162,15 +145,23 @@ export default async function Home() {
                         </svg>
                         <div className="relative flex max-w-3xl flex-col gap-5">
                             <div className="space-y-2">
-                                <h1 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
-                                    Bentornato, {displayName}
-                                </h1>
+                                <div className="flex items-center gap-3">
+                                    {photoURL && (
+                                        <Avatar size="lg" className="mt-1">
+                                            <AvatarImage src={photoURL} alt="foto profilo" />
+                                            <AvatarFallback>{displayName?.substring(0, 1).toUpperCase() || "U"}</AvatarFallback>
+                                        </Avatar>
+                                    )}
+                                    <h1 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
+                                        Bentornato, {displayName}
+                                    </h1>
+                                </div>
                                 <p className="max-w-2xl text-base leading-7 text-muted-foreground">
-                                    Organizza i formulari, riprendi le modifiche e tieni a portata di mano le raccolte più utili.
+                                    Crea un formulario, dividilo in capitoli e riprendi le modifiche in ogni momento.
                                 </p>
                             </div>
                             <div className="flex flex-col gap-3 sm:flex-row">
-                                <ForumlarioAdd allowKey={false} showLabel={true} />
+                                <ForumlarioAdd showLabel={true} />
                             </div>
                         </div>
                     </div>
@@ -195,81 +186,64 @@ export default async function Home() {
                         </CardContent>
                     </Card>
                 </section>
-                <section className="hidden md:grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                    {stats.map((stat) => (
-                        <Card key={stat.label} size="sm" className="shadow-sm">
-                            <CardContent className="flex items-center justify-between gap-4">
-                                <div>
-                                    <p className="text-sm text-muted-foreground">{stat.label}</p>
-                                    <p className="mt-1 text-2xl font-semibold tracking-tight">{stat.value}</p>
-                                    <p className="mt-1 text-xs text-muted-foreground">{stat.description}</p>
-                                </div>
-                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-secondary text-secondary-foreground">
-                                    <stat.icon className="h-5 w-5" />
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </section>
                 <Separator />
-                <section className="flex flex-col gap-4">
+                <Tabs defaultValue="formulari" className="w-full gap-4">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                         <div>
-                            <div className="flex items-center gap-2">
-                                <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-                                    I tuoi formulari
-                                </h2>
-                                <Badge variant="outline">{formatNumber(totalFormulari)}</Badge>
-                            </div>
-                            <p className="mt-1 text-sm text-muted-foreground">
-                                Crea, modifica e consulta le raccolte che possiedi.
-                            </p>
+                            <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+                                La tua raccolta
+                            </h2>
                         </div>
+                        <TabsList className="w-full sm:w-fit">
+                            <TabsTrigger value="formulari" className="gap-2 px-3">
+                                <FileText className="h-4 w-4" />
+                                Formulari
+                                <Badge variant="secondary" className="ml-1 h-5 px-1.5">
+                                    {formatNumber(totalFormulari)}
+                                </Badge>
+                            </TabsTrigger>
+                            <TabsTrigger value="preferiti" className="gap-2 px-3">
+                                <Star className="h-4 w-4" />
+                                Preferiti
+                                <Badge variant="secondary" className="ml-1 h-5 px-1.5">
+                                    {formatNumber(totalPreferiti)}
+                                </Badge>
+                            </TabsTrigger>
+                        </TabsList>
                     </div>
-                    <Suspense fallback={renderLoadingSkeleton()}>
-                        <div className="flex flex-col gap-4 w-full">
-                            {formulari.length === 0 ? (
-                                renderEmptyFormulari()
-                            ) : (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[101rem]:grid-cols-5 gap-4 w-full">
-                                    {formulari.map((f) => (
-                                        <FormularioCard formulario={f} key={f.id} />
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </Suspense>
-                </section>
-                <Separator />
-                <section className="flex flex-col gap-4">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-                        <div>
-                            <div className="flex items-center gap-2">
-                                <h2 className="flex items-center gap-2 text-2xl font-semibold tracking-tight text-foreground">
-                                    <Star size={24} className="fill-foreground/50 text-transparent" />
-                                    Preferiti
-                                </h2>
-                                <Badge variant="outline">{formatNumber(totalPreferiti)}</Badge>
+
+                    <TabsContent value="formulari" className="mt-0">
+                        <Suspense fallback={renderLoadingSkeleton()}>
+                            <div className="flex flex-col gap-4 w-full">
+                                {formulari.length === 0 ? (
+                                    renderEmptyFormulari()
+                                ) : (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[101rem]:grid-cols-5 gap-4 w-full">
+                                        {formulari.map((f) => (
+                                            <FormularioCard formulario={f} key={f.id} />
+                                        ))}
+                                    </div>
+                                )}
                             </div>
-                            <p className="mt-1 text-sm text-muted-foreground">
-                                Formulari pubblici salvati dalla community.
-                            </p>
-                        </div>
-                    </div>
-                    <Suspense fallback={renderLoadingSkeleton()}>
-                        <div className="flex flex-col gap-4 w-full">
-                            {preferiti.length === 0 ? (
-                                renderEmptyPreferiti()
-                            ) : (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[101rem]:grid-cols-5 gap-4 w-full">
-                                    {preferiti.map((f) => (
-                                        <FormularioCard formulario={f} key={f.id} />
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </Suspense>
-                </section>
+                        </Suspense>
+                    </TabsContent>
+
+                    <TabsContent value="preferiti" className="mt-0">
+                        <Suspense fallback={renderLoadingSkeleton()}>
+                            <div className="flex flex-col gap-4 w-full">
+                                {preferiti.length === 0 ? (
+                                    renderEmptyPreferiti()
+                                ) : (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[101rem]:grid-cols-5 gap-4 w-full">
+                                        {preferiti.map((f) => (
+                                            <FormularioCard formulario={f} key={f.id} />
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </Suspense>
+                    </TabsContent>
+                </Tabs>
             </div>
         </>
     )
