@@ -30,10 +30,12 @@ export async function FormularioCard({ formulario }: Readonly<{ formulario: Form
     return (
         <Card className="w-full">
             <CardHeader>
-                <div className="flex gap-2 items-center">
-                    <CardTitle>{formulario.titolo}</CardTitle>
-                    <div className="text-muted-foreground">
-                        <VisibilityIcon visibility={formulario.visibility} />
+                <div className="flex gap-2 justify-between items-center">
+                    <div className="flex gap-2 items-center">
+                        <CardTitle>{formulario.titolo}</CardTitle>
+                        <div className="text-muted-foreground">
+                            <VisibilityIcon visibility={formulario.visibility} />
+                        </div>
                     </div>
                     {session.uid && (
                         <StarFormulario formularioId={formulario.id} isStarred={formulario.starred} />
