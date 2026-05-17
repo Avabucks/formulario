@@ -1,11 +1,12 @@
 "use client"
 
 import { cn, formatNumber } from "@/src/lib/utils";
-import { Calendar, Download, Eye, GlobeIcon, Info, LinkIcon, LockIcon, Pencil, QrCode, Settings, Star, Trash2, UserRound, X } from "lucide-react";
+import { Calendar, Download, Eye, GlobeIcon, Info, LinkIcon, ListTree, LockIcon, Pencil, QrCode, Settings, Star, Trash2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { NavigationBlocker } from "../navigation/navigation-blocker";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { Kbd, KbdGroup } from "../ui/kbd";
@@ -17,7 +18,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/
 import { EditSection } from "./settings-sections/edit-section";
 import { StarFormulario } from "./star-formulario";
 import { TakeFormulario } from "./take-formulario";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { FormularioStructureSection } from "./settings-sections/formulario-structure-section";
 
 type Formulario = {
     titolo: string
@@ -37,26 +38,34 @@ export function FormularioSettings({ formularioId }: Readonly<{ formularioId: st
     const [formulario, setFormulario] = useState<Formulario>();
     const [open, setOpen] = useState(false)
     const [edited, setEdited] = useState(false)
-    const [activeSection, setActiveSection] = useState<"info" | "edit" | "qr">()
+    const [activeSection, setActiveSection] = useState<"info" | "edit" | "structure" | "qr">()
 
     const SHARE_URL = `${process.env.NEXT_PUBLIC_APP_URL}/formulario/${formularioId}`;
 
-    async function fetchFormulario() {
-        const response = await fetch(`/api/formulari/${formularioId}`);
-
-        if (!response.ok) {
-            const { error } = await response.json();
-            throw new Error(error);
-        }
-
-        const data = await response.json();
-        setFormulario(data);
-        setEdited(false);
-        setActiveSection(data.editable ? "edit" : "info")
-    }
-
     useEffect(() => {
-        fetchFormulario()
+        let ignore = false;
+
+        fetch(`/api/formulari/${formularioId}`)
+            .then(async (response) => {
+                if (!response.ok) {
+                    const { error } = await response.json();
+                    throw new Error(error);
+                }
+
+                return response.json();
+            })
+            .then((data) => {
+                if (ignore) return;
+
+                setFormulario(data);
+                setEdited(false);
+                setActiveSection(data.editable ? "edit" : "info");
+            })
+            .catch(() => {
+                if (!ignore) {
+                    toast.error("Errore durante il caricamento del formulario.", { position: "bottom-center" });
+                }
+            });
 
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === "I" && (e.metaKey || e.ctrlKey) && e.shiftKey) {
@@ -66,9 +75,12 @@ export function FormularioSettings({ formularioId }: Readonly<{ formularioId: st
         }
 
         document.addEventListener("keydown", handleKeyDown)
-        return () => document.removeEventListener("keydown", handleKeyDown)
+        return () => {
+            ignore = true;
+            document.removeEventListener("keydown", handleKeyDown);
+        }
 
-    }, []);
+    }, [formularioId]);
 
     async function handleDelete() {
 
@@ -212,6 +224,18 @@ export function FormularioSettings({ formularioId }: Readonly<{ formularioId: st
                                                 <span className="hidden md:flex">Informazioni</span>
                                             </button>
                                         )}
+                                        <button
+                                            onClick={() => setActiveSection("structure")}
+                                            className={cn(
+                                                "flex items-center gap-2 rounded-md px-3 py-2 text-sm text-left transition-colors",
+                                                activeSection === "structure"
+                                                    ? "bg-accent text-accent-foreground font-medium"
+                                                    : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+                                            )}
+                                        >
+                                            <ListTree size={15} />
+                                            <span className="hidden md:flex">Struttura</span>
+                                        </button>
                                         {formulario.visibility !== 0 && (
                                             <button
                                                 onClick={() => setActiveSection("qr")}
@@ -266,6 +290,10 @@ export function FormularioSettings({ formularioId }: Readonly<{ formularioId: st
                                             />
                                         )}
 
+                                        {activeSection === "structure" && (
+                                            <FormularioStructureSection formularioId={formularioId} />
+                                        )}
+
                                         {(activeSection === "qr" && formulario.visibility !== 0) && (
                                             <div>
                                                 <Qr link={SHARE_URL} title={formulario.titolo} />
@@ -289,7 +317,7 @@ export function FormularioSettings({ formularioId }: Readonly<{ formularioId: st
                                                 <DialogTitle>Elimina</DialogTitle>
                                             </DialogHeader>
                                             <DialogDescription>
-                                                Sei sicuro di voler eliminare "{formulario.titolo}"? Questa azione non è reversibile.
+                                                Sei sicuro di voler eliminare &quot;{formulario.titolo}&quot;? Questa azione non è reversibile.
                                             </DialogDescription>
                                             <DialogFooter>
                                                 <DialogClose asChild>
