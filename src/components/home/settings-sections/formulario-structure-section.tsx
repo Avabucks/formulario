@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/src/lib/utils";
-import { BookOpen, ChevronDown, ChevronRight, FileText, GripVertical, Search } from "lucide-react";
+import { Bookmark, ChevronDown, ChevronRight, FileText, GripVertical, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -131,7 +131,7 @@ export function FormularioStructureSection(
                                     className="flex h-11 w-full items-center gap-2 px-3 text-left text-sm hover:bg-muted/50"
                                 >
                                     {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                                    <BookOpen size={16} className="text-muted-foreground" />
+                                    <Bookmark size={16} className="text-muted-foreground" />
                                     <span className="min-w-0 flex-1 truncate font-medium">{capitolo.titolo}</span>
                                     <Badge variant={capitolo.argomenti.length === 0 ? "outline" : "secondary"}>
                                         {capitolo.argomenti.length}

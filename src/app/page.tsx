@@ -26,7 +26,7 @@ export default function Home() {
 
 // - [EDITOR]
 // - titoli come notion con "scaletta"
-// - sistemare preview <p>, code, ...
+// - sistemare preview <p>, code, titoli (hanno margin sbagliati), ...
 // - refactor formatting-utils
 
 // - [GENERALI]
@@ -34,15 +34,17 @@ export default function Home() {
 // - aggiornare video e formulario di benvenuto
 
 // - [PREMIUM]
-// - abbonamento a 1,99 che ti da accesso illimitato a creazione formulari e 200 crediti AI (senza crediti ma con tokens cosi e piu preciso ma senza scrivere il ilmite, semplicemente quando finiscono esce popup)
+// - abbonamento che ti da accesso illimitato a creazione formulari e tokens cosi e piu preciso ma senza scrivere il ilmite, semplicemente quando finiscono esce popup
+// - creazione del formulario vuoto/da files con AI (es. carica un pdf e te lo trasforma in formulario)
+// - image manager nelle impostazioni
 
 // - [NOVITA]
-// - link share solo con chi selezioni
 // - ⁠categorie per organizzare formulari + colori titoli
 // - aggiungere funzionalità di esportazione (pdf, markdown, ecc.)
+// - link share solo con chi selezioni
 // - supporto piu lingue
-// - image manager nelle impostazioni
-// - tree del formulario (accessibile da tasto di fianco a impostazioni e apre drawer laterale)
+
+// - [LUNGO TERMINE]
 // - flashcards con ai per ogni argomento
 // - console errori della preview
 // - note protette da password
