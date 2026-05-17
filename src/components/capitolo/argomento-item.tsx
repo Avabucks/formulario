@@ -14,7 +14,7 @@ import {
     ItemMedia,
     ItemTitle,
 } from "@/src/components/ui/item"
-import { ArrowDown, ArrowUp, ChevronRightIcon, EllipsisVertical, Info, TableOfContents, Trash2 } from "lucide-react"
+import { ArrowDown, ArrowUp, ChevronRightIcon, EllipsisVertical, Info, FileText, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
@@ -87,7 +87,7 @@ export function ArgomentoItem({ argomento }: Readonly<{ argomento: Argomento }>)
     const content = (
         <>
             <ItemMedia>
-                <TableOfContents size={16} />
+                <FileText size={16} />
             </ItemMedia>
             <ItemContent className={`${!argomento.editable && "py-2"}`}>
                 <ItemTitle>
