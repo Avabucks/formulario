@@ -1,13 +1,12 @@
 import { Button } from "@/src/components/ui/button";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { getIronSession } from "iron-session";
-import { ArrowRight, Pi, UsersRound } from "lucide-react";
+import { ArrowRight, Pi } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { AvatarLogic } from "../auth/avatar-logic";
-import { ModeToggle } from "../theme/theme-toggler";
-import { SearchLogic } from "./search-logic";
 import { LandingMenu } from "./landing-menu";
+import { SearchLogic } from "./search-logic";
 
 export async function Header() {
 
@@ -32,12 +31,8 @@ export async function Header() {
             </div>
             <div className="flex items-center gap-2">
                 {session.uid && (
-                    <>
-                        <SearchLogic />
-                        <div className="h-6 border-l"></div>
-                    </>
+                    <SearchLogic />
                 )}
-                <ModeToggle />
                 <div className="h-6 border-l"></div>
                 {session.uid ? <AvatarLogic /> : (
                     <Link href="/login">

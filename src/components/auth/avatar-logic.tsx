@@ -12,7 +12,7 @@ import {
 } from "@/src/components/ui/dropdown-menu";
 import { auth } from "@/src/lib/firebase";
 import { signOut } from "firebase/auth";
-import { BadgeInfo, Book, Cookie, Handshake, Keyboard, LogOutIcon, Users } from "lucide-react";
+import { BadgeInfo, Book, Keyboard, LogOutIcon, Settings, Users } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -55,7 +55,16 @@ export function AvatarLogic() {
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>{name}</DropdownMenuLabel>
+                    <Link href="/settings">
+                        <DropdownMenuItem>
+                            <Avatar size="sm">
+                                {photoURL && <AvatarImage src={photoURL} alt="foto profilo" />}
+                                <AvatarFallback>{name?.substring(0, 1).toUpperCase() || "U"}</AvatarFallback>
+                            </Avatar>
+                            {name}
+                        </DropdownMenuItem>
+                    </Link>
+                    <DropdownMenuSeparator />
                     <Link href="/home">
                         <DropdownMenuItem>
                             <Book />
@@ -77,19 +86,6 @@ export function AvatarLogic() {
                         <Keyboard />
                         Scorciatoie da tastiera
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <Link href="/terms">
-                        <DropdownMenuItem>
-                            <Handshake />
-                            Termini e condizioni
-                        </DropdownMenuItem>
-                    </Link>
-                    <Link href="/privacy">
-                        <DropdownMenuItem>
-                            <Cookie />
-                            Privacy
-                        </DropdownMenuItem>
-                    </Link>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem variant="destructive" onClick={handleLogout}>
                         <LogOutIcon />
