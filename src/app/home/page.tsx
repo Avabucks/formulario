@@ -153,7 +153,7 @@ export default async function Home() {
                                         </Avatar>
                                     )}
                                     <h1 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
-                                        Bentornato, {displayName}
+                                        Ciao, {displayName}
                                     </h1>
                                 </div>
                                 <p className="max-w-2xl text-base leading-7 text-muted-foreground">
