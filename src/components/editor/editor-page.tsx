@@ -28,7 +28,7 @@ import { FormattingOrderedList } from './editor-katex/tools/formatting-ordered';
 import { FormattingQuote } from './editor-katex/tools/formatting-quote';
 import { FormattingTable } from './editor-katex/tools/formatting-table';
 import { FormattingUnorderedList } from './editor-katex/tools/formatting-unordered';
-import { GeminiButton } from './editor-katex/tools/gemini-ai';
+import { AskAIButton } from './editor-katex/tools/ask-ai';
 
 export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ argomentoId: string, editable: boolean, formularioId: string }>) {
     const isMobile = useIsMobile();
@@ -327,7 +327,7 @@ export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ a
                 </div>
 
                 <div className="flex items-center gap-3 px-3 h-full">
-                    <GeminiButton
+                    <AskAIButton
                         editorRef={editorRef}
                     />
                 </div>

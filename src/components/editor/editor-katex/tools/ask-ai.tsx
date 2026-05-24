@@ -25,7 +25,7 @@ const loadingMessages = [
     "Un secondo ancora...",
 ];
 
-export function GeminiButton({
+export function AskAIButton({
     editorRef,
 }: Readonly<{
     editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
@@ -51,7 +51,7 @@ export function GeminiButton({
         setLoading(true);
         setResult(null);
         try {
-            const res = await fetch("/api/gemini", {
+            const res = await fetch("/api/groq", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ prompt }),

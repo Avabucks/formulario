@@ -1,7 +1,7 @@
 
 export function CtaCommunity() {
     return (
-        <section className="relative overflow-hidden bg-accent-foreground/1">
+        <section className="relative overflow-hidden bg-accent-foreground/1 border rounded-xl">
             <div className="absolute inset-0 dark:bg-card/10 bg-foreground/2" />
             <svg className="absolute inset-0 h-full w-full opacity-[0.10]" xmlns="http://www.w3.org/2000/svg">
                 <defs>

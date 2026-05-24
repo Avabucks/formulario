@@ -89,7 +89,7 @@ export function FormularioStructureSection(
     }
 
     return (
-        <div className="flex flex-col gap-5">
+        <div className="flex min-w-0 flex-col gap-5">
             <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
                 <StructureStat label="Capitoli" value={structure.stats.capitoliCount} />
                 <StructureStat label="Argomenti" value={structure.stats.argomentiCount} />
@@ -119,21 +119,21 @@ export function FormularioStructureSection(
                     Nessun risultato nella struttura.
                 </div>
             ) : (
-                <div className="flex flex-col gap-2">
+                <div className="flex min-w-0 flex-col gap-2">
                     {filteredCapitoli.map((capitolo) => {
                         const isExpanded = expanded[capitolo.id] ?? true;
 
                         return (
-                            <div key={capitolo.id} className="rounded-md border">
+                            <div key={capitolo.id} className="min-w-0 overflow-hidden rounded-md border">
                                 <button
                                     type="button"
                                     onClick={() => setExpanded((prev) => ({ ...prev, [capitolo.id]: !isExpanded }))}
-                                    className="flex h-11 w-full items-center gap-2 px-3 text-left text-sm hover:bg-muted/50"
+                                    className="flex h-11 w-full min-w-0 items-center gap-2 overflow-hidden px-3 text-left text-sm hover:bg-muted/50"
                                 >
-                                    {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                                    <Bookmark size={16} className="text-muted-foreground" />
-                                    <span className="min-w-0 flex-1 truncate font-medium">{capitolo.titolo}</span>
-                                    <Badge variant={capitolo.argomenti.length === 0 ? "outline" : "secondary"}>
+                                    {isExpanded ? <ChevronDown size={16} className="shrink-0" /> : <ChevronRight size={16} className="shrink-0" />}
+                                    <Bookmark size={16} className="shrink-0 text-muted-foreground" />
+                                    <span className="block w-0 min-w-0 flex-1 truncate font-medium">{capitolo.titolo}</span>
+                                    <Badge variant={capitolo.argomenti.length === 0 ? "outline" : "secondary"} className="shrink-0">
                                         {capitolo.argomenti.length}
                                     </Badge>
                                 </button>
@@ -141,7 +141,7 @@ export function FormularioStructureSection(
                                 {isExpanded && (
                                     <div
                                         className={cn(
-                                            "border-t px-3 py-2",
+                                            "min-w-0 border-t px-3 py-2",
                                             canDrag && dropTarget?.capitoloId === capitolo.id && dropTarget.index === capitolo.argomenti.length && "bg-muted/40"
                                         )}
                                         onDragOver={(event) => {
@@ -154,7 +154,7 @@ export function FormularioStructureSection(
                                         {capitolo.argomenti.length === 0 ? (
                                             <div className="py-2 pl-7 text-sm text-muted-foreground">Nessun argomento</div>
                                         ) : (
-                                            <div className="flex flex-col gap-1">
+                                            <div className="flex min-w-0 flex-col gap-1">
                                                 {capitolo.argomenti.map((argomento, index) => (
                                                     <button
                                                         key={argomento.id}
@@ -182,16 +182,16 @@ export function FormularioStructureSection(
                                                         }}
                                                         onClick={() => router.push(`/editor/${argomento.id}`)}
                                                         className={cn(
-                                                            "flex h-9 items-center gap-2 rounded-md px-2 text-left text-sm hover:bg-muted/50",
+                                                            "flex h-9 w-full min-w-0 items-center gap-2 overflow-hidden rounded-md px-2 text-left text-sm hover:bg-muted/50",
                                                             canDrag && "cursor-grab active:cursor-grabbing",
                                                             draggedArgomentoId === argomento.id && "opacity-50",
                                                             dropTarget?.capitoloId === capitolo.id && dropTarget.index === index && draggedArgomentoId !== argomento.id && "bg-accent"
                                                         )}
                                                     >
-                                                        {editable && <GripVertical size={14} className="text-muted-foreground" />}
-                                                        <FileText size={15} className="text-muted-foreground" />
-                                                        <span className="min-w-0 flex-1 truncate">{argomento.titolo}</span>
-                                                        {argomento.empty && <Badge variant="outline">Vuoto</Badge>}
+                                                        {editable && <GripVertical size={14} className="shrink-0 text-muted-foreground" />}
+                                                        <FileText size={15} className="shrink-0 text-muted-foreground" />
+                                                        <span className="block w-0 min-w-0 flex-1 truncate">{argomento.titolo}</span>
+                                                        {argomento.empty && <Badge variant="outline" className="shrink-0">Vuoto</Badge>}
                                                     </button>
                                                 ))}
                                             </div>
