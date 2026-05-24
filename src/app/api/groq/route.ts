@@ -51,8 +51,10 @@ export async function POST(req: NextRequest) {
             model: "meta-llama/llama-prompt-guard-2-86m",
             messages: [{ role: "user", content: userMessage }],
         });
-        const label = guard.choices[0]?.message?.content?.trim();
-        if (label !== "SAFE") {
+        const score = Number.parseFloat(
+            guard.choices[0]?.message?.content?.trim() || "0"
+        );
+        if (score > 0.5) {
             return NextResponse.json({ error: "Prompt non sicuro." }, { status: 400 });
         }
 
