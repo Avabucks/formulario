@@ -224,6 +224,8 @@ export function FormattingLatex({
                 }
             );
         }
+
+        (globalThis as unknown as { umami?: any }).umami?.track('selected_formula_latex');
     };
 
     useEffect(() => {
