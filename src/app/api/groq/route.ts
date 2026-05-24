@@ -43,9 +43,18 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        const userMessage = context && typeof context === "string"
-            ? `Contesto:\n${context}\n\nDomanda:\n${prompt}`
+        const userMessage = context?.trim()
+            ? `<documento>\n${context}\n</documento>\n\nDomanda: ${prompt}`
             : prompt;
+
+        const guard = await groq.chat.completions.create({
+            model: "meta-llama/llama-prompt-guard-2-86m",
+            messages: [{ role: "user", content: userMessage }],
+        });
+        const label = guard.choices[0]?.message?.content?.trim();
+        if (label !== "SAFE") {
+            return NextResponse.json({ error: "Prompt non sicuro." }, { status: 400 });
+        }
 
         const completion = await groq.chat.completions.create({
             model: "llama-3.1-8b-instant",
