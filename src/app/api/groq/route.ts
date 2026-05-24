@@ -19,18 +19,22 @@ const SYSTEM_INSTRUCTION =
     "suddividendo bene i paragrafi con gli headings. Rispondi in modo conciso. " +
     "Niente introduzioni come 'Certamente' o 'Ecco la risposta', devi generare un testo ready to use.";
 
+type Message = {
+    role: "user" | "assistant";
+    content: string;
+};
+
 export async function POST(req: NextRequest) {
     const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
     const uid = session.uid;
 
-    // check if user exists
     const { rows: users } = await pool.query(`SELECT id FROM users WHERE uid = $1`, [uid]);
     if (users.length === 0) {
         redirect("/api/auth/logout");
     }
 
     try {
-        const { prompt } = await req.json();
+        const { prompt, context } = await req.json();
 
         if (!prompt || typeof prompt !== "string") {
             return NextResponse.json(
@@ -39,24 +43,16 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        // TODO:
-        // const { rows: updated } = await pool.query(
-        //     `UPDATE users SET credits = credits - 1
-        //      WHERE uid = $1 AND credits > 0
-        //      RETURNING credits`,
-        //     [uid]
-        // );
-        // if (updated.length === 0) {
-        //     return NextResponse.json({ error: "Crediti esauriti" }, { status: 403 });
-        // }
+        const userMessage = context && typeof context === "string"
+            ? `Contesto:\n${context}\n\nDomanda:\n${prompt}`
+            : prompt;
 
         const completion = await groq.chat.completions.create({
             model: "llama-3.3-70b-versatile",
             temperature: 0.5,
-            // max_tokens: 1500,
             messages: [
                 { role: "system", content: SYSTEM_INSTRUCTION },
-                { role: "user", content: prompt },
+                { role: "user", content: userMessage },
             ],
         });
 

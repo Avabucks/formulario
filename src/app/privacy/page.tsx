@@ -44,12 +44,12 @@ export default function PrivacyPage() {
           </Section>
 
           <Section title="4. Servizi di intelligenza artificiale">
-            <p>La piattaforma integra <strong>Google Gemini</strong> come servizio di intelligenza artificiale per la generazione di contenuti. Quando utilizzi questa funzionalità:</p>
+            <p>La piattaforma integra <strong>Groq</strong> (con modello <strong>Llama 3.3 70B</strong>) come servizio di intelligenza artificiale per la generazione di contenuti. Quando utilizzi questa funzionalità:</p>
             <ul className="list-disc list-inside flex flex-col gap-1 mt-2 text-muted-foreground">
-              <li>Solo il testo del prompt che scrivi esplicitamente nell'apposito campo viene trasmesso alle API di Google</li>
-              <li>Il contenuto del tuo formulario non viene mai inviato a servizi esterni</li>
-              <li>Non inviamo dati personali identificativi (email, nome) alle API di Google</li>
-              <li>Il trattamento dei dati da parte di Google è disciplinato dalla <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="underline text-foreground">Privacy Policy di Google</a></li>
+              <li>Solo il testo del prompt che scrivi esplicitamente nell'apposito campo viene trasmesso alle API di Groq</li>
+              <li>Il testo dell'argomento su cui stai lavorando viene inviato come contesto per migliorare la qualità delle risposte</li>
+              <li>Non inviamo dati personali identificativi (email, nome) alle API di Groq</li>
+              <li>Il trattamento dei dati da parte di Groq è disciplinato dalla <a href="https://groq.com/privacy-policy/" target="_blank" rel="noopener noreferrer" className="underline text-foreground">Privacy Policy di Groq</a></li>
             </ul>
             <p className="mt-3">Ti invitiamo a non inserire dati personali nel testo dei prompt inviati all'assistente AI.</p>
           </Section>

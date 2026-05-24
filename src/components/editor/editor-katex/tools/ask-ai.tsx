@@ -54,7 +54,7 @@ export function AskAIButton({
             const res = await fetch("/api/groq", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ prompt }),
+                body: JSON.stringify({ prompt, context: editorRef.current?.getValue() ?? "" }),
             });
 
             const data = await res.json();
