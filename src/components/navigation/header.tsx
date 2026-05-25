@@ -42,7 +42,7 @@ export async function Header() {
                         aria-label="Supporta FormulaBase su Ko-fi"
                     >
                         <Coffee className="h-4 w-4" />
-                        <span className="hidden md:inline">Supporta il progetto</span>
+                        <span>Supporta il progetto</span>
                     </Link>
                 </Button>
             </div>
