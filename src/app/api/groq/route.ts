@@ -47,17 +47,6 @@ export async function POST(req: NextRequest) {
             ? `<documento>\n${context}\n</documento>\n\nDomanda: ${prompt}`
             : prompt;
 
-        const guard = await groq.chat.completions.create({
-            model: "meta-llama/llama-prompt-guard-2-86m",
-            messages: [{ role: "user", content: userMessage }],
-        });
-        const score = Number.parseFloat(
-            guard.choices[0]?.message?.content?.trim() || "0"
-        );
-        if (score > 0.5) {
-            return NextResponse.json({ error: "Prompt non sicuro." }, { status: 400 });
-        }
-
         const completion = await groq.chat.completions.create({
             model: "llama-3.1-8b-instant",
             temperature: 0.5,
