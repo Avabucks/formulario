@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Button } from "../ui/button";
 
 export function LandingMenu() {
@@ -27,6 +26,17 @@ export function LandingMenu() {
         }
       >
         Funzionalità
+      </Button>
+      <Button
+        variant="ghost"
+        className="cursor-pointer"
+        onClick={() =>
+          document
+            .getElementById("pricing")
+            ?.scrollIntoView({ behavior: "smooth" })
+        }
+      >
+        Pricing
       </Button>
       <Button
         variant="ghost"

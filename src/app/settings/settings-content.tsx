@@ -1,4 +1,6 @@
 import DeleteAccount from "@/src/components/auth/delete-account";
+import { CancelSubscriptionButton } from "@/src/components/billing/cancel-subscription-button";
+import { PaddleCheckoutButton } from "@/src/components/billing/paddle-checkout-button";
 import { Footer } from "@/src/components/landing/footer";
 import { Header } from "@/src/components/navigation/header";
 import { ModeToggle } from "@/src/components/theme/theme-toggler";
@@ -23,6 +25,7 @@ import {
   BookOpen,
   ChevronRight,
   Cookie,
+  CreditCard,
   Handshake,
   Mail,
   Palette,
@@ -42,6 +45,12 @@ const settingsNav = [
     href: "/settings/preferences",
     label: "Preferenze",
     icon: Palette,
+  },
+  {
+    id: "billing",
+    href: "/settings/billing",
+    label: "Billing",
+    icon: CreditCard,
   },
   {
     id: "legal",
@@ -93,12 +102,41 @@ export async function SettingsContent({
     [session.uid],
   );
 
+  const { rows: subscriptions } = await pool.query(
+    `SELECT status, current_period_ends_at as "currentPeriodEndsAt"
+        FROM subscriptions
+        WHERE user_uid = $1
+        ORDER BY updated_at DESC
+        LIMIT 1`,
+    [session.uid],
+  );
+
+  const { rows: tokenUsageRows } = await pool.query(
+    `SELECT COALESCE(SUM(total_tokens), 0) AS "totalTokens"
+        FROM ai_token_usage
+        WHERE user_uid = $1
+          AND period_month = DATE_TRUNC('month', CURRENT_DATE)::date`,
+    [session.uid],
+  );
+
   const user = users[0];
+  const subscription = subscriptions[0];
+  const isPro =
+    subscription && ["active", "trialing"].includes(subscription.status);
+  const formulariCount = Number(stats[0]?.formulari ?? 0);
+  const monthlyTokens = Number(tokenUsageRows[0]?.totalTokens ?? 0);
+  const formulariLimit = isPro ? null : 5;
+  const tokenLimit = isPro ? 1_000_000 : 10_000;
   const createdAt = user.createdAt
     ? new Intl.DateTimeFormat("it-IT", { dateStyle: "long" }).format(
         new Date(user.createdAt),
       )
     : "Non disponibile";
+  const proRenewsAt = subscription?.currentPeriodEndsAt
+    ? new Intl.DateTimeFormat("it-IT", { dateStyle: "long" }).format(
+        new Date(subscription.currentPeriodEndsAt),
+      )
+    : null;
 
   return (
     <>
@@ -204,6 +242,69 @@ export async function SettingsContent({
               </SettingsSection>
             )}
 
+            {activeSection === "billing" && (
+              <SettingsSection
+                title="Billing"
+                description="Gestisci il piano FormulaBase e avvia l'abbonamento Pro con Paddle."
+              >
+                <div className="grid gap-3 md:grid-cols-2">
+                  <UsageMeter
+                    label="Formulari"
+                    value={formulariCount}
+                    limit={formulariLimit}
+                  />
+                  <UsageMeter
+                    label="Token AI questo mese"
+                    value={monthlyTokens}
+                    limit={tokenLimit}
+                  />
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <PlanBox
+                    name="Free"
+                    price="0 euro"
+                    description="Piano gratuito attivo per tutti gli account."
+                    features={["Massimo 5 formulari", "10k token AI al mese"]}
+                  />
+                  <PlanBox
+                    name="Pro"
+                    price="2,99 euro / mese"
+                    description="Piano per uso intensivo con piu spazio e AI."
+                    features={[
+                      "Formulari illimitati",
+                      "1 milione di token AI al mese",
+                    ]}
+                    action={
+                      isPro ? (
+                        <div className="flex flex-col gap-2">
+                          <Badge className="w-fit">Pro attivo</Badge>
+                          {proRenewsAt && (
+                            <p className="text-sm text-muted-foreground">
+                              Rinnovo o scadenza periodo: {proRenewsAt}
+                            </p>
+                          )}
+                          <CancelSubscriptionButton />
+                        </div>
+                      ) : (
+                        <PaddleCheckoutButton
+                          email={user.email}
+                          userId={session.uid}
+                          className="w-full gap-2 sm:w-fit"
+                        >
+                          Abbonati con Paddle
+                        </PaddleCheckoutButton>
+                      )
+                    }
+                  />
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Dopo il pagamento, Paddle gestisce checkout e ricevute. Per
+                  attivare automaticamente i limiti Pro serve collegare il
+                  webhook Paddle al database dell&apos;app.
+                </p>
+              </SettingsSection>
+            )}
+
             {activeSection === "legal" && (
               <SettingsSection
                 title="Termini e privacy"
@@ -302,6 +403,84 @@ function InfoRow({
       </div>
     </div>
   );
+}
+
+function PlanBox({
+  name,
+  price,
+  description,
+  features,
+  action,
+}: Readonly<{
+  name: string;
+  price: string;
+  description: string;
+  features: string[];
+  action?: React.ReactNode;
+}>) {
+  return (
+    <div className="flex h-full flex-col gap-4 rounded-lg border p-4">
+      <div>
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="font-medium">{name}</h3>
+          <Badge variant={name === "Pro" ? "default" : "outline"}>{price}</Badge>
+        </div>
+        <p className="mt-2 text-sm text-muted-foreground">{description}</p>
+      </div>
+      <ul className="flex flex-col gap-2 text-sm text-muted-foreground">
+        {features.map((feature) => (
+          <li key={feature} className="flex items-center gap-2">
+            <ChevronRight className="h-4 w-4" />
+            <span>{feature}</span>
+          </li>
+        ))}
+      </ul>
+      {action && <div className="mt-auto pt-2">{action}</div>}
+    </div>
+  );
+}
+
+function UsageMeter({
+  label,
+  value,
+  limit,
+}: Readonly<{
+  label: string;
+  value: number;
+  limit: number | null;
+}>) {
+  const percentage = limit ? Math.min(100, Math.round((value / limit) * 100)) : 0;
+
+  return (
+    <div className="rounded-lg border p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-sm font-medium">{label}</p>
+          <p className="mt-1 text-2xl font-semibold">
+            {formatUsageNumber(value)}
+          </p>
+        </div>
+        <Badge variant="outline">
+          {limit ? `su ${formatUsageNumber(limit)}` : "Illimitati"}
+        </Badge>
+      </div>
+      {limit && (
+        <div className="mt-4 h-2 overflow-hidden rounded-full bg-secondary">
+          <div
+            className="h-full rounded-full bg-primary"
+            style={{ width: `${percentage}%` }}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function formatUsageNumber(value: number) {
+  return new Intl.NumberFormat("it-IT", {
+    notation: value >= 100_000 ? "compact" : "standard",
+    maximumFractionDigits: 1,
+  }).format(value);
 }
 
 function LegalLink({

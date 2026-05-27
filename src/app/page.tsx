@@ -4,6 +4,7 @@ import { Faq } from "../components/landing/faq";
 import { Features } from "../components/landing/features";
 import { Footer } from "../components/landing/footer";
 import { Hero } from "../components/landing/hero";
+import { Pricing } from "../components/landing/pricing";
 import { VideoDemo } from "../components/landing/video-demo";
 import { GoogleOneTap } from "../components/auth/google-one-tap";
 
@@ -15,6 +16,7 @@ export default function Home() {
       <Hero />
       <VideoDemo />
       <Features />
+      <Pricing />
       <Faq />
       <Cta />
       <Footer />
@@ -23,6 +25,10 @@ export default function Home() {
 }
 
 // TODOs:
+
+// - [BUG]
+// - mettere webhook paddle
+// - creare le tabelle nel db per i pagamenti e testare tutto il flow di acquisto, rinnovo, cancellazione, ecc.
 
 // - [EDITOR]
 // - titoli come notion con "scaletta"

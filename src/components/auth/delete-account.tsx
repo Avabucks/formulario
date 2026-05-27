@@ -28,8 +28,8 @@ import { Input } from "../ui/input";
 async function deleteFirebaseUser(user: User) {
   try {
     await deleteUser(user);
-  } catch (error: any) {
-    if (error.code !== "auth/requires-recent-login") throw error;
+  } catch (error: unknown) {
+    if (getErrorCode(error) !== "auth/requires-recent-login") throw error;
 
     await reauthenticateWithPopup(user, new GoogleAuthProvider());
 
@@ -64,17 +64,31 @@ export default function DeleteAccount({
     setLoading(true);
 
     try {
+      await cancelSubscriptionIfAny();
       await deleteFirebaseUser(user);
       await callDeleteApi(user);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error(
-        error.code === "auth/popup-closed-by-user"
+        getErrorCode(error) === "auth/popup-closed-by-user"
           ? "Finestra di autenticazione chiusa"
           : "Errore durante l'eliminazione dell'account",
         { position: "bottom-center" },
       );
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function cancelSubscriptionIfAny() {
+    const res = await fetch("/api/paddle/subscription/cancel", {
+      method: "POST",
+    });
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(
+        data?.error ?? "Errore durante la cancellazione dell'abbonamento",
+      );
     }
   }
 
@@ -115,7 +129,7 @@ export default function DeleteAccount({
       <DialogTrigger asChild>
         <Button variant="destructive">
           <Trash />
-          Elimina l'account e tutti i tuoi dati
+          Elimina l&apos;account e tutti i tuoi dati
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
@@ -130,7 +144,7 @@ export default function DeleteAccount({
         <div className="flex flex-col gap-2">
           <p className="text-sm text-muted-foreground">
             Per confermare, scrivi il tuo nome utente{" "}
-            <span className="">"{username}"</span> qui sotto:
+            <span className="">&quot;{username}&quot;</span> qui sotto:
           </p>
           <Input
             value={confirmText}
@@ -157,4 +171,13 @@ export default function DeleteAccount({
       </DialogContent>
     </Dialog>
   );
+}
+
+function getErrorCode(error: unknown) {
+  return typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    typeof error.code === "string"
+    ? error.code
+    : null;
 }

@@ -1,5 +1,6 @@
 import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
+import { recordAiTokenUsage } from "@/src/lib/usage";
 import Groq from "groq-sdk";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
@@ -18,11 +19,6 @@ const SYSTEM_INSTRUCTION =
   "Usa Markdown (usa per le liste il trattino - non l'asterisco) e LaTeX ($ per inline, $$ per display), " +
   "suddividendo bene i paragrafi con gli headings. Rispondi in modo conciso. " +
   "Niente introduzioni come 'Certamente' o 'Ecco la risposta', devi generare un testo ready to use.";
-
-type Message = {
-  role: "user" | "assistant";
-  content: string;
-};
 
 export async function POST(req: NextRequest) {
   const session = await getIronSession<SessionData>(
@@ -63,9 +59,13 @@ export async function POST(req: NextRequest) {
     });
 
     const usage = completion.usage;
-    console.log(`Token Prompt: ${usage?.prompt_tokens}`);
-    console.log(`Token Risposta: ${usage?.completion_tokens}`);
-    console.log(`Token Totali: ${usage?.total_tokens}`);
+    await recordAiTokenUsage({
+      userId: uid,
+      provider: "groq",
+      promptTokens: usage?.prompt_tokens,
+      completionTokens: usage?.completion_tokens,
+      totalTokens: usage?.total_tokens,
+    });
 
     const text = completion.choices[0]?.message?.content;
 
@@ -80,10 +80,10 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ text });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Groq error details:", error);
 
-    if (error.status === 429) {
+    if (getErrorStatus(error) === 429) {
       return NextResponse.json(
         { error: "Limite di richieste raggiunto. Riprova tra un minuto." },
         { status: 429 },
@@ -95,4 +95,13 @@ export async function POST(req: NextRequest) {
       { status: 500 },
     );
   }
+}
+
+function getErrorStatus(error: unknown) {
+  return typeof error === "object" &&
+    error !== null &&
+    "status" in error &&
+    typeof error.status === "number"
+    ? error.status
+    : null;
 }

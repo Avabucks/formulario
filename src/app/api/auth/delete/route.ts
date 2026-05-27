@@ -1,5 +1,6 @@
 import { pool } from "@/src/lib/db";
 import { adminAuth } from "@/src/lib/firebase-admin";
+import { cancelUserSubscriptions } from "@/src/lib/paddle-server";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
@@ -58,6 +59,15 @@ export async function DELETE(request: Request) {
     return NextResponse.json(
       { error: "Nome utente di conferma non corretto" },
       { status: 400 },
+    );
+  }
+
+  try {
+    await cancelUserSubscriptions(session.uid);
+  } catch {
+    return NextResponse.json(
+      { error: "Impossibile cancellare l'abbonamento Paddle" },
+      { status: 500 },
     );
   }
 

@@ -1,5 +1,6 @@
 import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
+import { recordAiTokenUsage } from "@/src/lib/usage";
 import {
   GoogleGenerativeAI,
   HarmBlockThreshold,
@@ -72,9 +73,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { totalTokens } = await model.countTokens(prompt);
-    const INPUT_LIMIT = 500;
-
     // if (totalTokens > INPUT_LIMIT) {
     //    return NextResponse.json(
     //        { error: `Prompt troppo lungo (${totalTokens} token). Il limite è ${INPUT_LIMIT}.` },
@@ -100,10 +98,13 @@ export async function POST(req: NextRequest) {
     const response = result.response;
 
     const usage = response.usageMetadata;
-
-    console.log(`Token Prompt: ${usage?.promptTokenCount}`);
-    console.log(`Token Risposta: ${usage?.candidatesTokenCount}`);
-    console.log(`Token Totali: ${usage?.totalTokenCount}`);
+    await recordAiTokenUsage({
+      userId: uid,
+      provider: "gemini",
+      promptTokens: usage?.promptTokenCount,
+      completionTokens: usage?.candidatesTokenCount,
+      totalTokens: usage?.totalTokenCount,
+    });
 
     const text = response.text();
 
@@ -131,10 +132,10 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ text });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Gemini error details:", error);
 
-    if (error.status === 429) {
+    if (getErrorStatus(error) === 429) {
       return NextResponse.json(
         { error: "Limite di richieste raggiunto. Riprova tra un minuto." },
         { status: 429 },
@@ -146,4 +147,13 @@ export async function POST(req: NextRequest) {
       { status: 500 },
     );
   }
+}
+
+function getErrorStatus(error: unknown) {
+  return typeof error === "object" &&
+    error !== null &&
+    "status" in error &&
+    typeof error.status === "number"
+    ? error.status
+    : null;
 }
