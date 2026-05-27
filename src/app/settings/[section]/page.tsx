@@ -1,16 +1,20 @@
 import { redirect } from "next/navigation";
-import { SettingsContent, SettingsSectionId, settingsSectionIds } from "../settings-content";
+import {
+  SettingsContent,
+  SettingsSectionId,
+  settingsSectionIds,
+} from "../settings-content";
 
 export default async function SettingsSectionPage({
-    params,
+  params,
 }: Readonly<{
-    params: Promise<{ section: string }>;
+  params: Promise<{ section: string }>;
 }>) {
-    const { section } = await params;
+  const { section } = await params;
 
-    if (!settingsSectionIds.includes(section as SettingsSectionId)) {
-        redirect("/settings");
-    }
+  if (!settingsSectionIds.includes(section as SettingsSectionId)) {
+    redirect("/settings");
+  }
 
-    return <SettingsContent activeSection={section as SettingsSectionId} />;
+  return <SettingsContent activeSection={section as SettingsSectionId} />;
 }

@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { useRef } from "react"
-import { motion, useInView } from "framer-motion"
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/src/components/ui/accordion"
+} from "@/src/components/ui/accordion";
 
 const faqs = [
   {
@@ -40,16 +40,15 @@ const faqs = [
     answer:
       "Sì, puoi iniziare gratuitamente senza carta di credito. Crei formulari, usi l'editor LaTeX e condividi via QR code o link da subito.",
   },
-]
+];
 
 export function Faq() {
-  const headingRef = useRef(null)
-  const headingInView = useInView(headingRef, { once: true, margin: "-80px" })
+  const headingRef = useRef(null);
+  const headingInView = useInView(headingRef, { once: true, margin: "-80px" });
 
   return (
     <section id="faq" className="py-24 md:py-32">
       <div className="mx-auto max-w-3xl px-6">
-
         {/* Heading */}
         <motion.div
           ref={headingRef}
@@ -72,22 +71,28 @@ export function Faq() {
             <FaqItem key={i} faq={faq} index={i} />
           ))}
         </Accordion>
-
       </div>
     </section>
-  )
+  );
 }
 
-function FaqItem({ faq, index }: Readonly<{ faq: typeof faqs[number]; index: number }>) {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: "-60px" })
+function FaqItem({
+  faq,
+  index,
+}: Readonly<{ faq: (typeof faqs)[number]; index: number }>) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-60px" });
 
   return (
     <motion.div
       ref={ref}
       initial={{ opacity: 0, y: 20 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: index * 0.07 }}
+      transition={{
+        duration: 0.5,
+        ease: [0.22, 1, 0.36, 1],
+        delay: index * 0.07,
+      }}
     >
       <AccordionItem value={`item-${index}`} className="border-border">
         <AccordionTrigger className="text-left text-sm font-medium text-foreground hover:no-underline">
@@ -98,5 +103,5 @@ function FaqItem({ faq, index }: Readonly<{ faq: typeof faqs[number]; index: num
         </AccordionContent>
       </AccordionItem>
     </motion.div>
-  )
+  );
 }

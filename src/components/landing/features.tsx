@@ -1,15 +1,8 @@
-"use client"
+"use client";
 
-import { useRef } from "react"
-import { motion, useInView } from "framer-motion"
-import {
-  BookOpen,
-  Lock,
-  QrCode,
-  ScanLine,
-  Search,
-  Wand2,
-} from "lucide-react"
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
+import { BookOpen, Lock, QrCode, ScanLine, Search, Wand2 } from "lucide-react";
 
 const features = [
   {
@@ -48,16 +41,15 @@ const features = [
     description:
       "Tieni le tue formule per te oppure rendile disponibili alla community. Il controllo è sempre nelle tue mani.",
   },
-]
+];
 
 export function Features() {
-  const headingRef = useRef(null)
-  const headingInView = useInView(headingRef, { once: true, margin: "-80px" })
+  const headingRef = useRef(null);
+  const headingInView = useInView(headingRef, { once: true, margin: "-80px" });
 
   return (
     <section id="features" className="py-24 md:py-32">
       <div className="mx-auto max-w-6xl px-6">
-
         {/* Heading */}
         <motion.div
           ref={headingRef}
@@ -73,7 +65,8 @@ export function Features() {
             Tutto ciò che serve per i tuoi formulari
           </h2>
           <p className="mt-4 text-pretty text-muted-foreground">
-            Uno strumento pensato per studenti, docenti e ricercatori. Meno confusione, più formule.
+            Uno strumento pensato per studenti, docenti e ricercatori. Meno
+            confusione, più formule.
           </p>
         </motion.div>
 
@@ -83,21 +76,20 @@ export function Features() {
             <FeatureCard key={feature.title} feature={feature} index={i} />
           ))}
         </div>
-
       </div>
     </section>
-  )
+  );
 }
 
 function FeatureCard({
   feature,
   index,
 }: {
-  feature: typeof features[number]
-  index: number
+  feature: (typeof features)[number];
+  index: number;
 }) {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: "-60px" })
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-60px" });
 
   return (
     <motion.div
@@ -121,5 +113,5 @@ function FeatureCard({
         {feature.description}
       </p>
     </motion.div>
-  )
+  );
 }

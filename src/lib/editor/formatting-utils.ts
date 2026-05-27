@@ -18,427 +18,493 @@ export const getUnorderedListRegex = () => /^\s*[-*]\s/;
 export const getCodeInlineRegex = () => /`(.+?)`/g;
 
 export function getIsActiveWord(
-    editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
-    getRegex: () => RegExp,
+  editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
+  getRegex: () => RegExp,
 ): boolean {
-    if (!editorRef.current) return false;
+  if (!editorRef.current) return false;
 
-    const model = editorRef.current.getModel();
-    if (!model) return false;
+  const model = editorRef.current.getModel();
+  if (!model) return false;
 
-    const fullText = model.getValue();
-    const regex = getRegex();
+  const fullText = model.getValue();
+  const regex = getRegex();
 
-    const sel = editorRef.current.getSelection();
-    if (!sel) return false;
+  const sel = editorRef.current.getSelection();
+  if (!sel) return false;
 
-    const cursorOffset = model.getOffsetAt({
-        lineNumber: sel.positionLineNumber,
-        column: sel.positionColumn,
-    });
-    const startOffset = model.getOffsetAt({
-        lineNumber: sel.startLineNumber,
-        column: sel.startColumn,
-    });
-    const endOffset = model.getOffsetAt({
-        lineNumber: sel.endLineNumber,
-        column: sel.endColumn,
-    });
+  const cursorOffset = model.getOffsetAt({
+    lineNumber: sel.positionLineNumber,
+    column: sel.positionColumn,
+  });
+  const startOffset = model.getOffsetAt({
+    lineNumber: sel.startLineNumber,
+    column: sel.startColumn,
+  });
+  const endOffset = model.getOffsetAt({
+    lineNumber: sel.endLineNumber,
+    column: sel.endColumn,
+  });
 
-    const isCursor = startOffset === endOffset;
+  const isCursor = startOffset === endOffset;
 
-    let match;
-    while ((match = regex.exec(fullText)) !== null) {
-        if (isCursor) {
-            if (cursorOffset > match.index && cursorOffset < match.index + match[0].length) return true;
-        } else {
-            if (startOffset >= match.index && endOffset <= match.index + match[0].length) return true;
-        }
+  let match;
+  while ((match = regex.exec(fullText)) !== null) {
+    if (isCursor) {
+      if (
+        cursorOffset > match.index &&
+        cursorOffset < match.index + match[0].length
+      )
+        return true;
+    } else {
+      if (
+        startOffset >= match.index &&
+        endOffset <= match.index + match[0].length
+      )
+        return true;
     }
-    return false;
+  }
+  return false;
 }
 
 export function handleWordToggle(
-    editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
-    isActive: boolean,
-    getRegex: () => RegExp,
-    wrap: (text: string) => string,   // es. (t) => `**${t}**`
-    unwrap: (match: RegExpExecArray) => string,  // es. (m) => m[1]
-    cursorOffsetAfterUnwrap: (matchIndex: number, match: RegExpExecArray) => number,
+  editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
+  isActive: boolean,
+  getRegex: () => RegExp,
+  wrap: (text: string) => string, // es. (t) => `**${t}**`
+  unwrap: (match: RegExpExecArray) => string, // es. (m) => m[1]
+  cursorOffsetAfterUnwrap: (
+    matchIndex: number,
+    match: RegExpExecArray,
+  ) => number,
 ) {
-    const editor = editorRef.current;
-    if (!editor) return false;
+  const editor = editorRef.current;
+  if (!editor) return false;
 
-    const model = editor.getModel();
-    if (!model) return;
+  const model = editor.getModel();
+  if (!model) return;
 
-    const fullText = model.getValue();
+  const fullText = model.getValue();
 
-    const sel = editor.getSelection();
-    if (!sel) return false;
+  const sel = editor.getSelection();
+  if (!sel) return false;
 
-    const startOffset = model.getOffsetAt({
-        lineNumber: sel.startLineNumber,
-        column: sel.startColumn,
-    });
-    const endOffset = model.getOffsetAt({
-        lineNumber: sel.endLineNumber,
-        column: sel.endColumn,
-    });
+  const startOffset = model.getOffsetAt({
+    lineNumber: sel.startLineNumber,
+    column: sel.startColumn,
+  });
+  const endOffset = model.getOffsetAt({
+    lineNumber: sel.endLineNumber,
+    column: sel.endColumn,
+  });
 
-    const raw = fullText.slice(startOffset, endOffset);
-    const trimmedText = raw.trim();
-    const leadingSpaces = raw.length - raw.trimStart().length;
-    const trimStart = startOffset + leadingSpaces;
-    const trimEnd = trimStart + trimmedText.length;
+  const raw = fullText.slice(startOffset, endOffset);
+  const trimmedText = raw.trim();
+  const leadingSpaces = raw.length - raw.trimStart().length;
+  const trimStart = startOffset + leadingSpaces;
+  const trimEnd = trimStart + trimmedText.length;
 
-    const controller = editor.getContribution('snippetController2') as any;
-    if (!controller) return false;
+  const controller = editor.getContribution("snippetController2") as any;
+  if (!controller) return false;
 
-    if (isActive) {
-        const regex = getRegex();
-        let match;
-        while ((match = regex.exec(fullText)) !== null) {
-            if (trimStart >= match.index && trimEnd <= match.index + match[0].length) {
-                const trimStartPos = model.getPositionAt(match.index);
-                const trimEndPos = model.getPositionAt(match.index + match[0].length);
-                const cursorPos = model.getPositionAt(cursorOffsetAfterUnwrap(match.index, match));
-                model.pushEditOperations(
-                    [],
-                    [{
-                        range: {
-                            startLineNumber: trimStartPos.lineNumber,
-                            startColumn: trimStartPos.column,
-                            endLineNumber: trimEndPos.lineNumber,
-                            endColumn: trimEndPos.column,
-                        },
-                        text: unwrap(match),
-                    }],
-                    () => null,
-                );
-                editor.setSelection({
-                    startLineNumber: cursorPos.lineNumber,
-                    startColumn: cursorPos.column,
-                    endLineNumber: cursorPos.lineNumber,
-                    endColumn: cursorPos.column,
-                });
-                editor.focus();
-                return;
-            }
-        }
+  if (isActive) {
+    const regex = getRegex();
+    let match;
+    while ((match = regex.exec(fullText)) !== null) {
+      if (
+        trimStart >= match.index &&
+        trimEnd <= match.index + match[0].length
+      ) {
+        const trimStartPos = model.getPositionAt(match.index);
+        const trimEndPos = model.getPositionAt(match.index + match[0].length);
+        const cursorPos = model.getPositionAt(
+          cursorOffsetAfterUnwrap(match.index, match),
+        );
+        model.pushEditOperations(
+          [],
+          [
+            {
+              range: {
+                startLineNumber: trimStartPos.lineNumber,
+                startColumn: trimStartPos.column,
+                endLineNumber: trimEndPos.lineNumber,
+                endColumn: trimEndPos.column,
+              },
+              text: unwrap(match),
+            },
+          ],
+          () => null,
+        );
+        editor.setSelection({
+          startLineNumber: cursorPos.lineNumber,
+          startColumn: cursorPos.column,
+          endLineNumber: cursorPos.lineNumber,
+          endColumn: cursorPos.column,
+        });
+        editor.focus();
+        return;
+      }
     }
-    if (trimmedText === "") return false;
-    const text = wrap(trimmedText);
-    controller.insert(text);
-    setTimeout(() => editor.focus(), 0);
+  }
+  if (trimmedText === "") return false;
+  const text = wrap(trimmedText);
+  controller.insert(text);
+  setTimeout(() => editor.focus(), 0);
 }
 
 export function getIsActiveList(
-    editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
-    getLineRegex: () => RegExp,
+  editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
+  getLineRegex: () => RegExp,
 ): boolean {
-    if (!editorRef.current) return false;
-    
-    const model = editorRef.current.getModel();
-    if (!model) return false;
+  if (!editorRef.current) return false;
 
-    const sel = editorRef.current.getSelection();
-    if (!sel) return false;
+  const model = editorRef.current.getModel();
+  if (!model) return false;
 
-    for (let line = sel.startLineNumber; line <= sel.endLineNumber; line++) {
-        const lineContent = model.getLineContent(line);
-        if (!getLineRegex().test(lineContent)) return false;
-    }
-    return true;
+  const sel = editorRef.current.getSelection();
+  if (!sel) return false;
+
+  for (let line = sel.startLineNumber; line <= sel.endLineNumber; line++) {
+    const lineContent = model.getLineContent(line);
+    if (!getLineRegex().test(lineContent)) return false;
+  }
+  return true;
 }
 
 export function handleListToggle(
-    editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
-    isActive: boolean,
-    getLineRegex: () => RegExp,
-    addPrefix: (line: string, index: number) => string,
-    removePrefix: (line: string) => string,
+  editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
+  isActive: boolean,
+  getLineRegex: () => RegExp,
+  addPrefix: (line: string, index: number) => string,
+  removePrefix: (line: string) => string,
 ) {
-    if (!editorRef.current) return;
-    const model = editorRef.current.getModel();
-    if (!model) return;
+  if (!editorRef.current) return;
+  const model = editorRef.current.getModel();
+  if (!model) return;
 
-    const sel = editorRef.current.getSelection();
-    if (!sel) return;
+  const sel = editorRef.current.getSelection();
+  if (!sel) return;
 
-    const endLine =
-        sel.endColumn === 1 && sel.endLineNumber > sel.startLineNumber
-            ? sel.endLineNumber - 1
-            : sel.endLineNumber;
+  const endLine =
+    sel.endColumn === 1 && sel.endLineNumber > sel.startLineNumber
+      ? sel.endLineNumber - 1
+      : sel.endLineNumber;
 
-    const edits = [];
-    for (let lineNumber = sel.startLineNumber; lineNumber <= sel.endLineNumber; lineNumber++) {
-        const lineContent = model.getLineContent(lineNumber);
-        const newContent = isActive
-            ? removePrefix(lineContent)
-            : addPrefix(lineContent, lineNumber - sel.startLineNumber);
+  const edits = [];
+  for (
+    let lineNumber = sel.startLineNumber;
+    lineNumber <= sel.endLineNumber;
+    lineNumber++
+  ) {
+    const lineContent = model.getLineContent(lineNumber);
+    const newContent = isActive
+      ? removePrefix(lineContent)
+      : addPrefix(lineContent, lineNumber - sel.startLineNumber);
 
-        edits.push({
-            range: {
-                startLineNumber: lineNumber,
-                startColumn: 1,
-                endLineNumber: lineNumber,
-                endColumn: lineContent.length + 1,
-            },
-            text: newContent,
-        });
-    }
-
-    model.pushEditOperations([], edits, () => null);
-
-    const lastLineContent = model.getLineContent(endLine);
-    editorRef.current.setSelection({
-        startLineNumber: endLine,
-        startColumn: lastLineContent.length + 1,
-        endLineNumber: endLine,
-        endColumn: lastLineContent.length + 1,
+    edits.push({
+      range: {
+        startLineNumber: lineNumber,
+        startColumn: 1,
+        endLineNumber: lineNumber,
+        endColumn: lineContent.length + 1,
+      },
+      text: newContent,
     });
-    editorRef.current.focus();
+  }
+
+  model.pushEditOperations([], edits, () => null);
+
+  const lastLineContent = model.getLineContent(endLine);
+  editorRef.current.setSelection({
+    startLineNumber: endLine,
+    startColumn: lastLineContent.length + 1,
+    endLineNumber: endLine,
+    endColumn: lastLineContent.length + 1,
+  });
+  editorRef.current.focus();
 }
 
 export function getIsActiveCode(
-    editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
+  editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
 ): { language: string | null } | null {
-    if (!editorRef.current) return null;
-    const model = editorRef.current.getModel();
-    if (!model) return null;
-    const sel = editorRef.current.getSelection();
-    if (!sel) return null;
+  if (!editorRef.current) return null;
+  const model = editorRef.current.getModel();
+  if (!model) return null;
+  const sel = editorRef.current.getSelection();
+  if (!sel) return null;
 
-    const cursorLine = sel.startLineNumber;
-    let blockStart: number | null = null;
-    let language: string | null = null;
+  const cursorLine = sel.startLineNumber;
+  let blockStart: number | null = null;
+  let language: string | null = null;
 
-    for (let l = 1; l <= model.getLineCount(); l++) {
-        const content = model.getLineContent(l).trim();
+  for (let l = 1; l <= model.getLineCount(); l++) {
+    const content = model.getLineContent(l).trim();
 
-        if (blockStart === null) {
-            if (content.startsWith("```")) {
-                const suffix = content.slice(3).trim();
-                language = suffix.length > 0 ? suffix : null;
-                blockStart = l;
-            }
-        } else {
-            if (content === "```") {
-                if (cursorLine >= blockStart && cursorLine < l) return { language };
-                blockStart = null;
-                language = null;
-            }
-        }
-
-        if (l > cursorLine && blockStart === null) break;
+    if (blockStart === null) {
+      if (content.startsWith("```")) {
+        const suffix = content.slice(3).trim();
+        language = suffix.length > 0 ? suffix : null;
+        blockStart = l;
+      }
+    } else {
+      if (content === "```") {
+        if (cursorLine >= blockStart && cursorLine < l) return { language };
+        blockStart = null;
+        language = null;
+      }
     }
 
-    return null;
+    if (l > cursorLine && blockStart === null) break;
+  }
+
+  return null;
 }
 
 export function handleBlockToggle(
-    editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
-    blockState: { language: string | null } | null,
-    openMarker: string,
-    closeMarker: string,
-    newLanguage?: string | null,
+  editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
+  blockState: { language: string | null } | null,
+  openMarker: string,
+  closeMarker: string,
+  newLanguage?: string | null,
 ) {
-    if (!editorRef.current) return;
-    const model = editorRef.current.getModel();
-    if (!model) return;
+  if (!editorRef.current) return;
+  const model = editorRef.current.getModel();
+  if (!model) return;
 
-    const sel = editorRef.current.getSelection();
-    if (!sel) return;
+  const sel = editorRef.current.getSelection();
+  if (!sel) return;
 
-    const totalLines = model.getLineCount();
+  const totalLines = model.getLineCount();
 
-    if (blockState === null) {
-        // Calcola la selezione escludendo il trailing newline vuoto
-        const endLine =
-            sel.endColumn === 1 && sel.endLineNumber > sel.startLineNumber
-                ? sel.endLineNumber - 1
-                : sel.endLineNumber;
+  if (blockState === null) {
+    // Calcola la selezione escludendo il trailing newline vuoto
+    const endLine =
+      sel.endColumn === 1 && sel.endLineNumber > sel.startLineNumber
+        ? sel.endLineNumber - 1
+        : sel.endLineNumber;
 
-        const startCol = 1;
-        const endCol = model.getLineContent(endLine).length + 1;
+    const startCol = 1;
+    const endCol = model.getLineContent(endLine).length + 1;
 
-        const selectedText = model.getValueInRange({
+    const selectedText = model.getValueInRange({
+      startLineNumber: sel.startLineNumber,
+      startColumn: startCol,
+      endLineNumber: endLine,
+      endColumn: endCol,
+    });
+
+    const newText = `${openMarker}\n${selectedText}\n${closeMarker}`;
+
+    model.pushEditOperations(
+      [],
+      [
+        {
+          range: {
             startLineNumber: sel.startLineNumber,
             startColumn: startCol,
             endLineNumber: endLine,
             endColumn: endCol,
-        });
+          },
+          text: newText,
+        },
+      ],
+      () => null,
+    );
 
-        const newText = `${openMarker}\n${selectedText}\n${closeMarker}`;
-
-        model.pushEditOperations(
-            [],
-            [{
-                range: {
-                    startLineNumber: sel.startLineNumber,
-                    startColumn: startCol,
-                    endLineNumber: endLine,
-                    endColumn: endCol,
-                },
-                text: newText,
-            }],
-            () => null,
-        );
-
-        // Cursore alla fine del blocco inserito
-        const newEndLine = sel.startLineNumber + selectedText.split("\n").length;
-        const newEndCol = closeMarker.length + 1;
-        editorRef.current.setSelection({
-            startLineNumber: newEndLine,
-            startColumn: newEndCol,
-            endLineNumber: newEndLine,
-            endColumn: newEndCol,
-        });
-        editorRef.current.focus();
-    } else {
-        // Trova le righe dei marker (apertura può avere suffisso lingua)
-        let openLine = -1;
-        for (let l = sel.startLineNumber; l >= 1; l--) {
-            const lineContent = model.getLineContent(l).trim();
-            if (lineContent === openMarker || (lineContent.startsWith(openMarker) && lineContent.length > openMarker.length)) {
-                openLine = l;
-                break;
-            }
-        }
-
-        // Se è richiesto solo l'aggiornamento del linguaggio, sostituisce la riga di apertura
-        if (newLanguage !== undefined && openLine !== -1) {
-            const newOpenLine = newLanguage ? `${openMarker}${newLanguage}` : openMarker;
-            const currentLineLength = model.getLineContent(openLine).length;
-            model.pushEditOperations([], [{
-                range: {
-                    startLineNumber: openLine,
-                    startColumn: 1,
-                    endLineNumber: openLine,
-                    endColumn: currentLineLength + 1,
-                },
-                text: newOpenLine,
-            }], () => null);
-            editorRef.current.focus();
-            return;
-        }
-        let closeLine = -1;
-        for (let l = sel.endLineNumber; l <= totalLines; l++) {
-            if (model.getLineContent(l).trim() === closeMarker) { closeLine = l; break; }
-        }
-        if (openLine === -1 || closeLine === -1) return;
-
-        const edits = [];
-
-        // Rimuove la riga di chiusura (prima, per non spostare gli indici)
-        edits.push({
-            range: {
-                startLineNumber: closeLine,
-                startColumn: 1,
-                endLineNumber: closeLine < totalLines ? closeLine + 1 : closeLine,
-                endColumn: closeLine < totalLines ? 1 : model.getLineContent(closeLine).length + 1,
-            },
-            text: "",
-        }, {
-            range: {
-                startLineNumber: openLine,
-                startColumn: 1,
-                endLineNumber: openLine + 1,
-                endColumn: 1,
-            },
-            text: "",
-        });
-
-        model.pushEditOperations([], edits, () => null);
-
-        // Riposiziona il cursore alla fine del contenuto rimasto
-        const newEndLine = closeLine - 2; // -2: rimossa apertura e chiusura
-        const safeEndLine = Math.max(1, Math.min(newEndLine, model.getLineCount()));
-        const endCol = model.getLineContent(safeEndLine).length + 1;
-        editorRef.current.setSelection({
-            startLineNumber: safeEndLine,
-            startColumn: endCol,
-            endLineNumber: safeEndLine,
-            endColumn: endCol,
-        });
-        setTimeout(() => editorRef.current?.focus(), 0);
-
+    // Cursore alla fine del blocco inserito
+    const newEndLine = sel.startLineNumber + selectedText.split("\n").length;
+    const newEndCol = closeMarker.length + 1;
+    editorRef.current.setSelection({
+      startLineNumber: newEndLine,
+      startColumn: newEndCol,
+      endLineNumber: newEndLine,
+      endColumn: newEndCol,
+    });
+    editorRef.current.focus();
+  } else {
+    // Trova le righe dei marker (apertura può avere suffisso lingua)
+    let openLine = -1;
+    for (let l = sel.startLineNumber; l >= 1; l--) {
+      const lineContent = model.getLineContent(l).trim();
+      if (
+        lineContent === openMarker ||
+        (lineContent.startsWith(openMarker) &&
+          lineContent.length > openMarker.length)
+      ) {
+        openLine = l;
+        break;
+      }
     }
 
+    // Se è richiesto solo l'aggiornamento del linguaggio, sostituisce la riga di apertura
+    if (newLanguage !== undefined && openLine !== -1) {
+      const newOpenLine = newLanguage
+        ? `${openMarker}${newLanguage}`
+        : openMarker;
+      const currentLineLength = model.getLineContent(openLine).length;
+      model.pushEditOperations(
+        [],
+        [
+          {
+            range: {
+              startLineNumber: openLine,
+              startColumn: 1,
+              endLineNumber: openLine,
+              endColumn: currentLineLength + 1,
+            },
+            text: newOpenLine,
+          },
+        ],
+        () => null,
+      );
+      editorRef.current.focus();
+      return;
+    }
+    let closeLine = -1;
+    for (let l = sel.endLineNumber; l <= totalLines; l++) {
+      if (model.getLineContent(l).trim() === closeMarker) {
+        closeLine = l;
+        break;
+      }
+    }
+    if (openLine === -1 || closeLine === -1) return;
+
+    const edits = [];
+
+    // Rimuove la riga di chiusura (prima, per non spostare gli indici)
+    edits.push(
+      {
+        range: {
+          startLineNumber: closeLine,
+          startColumn: 1,
+          endLineNumber: closeLine < totalLines ? closeLine + 1 : closeLine,
+          endColumn:
+            closeLine < totalLines
+              ? 1
+              : model.getLineContent(closeLine).length + 1,
+        },
+        text: "",
+      },
+      {
+        range: {
+          startLineNumber: openLine,
+          startColumn: 1,
+          endLineNumber: openLine + 1,
+          endColumn: 1,
+        },
+        text: "",
+      },
+    );
+
+    model.pushEditOperations([], edits, () => null);
+
+    // Riposiziona il cursore alla fine del contenuto rimasto
+    const newEndLine = closeLine - 2; // -2: rimossa apertura e chiusura
+    const safeEndLine = Math.max(1, Math.min(newEndLine, model.getLineCount()));
+    const endCol = model.getLineContent(safeEndLine).length + 1;
+    editorRef.current.setSelection({
+      startLineNumber: safeEndLine,
+      startColumn: endCol,
+      endLineNumber: safeEndLine,
+      endColumn: endCol,
+    });
+    setTimeout(() => editorRef.current?.focus(), 0);
+  }
 }
 
 export function getIsActiveLatex(
-    editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
-): { kind: 'single' | 'double'; matchIndex: number; matchEnd: number; lineNumber: number } | null {
-    if (!editorRef.current) return null;
-    const model = editorRef.current.getModel();
-    if (!model) return null;
+  editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
+): {
+  kind: "single" | "double";
+  matchIndex: number;
+  matchEnd: number;
+  lineNumber: number;
+} | null {
+  if (!editorRef.current) return null;
+  const model = editorRef.current.getModel();
+  if (!model) return null;
 
-    const sel = editorRef.current.getSelection();
-    if (!sel) return null;
+  const sel = editorRef.current.getSelection();
+  if (!sel) return null;
 
-    const cursorLine = sel.startLineNumber;
-    const cursorCol = sel.startColumn; // 1-based (Monaco standard)
-    const lineContent = model.getLineContent(cursorLine);
+  const cursorLine = sel.startLineNumber;
+  const cursorCol = sel.startColumn; // 1-based (Monaco standard)
+  const lineContent = model.getLineContent(cursorLine);
 
-    const inlinePatterns = [
-        { regex: /\$\$(?:[\s\S]*?)\$\$/g, kind: 'double' as const, delimiterLen: 2 },
-        { regex: /(?<!\$)\$(?!\$)(?:[\s\S]+?)(?<!\$)\$(?!\$)/g, kind: 'single' as const, delimiterLen: 1 },
-        { regex: /(?<!\$)\$\$(?!\$)/g, kind: 'single' as const, delimiterLen: 1 } // Caso vuoto $ $
-    ];
+  const inlinePatterns = [
+    {
+      regex: /\$\$(?:[\s\S]*?)\$\$/g,
+      kind: "double" as const,
+      delimiterLen: 2,
+    },
+    {
+      regex: /(?<!\$)\$(?!\$)(?:[\s\S]+?)(?<!\$)\$(?!\$)/g,
+      kind: "single" as const,
+      delimiterLen: 1,
+    },
+    { regex: /(?<!\$)\$\$(?!\$)/g, kind: "single" as const, delimiterLen: 1 }, // Caso vuoto $ $
+  ];
 
-    for (const pattern of inlinePatterns) {
-        let match: RegExpExecArray | null;
-        while ((match = pattern.regex.exec(lineContent)) !== null) {
-            const startCol = match.index + 1; // Converti in 1-based
-            const endCol = startCol + match[0].length;
-            
-            // Verifica: cursore DOPO i primi dollari e PRIMA degli ultimi
-            if (cursorCol > (startCol + pattern.delimiterLen - 1) && 
-                cursorCol <= (endCol - pattern.delimiterLen)) {
-                return { 
-                    kind: pattern.kind, 
-                    matchIndex: match.index, 
-                    matchEnd: match.index + match[0].length, 
-                    lineNumber: cursorLine 
-                };
-            }
-        }
+  for (const pattern of inlinePatterns) {
+    let match: RegExpExecArray | null;
+    while ((match = pattern.regex.exec(lineContent)) !== null) {
+      const startCol = match.index + 1; // Converti in 1-based
+      const endCol = startCol + match[0].length;
+
+      // Verifica: cursore DOPO i primi dollari e PRIMA degli ultimi
+      if (
+        cursorCol > startCol + pattern.delimiterLen - 1 &&
+        cursorCol <= endCol - pattern.delimiterLen
+      ) {
+        return {
+          kind: pattern.kind,
+          matchIndex: match.index,
+          matchEnd: match.index + match[0].length,
+          lineNumber: cursorLine,
+        };
+      }
     }
+  }
 
-    const fullText = model.getValue();
-    const blockRegex = /\$\$([\s\S]*?)\$\$/g;
-    let blockMatch: RegExpExecArray | null;
+  const fullText = model.getValue();
+  const blockRegex = /\$\$([\s\S]*?)\$\$/g;
+  let blockMatch: RegExpExecArray | null;
 
-    while ((blockMatch = blockRegex.exec(fullText)) !== null) {
-        const startOffset = blockMatch.index;
-        const endOffset = startOffset + blockMatch[0].length;
-        
-        const startPos = model.getPositionAt(startOffset);
-        const endPos = model.getPositionAt(endOffset);
+  while ((blockMatch = blockRegex.exec(fullText)) !== null) {
+    const startOffset = blockMatch.index;
+    const endOffset = startOffset + blockMatch[0].length;
 
-        const isStrictlyAfterStart = (cursorLine > startPos.lineNumber) || 
-                                     (cursorLine === startPos.lineNumber && cursorCol > startPos.column + 1);
-        
-        const isStrictlyBeforeEnd = (cursorLine < endPos.lineNumber) || 
-                                    (cursorLine === endPos.lineNumber && cursorCol <= endPos.column - 2);
+    const startPos = model.getPositionAt(startOffset);
+    const endPos = model.getPositionAt(endOffset);
 
-        if (isStrictlyAfterStart && isStrictlyBeforeEnd) {
-            return {
-                kind: 'double',
-                matchIndex: cursorLine === startPos.lineNumber ? startPos.column - 1 : 0,
-                matchEnd: cursorLine === endPos.lineNumber ? endPos.column - 1 : model.getLineContent(cursorLine).length,
-                lineNumber: cursorLine
-            };
-        }
+    const isStrictlyAfterStart =
+      cursorLine > startPos.lineNumber ||
+      (cursorLine === startPos.lineNumber && cursorCol > startPos.column + 1);
+
+    const isStrictlyBeforeEnd =
+      cursorLine < endPos.lineNumber ||
+      (cursorLine === endPos.lineNumber && cursorCol <= endPos.column - 2);
+
+    if (isStrictlyAfterStart && isStrictlyBeforeEnd) {
+      return {
+        kind: "double",
+        matchIndex:
+          cursorLine === startPos.lineNumber ? startPos.column - 1 : 0,
+        matchEnd:
+          cursorLine === endPos.lineNumber
+            ? endPos.column - 1
+            : model.getLineContent(cursorLine).length,
+        lineNumber: cursorLine,
+      };
     }
+  }
 
-    return null;
+  return null;
 }
 
-export function checkActiveLatexOrCode(editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>) {
-    const code = getIsActiveCode(editorRef);
-    const latex = getIsActiveLatex(editorRef);
-    if ((latex?.kind === 'double') || code) return true
+export function checkActiveLatexOrCode(
+  editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
+) {
+  const code = getIsActiveCode(editorRef);
+  const latex = getIsActiveLatex(editorRef);
+  if (latex?.kind === "double" || code) return true;
 }

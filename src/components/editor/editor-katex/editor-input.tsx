@@ -1,130 +1,143 @@
 "use client";
-import Editor, { Monaco } from '@monaco-editor/react';
+import Editor, { Monaco } from "@monaco-editor/react";
 import { AlertTriangle, CheckCheck } from "lucide-react";
-import { editor } from 'monaco-editor';
+import { editor } from "monaco-editor";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { NavigationBlocker } from "../../navigation/navigation-blocker";
 import { Spinner } from "../../ui/spinner";
 
 export function EditorInput({
-    argomentoId,
-    textAreaContent,
-    setTextAreaContent,
-    edited,
-    setEdited,
-    handleEditorDidMount,
-    editable,
+  argomentoId,
+  textAreaContent,
+  setTextAreaContent,
+  edited,
+  setEdited,
+  handleEditorDidMount,
+  editable,
 }: Readonly<{
-    argomentoId: string,
-    textAreaContent: string,
-    setTextAreaContent: (value: string) => void,
-    edited: boolean
-    setEdited: (value: boolean) => void,
-    handleEditorDidMount: (editor: editor.IStandaloneCodeEditor, monaco: Monaco) => void;
-    editable: boolean;
+  argomentoId: string;
+  textAreaContent: string;
+  setTextAreaContent: (value: string) => void;
+  edited: boolean;
+  setEdited: (value: boolean) => void;
+  handleEditorDidMount: (
+    editor: editor.IStandaloneCodeEditor,
+    monaco: Monaco,
+  ) => void;
+  editable: boolean;
 }>) {
-    const router = useRouter();
+  const router = useRouter();
 
-    const [loading, setLoading] = useState(false)
-    const [error, setError] = useState(false)
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
-    const save = (content: string) => {
-        setLoading(true)
-        setError(false)
-        fetch("/api/editor/save", {
-            method: "POST",
-            body: JSON.stringify({ argomentoId, content }),
-            headers: { "Content-Type": "application/json" },
-        }).then(async (res) => {
-            if (!res.ok) {
-                setError(true)
-                const text = await res.text()
-                throw new Error(text)
-            }
-            router.refresh();
-        })
-            .catch(() => setError(true))
-            .finally(() => {
-                setLoading(false)
-                setEdited(false)
-            })
-    }
+  const save = (content: string) => {
+    setLoading(true);
+    setError(false);
+    fetch("/api/editor/save", {
+      method: "POST",
+      body: JSON.stringify({ argomentoId, content }),
+      headers: { "Content-Type": "application/json" },
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          setError(true);
+          const text = await res.text();
+          throw new Error(text);
+        }
+        router.refresh();
+      })
+      .catch(() => setError(true))
+      .finally(() => {
+        setLoading(false);
+        setEdited(false);
+      });
+  };
 
-    useEffect(() => {
-        let timeout: ReturnType<typeof setTimeout> | null = null;
+  useEffect(() => {
+    let timeout: ReturnType<typeof setTimeout> | null = null;
 
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "s" && (e.ctrlKey || e.metaKey)) {
-                e.preventDefault();
-                e.stopPropagation();
-                if (timeout) return;
-                timeout = setTimeout(() => { timeout = null; }, 1000);
-                save(textAreaContent);
-            }
-        };
-
-        document.addEventListener("keydown", handleKeyDown);
-        return () => {
-            document.removeEventListener("keydown", handleKeyDown);
-            if (timeout) clearTimeout(timeout);
-        };
-    }, []);
-
-    useEffect(() => {
-        if (!edited) return
-        setLoading(true)
-        setError(false)
-        const timeout = setTimeout(() => save(textAreaContent), 1000)
-        return () => clearTimeout(timeout)
-    }, [textAreaContent])
-
-    const handleChange = (content = "") => {
-        setTextAreaContent(content);
-        setEdited(true);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "s" && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (timeout) return;
+        timeout = setTimeout(() => {
+          timeout = null;
+        }, 1000);
+        save(textAreaContent);
+      }
     };
 
-    return (
-        <div className="relative h-full overflow-hidden group">
-            <NavigationBlocker blocked={loading} />
-            <Editor
-                defaultLanguage="markdown-math"
-                defaultValue={textAreaContent}
-                onMount={handleEditorDidMount}
-                onChange={handleChange}
-                options={{
-                    readOnly: !editable,
-                    links: false,
-                    minimap: { enabled: false },
-                    automaticLayout: true,
-                    wordWrap: "on",
-                    quickSuggestions: false,
-                }}
-                loading={<Spinner />}
-            />
-            {loading ? (
-                <div className="absolute right-3 bottom-3">
-                    <Spinner />
-                </div>
-            ) : (
-                <SyncStatus error={error} loading={loading} />
-            )}
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      if (timeout) clearTimeout(timeout);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!edited) return;
+    setLoading(true);
+    setError(false);
+    const timeout = setTimeout(() => save(textAreaContent), 1000);
+    return () => clearTimeout(timeout);
+  }, [textAreaContent]);
+
+  const handleChange = (content = "") => {
+    setTextAreaContent(content);
+    setEdited(true);
+  };
+
+  return (
+    <div className="relative h-full overflow-hidden group">
+      <NavigationBlocker blocked={loading} />
+      <Editor
+        defaultLanguage="markdown-math"
+        defaultValue={textAreaContent}
+        onMount={handleEditorDidMount}
+        onChange={handleChange}
+        options={{
+          readOnly: !editable,
+          links: false,
+          minimap: { enabled: false },
+          automaticLayout: true,
+          wordWrap: "on",
+          quickSuggestions: false,
+        }}
+        loading={<Spinner />}
+      />
+      {loading ? (
+        <div className="absolute right-3 bottom-3">
+          <Spinner />
         </div>
-    )
+      ) : (
+        <SyncStatus error={error} loading={loading} />
+      )}
+    </div>
+  );
 }
 
-const SyncStatus = ({ error, loading }: { error: boolean, loading: boolean }) => {
-    if (error) return (
-        <div className="absolute right-3 bottom-3 flex items-center gap-1.5 bg-destructive/10 text-destructive rounded-md px-2 py-1 text-xs group-hover:opacity-30 duration-300">
-            <AlertTriangle className="size-3.5" />
-            <span>Modifiche non sincronizzate</span>
-        </div>
-    )
-
+const SyncStatus = ({
+  error,
+  loading,
+}: {
+  error: boolean;
+  loading: boolean;
+}) => {
+  if (error)
     return (
-        <div className="absolute right-3 bottom-3 flex items-center gap-1.5 bg-green-100 text-green-700 border border-green-200 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20 rounded-md px-2 py-1 text-xs group-hover:opacity-30 duration-300">
-            <CheckCheck className="size-3.5" />
-            <span>Modifiche sincronizzate</span>
-        </div>
-    )
-}
+      <div className="absolute right-3 bottom-3 flex items-center gap-1.5 bg-destructive/10 text-destructive rounded-md px-2 py-1 text-xs group-hover:opacity-30 duration-300">
+        <AlertTriangle className="size-3.5" />
+        <span>Modifiche non sincronizzate</span>
+      </div>
+    );
+
+  return (
+    <div className="absolute right-3 bottom-3 flex items-center gap-1.5 bg-green-100 text-green-700 border border-green-200 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20 rounded-md px-2 py-1 text-xs group-hover:opacity-30 duration-300">
+      <CheckCheck className="size-3.5" />
+      <span>Modifiche sincronizzate</span>
+    </div>
+  );
+};

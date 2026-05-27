@@ -1,12 +1,15 @@
-"use client"
+"use client";
 
 import { Check, Copy, Download, Lightbulb } from "lucide-react";
-import mermaid from 'mermaid';
-import { useTheme } from 'next-themes';
+import mermaid from "mermaid";
+import { useTheme } from "next-themes";
 import { useEffect, useRef, useState } from "react";
 import { Components } from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { oneDark, oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
+import {
+  oneDark,
+  oneLight,
+} from "react-syntax-highlighter/dist/esm/styles/prism";
 import { toast } from "sonner";
 import { Button } from "../../ui/button";
 import { Spinner } from "../../ui/spinner";
@@ -17,17 +20,19 @@ export const CodeBlock = ({ className, children, node, ...props }: any) => {
   const codeString = String(children).replace(/\n$/, "");
 
   // Caso 1: Mermaid
-  if (language === 'mermaid') {
+  if (language === "mermaid") {
     return <MermaidBlock code={codeString} />;
   }
 
   // Caso 2: Blocco con linguaggio (SyntaxHighlighter)
   if (language) {
-    return <SyntaxBlock language={language} codeString={codeString} />
+    return <SyntaxBlock language={language} codeString={codeString} />;
   }
 
   // Caso 3: Blocco senza linguaggio (Multiriga)
-  const isBlock = node?.position?.start.line !== node?.position?.end.line || codeString.includes("\n");
+  const isBlock =
+    node?.position?.start.line !== node?.position?.end.line ||
+    codeString.includes("\n");
 
   if (isBlock) {
     return (
@@ -48,9 +53,12 @@ export const CodeBlock = ({ className, children, node, ...props }: any) => {
   );
 };
 
-function SyntaxBlock({ language, codeString }: Readonly<{ language: string, codeString: string }>) {
+function SyntaxBlock({
+  language,
+  codeString,
+}: Readonly<{ language: string; codeString: string }>) {
   const { resolvedTheme } = useTheme();
-  const style = resolvedTheme === 'dark' ? oneDark : oneLight;
+  const style = resolvedTheme === "dark" ? oneDark : oneLight;
 
   const [copied, setCopied] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -60,7 +68,9 @@ function SyntaxBlock({ language, codeString }: Readonly<{ language: string, code
   const handleCopy = async () => {
     await navigator.clipboard.writeText(codeString);
     setCopied(true);
-    toast.success("Codice copiato con successo.", { position: "bottom-center" });
+    toast.success("Codice copiato con successo.", {
+      position: "bottom-center",
+    });
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -69,7 +79,11 @@ function SyntaxBlock({ language, codeString }: Readonly<{ language: string, code
       <div className="flex items-center justify-between px-4 py-1 border-b border-b-foreground/10 bg-foreground/7">
         <span className="text-[12px] lowercase font-mono">{language}</span>
         <Button variant="ghost" size="icon" onClick={handleCopy}>
-          {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+          {copied ? (
+            <Check className="h-3.5 w-3.5" />
+          ) : (
+            <Copy className="h-3.5 w-3.5" />
+          )}
           <span className="sr-only">Copy code</span>
         </Button>
       </div>
@@ -100,7 +114,7 @@ function SyntaxBlock({ language, codeString }: Readonly<{ language: string, code
       </div>
     </div>
   );
-};
+}
 
 function MermaidBlock({ code }: Readonly<{ code: string }>) {
   const ref = useRef<HTMLDivElement>(null);
@@ -117,8 +131,8 @@ function MermaidBlock({ code }: Readonly<{ code: string }>) {
       try {
         mermaid.initialize({
           startOnLoad: false,
-          theme: resolvedTheme === 'dark' ? 'dark' : 'default',
-          securityLevel: 'strict',
+          theme: resolvedTheme === "dark" ? "dark" : "default",
+          securityLevel: "strict",
         });
 
         const isValid = await mermaid.parse(code, { suppressErrors: true });
@@ -142,20 +156,22 @@ function MermaidBlock({ code }: Readonly<{ code: string }>) {
   }, [code, resolvedTheme]);
 
   const handleDownload = () => {
-    const svgElement = ref.current?.querySelector('svg');
+    const svgElement = ref.current?.querySelector("svg");
     if (!svgElement) return;
 
     const clonedSvg = svgElement.cloneNode(true) as SVGSVGElement;
 
     const width = svgElement.viewBox.baseVal.width || svgElement.clientWidth;
     const height = svgElement.viewBox.baseVal.height || svgElement.clientHeight;
-    clonedSvg.setAttribute('width', width.toString());
-    clonedSvg.setAttribute('height', height.toString());
+    clonedSvg.setAttribute("width", width.toString());
+    clonedSvg.setAttribute("height", height.toString());
 
     const svgData = new XMLSerializer().serializeToString(clonedSvg);
 
     const uint8Array = new TextEncoder().encode(svgData);
-    const binString = Array.from(uint8Array, (byte) => String.fromCodePoint(byte)).join("");
+    const binString = Array.from(uint8Array, (byte) =>
+      String.fromCodePoint(byte),
+    ).join("");
     const svgBase64 = btoa(binString);
     const imgSource = `data:image/svg+xml;base64,${svgBase64}`;
 
@@ -169,7 +185,7 @@ function MermaidBlock({ code }: Readonly<{ code: string }>) {
 
     img.onload = () => {
       if (ctx) {
-        ctx.fillStyle = resolvedTheme === 'dark' ? '#1a1a1a' : '#ffffff';
+        ctx.fillStyle = resolvedTheme === "dark" ? "#1a1a1a" : "#ffffff";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         ctx.scale(scale, scale);
@@ -182,7 +198,10 @@ function MermaidBlock({ code }: Readonly<{ code: string }>) {
           downloadLink.download = `diagramma-${Date.now()}.png`;
           downloadLink.click();
         } catch (e) {
-          console.error("Errore durante l'esportazione: il canvas è ancora tainted.", e);
+          console.error(
+            "Errore durante l'esportazione: il canvas è ancora tainted.",
+            e,
+          );
         }
       }
     };
@@ -192,9 +211,7 @@ function MermaidBlock({ code }: Readonly<{ code: string }>) {
 
   return (
     <div className="relative flex flex-col items-center bg-foreground/5 rounded-lg p-4 mb-5 w-full overflow-hidden border border-foreground/10">
-      {loading && (
-        <Spinner />
-      )}
+      {loading && <Spinner />}
 
       {!loading && (
         <Button
@@ -207,10 +224,7 @@ function MermaidBlock({ code }: Readonly<{ code: string }>) {
         </Button>
       )}
 
-      <div
-        ref={ref}
-        className="flex justify-center w-full overflow-x-auto"
-      />
+      <div ref={ref} className="flex justify-center w-full overflow-x-auto" />
     </div>
   );
 }
@@ -221,15 +235,13 @@ interface HeadingProps {
   className?: string;
 }
 
-const Heading = ({
-  level,
-  children,
-  className = ""
-}: HeadingProps) => {
+const Heading = ({ level, children, className = "" }: HeadingProps) => {
   const Tag = `h${level}` as any;
 
   const handleHover = (isEntering: any) => {
-    const elements = document.querySelectorAll(`[data-heading-level="h${level}"]`);
+    const elements = document.querySelectorAll(
+      `[data-heading-level="h${level}"]`,
+    );
     elements.forEach((el) => {
       if (isEntering) {
         el.classList.add("active-type");
@@ -246,59 +258,72 @@ const Heading = ({
       onMouseEnter={() => handleHover(true)}
       onMouseLeave={() => handleHover(false)}
     >
-
       {/* Sottolineatura */}
       <span className="absolute w-full h-px top-full mt-2 bg-foreground/50 opacity-0 group-hover:opacity-50 transition-opacity underline-indicator"></span>
 
-      <Tag className={`${className}`}>
-        {children}
-      </Tag>
+      <Tag className={`${className}`}>{children}</Tag>
     </div>
   );
 };
 
 export const markdownComponents: Components = {
   h1: ({ children }) => (
-    <Heading level={1} className="text-(--editor-title) text-[2em] font-semibold leading-9 mb-7">
+    <Heading
+      level={1}
+      className="text-(--editor-title) text-[2em] font-semibold leading-9 mb-7"
+    >
       {children}
     </Heading>
   ),
   h2: ({ children }) => (
-    <Heading level={2} className="text-(--editor-title) text-[1.5em] font-semibold leading-6 mb-6">
+    <Heading
+      level={2}
+      className="text-(--editor-title) text-[1.5em] font-semibold leading-6 mb-6"
+    >
       {children}
     </Heading>
   ),
   h3: ({ children }) => (
-    <Heading level={3} className="text-(--editor-title) text-[1.2em] font-semibold leading-5 mb-3">
+    <Heading
+      level={3}
+      className="text-(--editor-title) text-[1.2em] font-semibold leading-5 mb-3"
+    >
       {children}
     </Heading>
   ),
   h4: ({ children }) => (
-    <Heading level={4} className="text-(--editor-title) text-[1em] font-semibold leading-4 mb-3">
+    <Heading
+      level={4}
+      className="text-(--editor-title) text-[1em] font-semibold leading-4 mb-3"
+    >
       {children}
     </Heading>
   ),
   h5: ({ children }) => (
-    <Heading level={5} className="text-(--editor-title) text-[0.875em] font-semibold leading-3 mb-3">
+    <Heading
+      level={5}
+      className="text-(--editor-title) text-[0.875em] font-semibold leading-3 mb-3"
+    >
       {children}
     </Heading>
   ),
   h6: ({ children }) => (
-    <Heading level={6} className="text-(--editor-title)/60 text-[0.85em] font-semibold mb-3">
+    <Heading
+      level={6}
+      className="text-(--editor-title)/60 text-[0.85em] font-semibold mb-3"
+    >
       {children}
     </Heading>
   ),
   p: ({ children }) => (
     <p className="leading-[1.8] text-base font-sans mb-5">{children}</p>
   ),
-  ul: ({ children }) => (
-    <ul className="pl-9 space-y-2 mb-5">{children}</ul>
-  ),
-  ol: ({ children }) => (
-    <ol className="pl-9 space-y-2 mb-5">{children}</ol>
-  ),
+  ul: ({ children }) => <ul className="pl-9 space-y-2 mb-5">{children}</ul>,
+  ol: ({ children }) => <ol className="pl-9 space-y-2 mb-5">{children}</ol>,
   li: ({ children }) => <li className="leading-9 text-[1rem]">{children}</li>,
-  strong: ({ children }) => <strong className="text-(--editor-title) font-semibold">{children}</strong>,
+  strong: ({ children }) => (
+    <strong className="text-(--editor-title) font-semibold">{children}</strong>
+  ),
   em: ({ children }) => <em className="italic">{children}</em>,
   del: ({ children }) => <del className="line-through">{children}</del>,
   hr: () => <hr className="mb-5 border-0 h-0.5 bg-foreground/20 rounded" />,
@@ -311,7 +336,9 @@ export const markdownComponents: Components = {
     </blockquote>
   ),
   code: CodeBlock,
-  img: ({ src, alt }) => <img src={src} alt={alt} className="max-w-full my-4 rounded-[6px]" />,
+  img: ({ src, alt }) => (
+    <img src={src} alt={alt} className="max-w-full my-4 rounded-[6px]" />
+  ),
   a: ({ href, children }) => (
     <span
       title={href}
@@ -328,9 +355,7 @@ export const markdownComponents: Components = {
   thead: ({ children }) => <thead>{children}</thead>,
   tbody: ({ children }) => <tbody>{children}</tbody>,
   tr: ({ children }) => (
-    <tr className="border-t border-(--editor-title)/30">
-      {children}
-    </tr>
+    <tr className="border-t border-(--editor-title)/30">{children}</tr>
   ),
   th: ({ children, ...props }) => (
     <th
@@ -341,10 +366,7 @@ export const markdownComponents: Components = {
     </th>
   ),
   td: ({ children, ...props }) => (
-    <td
-      {...props}
-      className="px-3.25 py-1.5 border border-(--editor-title)/30"
-    >
+    <td {...props} className="px-3.25 py-1.5 border border-(--editor-title)/30">
       {children}
     </td>
   ),

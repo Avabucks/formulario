@@ -1,430 +1,481 @@
 "use client";
 
-import { useIsMobile } from '@/src/hooks/useIsMobile';
-import { Monaco } from '@monaco-editor/react';
-import { ArrowRightLeft, Eye, EyeClosed, PenOff, Redo2, Undo2 } from "lucide-react";
+import { useIsMobile } from "@/src/hooks/useIsMobile";
+import { Monaco } from "@monaco-editor/react";
+import {
+  ArrowRightLeft,
+  Eye,
+  EyeClosed,
+  PenOff,
+  Redo2,
+  Undo2,
+} from "lucide-react";
 import type { Selection } from "monaco-editor";
-import { useTheme } from 'next-themes';
+import { useTheme } from "next-themes";
 import { useEffect, useRef, useState } from "react";
 import { FormularioSettings } from "../home/formulario-settings";
-import { TakeFormulario } from '../home/take-formulario';
+import { TakeFormulario } from "../home/take-formulario";
 import { Button } from "../ui/button";
 import { Kbd, KbdGroup } from "../ui/kbd";
 import { ResizablePanel, ResizablePanelGroup } from "../ui/resizable";
-import { Separator } from '../ui/separator';
-import { Spinner } from '../ui/spinner';
+import { Separator } from "../ui/separator";
+import { Spinner } from "../ui/spinner";
 import { Toggle } from "../ui/toggle";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 import { EditorInput } from "./editor-katex/editor-input";
 import { EditorPreview } from "./editor-katex/editor-preview";
-import { FormattingBold } from './editor-katex/tools/formatting-bold';
-import { FormattingCodeBlock } from './editor-katex/tools/formatting-code-block';
-import { FormattingCodeInline } from './editor-katex/tools/formatting-code-inline';
-import { FormattingDivider } from './editor-katex/tools/formatting-divider';
-import { FormattingHeaders } from './editor-katex/tools/formatting-headers';
-import { FormattingItalic } from './editor-katex/tools/formatting-italic';
-import { FormattingLatex } from './editor-katex/tools/formatting-latex';
-import { FormattingOrderedList } from './editor-katex/tools/formatting-ordered';
-import { FormattingQuote } from './editor-katex/tools/formatting-quote';
-import { FormattingTable } from './editor-katex/tools/formatting-table';
-import { FormattingUnorderedList } from './editor-katex/tools/formatting-unordered';
-import { AskAIButton } from './editor-katex/tools/ask-ai';
+import { FormattingBold } from "./editor-katex/tools/formatting-bold";
+import { FormattingCodeBlock } from "./editor-katex/tools/formatting-code-block";
+import { FormattingCodeInline } from "./editor-katex/tools/formatting-code-inline";
+import { FormattingDivider } from "./editor-katex/tools/formatting-divider";
+import { FormattingHeaders } from "./editor-katex/tools/formatting-headers";
+import { FormattingItalic } from "./editor-katex/tools/formatting-italic";
+import { FormattingLatex } from "./editor-katex/tools/formatting-latex";
+import { FormattingOrderedList } from "./editor-katex/tools/formatting-ordered";
+import { FormattingQuote } from "./editor-katex/tools/formatting-quote";
+import { FormattingTable } from "./editor-katex/tools/formatting-table";
+import { FormattingUnorderedList } from "./editor-katex/tools/formatting-unordered";
+import { AskAIButton } from "./editor-katex/tools/ask-ai";
 
-export function EditorPage({ argomentoId, editable, formularioId }: Readonly<{ argomentoId: string, editable: boolean, formularioId: string }>) {
-    const isMobile = useIsMobile();
-    const { resolvedTheme } = useTheme();
+export function EditorPage({
+  argomentoId,
+  editable,
+  formularioId,
+}: Readonly<{ argomentoId: string; editable: boolean; formularioId: string }>) {
+  const isMobile = useIsMobile();
+  const { resolvedTheme } = useTheme();
 
-    const [textAreaContent, setTextAreaContent] = useState<string>("");
-    const [markdownContent, setMarkdownContent] = useState<string>("");
-    const [loading, setLoading] = useState<boolean>(true);
-    const [edited, setEdited] = useState<boolean>(false);
-    const [switchView, setSwitchView] = useState<boolean>(false);
-    const [resizableSize, setResizableSize] = useState<number>(40);
-    const [isFocused, setIsFocused] = useState(false);
-    const [selection, setSelection] = useState<Selection | null>(null);
+  const [textAreaContent, setTextAreaContent] = useState<string>("");
+  const [markdownContent, setMarkdownContent] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(true);
+  const [edited, setEdited] = useState<boolean>(false);
+  const [switchView, setSwitchView] = useState<boolean>(false);
+  const [resizableSize, setResizableSize] = useState<number>(40);
+  const [isFocused, setIsFocused] = useState(false);
+  const [selection, setSelection] = useState<Selection | null>(null);
 
-    const editorRef = useRef<any>(null);
-    const monacoRef = useRef<Monaco | null>(null);
-    const [monacoReady, setMonacoReady] = useState(false);
+  const editorRef = useRef<any>(null);
+  const monacoRef = useRef<Monaco | null>(null);
+  const [monacoReady, setMonacoReady] = useState(false);
 
-    const undoBtnRef = useRef<HTMLButtonElement>(null);
-    const redoBtnRef = useRef<HTMLButtonElement>(null);
+  const undoBtnRef = useRef<HTMLButtonElement>(null);
+  const redoBtnRef = useRef<HTMLButtonElement>(null);
 
-    const updateSelection = (editor: any) => {
-        const sel = editor.getSelection();
-        if (!sel) return;
-        setSelection(sel);
+  const updateSelection = (editor: any) => {
+    const sel = editor.getSelection();
+    if (!sel) return;
+    setSelection(sel);
+  };
+
+  function handleEditorDidMount(editor: any, monaco: Monaco) {
+    editorRef.current = editor;
+    monacoRef.current = monaco;
+    setMonacoReady(true);
+
+    monaco.languages.register({ id: "markdown-math" });
+
+    monaco.languages.setMonarchTokensProvider("markdown-math", {
+      tokenizer: {
+        root: [
+          [/\$\$/, { token: "math.display", next: "@mathDisplay" }],
+          [/\$/, { token: "math.inline", next: "@mathInline" }],
+          [/^#{1,6}\s.*$/, "keyword"],
+          [/^\s*>.*$/, "markdown.blockquote"],
+          [/\*\*[^*]+\*\*/, "strong"],
+          [/^(`{3,}).*$/, { token: "markdown.code.block", next: "@codeBlock" }],
+          [/`[^`]+`/, "markdown.code.inline"],
+        ],
+        mathDisplay: [
+          [/[^$]+/, "math.content"],
+          [/\$\$/, { token: "math.display", next: "@pop" }],
+        ],
+        mathInline: [
+          [/[^$]+/, "math.content"],
+          [/\$/, { token: "math.inline", next: "@pop" }],
+        ],
+        codeBlock: [
+          [/^`{3,}$/, { token: "markdown.code.block", next: "@pop" }],
+          [/.*$/, "markdown.code.block"],
+        ],
+      },
+    });
+
+    editor.onDidChangeCursorSelection(() => updateSelection(editor));
+    editor.onDidChangeCursorPosition(() => updateSelection(editor));
+
+    editor.onDidBlurEditorWidget(() => {
+      setIsFocused(false);
+    });
+
+    editor.onDidFocusEditorWidget(() => {
+      setIsFocused(true);
+    });
+
+    const updateButtons = () => {
+      const model = editor.getModel();
+
+      if (model) {
+        if (undoBtnRef.current) undoBtnRef.current.disabled = !model.canUndo();
+        if (redoBtnRef.current) redoBtnRef.current.disabled = !model.canRedo();
+      }
     };
 
-    function handleEditorDidMount(editor: any, monaco: Monaco) {
-        editorRef.current = editor;
-        monacoRef.current = monaco;
-        setMonacoReady(true);
+    editor.onDidChangeModelContent(() => {
+      updateButtons();
+    });
+    updateButtons();
+    if (undoBtnRef.current) undoBtnRef.current.disabled = true;
+    if (redoBtnRef.current) redoBtnRef.current.disabled = true;
+  }
 
-        monaco.languages.register({ id: "markdown-math" });
+  const handleUndo = () => {
+    editorRef.current?.trigger("source", "undo", null);
+  };
 
-        monaco.languages.setMonarchTokensProvider("markdown-math", {
-            tokenizer: {
-                root: [
-                    [/\$\$/, { token: "math.display", next: "@mathDisplay" }],
-                    [/\$/, { token: "math.inline", next: "@mathInline" }],
-                    [/^#{1,6}\s.*$/, "keyword"],
-                    [/^\s*>.*$/, "markdown.blockquote"],
-                    [/\*\*[^*]+\*\*/, "strong"],
-                    [/^(`{3,}).*$/, { token: "markdown.code.block", next: "@codeBlock" }],
-                    [/`[^`]+`/, "markdown.code.inline"],
-                ],
-                mathDisplay: [
-                    [/[^$]+/, "math.content"],
-                    [/\$\$/, { token: "math.display", next: "@pop" }],
-                ],
-                mathInline: [
-                    [/[^$]+/, "math.content"],
-                    [/\$/, { token: "math.inline", next: "@pop" }],
-                ],
-                codeBlock: [
-                    [/^`{3,}$/, { token: "markdown.code.block", next: "@pop" }],
-                    [/.*$/, "markdown.code.block"],
-                ],
-            },
-        });
+  const handleRedo = () => {
+    editorRef.current?.trigger("source", "redo", null);
+  };
 
-        editor.onDidChangeCursorSelection(() => updateSelection(editor));
-        editor.onDidChangeCursorPosition(() => updateSelection(editor));
+  const fetchContent = async () => {
+    try {
+      const response = await fetch(`/api/argomenti/${argomentoId}`);
+      if (!response.ok) throw new Error("Errore nel caricamento");
 
-        editor.onDidBlurEditorWidget(() => {
-            setIsFocused(false);
-        });
-
-        editor.onDidFocusEditorWidget(() => {
-            setIsFocused(true);
-        });
-
-        const updateButtons = () => {
-            const model = editor.getModel();
-
-            if (model) {
-                if (undoBtnRef.current) undoBtnRef.current.disabled = !model.canUndo();
-                if (redoBtnRef.current) redoBtnRef.current.disabled = !model.canRedo();
-            }
-        };
-
-        editor.onDidChangeModelContent(() => {
-            updateButtons();
-        });
-        updateButtons();
-        if (undoBtnRef.current) undoBtnRef.current.disabled = true;
-        if (redoBtnRef.current) redoBtnRef.current.disabled = true;
+      const data = await response.json();
+      setTextAreaContent(data.content);
+      setMarkdownContent(data.content);
+      setLoading(false);
+    } catch (error: any) {
+      console.error(error.message);
     }
+  };
 
-    const handleUndo = () => {
-        editorRef.current?.trigger('source', 'undo', null);
+  useEffect(() => {
+    fetchContent();
+  }, []);
+
+  useEffect(() => {
+    if (isMobile) {
+      setSwitchView(false);
+    } else if (!editable) setSwitchView(true);
+
+    setMonacoReady(false);
+  }, [isMobile]);
+
+  useEffect(() => {
+    if (edited) {
+      return;
+    }
+    setMarkdownContent(textAreaContent);
+  }, [edited]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "z" && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        handleUndo();
+      }
+      if (e.key === "y" && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        handleRedo();
+      }
     };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [handleUndo, handleRedo]);
 
-    const handleRedo = () => {
-        editorRef.current?.trigger('source', 'redo', null);
-    };
+  useEffect(() => {
+    if (!monacoRef.current) return;
 
-    const fetchContent = async () => {
-        try {
-            const response = await fetch(`/api/argomenti/${argomentoId}`);
-            if (!response.ok) throw new Error("Errore nel caricamento");
+    const darkRules = [
+      { token: "math.display", foreground: "4EC9B0" },
+      { token: "math.inline", foreground: "4EC9B0" },
+      { token: "math.content", foreground: "CE9178" },
+      { token: "markdown.blockquote", foreground: "6A9955" },
+      { token: "markdown.code.inline", foreground: "D7BA7D" },
+      { token: "markdown.code.block", foreground: "D7BA7D" },
+      { token: "strong", foreground: "C586C0" },
+      { token: "markup.bold.italic", foreground: "E06C75" },
+    ];
 
-            const data = await response.json();
-            setTextAreaContent(data.content);
-            setMarkdownContent(data.content);
-            setLoading(false)
-        } catch (error: any) {
-            console.error(error.message);
-        }
-    };
+    const lightRules = [
+      { token: "math.display", foreground: "267F99" },
+      { token: "math.inline", foreground: "267F99" },
+      { token: "math.content", foreground: "A31515" },
+      { token: "markdown.blockquote", foreground: "008000" },
+      { token: "markdown.code.inline", foreground: "795E26" },
+      { token: "markdown.code.block", foreground: "795E26" },
+      { token: "strong", foreground: "7B2FBE" },
+      { token: "markup.bold.italic", foreground: "C0392B" },
+    ];
 
-    useEffect(() => {
-        fetchContent();
-    }, [])
+    monacoRef.current.editor.defineTheme("markdown-math-theme", {
+      base: resolvedTheme === "dark" ? "vs-dark" : "vs",
+      inherit: true,
+      rules: resolvedTheme === "dark" ? darkRules : lightRules,
+      colors: {},
+    });
 
-    useEffect(() => {
-        if (isMobile) { setSwitchView(false) }
-        else if (!editable) setSwitchView(true)
+    monacoRef.current.editor.setTheme("markdown-math-theme");
+  }, [resolvedTheme, monacoReady]);
 
-            setMonacoReady(false);
-    }, [isMobile])
+  const toolbar = (
+    <div className="flex w-full border-b min-h-15 overflow-x-auto">
+      <div className="flex gap-3 border-r items-center px-3">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                ref={undoBtnRef}
+                variant="outline"
+                size="icon"
+                onClick={handleUndo}
+                onMouseDown={(e) => e.preventDefault()}
+              >
+                <Undo2 size={16} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="pr-1.5">
+              <div className="flex items-center gap-2">
+                Annulla
+                <KbdGroup className="hidden md:flex">
+                  <Kbd>Ctrl</Kbd>
+                  <span>+</span>
+                  <Kbd>Z</Kbd>
+                </KbdGroup>
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                ref={redoBtnRef}
+                variant="outline"
+                size="icon"
+                onClick={handleRedo}
+                onMouseDown={(e) => e.preventDefault()}
+              >
+                <Redo2 size={16} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="pr-1.5">
+              <div className="flex items-center gap-2">
+                Ripristina
+                <KbdGroup className="hidden md:flex">
+                  <Kbd>Ctrl</Kbd>
+                  <span>+</span>
+                  <Kbd>Y</Kbd>
+                </KbdGroup>
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
 
-    useEffect(() => {
-        if (edited) {
-            return;
-        }
-        setMarkdownContent(textAreaContent)
-    }, [edited]);
+      <div className="flex flex-1 items-center">
+        <div className="flex flex-1 items-center gap-3 h-full px-3">
+          <FormattingHeaders
+            _selection={selection}
+            editorRef={editorRef}
+            isFocused={isFocused}
+          />
+          <FormattingBold
+            _selection={selection}
+            editorRef={editorRef}
+            isFocused={isFocused}
+          />
+          <FormattingItalic
+            _selection={selection}
+            editorRef={editorRef}
+            isFocused={isFocused}
+          />
+          <FormattingQuote
+            _selection={selection}
+            editorRef={editorRef}
+            isFocused={isFocused}
+          />
 
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "z" && (e.ctrlKey || e.metaKey)) {
-                e.preventDefault();
-                handleUndo();
-            }
-            if (e.key === "y" && (e.ctrlKey || e.metaKey)) {
-                e.preventDefault();
-                handleRedo();
-            }
-        };
-        document.addEventListener("keydown", handleKeyDown);
-        return () => document.removeEventListener("keydown", handleKeyDown);
-    }, [handleUndo, handleRedo]);
+          <FormattingOrderedList
+            _selection={selection}
+            editorRef={editorRef}
+            isFocused={isFocused}
+          />
+          <FormattingUnorderedList
+            _selection={selection}
+            editorRef={editorRef}
+            isFocused={isFocused}
+          />
 
-    useEffect(() => {
-        if (!monacoRef.current) return;
+          <FormattingTable
+            _selection={selection}
+            editorRef={editorRef}
+            isFocused={isFocused}
+          />
+          <FormattingDivider
+            _selection={selection}
+            editorRef={editorRef}
+            isFocused={isFocused}
+          />
 
-        const darkRules = [
-            { token: "math.display", foreground: "4EC9B0" },
-            { token: "math.inline", foreground: "4EC9B0" },
-            { token: "math.content", foreground: "CE9178" },
-            { token: "markdown.blockquote", foreground: "6A9955" },
-            { token: "markdown.code.inline", foreground: "D7BA7D" },
-            { token: "markdown.code.block", foreground: "D7BA7D" },
-            { token: "strong", foreground: "C586C0" },
-            { token: "markup.bold.italic", foreground: "E06C75" },
-        ];
+          <FormattingCodeInline
+            _selection={selection}
+            editorRef={editorRef}
+            isFocused={isFocused}
+          />
+          <FormattingCodeBlock
+            _selection={selection}
+            editorRef={editorRef}
+            isFocused={isFocused}
+          />
 
-        const lightRules = [
-            { token: "math.display", foreground: "267F99" },
-            { token: "math.inline", foreground: "267F99" },
-            { token: "math.content", foreground: "A31515" },
-            { token: "markdown.blockquote", foreground: "008000" },
-            { token: "markdown.code.inline", foreground: "795E26" },
-            { token: "markdown.code.block", foreground: "795E26" },
-            { token: "strong", foreground: "7B2FBE" },
-            { token: "markup.bold.italic", foreground: "C0392B" },
-        ];
-
-        monacoRef.current.editor.defineTheme("markdown-math-theme", {
-            base: resolvedTheme === "dark" ? "vs-dark" : "vs",
-            inherit: true,
-            rules: resolvedTheme === "dark" ? darkRules : lightRules,
-            colors: {},
-        });
-
-        monacoRef.current.editor.setTheme("markdown-math-theme");
-    }, [resolvedTheme, monacoReady]);
-
-    const toolbar = (
-        <div className="flex w-full border-b min-h-15 overflow-x-auto">
-            <div className="flex gap-3 border-r items-center px-3">
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button
-                                ref={undoBtnRef}
-                                variant="outline"
-                                size="icon"
-                                onClick={handleUndo}
-                                onMouseDown={(e) => e.preventDefault()}
-                            >
-                                <Undo2 size={16} />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent className="pr-1.5">
-                            <div className="flex items-center gap-2">
-                                Annulla
-                                <KbdGroup className="hidden md:flex">
-                                    <Kbd>Ctrl</Kbd>
-                                    <span>+</span>
-                                    <Kbd>Z</Kbd>
-                                </KbdGroup>
-                            </div>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button
-                                ref={redoBtnRef}
-                                variant="outline"
-                                size="icon"
-                                onClick={handleRedo}
-                                onMouseDown={(e) => e.preventDefault()}
-                            >
-                                <Redo2 size={16} />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent className="pr-1.5">
-                            <div className="flex items-center gap-2">
-                                Ripristina
-                                <KbdGroup className="hidden md:flex">
-                                    <Kbd>Ctrl</Kbd>
-                                    <span>+</span>
-                                    <Kbd>Y</Kbd>
-                                </KbdGroup>
-                            </div>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
-            </div>
-
-            <div className="flex flex-1 items-center">
-                <div className="flex flex-1 items-center gap-3 h-full px-3">
-                    <FormattingHeaders
-                        _selection={selection}
-                        editorRef={editorRef}
-                        isFocused={isFocused}
-                    />
-                    <FormattingBold
-                        _selection={selection}
-                        editorRef={editorRef}
-                        isFocused={isFocused}
-                    />
-                    <FormattingItalic
-                        _selection={selection}
-                        editorRef={editorRef}
-                        isFocused={isFocused}
-                    />
-                    <FormattingQuote
-                        _selection={selection}
-                        editorRef={editorRef}
-                        isFocused={isFocused}
-                    />
-
-                    <FormattingOrderedList
-                        _selection={selection}
-                        editorRef={editorRef}
-                        isFocused={isFocused}
-                    />
-                    <FormattingUnorderedList
-                        _selection={selection}
-                        editorRef={editorRef}
-                        isFocused={isFocused}
-                    />
-
-                    <FormattingTable
-                        _selection={selection}
-                        editorRef={editorRef}
-                        isFocused={isFocused}
-                    />
-                    <FormattingDivider
-                        _selection={selection}
-                        editorRef={editorRef}
-                        isFocused={isFocused}
-                    />
-
-                    <FormattingCodeInline
-                        _selection={selection}
-                        editorRef={editorRef}
-                        isFocused={isFocused}
-                    />
-                    <FormattingCodeBlock
-                        _selection={selection}
-                        editorRef={editorRef}
-                        isFocused={isFocused}
-                    />
-
-                    <FormattingLatex
-                        _selection={selection}
-                        editorRef={editorRef}
-                        isFocused={isFocused}
-                    />
-
-                </div>
-
-                <div className="flex items-center gap-3 px-3 h-full">
-                    <AskAIButton
-                        editorRef={editorRef}
-                    />
-                </div>
-            </div>
-
-            {/* Mobile */}
-            <div className="flex md:hidden border-l items-center px-3 gap-3">
-                <Button variant="outline" size="icon" onClick={() => setSwitchView((prev) => !prev)}>
-                    <ArrowRightLeft size={16} />
-                </Button>
-            </div>
-
-            {/* Desktop */}
-            <div className="hidden md:flex border-l items-center px-3 gap-3">
-                <Toggle variant="outline" pressed={switchView} onClick={() => setSwitchView((prev) => !prev)}>
-                    {switchView ? <Eye size={16} /> : <EyeClosed size={16} />}
-                </Toggle>
-            </div>
-
-            <div className="flex border-l items-center px-3 gap-3">
-                <FormularioSettings formularioId={formularioId} />
-            </div>
-
+          <FormattingLatex
+            _selection={selection}
+            editorRef={editorRef}
+            isFocused={isFocused}
+          />
         </div>
-    );
-    const preview = !loading && <EditorPreview markdownContent={markdownContent ?? ""} />;
-    const editor = <EditorInput
-        argomentoId={argomentoId}
-        textAreaContent={textAreaContent ?? ""}
-        setTextAreaContent={setTextAreaContent}
-        edited={edited}
-        setEdited={setEdited}
-        handleEditorDidMount={handleEditorDidMount}
-        editable={editable}
+
+        <div className="flex items-center gap-3 px-3 h-full">
+          <AskAIButton editorRef={editorRef} />
+        </div>
+      </div>
+
+      {/* Mobile */}
+      <div className="flex md:hidden border-l items-center px-3 gap-3">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => setSwitchView((prev) => !prev)}
+        >
+          <ArrowRightLeft size={16} />
+        </Button>
+      </div>
+
+      {/* Desktop */}
+      <div className="hidden md:flex border-l items-center px-3 gap-3">
+        <Toggle
+          variant="outline"
+          pressed={switchView}
+          onClick={() => setSwitchView((prev) => !prev)}
+        >
+          {switchView ? <Eye size={16} /> : <EyeClosed size={16} />}
+        </Toggle>
+      </div>
+
+      <div className="flex border-l items-center px-3 gap-3">
+        <FormularioSettings formularioId={formularioId} />
+      </div>
+    </div>
+  );
+  const preview = !loading && (
+    <EditorPreview markdownContent={markdownContent ?? ""} />
+  );
+  const editor = (
+    <EditorInput
+      argomentoId={argomentoId}
+      textAreaContent={textAreaContent ?? ""}
+      setTextAreaContent={setTextAreaContent}
+      edited={edited}
+      setEdited={setEdited}
+      handleEditorDidMount={handleEditorDidMount}
+      editable={editable}
     />
+  );
 
-    const input = !loading && editor
+  const input = !loading && editor;
 
-    return (
-        <div className="flex flex-1 flex-col min-h-0 border rounded-lg overflow-hidden">
-            {loading ? <div className="flex h-full items-center justify-center"><Spinner /></div> : (
-                <>
-                    {editable ?
-                        toolbar
-                        : (
-                            <div className="flex w-full border-b min-h-15 justify-between items-center">
-                                <div className="flex flex-1 items-center gap-2 px-4 text-sm text-muted-foreground">
-                                    <PenOff size={16} />
-                                    <TakeFormulario formularioId={formularioId} />
-                                    <span className="hidden md:flex">per modifcare</span>
-                                </div>
-
-                                {/* Mobile */}
-                                <div className="flex md:hidden border-l items-center px-3 gap-3 h-full">
-                                    <Button variant="outline" size="icon" onClick={() => setSwitchView((prev) => !prev)}>
-                                        <ArrowRightLeft size={16} />
-                                    </Button>
-                                </div>
-
-                                {/* Desktop */}
-                                <div className="hidden md:flex border-l items-center px-3 gap-3 h-full">
-                                    <Toggle variant="outline" pressed={switchView} onClick={() => setSwitchView((prev) => !prev)}>
-                                        {switchView ? <Eye size={16} /> : <EyeClosed size={16} />}
-                                    </Toggle>
-                                </div>
-
-                                <div className="flex border-l items-center px-3 gap-2 h-full">
-                                    <FormularioSettings formularioId={formularioId} />
-                                </div>
-                            </div>
-                        )}
-                </>
-            )}
-
-            {isMobile ? (
-                <div className="md:hidden flex-1 min-h-0 overflow-auto">
-                    <div className={switchView ? "block h-full" : "hidden"}>
-                        {input}
-                    </div>
-                    <div className={switchView ? "hidden" : "block h-full"}>
-                        {preview}
-                    </div>
-                </div>
-            ) : (
-                <div className="hidden md:flex flex-1 min-h-0">
-                    <ResizablePanelGroup
-                        onLayoutChanged={(sizes) => { if (sizes.input) setResizableSize(sizes.input) }}
-                        orientation="horizontal"
-                    >
-                        <div style={{ display: switchView ? 'none' : 'contents' }}>
-                            <ResizablePanel id="input" collapsedSize={resizableSize} minSize="20%" defaultSize="40%">{input}</ResizablePanel>
-                            <Separator orientation="vertical" />
-                        </div>
-                        <ResizablePanel id="preview" collapsedSize={100 - resizableSize} minSize="20%" defaultSize="60%">{preview}</ResizablePanel>
-                    </ResizablePanelGroup>
-                </div>
-            )}
+  return (
+    <div className="flex flex-1 flex-col min-h-0 border rounded-lg overflow-hidden">
+      {loading ? (
+        <div className="flex h-full items-center justify-center">
+          <Spinner />
         </div>
-    );
+      ) : (
+        <>
+          {editable ? (
+            toolbar
+          ) : (
+            <div className="flex w-full border-b min-h-15 justify-between items-center">
+              <div className="flex flex-1 items-center gap-2 px-4 text-sm text-muted-foreground">
+                <PenOff size={16} />
+                <TakeFormulario formularioId={formularioId} />
+                <span className="hidden md:flex">per modifcare</span>
+              </div>
+
+              {/* Mobile */}
+              <div className="flex md:hidden border-l items-center px-3 gap-3 h-full">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setSwitchView((prev) => !prev)}
+                >
+                  <ArrowRightLeft size={16} />
+                </Button>
+              </div>
+
+              {/* Desktop */}
+              <div className="hidden md:flex border-l items-center px-3 gap-3 h-full">
+                <Toggle
+                  variant="outline"
+                  pressed={switchView}
+                  onClick={() => setSwitchView((prev) => !prev)}
+                >
+                  {switchView ? <Eye size={16} /> : <EyeClosed size={16} />}
+                </Toggle>
+              </div>
+
+              <div className="flex border-l items-center px-3 gap-2 h-full">
+                <FormularioSettings formularioId={formularioId} />
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      {isMobile ? (
+        <div className="md:hidden flex-1 min-h-0 overflow-auto">
+          <div className={switchView ? "block h-full" : "hidden"}>{input}</div>
+          <div className={switchView ? "hidden" : "block h-full"}>
+            {preview}
+          </div>
+        </div>
+      ) : (
+        <div className="hidden md:flex flex-1 min-h-0">
+          <ResizablePanelGroup
+            onLayoutChanged={(sizes) => {
+              if (sizes.input) setResizableSize(sizes.input);
+            }}
+            orientation="horizontal"
+          >
+            <div style={{ display: switchView ? "none" : "contents" }}>
+              <ResizablePanel
+                id="input"
+                collapsedSize={resizableSize}
+                minSize="20%"
+                defaultSize="40%"
+              >
+                {input}
+              </ResizablePanel>
+              <Separator orientation="vertical" />
+            </div>
+            <ResizablePanel
+              id="preview"
+              collapsedSize={100 - resizableSize}
+              minSize="20%"
+              defaultSize="60%"
+            >
+              {preview}
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        </div>
+      )}
+    </div>
+  );
 }

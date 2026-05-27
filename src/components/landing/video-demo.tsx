@@ -1,14 +1,17 @@
-"use client"
+"use client";
 
-import { useRef } from "react"
-import { motion, useInView } from "framer-motion"
-import { FileVideo } from "lucide-react"
-import slides from "@/src/data/slides.json"
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
+import { FileVideo } from "lucide-react";
+import slides from "@/src/data/slides.json";
 
-function SlideRow({ slide, index }: Readonly<{ slide: typeof slides[number]; index: number }>) {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: "-100px" })
-  const isEven = index % 2 === 0
+function SlideRow({
+  slide,
+  index,
+}: Readonly<{ slide: (typeof slides)[number]; index: number }>) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const isEven = index % 2 === 0;
 
   return (
     <motion.div
@@ -59,17 +62,16 @@ function SlideRow({ slide, index }: Readonly<{ slide: typeof slides[number]; ind
         </p>
       </motion.div>
     </motion.div>
-  )
+  );
 }
 
 export function VideoDemo() {
-  const headingRef = useRef(null)
-  const headingInView = useInView(headingRef, { once: true, margin: "-80px" })
+  const headingRef = useRef(null);
+  const headingInView = useInView(headingRef, { once: true, margin: "-80px" });
 
   return (
     <section id="demo" className="relative py-24 md:py-32 overflow-hidden">
       <div className="relative mx-auto max-w-7xl px-6">
-
         {/* Heading */}
         <motion.div
           ref={headingRef}
@@ -85,7 +87,8 @@ export function VideoDemo() {
             Tutto quello che ti serve
           </h2>
           <p className="mt-4 text-pretty text-muted-foreground">
-            Abbiamo unito creazione, organizzazione e condivisione in un'unica interfaccia.
+            Abbiamo unito creazione, organizzazione e condivisione in un'unica
+            interfaccia.
           </p>
         </motion.div>
 
@@ -95,8 +98,7 @@ export function VideoDemo() {
             <SlideRow key={slide.id} slide={slide} index={i} />
           ))}
         </div>
-
       </div>
     </section>
-  )
+  );
 }

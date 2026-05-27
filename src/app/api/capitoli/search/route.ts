@@ -5,24 +5,29 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
-    const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
-    const uid = session.uid;
+  const session = await getIronSession<SessionData>(
+    await cookies(),
+    sessionOptions,
+  );
+  const uid = session.uid;
 
-    if (!uid) return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
+  if (!uid)
+    return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
 
-    const { searchParams } = new URL(request.url);
-    const titolo = searchParams.get("titolo");
+  const { searchParams } = new URL(request.url);
+  const titolo = searchParams.get("titolo");
 
-    if (!titolo) return NextResponse.json({ error: "Titolo obbligatorio" }, { status: 400 });
+  if (!titolo)
+    return NextResponse.json({ error: "Titolo obbligatorio" }, { status: 400 });
 
-    const { rows } = await pool.query(
-        `SELECT C.beautiful_id AS "id", COALESCE(C.titolo, 'Senza titolo') AS "titolo", C.formulario AS "formularioId", F.titolo AS "formularioTitolo", similarity(COALESCE(C.titolo, 'Senza titolo'), $1) AS similarity
+  const { rows } = await pool.query(
+    `SELECT C.beautiful_id AS "id", COALESCE(C.titolo, 'Senza titolo') AS "titolo", C.formulario AS "formularioId", F.titolo AS "formularioTitolo", similarity(COALESCE(C.titolo, 'Senza titolo'), $1) AS similarity
          FROM capitoli C JOIN formulari F ON C.formulario = F.beautiful_id
          WHERE F.owner_uid = $2 AND similarity(COALESCE(C.titolo, 'Senza titolo'), $1) > 0.2
          ORDER BY similarity DESC, COALESCE(C.titolo, 'Senza titolo') DESC
          LIMIT 4`,
-        [titolo, uid]
-    );
+    [titolo, uid],
+  );
 
-    return NextResponse.json(rows);
+  return NextResponse.json(rows);
 }

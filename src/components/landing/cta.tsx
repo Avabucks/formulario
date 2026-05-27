@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import { useRef } from "react"
-import { motion, useInView } from "framer-motion"
-import { Button } from "@/src/components/ui/button"
-import { ArrowRight } from "lucide-react"
-import Link from "next/link"
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
+import { Button } from "@/src/components/ui/button";
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 export function Cta() {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: "-80px" })
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
     <section className="border-t border-border py-24 md:py-32">
@@ -41,5 +41,5 @@ export function Cta() {
         </motion.div>
       </motion.div>
     </section>
-  )
+  );
 }

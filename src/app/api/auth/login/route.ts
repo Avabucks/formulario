@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
           ON CONFLICT (uid) 
           DO UPDATE SET display_name = EXCLUDED.display_name, email = EXCLUDED.email, foto_profilo = EXCLUDED.foto_profilo
           RETURNING (xmax = 0) AS inserted`,
-    [decoded.name, decoded.email, decoded.uid, decoded.picture]
+    [decoded.name, decoded.email, decoded.uid, decoded.picture],
   );
 
   const isNewUser = rows[0].inserted;
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
   if (isNewUser) {
     await pool.query(
       `INSERT INTO preferiti (user_uid, formulario_id) VALUES ($1, $2)`,
-      [decoded.uid, process.env.NEXT_PUBLIC_FORMULARIO_BENVENUTO_ID]
+      [decoded.uid, process.env.NEXT_PUBLIC_FORMULARIO_BENVENUTO_ID],
     );
   }
 

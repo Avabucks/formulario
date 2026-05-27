@@ -1,4 +1,4 @@
-import packageJson from '@/package.json'
+import packageJson from "@/package.json";
 
 export function Footer() {
   return (
@@ -9,5 +9,5 @@ export function Footer() {
         </p>
       </div>
     </footer>
-  )
+  );
 }

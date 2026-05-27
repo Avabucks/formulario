@@ -1,4 +1,4 @@
-import packageJson from '@/package.json';
+import packageJson from "@/package.json";
 import { EditorPage } from "@/src/components/editor/editor-page";
 import { BreadcrumbLogic } from "@/src/components/navigation/breadcrumb-logic";
 import { Header } from "@/src/components/navigation/header";
@@ -11,75 +11,86 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 export async function generateMetadata({
-    params,
+  params,
 }: {
-    params: Promise<{ argomentoId: string }>
+  params: Promise<{ argomentoId: string }>;
 }) {
-    const { argomentoId } = await params;
-    const { rows: argomentoRows, rowCount } = await pool.query(
-        `SELECT F.descrizione, F.visibility, A.content AS "content"
+  const { argomentoId } = await params;
+  const { rows: argomentoRows, rowCount } = await pool.query(
+    `SELECT F.descrizione, F.visibility, A.content AS "content"
      FROM argomenti A
      JOIN capitoli C ON C.beautiful_id = A.capitolo
      JOIN formulari F ON F.beautiful_id = C.formulario
      WHERE A.beautiful_id = $1`,
-        [argomentoId]
-    );
+    [argomentoId],
+  );
 
-    const argomento = rowCount && rowCount > 0 ? (() => {
-        const { content, ...rest } = argomentoRows[0];
-        const firstLine = content?.split("\n")[0] ?? "";
-        const titolo = firstLine.startsWith("#") ? firstLine.replace(/^#+\s*/, "") : "Senza titolo";
-        return { ...rest, titolo };
-    })() : null;
+  const argomento =
+    rowCount && rowCount > 0
+      ? (() => {
+          const { content, ...rest } = argomentoRows[0];
+          const firstLine = content?.split("\n")[0] ?? "";
+          const titolo = firstLine.startsWith("#")
+            ? firstLine.replace(/^#+\s*/, "")
+            : "Senza titolo";
+          return { ...rest, titolo };
+        })()
+      : null;
 
-    if (!argomento) {
-        return {
-            robots: { index: false, follow: false },
-        };
-    }
-
-    if (argomento.visibility <= 0) {
-        return {
-            title: `${argomento.titolo} - ${packageJson.displayName}`,
-            robots: { index: false, follow: false },
-        };
-    }
-
+  if (!argomento) {
     return {
-        title: `${argomento.titolo} - ${packageJson.displayName}`,
-        description: argomento.descrizione,
-        openGraph: {
-            title: `${argomento.titolo} - ${packageJson.displayName}`,
-            description: argomento.descrizione,
-            images: ["/social.png"],
-        },
-        twitter: {
-            card: 'summary',
-            title: `${argomento.titolo} - ${packageJson.displayName}`,
-            description: argomento.descrizione,
-        },
+      robots: { index: false, follow: false },
     };
+  }
+
+  if (argomento.visibility <= 0) {
+    return {
+      title: `${argomento.titolo} - ${packageJson.displayName}`,
+      robots: { index: false, follow: false },
+    };
+  }
+
+  return {
+    title: `${argomento.titolo} - ${packageJson.displayName}`,
+    description: argomento.descrizione,
+    openGraph: {
+      title: `${argomento.titolo} - ${packageJson.displayName}`,
+      description: argomento.descrizione,
+      images: ["/social.png"],
+    },
+    twitter: {
+      card: "summary",
+      title: `${argomento.titolo} - ${packageJson.displayName}`,
+      description: argomento.descrizione,
+    },
+  };
 }
 
 export default async function Argomento({
-    params,
+  params,
 }: Readonly<{
-    params: Promise<{ argomentoId: string }>
+  params: Promise<{ argomentoId: string }>;
 }>) {
-    const { argomentoId } = await params
+  const { argomentoId } = await params;
 
-    const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
-    const uid = session.uid;
+  const session = await getIronSession<SessionData>(
+    await cookies(),
+    sessionOptions,
+  );
+  const uid = session.uid;
 
-    // check if user exists
-    const { rows: users } = await pool.query(`SELECT id FROM users WHERE uid = $1`, [uid]);
-    if (users.length === 0) {
-        redirect('/api/auth/logout')
-    }
+  // check if user exists
+  const { rows: users } = await pool.query(
+    `SELECT id FROM users WHERE uid = $1`,
+    [uid],
+  );
+  if (users.length === 0) {
+    redirect("/api/auth/logout");
+  }
 
-    // Check if user has access to the capitolo (owner or public)
-    const { rows: argomentoRows, rowCount } = await pool.query(
-        `SELECT A.beautiful_id AS "id",
+  // Check if user has access to the capitolo (owner or public)
+  const { rows: argomentoRows, rowCount } = await pool.query(
+    `SELECT A.beautiful_id AS "id",
             A.content AS "content",
             F.titolo AS "formularioTitolo", F.owner_uid as "ownerUid", F.beautiful_id AS "formularioId",
             COALESCE(C.titolo, 'Senza titolo') AS "capitoloTitolo", C.beautiful_id AS "capitoloId"
@@ -89,39 +100,51 @@ export default async function Argomento({
             LEFT JOIN users U_A ON F.author_uid = U_A.uid
             WHERE A.beautiful_id = $1
             AND (F.owner_uid = $2 OR F.visibility > 0)`,
-        [argomentoId, uid]
-    );
+    [argomentoId, uid],
+  );
 
-    if (rowCount === 0) {
-        redirect('/home');
-    }
+  if (rowCount === 0) {
+    redirect("/home");
+  }
 
-    const { content, ...argomentoData } = argomentoRows[0];
-    const firstLine = content?.split("\n")[0] ?? "";
-    const titolo = firstLine.startsWith("#") ? firstLine.replace(/^#+\s*/, "") : "Senza titolo";
+  const { content, ...argomentoData } = argomentoRows[0];
+  const firstLine = content?.split("\n")[0] ?? "";
+  const titolo = firstLine.startsWith("#")
+    ? firstLine.replace(/^#+\s*/, "")
+    : "Senza titolo";
 
-    const argomento = {
-        ...argomentoData,
-        titolo,
-        editable: argomentoRows[0].ownerUid === uid,
-    };
+  const argomento = {
+    ...argomentoData,
+    titolo,
+    editable: argomentoRows[0].ownerUid === uid,
+  };
 
-    const breadcrumbs = [
-        { label: "Home", href: "/" },
-        { label: argomento.formularioTitolo, href: `/formulario/${argomento.formularioId}` },
-        { label: argomento.capitoloTitolo, href: `/capitolo/${argomento.capitoloId}` },
-        { label: argomento.titolo, href: `/editor/${argomento}` },
-    ];
+  const breadcrumbs = [
+    { label: "Home", href: "/" },
+    {
+      label: argomento.formularioTitolo,
+      href: `/formulario/${argomento.formularioId}`,
+    },
+    {
+      label: argomento.capitoloTitolo,
+      href: `/capitolo/${argomento.capitoloId}`,
+    },
+    { label: argomento.titolo, href: `/editor/${argomento}` },
+  ];
 
-    return (
-        <div className="flex flex-col h-screen">
-            <Header />
-            <div className="flex flex-1 flex-col gap-4 w-full px-2 md:px-6 pt-16 pb-5 overflow-hidden">
-                <BreadcrumbLogic items={breadcrumbs} />
-                <Suspense fallback={<Skeleton className="h-full w-full" />}>
-                    <EditorPage argomentoId={argomento.id} editable={argomento.editable} formularioId={argomento.formularioId} />
-                </Suspense>
-            </div>
-        </div>
-    )
+  return (
+    <div className="flex flex-col h-screen">
+      <Header />
+      <div className="flex flex-1 flex-col gap-4 w-full px-2 md:px-6 pt-16 pb-5 overflow-hidden">
+        <BreadcrumbLogic items={breadcrumbs} />
+        <Suspense fallback={<Skeleton className="h-full w-full" />}>
+          <EditorPage
+            argomentoId={argomento.id}
+            editable={argomento.editable}
+            formularioId={argomento.formularioId}
+          />
+        </Suspense>
+      </div>
+    </div>
+  );
 }

@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { usePathname } from 'next/navigation';
-import { useEffect } from 'react';
+import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 
 export function UmamiTracker() {
-    const pathname = usePathname();
+  const pathname = usePathname();
 
-    useEffect(() => {
-            (globalThis as unknown as { umami?: any }).umami?.track('pageview', {
-            url: pathname,
-        });
-    }, [pathname]);
+  useEffect(() => {
+    (globalThis as unknown as { umami?: any }).umami?.track("pageview", {
+      url: pathname,
+    });
+  }, [pathname]);
 
-    return null;
+  return null;
 }

@@ -5,39 +5,51 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function PUT(request: Request) {
-    const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
-    const uid = session.uid;
+  const session = await getIronSession<SessionData>(
+    await cookies(),
+    sessionOptions,
+  );
+  const uid = session.uid;
 
-    if (!uid) return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
+  if (!uid)
+    return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
 
-    const formData = await request.formData();
-    const titolo = formData.get("titolo") as string;
-    const capitoloId = formData.get("capitoloId") as string;
+  const formData = await request.formData();
+  const titolo = formData.get("titolo") as string;
+  const capitoloId = formData.get("capitoloId") as string;
 
-    if (!capitoloId) return NextResponse.json({ error: "ID obbligatorio" }, { status: 400 });
+  if (!capitoloId)
+    return NextResponse.json({ error: "ID obbligatorio" }, { status: 400 });
 
-    try {
-        const result = await pool.query(
-            `UPDATE capitoli SET titolo = $1
+  try {
+    const result = await pool.query(
+      `UPDATE capitoli SET titolo = $1
              WHERE beautiful_id = $2
              AND formulario IN (SELECT beautiful_id AS "id" FROM formulari WHERE owner_uid = $3)`,
-            [titolo == '' ? null : titolo, capitoloId, uid]
-        );
+      [titolo == "" ? null : titolo, capitoloId, uid],
+    );
 
-        if (result.rowCount === 0) return NextResponse.json({ error: "Capitolo non trovato o non autorizzato" }, { status: 404 });
+    if (result.rowCount === 0)
+      return NextResponse.json(
+        { error: "Capitolo non trovato o non autorizzato" },
+        { status: 404 },
+      );
 
-        await pool.query(
-            `UPDATE formulari f
+    await pool.query(
+      `UPDATE formulari f
             SET data_modifica = CURRENT_TIMESTAMP
             FROM capitoli c
             WHERE c.formulario = f.beautiful_id
             AND c.beautiful_id = $1`,
-            [capitoloId]
-        );
-        
-        return NextResponse.json({ success: true });
-    } catch (error: any) {
-        console.error(error.message);
-        return NextResponse.json({ error: "Errore nella modifica del capitolo" }, { status: 500 });
-    }
+      [capitoloId],
+    );
+
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error(error.message);
+    return NextResponse.json(
+      { error: "Errore nella modifica del capitolo" },
+      { status: 500 },
+    );
+  }
 }

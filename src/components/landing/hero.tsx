@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import { Button } from "@/src/components/ui/button"
-import { ArrowRight, ScanEye } from "lucide-react"
-import { motion } from "framer-motion"
-import Link from "next/link"
+import { Button } from "@/src/components/ui/button";
+import { ArrowRight, ScanEye } from "lucide-react";
+import { motion } from "framer-motion";
+import Link from "next/link";
 
-const ease = [0.22, 1, 0.36, 1] as const
+const ease = [0.22, 1, 0.36, 1] as const;
 
 const wordVariants = {
   hidden: { opacity: 0, y: 18 },
@@ -14,7 +14,7 @@ const wordVariants = {
     y: 0,
     transition: { duration: 0.5, ease, delay },
   }),
-}
+};
 
 const titleWords: { text: string; muted: boolean }[] = [
   { text: "Le", muted: false },
@@ -25,32 +25,46 @@ const titleWords: { text: string; muted: boolean }[] = [
   { text: "portata", muted: true },
   { text: "di", muted: true },
   { text: "mano.", muted: true },
-]
+];
 
 const subWords =
-  "La piattaforma completa per creare, organizzare e condividere formulari scientifici. Scrivi in LaTeX, genera con l'AI, dividi per capitoli, condividi via QR o link.".split(" ")
+  "La piattaforma completa per creare, organizzare e condividere formulari scientifici. Scrivi in LaTeX, genera con l'AI, dividi per capitoli, condividi via QR o link.".split(
+    " ",
+  );
 
-const TITLE_START = 0.1
-const TITLE_STEP = 0.055
-const SUB_START = TITLE_START + titleWords.length * TITLE_STEP + 0.1
-const SUB_STEP = 0.03
-const AFTER_SUB = SUB_START + subWords.length * SUB_STEP + 0.05
+const TITLE_START = 0.1;
+const TITLE_STEP = 0.055;
+const SUB_START = TITLE_START + titleWords.length * TITLE_STEP + 0.1;
+const SUB_STEP = 0.03;
+const AFTER_SUB = SUB_START + subWords.length * SUB_STEP + 0.05;
 
 export function Hero() {
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden px-6">
       <div className="absolute inset-0 bg-background" />
-      <svg className="absolute inset-0 h-full w-full opacity-[0.10]" xmlns="http://www.w3.org/2000/svg">
+      <svg
+        className="absolute inset-0 h-full w-full opacity-[0.10]"
+        xmlns="http://www.w3.org/2000/svg"
+      >
         <defs>
-          <pattern id="cross" width="50" height="50" patternUnits="userSpaceOnUse">
-            <path d="M16 0v50M0 16h50" stroke="currentColor" strokeWidth="0.5" fill="none" />
+          <pattern
+            id="cross"
+            width="50"
+            height="50"
+            patternUnits="userSpaceOnUse"
+          >
+            <path
+              d="M16 0v50M0 16h50"
+              stroke="currentColor"
+              strokeWidth="0.5"
+              fill="none"
+            />
           </pattern>
         </defs>
         <rect width="100%" height="100%" fill="url(#cross)" />
       </svg>
 
       <div className="relative z-10 mx-auto max-w-4xl text-center">
-
         {/* Titolo — parola per parola */}
         <h1 className="text-balance text-5xl font-bold leading-tight tracking-tight text-foreground md:text-7xl">
           {titleWords.map((word, i) => (
@@ -97,8 +111,14 @@ export function Hero() {
             </Link>
           </Button>
           <Button
-            variant="secondary" size="lg" className="gap-2 px-8 cursor-pointer"
-            onClick={() => document.getElementById("demo")?.scrollIntoView({ behavior: "smooth" })}
+            variant="secondary"
+            size="lg"
+            className="gap-2 px-8 cursor-pointer"
+            onClick={() =>
+              document
+                .getElementById("demo")
+                ?.scrollIntoView({ behavior: "smooth" })
+            }
           >
             <ScanEye className="h-5 w-5" />
             Guarda la demo
@@ -113,15 +133,23 @@ export function Hero() {
           className="mt-16 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-xs text-muted-foreground"
         >
           <span>Gratuito per iniziare</span>
-          <span className="hidden h-4 w-px bg-border sm:block" aria-hidden="true" />
+          <span
+            className="hidden h-4 w-px bg-border sm:block"
+            aria-hidden="true"
+          />
           <span>Generazione formule con AI</span>
-          <span className="hidden h-4 w-px bg-border sm:block" aria-hidden="true" />
+          <span
+            className="hidden h-4 w-px bg-border sm:block"
+            aria-hidden="true"
+          />
           <span>Supporto LaTeX completo</span>
-          <span className="hidden h-4 w-px bg-border sm:block" aria-hidden="true" />
+          <span
+            className="hidden h-4 w-px bg-border sm:block"
+            aria-hidden="true"
+          />
           <span>Condivisione via QR code</span>
         </motion.div>
-
       </div>
     </section>
-  )
+  );
 }

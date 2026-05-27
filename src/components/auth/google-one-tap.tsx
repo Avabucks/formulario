@@ -12,73 +12,70 @@ type User = {
 };
 
 declare global {
-    interface Window {
-        google: any;
-    }
+  interface Window {
+    google: any;
+  }
 }
 
 export function GoogleOneTapInner() {
-    const router = useRouter();
-    const searchParams = useSearchParams();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-    const saveUserAndRedirect = (user: User) => {
-        localStorage.setItem("email", user.email ?? "");
-        localStorage.setItem("name", user.displayName ?? "");
-        localStorage.setItem("photoURL", user.photoURL ?? "");
+  const saveUserAndRedirect = (user: User) => {
+    localStorage.setItem("email", user.email ?? "");
+    localStorage.setItem("name", user.displayName ?? "");
+    localStorage.setItem("photoURL", user.photoURL ?? "");
 
-        const next = searchParams.get("next") || "/home";
-        router.refresh();
-        router.push(next);
-        (globalThis as unknown as { umami?: any }).umami?.track('created_account');
-    };
+    const next = searchParams.get("next") || "/home";
+    router.refresh();
+    router.push(next);
+    (globalThis as unknown as { umami?: any }).umami?.track("created_account");
+  };
 
-    const handleGoogle = () => {
-        if (!window.google) return;
+  const handleGoogle = () => {
+    if (!window.google) return;
 
-        window.google.accounts.id.initialize({
-            use_fedcm_for_prompt: true,
-            auto_select: true,
-            client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-            callback: async (response: any) => {
-                const credential = GoogleAuthProvider.credential(response.credential);
-                const result = await signInWithCredential(auth, credential);
-                const idToken = await result.user.getIdToken();
+    window.google.accounts.id.initialize({
+      use_fedcm_for_prompt: true,
+      auto_select: true,
+      client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+      callback: async (response: any) => {
+        const credential = GoogleAuthProvider.credential(response.credential);
+        const result = await signInWithCredential(auth, credential);
+        const idToken = await result.user.getIdToken();
 
-                await fetch("/api/auth/login", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ idToken }),
-                });
-
-                saveUserAndRedirect(result.user);
-            },
-            promptMomentNotification: (notification: any) => {
-                if (
-                    notification.isNotDisplayed() ||
-                    notification.isSkippedMoment()
-                ) {
-                    console.log("One Tap non mostrato");
-                }
-            },
+        await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ idToken }),
         });
 
-        window.google.accounts.id.prompt();
-    };
+        saveUserAndRedirect(result.user);
+      },
+      promptMomentNotification: (notification: any) => {
+        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+          console.log("One Tap non mostrato");
+        }
+      },
+    });
 
-    return (
-        <Script
-            src="https://accounts.google.com/gsi/client"
-            async
-            defer
-            onLoad={handleGoogle}
-        />
-    );
+    window.google.accounts.id.prompt();
+  };
+
+  return (
+    <Script
+      src="https://accounts.google.com/gsi/client"
+      async
+      defer
+      onLoad={handleGoogle}
+    />
+  );
 }
 
 export function GoogleOneTap() {
-    return (
-        <Suspense fallback={null}>
-            <GoogleOneTapInner />
-        </Suspense>
-    );
+  return (
+    <Suspense fallback={null}>
+      <GoogleOneTapInner />
+    </Suspense>
+  );
 }

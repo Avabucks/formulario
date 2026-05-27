@@ -5,44 +5,57 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function PUT(request: Request) {
-    const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
-    const uid = session.uid;
+  const session = await getIronSession<SessionData>(
+    await cookies(),
+    sessionOptions,
+  );
+  const uid = session.uid;
 
-    if (!uid) return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
+  if (!uid)
+    return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
 
-    const formData = await request.formData();
-    const titolo = formData.get("titolo") as string;
-    const argomentoId = formData.get("argomentoId") as string;
+  const formData = await request.formData();
+  const titolo = formData.get("titolo") as string;
+  const argomentoId = formData.get("argomentoId") as string;
 
-    if (!titolo) return NextResponse.json({ error: "Titolo obbligatorio" }, { status: 400 });
-    if (!argomentoId) return NextResponse.json({ error: "ID obbligatorio" }, { status: 400 });
+  if (!titolo)
+    return NextResponse.json({ error: "Titolo obbligatorio" }, { status: 400 });
+  if (!argomentoId)
+    return NextResponse.json({ error: "ID obbligatorio" }, { status: 400 });
 
-    try {
-        const result = await pool.query(
-            `UPDATE argomenti SET titolo = $1
+  try {
+    const result = await pool.query(
+      `UPDATE argomenti SET titolo = $1
              WHERE beautiful_id = $2
              AND capitolo IN (
                 SELECT beautiful_id FROM capitoli
                 WHERE formulario IN (SELECT beautiful_id FROM formulari WHERE owner_uid = $3)
              )`,
-            [titolo, argomentoId, uid]
-        );
+      [titolo, argomentoId, uid],
+    );
 
-        if (result.rowCount === 0) return NextResponse.json({ error: "Argomento non trovato o non autorizzato" }, { status: 404 });
+    if (result.rowCount === 0)
+      return NextResponse.json(
+        { error: "Argomento non trovato o non autorizzato" },
+        { status: 404 },
+      );
 
-        await pool.query(
-            `UPDATE formulari f
+    await pool.query(
+      `UPDATE formulari f
             SET data_modifica = CURRENT_TIMESTAMP
             FROM capitoli c
             JOIN argomenti a ON a.capitolo = c.beautiful_id
             WHERE a.beautiful_id = $1
             AND c.formulario = f.beautiful_id`,
-            [argomentoId]
-        );
+      [argomentoId],
+    );
 
-        return NextResponse.json({ success: true });
-    } catch (error: any) {
-        console.error(error.message);
-        return NextResponse.json({ error: "Errore nella modifica dell'argomento" }, { status: 500 });
-    }
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error(error.message);
+    return NextResponse.json(
+      { error: "Errore nella modifica dell'argomento" },
+      { status: 500 },
+    );
+  }
 }
