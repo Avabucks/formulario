@@ -202,14 +202,3 @@ Viene inoltre abilitata l'estensione PostgreSQL `pg_trgm`, utilizzata per miglio
    * preferiti
    * visibilità
    * richieste AI
-
-## Deploy
-
-Per il deploy configura le stesse variabili ambiente usate in locale sulla piattaforma di hosting scelta.
-
-Prima del rilascio esegui:
-
-```bash
-npm run lint
-npm run build
-```
