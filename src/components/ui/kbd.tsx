@@ -5,10 +5,9 @@ const isMac =
   /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
 
 const keyMap: Record<string, string> = {
-  Ctrl: isMac ? "^" : "Ctrl",
+  Ctrl: isMac ? "⌘" : "Ctrl",
   Alt: isMac ? "⌥" : "Alt",
   Shift: isMac ? "⇧" : "Shift",
-  Meta: isMac ? "⌘" : "Ctrl",
 };
 
 function resolveKey(key: string): string {

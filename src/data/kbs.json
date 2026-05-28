@@ -35,11 +35,11 @@
       "title": "Editor",
       "shortcuts": [
         { "label": "Salva", "keys": ["Ctrl", "S"] },
-        { "label": "Annulla", "keys": ["Meta", "Z"] },
-        { "label": "Ripristina", "keys": ["Meta", "Y"] },
-        { "label": "Taglia", "keys": ["Meta", "X"] },
-        { "label": "Copia", "keys": ["Meta", "C"] },
-        { "label": "Seleziona tutto", "keys": ["Meta", "A"] },
+        { "label": "Annulla", "keys": ["Ctrl", "Z"] },
+        { "label": "Ripristina", "keys": ["Ctrl", "Y"] },
+        { "label": "Taglia", "keys": ["Ctrl", "X"] },
+        { "label": "Copia", "keys": ["Ctrl", "C"] },
+        { "label": "Seleziona tutto", "keys": ["Ctrl", "A"] },
         { "label": "Cancella parola", "keys": ["Ctrl", "⌫"] },
         { "label": "Seleziona la prossima occorrenza", "keys": ["Ctrl", "D"] },
         {
