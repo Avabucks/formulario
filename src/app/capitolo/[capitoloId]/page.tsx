@@ -1,5 +1,4 @@
 import packageJson from "@/package.json";
-import { AdsenseBanner } from "@/src/components/ads/adsense-banner";
 import { ArgomentoAdd } from "@/src/components/capitolo/argomento-add";
 import { ArgomentoItem } from "@/src/components/capitolo/argomento-item";
 import { FormularioSettings } from "@/src/components/home/formulario-settings";
@@ -179,12 +178,6 @@ export default async function Capitolo({
             </div>
           </div>
         </div>
-        {argomentiRes.length > 0 && (
-          <AdsenseBanner
-            slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_CONTENT}
-            format="horizontal"
-          />
-        )}
         <Suspense fallback={renderLoadingSkeleton()}>
           <div className="flex flex-col gap-4 w-full">
             {argomentiRes.length == 0
