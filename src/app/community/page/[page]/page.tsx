@@ -1,4 +1,5 @@
 import packageJson from "@/package.json";
+import { AdsenseBanner } from "@/src/components/ads/adsense-banner";
 import { CommunityFilters } from "@/src/components/community/community-filters";
 import { CtaCommunity } from "@/src/components/community/cta-community";
 import { FormularioCard } from "@/src/components/home/formulario-card";
@@ -107,6 +108,12 @@ export default async function Capitolo({
           <CtaCommunity />
         </div>
         <CommunityFilters />
+        {formulari.length > 0 && (
+          <AdsenseBanner
+            slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_COMMUNITY}
+            format="horizontal"
+          />
+        )}
         <div className="flex flex-col gap-4 w-full">
           {formulari.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[101rem]:grid-cols-5 gap-4 w-full">

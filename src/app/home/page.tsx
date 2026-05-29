@@ -1,4 +1,5 @@
 import packageJson from "@/package.json";
+import { AdsenseBanner } from "@/src/components/ads/adsense-banner";
 import ForumlarioAdd from "@/src/components/home/formulario-add";
 import { FormularioCard } from "@/src/components/home/formulario-card";
 import { Header } from "@/src/components/navigation/header";
@@ -228,6 +229,10 @@ export default async function Home() {
             </CardContent>
           </Card>
         </section>
+        <AdsenseBanner
+          slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_DASHBOARD}
+          format="horizontal"
+        />
         <Separator />
         <Tabs defaultValue="formulari" className="w-full gap-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
