@@ -7,6 +7,7 @@ import "katex/dist/katex.min.css";
 import { Maximize2, Scan, ZoomIn, ZoomOut } from "lucide-react";
 import {
   memo,
+  type MouseEvent,
   useCallback,
   useEffect,
   useId,
@@ -29,6 +30,17 @@ const A4_HEIGHT_PX = 1123;
 const ZOOM_STEP = 0.1;
 const ZOOM_MIN = 0.3;
 const ZOOM_MAX = 3;
+const HEADING_SELECTOR = "[data-heading-level]";
+const SCROLL_OFFSET = 48;
+const SCROLLBAR_HOVER_ZONE_PX = 28;
+const NAVIGATOR_HIDE_DELAY_MS = 1200;
+
+type PreviewHeading = {
+  id: string;
+  level: number;
+  title: string;
+  element: HTMLElement;
+};
 
 export const EditorPreview = memo(function EditorPreview({
   markdownContent,
@@ -36,12 +48,20 @@ export const EditorPreview = memo(function EditorPreview({
   const patternId = `cross-${useId()}`;
   const [scale, setScale] = useState(1);
   const [fitMode, setFitMode] = useState<"manual" | "fit">("manual");
+  const [headings, setHeadings] = useState<PreviewHeading[]>([]);
+  const [activeHeadingId, setActiveHeadingId] = useState<string | null>(null);
+  const [navigatorVisible, setNavigatorVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const navigatorHoverRef = useRef(false);
+  const navigatorHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
   const processedContent = useMemo(() => {
     return markdownContent.replaceAll(
-      /(^[ \t]*)(\$\$)([\s\S]*?)(\$\$)/gm,
-      (_, indent, _open, math, _close) => {
+      /(^[ \t]*)\$\$([\s\S]*?)\$\$/gm,
+      (_, indent, math) => {
         const cleaned = math.trim();
         const indentedMath = cleaned
           .split("\n")
@@ -64,31 +84,6 @@ export const EditorPreview = memo(function EditorPreview({
     return Math.max(ZOOM_MIN, (width - padding) / A4_WIDTH_PX);
   }, []);
 
-  useEffect(() => {
-    if (fitMode !== "fit") return;
-    const el = containerRef.current;
-    if (!el) return;
-    const observer = new ResizeObserver(() => setScale(computeFitScale()));
-    observer.observe(el);
-    setScale(computeFitScale());
-    return () => observer.disconnect();
-  }, [fitMode, computeFitScale]);
-
-  useEffect(() => {
-    const init = () => {
-      const width = containerRef.current?.getBoundingClientRect().width ?? 0;
-      if (width === 0) return;
-      if (A4_WIDTH_PX > width) {
-        handleFitWidth();
-      } else {
-        setScale(1);
-        setFitMode("manual");
-      }
-    };
-
-    requestAnimationFrame(() => requestAnimationFrame(init));
-  }, []);
-
   const handleZoomOut = () => {
     setFitMode("manual");
     setScale((s) =>
@@ -108,9 +103,169 @@ export const EditorPreview = memo(function EditorPreview({
     setScale(1);
   };
 
-  const handleFitWidth = () => {
+  const handleFitWidth = useCallback(() => {
     setFitMode("fit");
     setScale(computeFitScale());
+  }, [computeFitScale]);
+
+  const clearNavigatorHideTimer = useCallback(() => {
+    if (!navigatorHideTimerRef.current) return;
+    clearTimeout(navigatorHideTimerRef.current);
+    navigatorHideTimerRef.current = null;
+  }, []);
+
+  const showNavigatorTemporarily = useCallback(() => {
+    setNavigatorVisible(true);
+    clearNavigatorHideTimer();
+    navigatorHideTimerRef.current = setTimeout(() => {
+      if (!navigatorHoverRef.current) {
+        setNavigatorVisible(false);
+      }
+    }, NAVIGATOR_HIDE_DELAY_MS);
+  }, [clearNavigatorHideTimer]);
+
+  useEffect(() => {
+    return () => clearNavigatorHideTimer();
+  }, [clearNavigatorHideTimer]);
+
+  useEffect(() => {
+    if (fitMode !== "fit") return;
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(() => setScale(computeFitScale()));
+    const frame = requestAnimationFrame(() => setScale(computeFitScale()));
+    observer.observe(el);
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
+  }, [fitMode, computeFitScale]);
+
+  useEffect(() => {
+    const init = () => {
+      const width = containerRef.current?.getBoundingClientRect().width ?? 0;
+      if (width === 0) return;
+      if (A4_WIDTH_PX > width) {
+        handleFitWidth();
+      } else {
+        setScale(1);
+        setFitMode("manual");
+      }
+    };
+
+    requestAnimationFrame(() => requestAnimationFrame(init));
+  }, [handleFitWidth]);
+
+  const updateActiveHeading = useCallback(() => {
+    const container = containerRef.current;
+    if (!container || headings.length === 0) return;
+
+    const containerTop = container.getBoundingClientRect().top;
+    const scrollLine = containerTop + SCROLL_OFFSET;
+    let active = headings[0];
+
+    for (const heading of headings) {
+      const top = heading.element.getBoundingClientRect().top;
+      if (top <= scrollLine) {
+        active = heading;
+      } else {
+        break;
+      }
+    }
+
+    setActiveHeadingId(active.id);
+  }, [headings]);
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      const content = contentRef.current;
+      if (!content) {
+        setHeadings([]);
+        setActiveHeadingId(null);
+        return;
+      }
+
+      const nextHeadings = Array.from(
+        content.querySelectorAll<HTMLElement>(HEADING_SELECTOR),
+      )
+        .map((element, index) => {
+          const levelAttr = element.dataset.headingLevel ?? "h1";
+          const level = Number.parseInt(levelAttr.replace("h", ""), 10);
+          const title = element.textContent?.trim().replace(/\s+/g, " ") ?? "";
+          return {
+            id: `preview-heading-${index}`,
+            level: Number.isNaN(level) ? 1 : level,
+            title,
+            element,
+          };
+        })
+        .filter((heading) => heading.title.length > 0);
+
+      setHeadings(nextHeadings);
+      setActiveHeadingId(nextHeadings[0]?.id ?? null);
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [processedContent]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container || headings.length === 0) return;
+
+    const frame = requestAnimationFrame(updateActiveHeading);
+    const handleScroll = () => {
+      updateActiveHeading();
+      showNavigatorTemporarily();
+    };
+
+    container.addEventListener("scroll", handleScroll, {
+      passive: true,
+    });
+    window.addEventListener("resize", updateActiveHeading);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      container.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", updateActiveHeading);
+    };
+  }, [headings, showNavigatorTemporarily, updateActiveHeading]);
+
+  const handleHeadingClick = (heading: PreviewHeading) => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const containerTop = container.getBoundingClientRect().top;
+    const headingTop = heading.element.getBoundingClientRect().top;
+    const nextScrollTop =
+      container.scrollTop + headingTop - containerTop - SCROLL_OFFSET;
+
+    container.scrollTo({
+      top: Math.max(0, nextScrollTop),
+      behavior: "smooth",
+    });
+    setActiveHeadingId(heading.id);
+  };
+
+  const handleContainerMouseMove = (event: MouseEvent<HTMLDivElement>) => {
+    const container = containerRef.current;
+    if (!container || headings.length === 0) return;
+
+    const rect = container.getBoundingClientRect();
+    const isNearScrollbar =
+      rect.right - event.clientX <= SCROLLBAR_HOVER_ZONE_PX;
+
+    if (isNearScrollbar) {
+      clearNavigatorHideTimer();
+      setNavigatorVisible(true);
+    } else if (!navigatorHoverRef.current) {
+      setNavigatorVisible(false);
+    }
+  };
+
+  const handleContainerMouseLeave = () => {
+    if (navigatorHoverRef.current) return;
+    clearNavigatorHideTimer();
+    setNavigatorVisible(false);
   };
 
   return (
@@ -118,6 +273,8 @@ export const EditorPreview = memo(function EditorPreview({
       <div
         ref={containerRef}
         className="group/container flex-1 overflow-auto"
+        onMouseMove={handleContainerMouseMove}
+        onMouseLeave={handleContainerMouseLeave}
         style={{
           backgroundColor: "hsl(var(--sidebar-background, var(--secondary)))",
         }}
@@ -174,7 +331,10 @@ export const EditorPreview = memo(function EditorPreview({
                   />
                 </svg>
 
-                <div className="editor p-9 leading-loose relative">
+                <div
+                  ref={contentRef}
+                  className="editor p-9 leading-loose relative"
+                >
                   <ReactMarkdown
                     remarkPlugins={remarkPlugins}
                     rehypePlugins={rehypePlugins}
@@ -187,6 +347,47 @@ export const EditorPreview = memo(function EditorPreview({
             </div>
           </div>
         </div>
+
+        {headings.length > 0 && (
+          <div
+            className={`absolute top-4 right-4 z-10 hidden max-h-[calc(100%-5rem)] w-56 overflow-hidden rounded-lg border bg-background/95 shadow-sm backdrop-blur-sm transition-opacity duration-200 lg:block ${
+              navigatorVisible
+                ? "pointer-events-auto opacity-100"
+                : "pointer-events-none opacity-0"
+            }`}
+            onMouseEnter={() => {
+              navigatorHoverRef.current = true;
+              clearNavigatorHideTimer();
+              setNavigatorVisible(true);
+            }}
+            onMouseLeave={() => {
+              navigatorHoverRef.current = false;
+              showNavigatorTemporarily();
+            }}
+          >
+            <div className="max-h-80 overflow-y-auto p-1">
+              {headings.map((heading) => (
+                <button
+                  key={heading.id}
+                  type="button"
+                  onClick={() => handleHeadingClick(heading)}
+                  className={`flex min-h-8 w-full items-center rounded-md py-1.5 pr-2 text-left text-xs transition-colors hover:bg-accent hover:text-accent-foreground ${
+                    activeHeadingId === heading.id
+                      ? "bg-accent text-accent-foreground"
+                      : "text-muted-foreground"
+                  }`}
+                  style={{ paddingLeft: 8 + (heading.level - 1) * 10 }}
+                  title={heading.title}
+                >
+                  <span className="line-clamp-2 leading-4">
+                    {heading.title}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Floating zoom toolbar — bottom center */}
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 pointer-events-none opacity-0 group-hover/container:opacity-100 transition-opacity duration-300">
           <div className="pointer-events-auto flex items-center gap-1 px-2 py-1.5 rounded-lg border bg-background/90 backdrop-blur-sm">
