@@ -6,6 +6,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/src/components/ui/breadcrumb";
+import { InlineLatex } from "@/src/components/editor/editor-katex/inline-latex";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { Fragment } from "react";
@@ -28,10 +29,14 @@ export function BreadcrumbLogic({
               <Fragment key={index}>
                 <BreadcrumbItem>
                   {isLast || !item.href ? (
-                    <BreadcrumbPage>{item.label}</BreadcrumbPage>
+                    <BreadcrumbPage>
+                      <InlineLatex>{item.label}</InlineLatex>
+                    </BreadcrumbPage>
                   ) : (
                     <BreadcrumbLink asChild>
-                      <Link href={item.href}>{item.label}</Link>
+                      <Link href={item.href}>
+                        <InlineLatex>{item.label}</InlineLatex>
+                      </Link>
                     </BreadcrumbLink>
                   )}
                 </BreadcrumbItem>

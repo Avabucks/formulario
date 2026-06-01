@@ -20,6 +20,7 @@ import rehypeKatex from "rehype-katex";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
+import { InlineLatex } from "./inline-latex";
 import { markdownComponents } from "./markdown-components";
 
 const remarkPlugins = [remarkMath, remarkBreaks, remarkGfm];
@@ -30,7 +31,7 @@ const A4_HEIGHT_PX = 1123;
 const ZOOM_STEP = 0.1;
 const ZOOM_MIN = 0.3;
 const ZOOM_MAX = 3;
-const HEADING_SELECTOR = "[data-heading-level]";
+const HEADING_SELECTOR = "h1, h2, h3, h4, h5, h6";
 const SCROLL_OFFSET = 48;
 const SCROLLBAR_HOVER_ZONE_PX = 28;
 const NAVIGATOR_HIDE_DELAY_MS = 1200;
@@ -39,8 +40,33 @@ type PreviewHeading = {
   id: string;
   level: number;
   title: string;
+  sourceTitle: string;
   element: HTMLElement;
 };
+
+function extractMarkdownHeadings(markdown: string) {
+  const headings: Array<{ level: number; title: string }> = [];
+  let inCodeBlock = false;
+
+  for (const line of markdown.split("\n")) {
+    if (/^\s*```/.test(line)) {
+      inCodeBlock = !inCodeBlock;
+      continue;
+    }
+
+    if (inCodeBlock) continue;
+
+    const match = /^(#{1,6})\s+(.+?)\s*$/.exec(line);
+    if (!match) continue;
+
+    headings.push({
+      level: match[1].length,
+      title: match[2].replace(/\s+#+$/, "").trim(),
+    });
+  }
+
+  return headings;
+}
 
 export const EditorPreview = memo(function EditorPreview({
   markdownContent,
@@ -71,6 +97,11 @@ export const EditorPreview = memo(function EditorPreview({
       },
     );
   }, [markdownContent]);
+
+  const markdownHeadings = useMemo(
+    () => extractMarkdownHeadings(processedContent),
+    [processedContent],
+  );
 
   const computeFitScale = useCallback(() => {
     if (!containerRef.current) return 1;
@@ -189,24 +220,29 @@ export const EditorPreview = memo(function EditorPreview({
         content.querySelectorAll<HTMLElement>(HEADING_SELECTOR),
       )
         .map((element, index) => {
-          const levelAttr = element.dataset.headingLevel ?? "h1";
-          const level = Number.parseInt(levelAttr.replace("h", ""), 10);
+          const level = Number.parseInt(element.tagName.slice(1), 10);
           const title = element.textContent?.trim().replace(/\s+/g, " ") ?? "";
+          const sourceHeading = markdownHeadings[index];
           return {
             id: `preview-heading-${index}`,
-            level: Number.isNaN(level) ? 1 : level,
+            level:
+              sourceHeading?.level ?? (Number.isNaN(level) ? 1 : level),
             title,
+            sourceTitle: sourceHeading?.title ?? title,
             element,
           };
         })
-        .filter((heading) => heading.title.length > 0);
+        .filter(
+          (heading) =>
+            heading.title.length > 0 || heading.sourceTitle.length > 0,
+        );
 
       setHeadings(nextHeadings);
       setActiveHeadingId(nextHeadings[0]?.id ?? null);
     });
 
     return () => cancelAnimationFrame(frame);
-  }, [processedContent]);
+  }, [processedContent, markdownHeadings]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -380,7 +416,7 @@ export const EditorPreview = memo(function EditorPreview({
                   title={heading.title}
                 >
                   <span className="line-clamp-2 leading-4">
-                    {heading.title}
+                    <InlineLatex>{heading.sourceTitle}</InlineLatex>
                   </span>
                 </button>
               ))}
