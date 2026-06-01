@@ -25,8 +25,6 @@ export default function Home() {
 // TODOs:
 
 // - [EDITOR]
-// - titoli come notion con "scaletta"
-// - sistemare preview <p>, code, titoli (hanno margin sbagliati), ...
 // - refactor formatting-utils
 
 // - [GENERALI]

@@ -76,7 +76,7 @@ function SyntaxBlock({
 
   return (
     <div className="relative my-6 w-full rounded-lg border border-foreground/10 overflow-hidden group">
-      <div className="flex items-center justify-between px-4 py-1 border-b border-b-foreground/10 bg-foreground/7">
+      <div className="flex items-center justify-between px-4 py-1 border-b bg-muted">
         <span className="text-[12px] lowercase font-mono">{language}</span>
         <Button variant="ghost" size="icon" onClick={handleCopy}>
           {copied ? (
@@ -96,7 +96,7 @@ function SyntaxBlock({
             padding: "1rem",
             fontSize: "13px",
             lineHeight: "1.6",
-            background: "transparent",
+            background: "var(--muted)",
             whiteSpace: "pre-wrap",
             wordBreak: "break-word",
           }}

@@ -33,8 +33,9 @@ const ZOOM_MIN = 0.3;
 const ZOOM_MAX = 3;
 const HEADING_SELECTOR = "h1, h2, h3, h4, h5, h6";
 const SCROLL_OFFSET = 48;
+const HEADING_SCROLL_NUDGE_PX = 6;
 const SCROLLBAR_HOVER_ZONE_PX = 28;
-const NAVIGATOR_HIDE_DELAY_MS = 1200;
+const NAVIGATOR_HIDE_DELAY_MS = 500;
 
 type PreviewHeading = {
   id: string;
@@ -79,6 +80,7 @@ export const EditorPreview = memo(function EditorPreview({
   const [navigatorVisible, setNavigatorVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const navigatorListRef = useRef<HTMLDivElement>(null);
   const navigatorHoverRef = useRef(false);
   const navigatorHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
@@ -145,8 +147,7 @@ export const EditorPreview = memo(function EditorPreview({
     navigatorHideTimerRef.current = null;
   }, []);
 
-  const showNavigatorTemporarily = useCallback(() => {
-    setNavigatorVisible(true);
+  const scheduleNavigatorHide = useCallback(() => {
     clearNavigatorHideTimer();
     navigatorHideTimerRef.current = setTimeout(() => {
       if (!navigatorHoverRef.current) {
@@ -154,6 +155,11 @@ export const EditorPreview = memo(function EditorPreview({
       }
     }, NAVIGATOR_HIDE_DELAY_MS);
   }, [clearNavigatorHideTimer]);
+
+  const showNavigatorTemporarily = useCallback(() => {
+    setNavigatorVisible(true);
+    scheduleNavigatorHide();
+  }, [scheduleNavigatorHide]);
 
   useEffect(() => {
     return () => clearNavigatorHideTimer();
@@ -266,6 +272,20 @@ export const EditorPreview = memo(function EditorPreview({
     };
   }, [headings, showNavigatorTemporarily, updateActiveHeading]);
 
+  useEffect(() => {
+    if (!navigatorVisible || !activeHeadingId) return;
+
+    const list = navigatorListRef.current;
+    const activeButton = list?.querySelector<HTMLButtonElement>(
+      `[data-heading-id="${activeHeadingId}"]`,
+    );
+
+    activeButton?.scrollIntoView({
+      block: "nearest",
+      inline: "nearest",
+    });
+  }, [activeHeadingId, navigatorVisible]);
+
   const handleHeadingClick = (heading: PreviewHeading) => {
     const container = containerRef.current;
     if (!container) return;
@@ -273,7 +293,11 @@ export const EditorPreview = memo(function EditorPreview({
     const containerTop = container.getBoundingClientRect().top;
     const headingTop = heading.element.getBoundingClientRect().top;
     const nextScrollTop =
-      container.scrollTop + headingTop - containerTop - SCROLL_OFFSET;
+      container.scrollTop +
+      headingTop -
+      containerTop -
+      SCROLL_OFFSET +
+      HEADING_SCROLL_NUDGE_PX;
 
     container.scrollTo({
       top: Math.max(0, nextScrollTop),
@@ -294,14 +318,13 @@ export const EditorPreview = memo(function EditorPreview({
       clearNavigatorHideTimer();
       setNavigatorVisible(true);
     } else if (!navigatorHoverRef.current) {
-      setNavigatorVisible(false);
+      scheduleNavigatorHide();
     }
   };
 
   const handleContainerMouseLeave = () => {
     if (navigatorHoverRef.current) return;
-    clearNavigatorHideTimer();
-    setNavigatorVisible(false);
+    scheduleNavigatorHide();
   };
 
   return (
@@ -401,11 +424,12 @@ export const EditorPreview = memo(function EditorPreview({
               showNavigatorTemporarily();
             }}
           >
-            <div className="max-h-80 overflow-y-auto p-1">
+            <div ref={navigatorListRef} className="max-h-80 overflow-y-auto p-1">
               {headings.map((heading) => (
                 <button
                   key={heading.id}
                   type="button"
+                  data-heading-id={heading.id}
                   onClick={() => handleHeadingClick(heading)}
                   className={`flex min-h-8 w-full items-center rounded-md py-1.5 pr-2 text-left text-xs transition-colors hover:bg-accent hover:text-accent-foreground ${
                     activeHeadingId === heading.id
