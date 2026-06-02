@@ -72,3 +72,35 @@ CREATE TABLE IF NOT EXISTS feedback (
   testo TEXT NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+--
+-- Table structure for table 'subscriptions'
+--
+CREATE TABLE IF NOT EXISTS subscriptions (
+  id SERIAL PRIMARY KEY,
+  user_uid VARCHAR(255) NOT NULL REFERENCES users(uid) ON DELETE CASCADE,
+  paddle_subscription_id VARCHAR(255) NOT NULL UNIQUE,
+  paddle_customer_id VARCHAR(255),
+  paddle_price_id VARCHAR(255),
+  status VARCHAR(50) NOT NULL,
+  plan VARCHAR(50) NOT NULL DEFAULT 'pro',
+  current_period_starts_at TIMESTAMP,
+  current_period_ends_at TIMESTAMP,
+  canceled_at TIMESTAMP,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+--
+-- Table structure for table 'ai_token_usage'
+--
+CREATE TABLE IF NOT EXISTS ai_token_usage (
+  id SERIAL PRIMARY KEY,
+  user_uid VARCHAR(255) NOT NULL REFERENCES users(uid) ON DELETE CASCADE,
+  period_month DATE NOT NULL,
+  provider VARCHAR(50) NOT NULL,
+  prompt_tokens BIGINT NOT NULL DEFAULT 0,
+  completion_tokens BIGINT NOT NULL DEFAULT 0,
+  total_tokens BIGINT NOT NULL DEFAULT 0,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(user_uid, period_month, provider)
+);
