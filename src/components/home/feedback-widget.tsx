@@ -1,8 +1,8 @@
 "use client";
 
+import { MessageCircle, Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Loader2, MessageCircle, Send } from "lucide-react";
 
 import {
   Dialog,
@@ -12,8 +12,9 @@ import {
 } from "@/src/components/ui/dialog";
 
 import { Button } from "@/src/components/ui/button";
-import { Textarea } from "@/src/components/ui/textarea";
 import { Separator } from "@/src/components/ui/separator";
+import { Textarea } from "@/src/components/ui/textarea";
+import { Spinner } from "../ui/spinner";
 
 const FEEDBACK_POPUP_DISABLED_KEY = "feedback_popup_disabled";
 const ACCOUNT_POPUP_KEY = "new-account-popup-closed";
@@ -112,7 +113,7 @@ export default function FeedbackWidget() {
       </button>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-[520px]">
+        <DialogContent className="sm:max-w-130">
           <DialogHeader>
             <DialogTitle className="text-sm font-medium">Feedback</DialogTitle>
           </DialogHeader>
@@ -155,7 +156,7 @@ export default function FeedbackWidget() {
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 placeholder="Descrivi la tua esperienza..."
-                className="min-h-[90px] text-sm"
+                className="min-h-22.5 text-sm"
               />
 
               <div className="flex items-center justify-between gap-2 pt-1">
@@ -174,7 +175,7 @@ export default function FeedbackWidget() {
                   className="text-xs"
                 >
                   {loading ? (
-                    <Loader2 className="h-3 w-3 animate-spin" />
+                    <Spinner />
                   ) : (
                     <Send className="h-3 w-3" />
                   )}
