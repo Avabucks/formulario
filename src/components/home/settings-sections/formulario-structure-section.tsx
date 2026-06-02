@@ -1,5 +1,6 @@
 "use client";
 
+import { InlineLatex } from "@/src/components/editor/editor-katex/inline-latex";
 import { cn } from "@/src/lib/utils";
 import {
   Bookmark,
@@ -281,7 +282,7 @@ export function FormularioStructureSection({
                               className="shrink-0 text-muted-foreground"
                             />
                             <span className="block w-0 min-w-0 flex-1 truncate">
-                              {argomento.titolo}
+                              <InlineLatex>{argomento.titolo}</InlineLatex>
                             </span>
                             {argomento.empty && (
                               <Badge variant="outline" className="shrink-0">

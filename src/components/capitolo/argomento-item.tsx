@@ -7,6 +7,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/src/components/ui/dropdown-menu";
+import { InlineLatex } from "@/src/components/editor/editor-katex/inline-latex";
 import {
   Item,
   ItemActions,
@@ -115,7 +116,11 @@ export function ArgomentoItem({
       <ItemContent className={`${!argomento.editable && "py-2"}`}>
         <ItemTitle>
           <span className="group-hover:underline">
-            {argomento.titolo || <span>Senza titolo</span>}
+            {argomento.titolo ? (
+              <InlineLatex>{argomento.titolo}</InlineLatex>
+            ) : (
+              <span>Senza titolo</span>
+            )}
           </span>
           {!argomento.titolo && argomento.editable && (
             <TooltipProvider>

@@ -31,8 +31,6 @@ export default function Home() {
 // - creare le tabelle nel db per i pagamenti e testare tutto il flow di acquisto, rinnovo, cancellazione, ecc.
 
 // - [EDITOR]
-// - titoli come notion con "scaletta"
-// - sistemare preview <p>, code, titoli (hanno margin sbagliati), ...
 // - refactor formatting-utils
 
 // - [GENERALI]

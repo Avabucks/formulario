@@ -173,7 +173,7 @@ export default async function Formulario({
           <div className="flex flex-col gap-4 w-full">
             {capitoli.length == 0
               ? renderEmpty()
-              : capitoli.map((c, index) => (
+              : capitoli.map((c) => (
                   <CapitoloItem
                     key={c.id}
                     capitolo={{

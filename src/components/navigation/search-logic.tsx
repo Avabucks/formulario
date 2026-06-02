@@ -1,4 +1,5 @@
 "use client";
+import { InlineLatex } from "@/src/components/editor/editor-katex/inline-latex";
 import { Button } from "@/src/components/ui/button";
 import {
   Command,
@@ -270,7 +271,9 @@ export function SearchLogic() {
                   >
                     <TableOfContents />
                     <div className="flex flex-col justify-center w-full">
-                      <span>{a.titolo}</span>
+                      <span>
+                        <InlineLatex>{a.titolo}</InlineLatex>
+                      </span>
                       <div className="inline-flex items-center">
                         <span className="text-xs text-muted-foreground text-nowrap">
                           {a.formularioTitolo}

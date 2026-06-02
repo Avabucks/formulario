@@ -4,10 +4,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import NextTopLoader from "nextjs-toploader";
+import { UmamiTracker } from "../components/analytics/umami-tracker";
 import { ThemeProvider } from "../components/theme/theme-provider";
 import "../styles/editor.css";
 import "../styles/globals.css";
-import { UmamiTracker } from "../components/analytics/umami-tracker";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

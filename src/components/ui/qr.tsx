@@ -93,39 +93,56 @@ export function Qr({ link, title }: Readonly<{ link: string; title: string }>) {
   };
 
   return (
-    <div className="flex">
-      <div className="flex flex-1 flex-col gap-4">
-        <Label>Condividi il tuo formulario</Label>
-        <div className="flex items-center gap-2 w-full">
-          <div className="grid flex-1 gap-2">
-            <Label htmlFor="link" className="sr-only">
-              Link
-            </Label>
-            <Input id="link" defaultValue={link} readOnly />
-          </div>
-          <Button variant="outline" size="icon" onClick={handleCopy}>
-            {copied ? <Check size={16} /> : <Copy size={16} />}
-          </Button>
+    <div className="w-full mx-auto flex flex-col gap-6">
+      {/* HEADER */}
+      <div className="flex flex-col gap-1">
+        <Label className="text-base font-medium">
+          Condividi il tuo formulario
+        </Label>
+        <p className="text-sm text-muted-foreground">
+          Copia il link o scarica il QR code
+        </p>
+      </div>
+
+      {/* LINK */}
+      <div className="flex items-center gap-2">
+        <Input value={link} readOnly className="flex-1" />
+
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          onClick={handleCopy}
+        >
+          {copied ? <Check size={16} /> : <Copy size={16} />}
+        </Button>
+      </div>
+
+      {/* QR */}
+      <div className="flex flex-col items-center gap-4">
+        <div
+          ref={svgRef}
+          className="p-4 bg-white rounded-2xl shadow-sm border"
+        >
+          <SvgQrCode
+            text={link}
+            options={{
+              width: 220,
+              margin: 2,
+              scale: 8,
+              errorCorrectionLevel: "H",
+              color: {
+                dark: "#111827",
+                light: "#ffffff",
+              },
+            }}
+          />
         </div>
-        <div className="flex flex-col items-center gap-4 w-full">
-          <div className="rounded-xl overflow-hidden mx-auto" ref={svgRef}>
-            <SvgQrCode
-              text={link}
-              options={{
-                margin: 3,
-                scale: 5,
-                width: 200,
-                color: {
-                  dark: "#000000",
-                  light: "#ffffff",
-                },
-              }}
-            />
-          </div>
-          <Button variant="outline" onClick={downloadQrPng}>
-            <Download size={16} /> Download QR
-          </Button>
-        </div>
+
+        <Button onClick={downloadQrPng} variant="outline">
+          <Download className="h-4 w-4 mr-2" />
+          Scarica QR Code
+        </Button>
       </div>
     </div>
   );

@@ -182,7 +182,7 @@ export default async function Capitolo({
           <div className="flex flex-col gap-4 w-full">
             {argomentiRes.length == 0
               ? renderEmpty()
-              : argomentiRes.map((a, index) => (
+              : argomentiRes.map((a) => (
                   <ArgomentoItem
                     key={a.id}
                     argomento={{

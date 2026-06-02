@@ -76,7 +76,7 @@ function SyntaxBlock({
 
   return (
     <div className="relative my-6 w-full rounded-lg border border-foreground/10 overflow-hidden group">
-      <div className="flex items-center justify-between px-4 py-1 border-b border-b-foreground/10 bg-foreground/7">
+      <div className="flex items-center justify-between px-4 py-1 border-b bg-muted">
         <span className="text-[12px] lowercase font-mono">{language}</span>
         <Button variant="ghost" size="icon" onClick={handleCopy}>
           {copied ? (
@@ -96,7 +96,7 @@ function SyntaxBlock({
             padding: "1rem",
             fontSize: "13px",
             lineHeight: "1.6",
-            background: "transparent",
+            background: "var(--muted)",
             whiteSpace: "pre-wrap",
             wordBreak: "break-word",
           }}
@@ -229,91 +229,36 @@ function MermaidBlock({ code }: Readonly<{ code: string }>) {
   );
 }
 
-interface HeadingProps {
-  level: 1 | 2 | 3 | 4 | 5 | 6;
-  children: React.ReactNode;
-  className?: string;
-}
-
-const Heading = ({ level, children, className = "" }: HeadingProps) => {
-  const Tag = `h${level}` as any;
-
-  const handleHover = (isEntering: any) => {
-    const elements = document.querySelectorAll(
-      `[data-heading-level="h${level}"]`,
-    );
-    elements.forEach((el) => {
-      if (isEntering) {
-        el.classList.add("active-type");
-      } else {
-        el.classList.remove("active-type");
-      }
-    });
-  };
-
-  return (
-    <div
-      className="group relative"
-      data-heading-level={`h${level}`}
-      onMouseEnter={() => handleHover(true)}
-      onMouseLeave={() => handleHover(false)}
-    >
-      {/* Sottolineatura */}
-      <span className="absolute w-full h-px top-full mt-2 bg-foreground/50 opacity-0 group-hover:opacity-50 transition-opacity underline-indicator"></span>
-
-      <Tag className={`${className}`}>{children}</Tag>
-    </div>
-  );
-};
-
 export const markdownComponents: Components = {
   h1: ({ children }) => (
-    <Heading
-      level={1}
-      className="text-(--editor-title) text-[2em] font-semibold leading-9 mb-7"
-    >
+    <h1 className="text-(--editor-title) text-[2em] font-semibold leading-9 mb-7">
       {children}
-    </Heading>
+    </h1>
   ),
   h2: ({ children }) => (
-    <Heading
-      level={2}
-      className="text-(--editor-title) text-[1.5em] font-semibold leading-6 mb-6"
-    >
+    <h2 className="text-(--editor-title) text-[1.5em] font-semibold leading-6 mb-6">
       {children}
-    </Heading>
+    </h2>
   ),
   h3: ({ children }) => (
-    <Heading
-      level={3}
-      className="text-(--editor-title) text-[1.2em] font-semibold leading-5 mb-3"
-    >
+    <h3 className="text-(--editor-title) text-[1.2em] font-semibold leading-5 mb-3">
       {children}
-    </Heading>
+    </h3>
   ),
   h4: ({ children }) => (
-    <Heading
-      level={4}
-      className="text-(--editor-title) text-[1em] font-semibold leading-4 mb-3"
-    >
+    <h4 className="text-(--editor-title) text-[1em] font-semibold leading-4 mb-3">
       {children}
-    </Heading>
+    </h4>
   ),
   h5: ({ children }) => (
-    <Heading
-      level={5}
-      className="text-(--editor-title) text-[0.875em] font-semibold leading-3 mb-3"
-    >
+    <h5 className="text-(--editor-title) text-[0.875em] font-semibold leading-3 mb-3">
       {children}
-    </Heading>
+    </h5>
   ),
   h6: ({ children }) => (
-    <Heading
-      level={6}
-      className="text-(--editor-title)/60 text-[0.85em] font-semibold mb-3"
-    >
+    <h6 className="text-(--editor-title)/60 text-[0.85em] font-semibold mb-3">
       {children}
-    </Heading>
+    </h6>
   ),
   p: ({ children }) => (
     <p className="leading-[1.8] text-base font-sans mb-5">{children}</p>
