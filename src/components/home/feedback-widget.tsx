@@ -13,10 +13,8 @@ import {
 } from "@/src/components/ui/dialog";
 
 import { Button } from "@/src/components/ui/button";
-import { Separator } from "@/src/components/ui/separator";
 import { Textarea } from "@/src/components/ui/textarea";
 import { Spinner } from "../ui/spinner";
-import { usePathname } from "next/navigation";
 
 const FEEDBACK_POPUP_DISABLED_KEY = "feedback_popup_disabled";
 const ACCOUNT_POPUP_KEY = "new-account-popup-closed";
@@ -24,8 +22,6 @@ const ACCOUNT_POPUP_KEY = "new-account-popup-closed";
 const RATING_LABELS = ["Pessimo", "Scarso", "Nella media", "Buono", "Ottimo"];
 
 export default function FeedbackWidget() {
-  const pathname = usePathname();
-
   const [visible, setVisible] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -106,10 +102,6 @@ export default function FeedbackWidget() {
 
   const activeRating = hover ?? rating;
 
-  if (pathname.startsWith("/editor")) {
-    return null;
-  }
-
   return (
     <>
       <button
@@ -172,14 +164,14 @@ export default function FeedbackWidget() {
                 <div className="flex items-center justify-end gap-2 pt-1">
                   {localStorage.getItem(FEEDBACK_POPUP_DISABLED_KEY) !==
                     "true" && (
-                    <Button
-                      type="button"
-                      onClick={disableAutomaticPopup}
-                      variant="link"
-                    >
-                      Non mostrare più
-                    </Button>
-                  )}
+                      <Button
+                        type="button"
+                        onClick={disableAutomaticPopup}
+                        variant="link"
+                      >
+                        Non mostrare più
+                      </Button>
+                    )}
 
                   <Button size="lg" onClick={submit} disabled={loading}>
                     {loading ? <Spinner /> : <Send className="h-3 w-3" />}
