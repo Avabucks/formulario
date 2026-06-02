@@ -1,0 +1,604 @@
+{
+  "metadata": {
+    "siteTitle": "FormulaBase - Formulario digitale",
+    "siteDescription": "Crea, organizza e condividi i tuoi formulari e cheat sheet con FormulaBase. Usa l'editor avanzato e l'assistente AI per generare formule e appunti in pochi secondi.",
+    "homeTitle": "Home",
+    "loginTitle": "Login",
+    "communityTitle": "Community",
+    "adminTitle": "Admin",
+    "privacyTitle": "Privacy",
+    "termsTitle": "Termini e condizioni"
+  },
+  "languageSwitcher": {
+    "label": "Cambia lingua",
+    "it": "Italiano",
+    "en": "English"
+  },
+  "theme": {
+    "toggleTheme": "Cambia tema",
+    "light": "Chiaro",
+    "dark": "Scuro",
+    "system": "Sistema"
+  },
+  "common": {
+    "home": "Home",
+    "community": "Community",
+    "close": "Chiudi",
+    "save": "Salva",
+    "cancel": "Annulla",
+    "delete": "Elimina",
+    "edit": "Modifica",
+    "description": "Descrizione",
+    "share": "Condividi",
+    "export": "Esporta",
+    "soon": "Soon",
+    "back": "Indietro",
+    "next": "Avanti",
+    "skip": "Salta",
+    "search": "Cerca",
+    "loading": "Caricamento in corso",
+    "signOut": "Esci"
+  },
+  "header": {
+    "demo": "Demo",
+    "features": "Funzionalità",
+    "faq": "FAQ",
+    "community": "Community",
+    "login": "Accedi"
+  },
+  "landing": {
+    "hero": {
+      "titleWords": [
+        { "text": "Le", "muted": false },
+        { "text": "tue", "muted": false },
+        { "text": "formule.", "muted": false },
+        { "text": "Sempre", "muted": true },
+        { "text": "a", "muted": true },
+        { "text": "portata", "muted": true },
+        { "text": "di", "muted": true },
+        { "text": "mano.", "muted": true }
+      ],
+      "subtitle": "La piattaforma completa per creare, organizzare e condividere formulari scientifici. Scrivi in LaTeX, genera con l'AI, dividi per capitoli, condividi via QR o link.",
+      "primaryCta": "Inizia ora",
+      "secondaryCta": "Guarda la demo",
+      "badges": [
+        "Gratuito per iniziare",
+        "Generazione formule con AI",
+        "Supporto LaTeX completo",
+        "Condivisione via QR code"
+      ]
+    },
+    "videoDemo": {
+      "eyebrow": "Demo",
+      "title": "Tutto quello che ti serve",
+      "description": "Abbiamo unito creazione, organizzazione e condivisione in un'unica interfaccia.",
+      "videoComingSoon": "video in arrivo",
+      "slides": [
+        {
+          "id": "01",
+          "label": "01 - Crea formulario",
+          "title": "Raccogli le tue formule in un unico posto",
+          "description": "Crea un formulario per ogni materia o esame. Dalla fisica alla chimica, tutto organizzato e sempre a portata di mano.",
+          "video": "/tutorial/01.mp4"
+        },
+        {
+          "id": "02",
+          "label": "02 - Crea capitolo",
+          "title": "Struttura il formulario in capitoli",
+          "description": "Organizza le formule in capitoli tematici. Ad esempio \"Meccanica\", \"Termodinamica\", \"Elettromagnetismo\".",
+          "video": "/tutorial/02.mp4"
+        },
+        {
+          "id": "03",
+          "label": "03 - Crea argomento",
+          "title": "Raggruppa formule per argomento",
+          "description": "Dentro ogni capitolo, crea argomenti specifici per tenere le formule organizzate.",
+          "video": "/tutorial/03.mp4"
+        },
+        {
+          "id": "04",
+          "label": "04 - L'editor",
+          "title": "Scrivi formule in LaTeX con anteprima live",
+          "description": "Scrivi formule in LaTeX e visualizza l'anteprima in tempo reale mentre digiti; l'editor supporta anche testo normale, titoli, elenchi e altro.",
+          "video": "/tutorial/04.mp4"
+        },
+        {
+          "id": "05",
+          "label": "05 - Genera con AI",
+          "title": "Lascia che l'AI compili il formulario per te",
+          "description": "Descrivi l'argomento e l'AI genera automaticamente le formule rilevanti con spiegazioni, pronte da aggiungere.",
+          "video": "/tutorial/05.mp4"
+        },
+        {
+          "id": "06",
+          "label": "06 - Condivisione QR",
+          "title": "Condividi il formulario con un QR code",
+          "description": "Genera un QR code per il tuo formulario e condividilo con i compagni. Basta inquadrare con il telefono per aprirlo.",
+          "video": "/tutorial/06.mp4"
+        }
+      ]
+    },
+    "features": {
+      "eyebrow": "Funzionalità",
+      "title": "Tutto ciò che serve per i tuoi formulari",
+      "description": "Uno strumento pensato per studenti, docenti e ricercatori. Meno confusione, più formule.",
+      "items": [
+        {
+          "title": "Genera con l'AI",
+          "description": "Descrivi l'argomento e l'AI crea per te il formulario completo in LaTeX. Dalla cinematica alla chimica organica, in pochi secondi."
+        },
+        {
+          "title": "Ricerca Intelligente",
+          "description": "Trova qualsiasi formula in secondi. Cerca per nome, simbolo, argomento o parola chiave e ottieni risultati istantanei."
+        },
+        {
+          "title": "Organizzazione per Capitoli",
+          "description": "Struttura i tuoi formulari in capitoli e argomenti. Dalla meccanica classica alla termodinamica, tutto al suo posto."
+        },
+        {
+          "title": "Editor LaTeX Integrato",
+          "description": "Scrivi e modifica formule direttamente in LaTeX con anteprima in tempo reale. Nessun software aggiuntivo richiesto."
+        },
+        {
+          "title": "Condivisione via QR Code",
+          "description": "Genera un QR code per ogni formulario. Perfetto per stampare e distribuire durante lezioni ed esami."
+        },
+        {
+          "title": "Formulari Privati e Pubblici",
+          "description": "Tieni le tue formule per te oppure rendile disponibili alla community. Il controllo è sempre nelle tue mani."
+        }
+      ]
+    },
+    "faq": {
+      "eyebrow": "FAQ",
+      "title": "Domande frequenti",
+      "items": [
+        {
+          "question": "Come fa l'AI a creare un formulario per me?",
+          "answer": "Ti basta inserire l'argomento, ad esempio 'Elettromagnetismo', e l'AI genera istantaneamente una struttura completa. Otterrai capitoli organizzati, formule precise e descrizioni pronte all'uso. È la fine del 'foglio bianco': l'AI fa il lavoro pesante, tu rifinisci i dettagli."
+        },
+        {
+          "question": "Non conosco il linguaggio LaTeX. Posso usare FormulaBase?",
+          "answer": "Assolutamente sì. Non devi scrivere una riga di codice se non vuoi. L'AI si occupa della formattazione tecnica, mentre tu interagisci con un editor intuitivo."
+        },
+        {
+          "question": "Come funziona la condivisione via QR code?",
+          "answer": "Ogni formulario ha un QR code univoco generato automaticamente. Prima di condividere scegli la visibilità: privato (solo tu), pubblico con link (chiunque abbia il QR o l'URL) o community (visibile a tutti gli utenti di FormulaBase). Stampalo direttamente o salvalo come immagine."
+        },
+        {
+          "question": "Qual è la differenza tra privato, pubblico e community?",
+          "answer": "Privato: visibile solo a te, ideale per i formulari in lavorazione. Pubblico con link: accessibile a chiunque abbia il link o il QR code, ottimo per condividere con la tua classe senza rendere tutto pubblico. Community: appare nella raccolta pubblica e può essere trovato e duplicato da altri utenti."
+        },
+        {
+          "question": "Posso modificare un formulario creato da altri?",
+          "answer": "Sì. Se trovi un formulario utile nella Community, puoi duplicarlo nel tuo profilo con un click. Otterrai una copia personale che potrai modificare, integrare o accorciare come preferisci, senza alterare il lavoro originale dell'autore."
+        },
+        {
+          "question": "È gratuito?",
+          "answer": "Sì, puoi iniziare gratuitamente senza carta di credito. Crei formulari, usi l'editor LaTeX e condividi via QR code o link da subito."
+        }
+      ]
+    },
+    "cta": {
+      "title": "Pronto a organizzare le tue formule?",
+      "description": "Crea il tuo primo formulario in meno di un minuto con l'AI o da zero. Nessuna carta di credito, nessuna configurazione.",
+      "button": "Inizia Gratis"
+    },
+    "footer": {
+      "copyright": "Tutti i diritti riservati."
+    }
+  },
+  "login": {
+    "welcome": "Benvenuto",
+    "subtitle": "Accedi con il tuo account Google",
+    "popupClosed": "Popup chiuso dall'utente",
+    "genericError": "Errore durante il login con Google. Riprova.",
+    "legalText": "Cliccando qui sotto, accetti i nostri {terms} e la nostra {privacy}.",
+    "terms": "Termini di servizio",
+    "privacy": "Informativa sulla privacy"
+  },
+  "avatarMenu": {
+    "myFormularios": "Visualizza i tuoi formulari",
+    "community": "Community",
+    "discover": "Scopri come funziona",
+    "shortcuts": "Scorciatoie da tastiera",
+    "terms": "Termini e condizioni",
+    "privacy": "Privacy",
+    "signOut": "Esci"
+  },
+  "kbShortcuts": {
+    "title": "Scorciatoie da tastiera",
+    "sections": [
+      {
+        "title": "Applicazione",
+        "shortcuts": [
+          "Cerca nei tuoi formulari",
+          "Impostazioni formulario",
+          "Aggiungi nuovo"
+        ]
+      },
+      {
+        "title": "Formattazione",
+        "shortcuts": [
+          "Chiedi all'AI",
+          "Grassetto",
+          "Corsivo",
+          "Citazione",
+          "Lista ordinata",
+          "Lista non ordinata",
+          "Divisore",
+          "Heading 1",
+          "Heading 2",
+          "Heading 3",
+          "Heading 4",
+          "Heading 5",
+          "Heading 6"
+        ]
+      },
+      {
+        "title": "Editor",
+        "shortcuts": [
+          "Salva",
+          "Annulla",
+          "Ripristina",
+          "Taglia",
+          "Copia",
+          "Seleziona tutto",
+          "Cancella parola",
+          "Seleziona la prossima occorrenza",
+          "Inserisci cursore",
+          "Sposta riga su",
+          "Sposta riga giù",
+          "Duplica riga",
+          "Elimina riga",
+          "Vai all'inizio",
+          "Vai alla fine",
+          "Commenta riga"
+        ]
+      }
+    ]
+  },
+  "home": {
+    "emptyFormulariosTitle": "Nessun formulario",
+    "emptyFormulariosDescription": "Non ci sono formulari da mostrare.",
+    "emptyFavoritesTitle": "Nessun formulario preferito",
+    "emptyFavoritesDescription": "Non hai ancora aggiunto formulari ai preferiti.",
+    "communityTitle": "Esplora la Community",
+    "communityDescription": "Una libreria collaborativa di formule, in costante espansione",
+    "communityButton": "Scopri",
+    "myFormulariosTitle": "I Formulari di {name}",
+    "myFormulariosDescription": "Gestisci e modifica i tuoi formulari",
+    "favoritesTitle": "I tuoi preferiti"
+  },
+  "communityPage": {
+    "title": "Scopri le formule della Community",
+    "description": "Esplora migliaia di formulari creati da studenti e professionisti. Trova, salva e condividi le tue formule preferite.",
+    "searchPlaceholder": "Cerca formule...",
+    "sortTrending": "In tendenza",
+    "sortRecent": "Recenti",
+    "sortPopular": "Popolari",
+    "noResults": "Nessun risultato trovato."
+  },
+  "formularioCard": {
+    "profilePhoto": "foto profilo",
+    "open": "Apri il formulario"
+  },
+  "search": {
+    "button": "Cerca nei tuoi formulari",
+    "loading": "Ricerca in corso...",
+    "placeholder": "Inserisci un termine di ricerca",
+    "formularios": "Formulari",
+    "chapters": "Capitoli",
+    "topics": "Argomenti"
+  },
+  "newAccountPopup": {
+    "title": "Scopri le funzionalità"
+  },
+  "formularioAdd": {
+    "loading": "Creazione in corso...",
+    "success": "Formulario creato con successo!",
+    "error": "Errore durante la creazione del formulario.",
+    "button": "Aggiungi formulario",
+    "title": "Aggiungi un formulario",
+    "titleLabel": "Titolo del formulario",
+    "titlePlaceholder": "Titolo del formulario",
+    "descriptionLabel": "Descrizione del formulario",
+    "descriptionPlaceholder": "Descrivi il formulario"
+  },
+  "formularioSettings": {
+    "loadingDelete": "Eliminazione in corso...",
+    "deleteSuccess": "Formulario cancellato con successo!",
+    "deleteError": "Errore durante la cancellazione del formulario.",
+    "tooltip": "Impostazioni formulario",
+    "edit": "Modifica",
+    "info": "Informazioni",
+    "share": "Condividi",
+    "export": "Esporta",
+    "description": "Descrizione",
+    "deleteFormulario": "Elimina formulario",
+    "deleteTitle": "Elimina",
+    "deleteMessage": "Sei sicuro di voler eliminare \"{title}\"? Questa azione non è reversibile.",
+    "loadingTitle": "Caricamento in corso",
+    "loadingDescription": "Caricamento del formulario in corso, attendere prego."
+  },
+  "editSection": {
+    "loading": "Modifica in corso...",
+    "success": "Formulario modificato con successo!",
+    "error": "Errore durante la modifica del formulario.",
+    "titleLabel": "Titolo del formulario",
+    "descriptionLabel": "Descrizione del formulario",
+    "shareWithLink": "Condividi con link",
+    "shareWithCommunity": "Condividi con la community",
+    "saveChanges": "Salva le modifiche"
+  },
+  "starFormulario": {
+    "addLoading": "Aggiunta ai preferiti...",
+    "removeLoading": "Rimozione dai preferiti...",
+    "addSuccess": "Formulario aggiunto ai preferiti!",
+    "removeSuccess": "Formulario rimosso dai preferiti!",
+    "addError": "Errore durante l'aggiunta ai preferiti.",
+    "removeError": "Errore durante la rimozione dai preferiti."
+  },
+  "takeFormulario": {
+    "loading": "Richiesta in corso...",
+    "success": "Formulario ottenuto con successo!",
+    "error": "Errore durante la richiesta del formulario.",
+    "button": "Aggiungi ai miei formulari",
+    "helper": "per modificare"
+  },
+  "capitoloPage": {
+    "emptyTitle": "Nessun Capitolo",
+    "emptyDescription": "Non ci sono capitoli da mostrare in \"{title}\"."
+  },
+  "capitoloAdd": {
+    "loading": "Creazione in corso...",
+    "success": "Capitolo creato con successo!",
+    "error": "Errore durante la creazione del capitolo.",
+    "button": "Aggiungi capitolo",
+    "title": "Aggiungi nuovo capitolo",
+    "description": "Crea un nuovo capitolo in {title}.",
+    "label": "Titolo del nuovo capitolo"
+  },
+  "capitoloItem": {
+    "renameLoading": "Modifica in corso...",
+    "renameSuccess": "Capitolo rinominato con successo!",
+    "renameError": "Errore durante la modifica del capitolo.",
+    "deleteLoading": "Eliminazione in corso...",
+    "deleteSuccess": "Capitolo eliminato con successo!",
+    "deleteError": "Errore durante l'eliminazione del capitolo.",
+    "moveLoading": "Spostamento in corso...",
+    "moveSuccess": "Capitolo spostato con successo!",
+    "moveError": "Errore durante lo spostamento del capitolo.",
+    "oneTopic": "argomento",
+    "manyTopics": "argomenti",
+    "moveUp": "Sposta Su",
+    "moveDown": "Sposta Giu",
+    "rename": "Rinomina",
+    "deleteMessage": "Sei sicuro di voler eliminare \"{title}\"? Questa azione non è reversibile."
+  },
+  "argomentoPage": {
+    "emptyTitle": "Nessun Capitolo",
+    "emptyDescription": "Non ci sono capitoli da mostrare in \"{title}\"."
+  },
+  "argomentoAdd": {
+    "loading": "Creazione in corso...",
+    "success": "Argomento creato con successo!",
+    "error": "Errore durante la creazione dell'argomento.",
+    "button": "Aggiungi argomento",
+    "title": "Aggiungi nuovo argomento",
+    "description": "Crea un nuovo argomento in {title}.",
+    "label": "Titolo del nuovo argomento"
+  },
+  "argomentoItem": {
+    "renameLoading": "Modifica in corso...",
+    "renameSuccess": "Argomento rinominato con successo!",
+    "renameError": "Errore durante la modifica dell'argomento.",
+    "deleteLoading": "Eliminazione in corso...",
+    "deleteSuccess": "Argomento eliminato con successo!",
+    "deleteError": "Errore durante l'eliminazione dell'argomento.",
+    "moveLoading": "Spostamento in corso...",
+    "moveSuccess": "Argomento spostato con successo!",
+    "moveError": "Errore durante lo spostamento dell'argomento.",
+    "moveUp": "Sposta Su",
+    "moveDown": "Sposta Giu",
+    "rename": "Rinomina",
+    "deleteMessage": "Sei sicuro di voler eliminare \"{title}\"? Questa azione non è reversibile."
+  },
+  "editor": {
+    "undo": "Annulla",
+    "redo": "Ripristina",
+    "unsynced": "Modifiche non sincronizzate",
+    "synced": "Modifiche sincronizzate",
+    "loadError": "Errore nel caricamento"
+  },
+  "editorTools": {
+    "bold": "Grassetto",
+    "italic": "Corsivo",
+    "orderedList": "Lista ordinata",
+    "unorderedList": "Lista non ordinata",
+    "quote": "Citazione",
+    "divider": "Divisore",
+    "askAi": "Chiedi all'AI",
+    "generatePrompt": "Descrivi cosa vuoi generare",
+    "generatePlaceholder": "Es: Scrivi una descrizione dettagliata di...",
+    "generateHint": "Premi Ctrl+Enter per generare",
+    "preview": "Anteprima risposta",
+    "accept": "Accetta e inserisci",
+    "serverError": "Impossibile contattare il server. Riprova più tardi.",
+    "loadingMessages": [
+      "L'AI sta elaborando la risposta...",
+      "Sto pensando a qualcosa di brillante...",
+      "Raccogliendo le idee migliori...",
+      "Quasi ci siamo...",
+      "Un momento di pazienza...",
+      "Sto scegliendo le parole giuste...",
+      "Elaborazione in corso...",
+      "Mettendo insieme i pezzi...",
+      "Sto dando il meglio di me...",
+      "Un secondo ancora..."
+    ]
+  },
+  "admin": {
+    "statsFor": "Statistiche per:",
+    "general": "Generali",
+    "totalUsers": "Totale utenti",
+    "newUsers": "nuovi",
+    "registeredTotal": "registrati in totale",
+    "formularios": "Formulari",
+    "createdTotal": "creati complessivamente"
+  },
+  "privacyPage": {
+    "updatedAt": "Ultimo aggiornamento: Febbraio 2026",
+    "title": "Privacy Policy",
+    "subtitle": "Informativa sul trattamento dei dati personali ai sensi del Regolamento (UE) 2016/679 (GDPR).",
+    "sections": [
+      {
+        "title": "1. Titolare del trattamento",
+        "paragraphs": [
+          "Il titolare del trattamento dei dati personali è il gestore della piattaforma FormulaBase. Per qualsiasi richiesta relativa al trattamento dei tuoi dati, puoi contattarci tramite i canali indicati nella sezione \"Contatti\"."
+        ]
+      },
+      {
+        "title": "2. Dati raccolti",
+        "paragraphs": [
+          "In fase di creazione dell'account raccogliamo esclusivamente i seguenti dati personali forniti tramite il provider di autenticazione:",
+          "Non raccogliamo dati sensibili, dati di pagamento, né effettuiamo profilazione a fini pubblicitari o commerciali."
+        ],
+        "list": [
+          "<span class=\"text-foreground font-medium\">Display name</span>: nome visualizzato pubblicamente agli altri utenti",
+          "<span class=\"text-foreground font-medium\">Indirizzo email</span>: utilizzato esclusivamente per l'autenticazione, non visibile ad altri utenti",
+          "<span class=\"text-foreground font-medium\">URL foto profilo</span>: utilizzato esclusivamente internamente, non visibile ad altri utenti"
+        ]
+      },
+      {
+        "title": "3. Finalità e base giuridica",
+        "paragraphs": [
+          "I dati raccolti vengono trattati esclusivamente per la seguente finalità:",
+          "Non trattiamo i tuoi dati per finalità diverse da quelle indicate, né li cediamo a terzi per scopi commerciali."
+        ],
+        "list": [
+          "<span class=\"text-foreground font-medium\">Creazione e gestione dell'account</span>: necessaria per l'erogazione del servizio (art. 6, par. 1, lett. b GDPR)"
+        ]
+      },
+      {
+        "title": "4. Servizi di intelligenza artificiale",
+        "paragraphs": [
+          "La piattaforma integra <strong>Google Gemini</strong> come servizio di intelligenza artificiale per la generazione di contenuti. Quando utilizzi questa funzionalità:",
+          "Ti invitiamo a non inserire dati personali nel testo dei prompt inviati all'assistente AI."
+        ],
+        "list": [
+          "Solo il testo del prompt che scrivi esplicitamente nell'apposito campo viene trasmesso alle API di Google",
+          "Il contenuto del tuo formulario non viene mai inviato a servizi esterni",
+          "Non inviamo dati personali identificativi (email, nome) alle API di Google",
+          "Il trattamento dei dati da parte di Google è disciplinato dalla <a href=\"https://policies.google.com/privacy\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline text-foreground\">Privacy Policy di Google</a>"
+        ]
+      },
+      {
+        "title": "5. Visibilità dei dati",
+        "paragraphs": [
+          "Solo il <strong>display name</strong> è visibile agli altri utenti della piattaforma. L'indirizzo email e l'URL della foto profilo sono trattati in modo strettamente riservato e non vengono mai resi visibili ad altri utenti."
+        ]
+      },
+      {
+        "title": "6. Conservazione dei dati",
+        "paragraphs": [
+          "I dati vengono conservati per tutta la durata dell'account. In caso di cancellazione dell'account, i dati personali verranno eliminati dai nostri sistemi entro 30 giorni, salvo obblighi di legge contrari."
+        ]
+      },
+      {
+        "title": "7. Sicurezza",
+        "paragraphs": [
+          "Adottiamo misure tecniche e organizzative adeguate per proteggere i tuoi dati personali da accessi non autorizzati, perdita o divulgazione, in conformità con l'art. 32 del GDPR."
+        ]
+      },
+      {
+        "title": "8. Contatti",
+        "paragraphs": [
+          "Per qualsiasi richiesta relativa alla presente informativa o al trattamento dei tuoi dati personali, puoi contattarci all'indirizzo email."
+        ]
+      }
+    ]
+  },
+  "termsPage": {
+    "updatedAt": "Ultimo aggiornamento: Aprile 2026",
+    "title": "Termini di Servizio",
+    "subtitle": "Leggere attentamente i presenti termini prima di utilizzare la piattaforma.",
+    "sections": [
+      {
+        "title": "1. Accettazione dei termini",
+        "paragraphs": [
+          "Utilizzando la piattaforma FormulaBase, accetti integralmente i presenti Termini di Servizio. Se non accetti questi termini, ti invitiamo a non utilizzare il servizio."
+        ]
+      },
+      {
+        "title": "2. Descrizione del servizio",
+        "paragraphs": [
+          "FormulaBase è una piattaforma che consente agli utenti registrati di creare, organizzare e consultare formulari strutturati in capitoli e argomenti. Il servizio è fornito così com'è, senza garanzie di disponibilità continua."
+        ]
+      },
+      {
+        "title": "3. Registrazione e account",
+        "paragraphs": [
+          "Per utilizzare il servizio è necessario creare un account tramite il provider di autenticazione supportato. L'utente è responsabile della sicurezza del proprio account e delle attività svolte attraverso di esso. In caso di accesso non autorizzato, è necessario notificarcelo immediatamente."
+        ]
+      },
+      {
+        "title": "4. Contenuti dell'utente",
+        "paragraphs": [
+          "L'utente è l'unico responsabile dei contenuti (formulari, capitoli, argomenti) che carica o crea sulla piattaforma. È vietato inserire contenuti:",
+          "Ci riserviamo il diritto di rimuovere contenuti che violino questi termini."
+        ],
+        "list": [
+          "Illegali o che violino diritti di terzi",
+          "Offensivi, diffamatori o discriminatori",
+          "Contenenti malware o codice dannoso"
+        ]
+      },
+      {
+        "title": "5. Proprietà intellettuale",
+        "paragraphs": [
+          "I contenuti creati dall'utente rimangono di sua proprietà. Utilizzando il servizio, l'utente concede alla piattaforma una licenza limitata, non esclusiva e non trasferibile per archiviare ed erogare tali contenuti esclusivamente ai fini del servizio."
+        ]
+      },
+      {
+        "title": "6. Limitazione di responsabilità",
+        "paragraphs": [
+          "La piattaforma non è responsabile per perdita di dati, interruzioni del servizio o danni derivanti dall'utilizzo o dall'impossibilità di utilizzo del servizio. Il servizio è fornito \"così com'è\" senza garanzie di alcun tipo."
+        ]
+      },
+      {
+        "title": "7. Cancellazione dell'account",
+        "paragraphs": [
+          "L'utente può richiedere la cancellazione del proprio account in qualsiasi momento. A seguito della cancellazione, tutti i dati personali e i contenuti associati verranno eliminati entro 30 giorni, salvo obblighi di legge contrari."
+        ]
+      },
+      {
+        "title": "8. Modifiche ai termini",
+        "paragraphs": [
+          "Ci riserviamo il diritto di modificare i presenti termini in qualsiasi momento. Le modifiche saranno comunicate agli utenti e avranno effetto dalla data di pubblicazione. L'uso continuato del servizio dopo la pubblicazione delle modifiche costituisce accettazione dei nuovi termini."
+        ]
+      },
+      {
+        "title": "9. Legge applicabile",
+        "paragraphs": [
+          "I presenti termini sono regolati dalla legge italiana. Per qualsiasi controversia è competente il foro del luogo di residenza del titolare del servizio, salvo diversa disposizione di legge applicabile ai consumatori."
+        ]
+      },
+      {
+        "title": "10. Contatti",
+        "paragraphs": [
+          "Per qualsiasi domanda relativa ai presenti termini, puoi contattarci tramite mail."
+        ]
+      }
+    ]
+  },
+  "deleteAccount": {
+    "reauthErrorLog": "Errore ri-autenticazione:",
+    "reauthError": "Errore durante la ri-autenticazione",
+    "deleteError": "Errore durante l'eliminazione dell'account",
+    "button": "Elimina l'account e tutti i tuoi dati",
+    "title": "Eliminazione Account",
+    "description": "Sei sicuro di voler eliminare il tuo account? Tutti i tuoi formulari verranno eliminati con esso. Questa azione non è reversibile."
+  }
+}
+

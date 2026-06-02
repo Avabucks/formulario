@@ -1,0 +1,600 @@
+{
+  "metadata": {
+    "siteTitle": "FormulaBase - Digital formula sheet",
+    "siteDescription": "Create, organize, and share your formula sheets and cheat sheets with FormulaBase. Use the advanced editor and AI assistant to generate formulas and notes in seconds.",
+    "homeTitle": "Home",
+    "loginTitle": "Login",
+    "communityTitle": "Community",
+    "adminTitle": "Admin",
+    "privacyTitle": "Privacy",
+    "termsTitle": "Terms and conditions"
+  },
+  "languageSwitcher": {
+    "label": "Change language",
+    "it": "Italiano",
+    "en": "English"
+  },
+  "theme": {
+    "toggleTheme": "Toggle theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "common": {
+    "home": "Home",
+    "community": "Community",
+    "close": "Close",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "description": "Description",
+    "share": "Share",
+    "export": "Export",
+    "soon": "Soon",
+    "back": "Back",
+    "next": "Next",
+    "skip": "Skip",
+    "search": "Search",
+    "loading": "Loading",
+    "signOut": "Sign out"
+  },
+  "header": {
+    "demo": "Demo",
+    "features": "Features",
+    "faq": "FAQ",
+    "community": "Community",
+    "login": "Log in"
+  },
+  "landing": {
+    "hero": {
+      "titleWords": [
+        { "text": "Your", "muted": false },
+        { "text": "formulas.", "muted": false },
+        { "text": "Always", "muted": true },
+        { "text": "within", "muted": true },
+        { "text": "reach.", "muted": true }
+      ],
+      "subtitle": "The complete platform to create, organize, and share scientific formula sheets. Write in LaTeX, generate with AI, split content into chapters, and share through QR codes or links.",
+      "primaryCta": "Get started",
+      "secondaryCta": "Watch the demo",
+      "badges": [
+        "Free to start",
+        "AI formula generation",
+        "Full LaTeX support",
+        "QR code sharing"
+      ]
+    },
+    "videoDemo": {
+      "eyebrow": "Demo",
+      "title": "Everything you need",
+      "description": "We combined creation, organization, and sharing in a single interface.",
+      "videoComingSoon": "video coming soon",
+      "slides": [
+        {
+          "id": "01",
+          "label": "01 - Create formula sheet",
+          "title": "Keep all your formulas in one place",
+          "description": "Create a formula sheet for every subject or exam. From physics to chemistry, everything stays organized and close at hand.",
+          "video": "/tutorial/01.mp4"
+        },
+        {
+          "id": "02",
+          "label": "02 - Create chapter",
+          "title": "Structure your formula sheet with chapters",
+          "description": "Organize formulas into topic-based chapters. For example \"Mechanics\", \"Thermodynamics\", or \"Electromagnetism\".",
+          "video": "/tutorial/02.mp4"
+        },
+        {
+          "id": "03",
+          "label": "03 - Create topic",
+          "title": "Group formulas by topic",
+          "description": "Inside each chapter, create focused topics to keep your formulas neatly organized.",
+          "video": "/tutorial/03.mp4"
+        },
+        {
+          "id": "04",
+          "label": "04 - The editor",
+          "title": "Write formulas in LaTeX with live preview",
+          "description": "Write formulas in LaTeX and preview them in real time as you type. The editor also supports plain text, headings, lists, and more.",
+          "video": "/tutorial/04.mp4"
+        },
+        {
+          "id": "05",
+          "label": "05 - Generate with AI",
+          "title": "Let AI build the formula sheet for you",
+          "description": "Describe the topic and AI automatically generates the relevant formulas with explanations, ready to be added.",
+          "video": "/tutorial/05.mp4"
+        },
+        {
+          "id": "06",
+          "label": "06 - QR sharing",
+          "title": "Share your formula sheet with a QR code",
+          "description": "Generate a QR code for your formula sheet and share it with classmates. Just scan it with a phone to open it.",
+          "video": "/tutorial/06.mp4"
+        }
+      ]
+    },
+    "features": {
+      "eyebrow": "Features",
+      "title": "Everything your formula sheets need",
+      "description": "A tool designed for students, teachers, and researchers. Less clutter, more formulas.",
+      "items": [
+        {
+          "title": "Generate with AI",
+          "description": "Describe the topic and AI creates the full LaTeX formula sheet for you. From kinematics to organic chemistry, in seconds."
+        },
+        {
+          "title": "Smart search",
+          "description": "Find any formula in seconds. Search by name, symbol, topic, or keyword and get instant results."
+        },
+        {
+          "title": "Chapter-based organization",
+          "description": "Structure your formula sheets into chapters and topics. From classical mechanics to thermodynamics, everything has its place."
+        },
+        {
+          "title": "Built-in LaTeX editor",
+          "description": "Write and edit formulas directly in LaTeX with real-time preview. No extra software required."
+        },
+        {
+          "title": "QR code sharing",
+          "description": "Generate a QR code for every formula sheet. Perfect for printing and sharing during lessons and exams."
+        },
+        {
+          "title": "Private and public formula sheets",
+          "description": "Keep your formulas private or make them available to the community. Control always stays in your hands."
+        }
+      ]
+    },
+    "faq": {
+      "eyebrow": "FAQ",
+      "title": "Frequently asked questions",
+      "items": [
+        {
+          "question": "How does AI create a formula sheet for me?",
+          "answer": "Just enter the topic, for example 'Electromagnetism', and the AI instantly generates a complete structure. You get organized chapters, accurate formulas, and ready-to-use descriptions. It removes the blank-page problem so you can focus on refining the details."
+        },
+        {
+          "question": "I do not know LaTeX. Can I still use FormulaBase?",
+          "answer": "Absolutely. You do not need to write any code unless you want to. The AI handles the technical formatting while you work with an intuitive editor."
+        },
+        {
+          "question": "How does QR code sharing work?",
+          "answer": "Every formula sheet gets a unique QR code automatically. Before sharing, you choose the visibility: private, public with link, or community. You can print it directly or save it as an image."
+        },
+        {
+          "question": "What is the difference between private, public, and community?",
+          "answer": "Private is visible only to you and is ideal for work in progress. Public with link is accessible to anyone with the link or QR code. Community appears in the public collection and can be found and duplicated by other users."
+        },
+        {
+          "question": "Can I edit a formula sheet created by someone else?",
+          "answer": "Yes. If you find a useful formula sheet in the Community, you can duplicate it into your profile with one click. You will get your own copy to edit, extend, or shorten without changing the original author's work."
+        },
+        {
+          "question": "Is it free?",
+          "answer": "Yes, you can start for free without a credit card. You can create formula sheets, use the LaTeX editor, and share via QR code or link right away."
+        }
+      ]
+    },
+    "cta": {
+      "title": "Ready to organize your formulas?",
+      "description": "Create your first formula sheet in under a minute with AI or from scratch. No credit card, no setup.",
+      "button": "Start free"
+    },
+    "footer": {
+      "copyright": "All rights reserved."
+    }
+  },
+  "login": {
+    "welcome": "Welcome",
+    "subtitle": "Sign in with your Google account",
+    "popupClosed": "Popup closed by the user",
+    "genericError": "Error during Google sign-in. Please try again.",
+    "legalText": "By clicking below, you accept our {terms} and our {privacy}.",
+    "terms": "Terms of service",
+    "privacy": "Privacy policy"
+  },
+  "avatarMenu": {
+    "myFormularios": "View your formula sheets",
+    "community": "Community",
+    "discover": "See how it works",
+    "shortcuts": "Keyboard shortcuts",
+    "terms": "Terms and conditions",
+    "privacy": "Privacy",
+    "signOut": "Sign out"
+  },
+  "kbShortcuts": {
+    "title": "Keyboard shortcuts",
+    "sections": [
+      {
+        "title": "Application",
+        "shortcuts": [
+          "Search your formula sheets",
+          "Formula sheet settings",
+          "Add new"
+        ]
+      },
+      {
+        "title": "Formatting",
+        "shortcuts": [
+          "Ask AI",
+          "Bold",
+          "Italic",
+          "Quote",
+          "Ordered list",
+          "Unordered list",
+          "Divider",
+          "Heading 1",
+          "Heading 2",
+          "Heading 3",
+          "Heading 4",
+          "Heading 5",
+          "Heading 6"
+        ]
+      },
+      {
+        "title": "Editor",
+        "shortcuts": [
+          "Save",
+          "Undo",
+          "Redo",
+          "Cut",
+          "Copy",
+          "Select all",
+          "Delete word",
+          "Select next occurrence",
+          "Insert cursor",
+          "Move line up",
+          "Move line down",
+          "Duplicate line",
+          "Delete line",
+          "Go to start",
+          "Go to end",
+          "Comment line"
+        ]
+      }
+    ]
+  },
+  "home": {
+    "emptyFormulariosTitle": "No formula sheets",
+    "emptyFormulariosDescription": "There are no formula sheets to display.",
+    "emptyFavoritesTitle": "No favorite formula sheets",
+    "emptyFavoritesDescription": "You have not added any formula sheets to favorites yet.",
+    "communityTitle": "Explore the Community",
+    "communityDescription": "A collaborative library of formulas that keeps growing",
+    "communityButton": "Explore",
+    "myFormulariosTitle": "{name}'s formula sheets",
+    "myFormulariosDescription": "Manage and edit your formula sheets",
+    "favoritesTitle": "Your favorites"
+  },
+  "communityPage": {
+    "title": "Discover formulas from the Community",
+    "description": "Explore thousands of formula sheets created by students and professionals. Find, save, and share your favorite formulas.",
+    "searchPlaceholder": "Search formulas...",
+    "sortTrending": "Trending",
+    "sortRecent": "Recent",
+    "sortPopular": "Popular",
+    "noResults": "No results found."
+  },
+  "formularioCard": {
+    "profilePhoto": "profile photo",
+    "open": "Open formula sheet"
+  },
+  "search": {
+    "button": "Search your formula sheets",
+    "loading": "Searching...",
+    "placeholder": "Enter a search term",
+    "formularios": "Formula sheets",
+    "chapters": "Chapters",
+    "topics": "Topics"
+  },
+  "newAccountPopup": {
+    "title": "Discover the features"
+  },
+  "formularioAdd": {
+    "loading": "Creating...",
+    "success": "Formula sheet created successfully.",
+    "error": "Error while creating the formula sheet.",
+    "button": "Add formula sheet",
+    "title": "Add a formula sheet",
+    "titleLabel": "Formula sheet title",
+    "titlePlaceholder": "Formula sheet title",
+    "descriptionLabel": "Formula sheet description",
+    "descriptionPlaceholder": "Describe the formula sheet"
+  },
+  "formularioSettings": {
+    "loadingDelete": "Deleting...",
+    "deleteSuccess": "Formula sheet deleted successfully.",
+    "deleteError": "Error while deleting the formula sheet.",
+    "tooltip": "Formula sheet settings",
+    "edit": "Edit",
+    "info": "Info",
+    "share": "Share",
+    "export": "Export",
+    "description": "Description",
+    "deleteFormulario": "Delete formula sheet",
+    "deleteTitle": "Delete",
+    "deleteMessage": "Are you sure you want to delete \"{title}\"? This action cannot be undone.",
+    "loadingTitle": "Loading",
+    "loadingDescription": "Loading the formula sheet, please wait."
+  },
+  "editSection": {
+    "loading": "Saving changes...",
+    "success": "Formula sheet updated successfully.",
+    "error": "Error while updating the formula sheet.",
+    "titleLabel": "Formula sheet title",
+    "descriptionLabel": "Formula sheet description",
+    "shareWithLink": "Share with link",
+    "shareWithCommunity": "Share with the community",
+    "saveChanges": "Save changes"
+  },
+  "starFormulario": {
+    "addLoading": "Adding to favorites...",
+    "removeLoading": "Removing from favorites...",
+    "addSuccess": "Formula sheet added to favorites.",
+    "removeSuccess": "Formula sheet removed from favorites.",
+    "addError": "Error while adding to favorites.",
+    "removeError": "Error while removing from favorites."
+  },
+  "takeFormulario": {
+    "loading": "Processing request...",
+    "success": "Formula sheet added successfully.",
+    "error": "Error while copying the formula sheet.",
+    "button": "Add to my formula sheets",
+    "helper": "to edit it"
+  },
+  "capitoloPage": {
+    "emptyTitle": "No chapters",
+    "emptyDescription": "There are no chapters to show in \"{title}\"."
+  },
+  "capitoloAdd": {
+    "loading": "Creating...",
+    "success": "Chapter created successfully.",
+    "error": "Error while creating the chapter.",
+    "button": "Add chapter",
+    "title": "Add new chapter",
+    "description": "Create a new chapter in {title}.",
+    "label": "New chapter title"
+  },
+  "capitoloItem": {
+    "renameLoading": "Updating...",
+    "renameSuccess": "Chapter renamed successfully.",
+    "renameError": "Error while updating the chapter.",
+    "deleteLoading": "Deleting...",
+    "deleteSuccess": "Chapter deleted successfully.",
+    "deleteError": "Error while deleting the chapter.",
+    "moveLoading": "Moving...",
+    "moveSuccess": "Chapter moved successfully.",
+    "moveError": "Error while moving the chapter.",
+    "oneTopic": "topic",
+    "manyTopics": "topics",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "rename": "Rename",
+    "deleteMessage": "Are you sure you want to delete \"{title}\"? This action cannot be undone."
+  },
+  "argomentoPage": {
+    "emptyTitle": "No topics",
+    "emptyDescription": "There are no topics to show in \"{title}\"."
+  },
+  "argomentoAdd": {
+    "loading": "Creating...",
+    "success": "Topic created successfully.",
+    "error": "Error while creating the topic.",
+    "button": "Add topic",
+    "title": "Add new topic",
+    "description": "Create a new topic in {title}.",
+    "label": "New topic title"
+  },
+  "argomentoItem": {
+    "renameLoading": "Updating...",
+    "renameSuccess": "Topic renamed successfully.",
+    "renameError": "Error while updating the topic.",
+    "deleteLoading": "Deleting...",
+    "deleteSuccess": "Topic deleted successfully.",
+    "deleteError": "Error while deleting the topic.",
+    "moveLoading": "Moving...",
+    "moveSuccess": "Topic moved successfully.",
+    "moveError": "Error while moving the topic.",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "rename": "Rename",
+    "deleteMessage": "Are you sure you want to delete \"{title}\"? This action cannot be undone."
+  },
+  "editor": {
+    "undo": "Undo",
+    "redo": "Redo",
+    "unsynced": "Changes not synced",
+    "synced": "Changes synced",
+    "loadError": "Loading error"
+  },
+  "editorTools": {
+    "bold": "Bold",
+    "italic": "Italic",
+    "orderedList": "Ordered list",
+    "unorderedList": "Unordered list",
+    "quote": "Quote",
+    "divider": "Divider",
+    "askAi": "Ask AI",
+    "generatePrompt": "Describe what you want to generate",
+    "generatePlaceholder": "Example: Write a detailed explanation of...",
+    "generateHint": "Press Ctrl+Enter to generate",
+    "preview": "Response preview",
+    "accept": "Accept and insert",
+    "serverError": "Unable to reach the server. Please try again later.",
+    "loadingMessages": [
+      "AI is working on the response...",
+      "Thinking of something useful...",
+      "Collecting the best ideas...",
+      "Almost there...",
+      "Just a moment...",
+      "Choosing the right words...",
+      "Processing...",
+      "Putting the pieces together...",
+      "Doing my best...",
+      "One more second..."
+    ]
+  },
+  "admin": {
+    "statsFor": "Stats for:",
+    "general": "General",
+    "totalUsers": "Total users",
+    "newUsers": "new",
+    "registeredTotal": "registered overall",
+    "formularios": "Formula sheets",
+    "createdTotal": "created overall"
+  },
+  "privacyPage": {
+    "updatedAt": "Last updated: February 2026",
+    "title": "Privacy Policy",
+    "subtitle": "Information on the processing of personal data pursuant to Regulation (EU) 2016/679 (GDPR).",
+    "sections": [
+      {
+        "title": "1. Data controller",
+        "paragraphs": [
+          "The controller of personal data is the operator of the FormulaBase platform. For any request related to the processing of your data, you can contact us through the channels listed in the \"Contact\" section."
+        ]
+      },
+      {
+        "title": "2. Data collected",
+        "paragraphs": [
+          "When creating an account, we collect only the following personal data provided through the authentication provider:",
+          "We do not collect sensitive data, payment data, and we do not perform profiling for advertising or commercial purposes."
+        ],
+        "list": [
+          "<span class=\"text-foreground font-medium\">Display name</span>: publicly shown to other users",
+          "<span class=\"text-foreground font-medium\">Email address</span>: used only for authentication and not visible to other users",
+          "<span class=\"text-foreground font-medium\">Profile photo URL</span>: used internally only and not visible to other users"
+        ]
+      },
+      {
+        "title": "3. Purpose and legal basis",
+        "paragraphs": [
+          "The collected data is processed exclusively for the following purpose:",
+          "We do not process your data for purposes other than those indicated, nor do we share it with third parties for commercial purposes."
+        ],
+        "list": [
+          "<span class=\"text-foreground font-medium\">Account creation and management</span>: necessary for providing the service (Art. 6(1)(b) GDPR)"
+        ]
+      },
+      {
+        "title": "4. Artificial intelligence services",
+        "paragraphs": [
+          "The platform integrates <strong>Google Gemini</strong> as an artificial intelligence service for content generation. When you use this feature:",
+          "We recommend that you do not include personal data in prompts sent to the AI assistant."
+        ],
+        "list": [
+          "Only the prompt text that you explicitly type into the dedicated field is sent to Google APIs",
+          "The content of your formula sheet is never sent to external services",
+          "We do not send identifying personal data such as email or name to Google APIs",
+          "Google's processing of data is governed by the <a href=\"https://policies.google.com/privacy\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"underline text-foreground\">Google Privacy Policy</a>"
+        ]
+      },
+      {
+        "title": "5. Data visibility",
+        "paragraphs": [
+          "Only the <strong>display name</strong> is visible to other users of the platform. Your email address and profile photo URL are processed confidentially and are never shown to other users."
+        ]
+      },
+      {
+        "title": "6. Data retention",
+        "paragraphs": [
+          "Data is stored for the entire lifetime of the account. If the account is deleted, personal data will be removed from our systems within 30 days, unless a different retention period is required by law."
+        ]
+      },
+      {
+        "title": "7. Security",
+        "paragraphs": [
+          "We adopt appropriate technical and organizational measures to protect your personal data from unauthorized access, loss, or disclosure, in accordance with Art. 32 GDPR."
+        ]
+      },
+      {
+        "title": "8. Contact",
+        "paragraphs": [
+          "For any request related to this notice or the processing of your personal data, you can contact us by email."
+        ]
+      }
+    ]
+  },
+  "termsPage": {
+    "updatedAt": "Last updated: April 2026",
+    "title": "Terms of Service",
+    "subtitle": "Please read these terms carefully before using the platform.",
+    "sections": [
+      {
+        "title": "1. Acceptance of terms",
+        "paragraphs": [
+          "By using the FormulaBase platform, you fully accept these Terms of Service. If you do not accept them, please do not use the service."
+        ]
+      },
+      {
+        "title": "2. Service description",
+        "paragraphs": [
+          "FormulaBase is a platform that allows registered users to create, organize, and consult formula sheets structured into chapters and topics. The service is provided as is, without guarantees of continuous availability."
+        ]
+      },
+      {
+        "title": "3. Registration and account",
+        "paragraphs": [
+          "To use the service, you must create an account through a supported authentication provider. You are responsible for the security of your account and for activities carried out through it. In case of unauthorized access, you must notify us immediately."
+        ]
+      },
+      {
+        "title": "4. User content",
+        "paragraphs": [
+          "You are solely responsible for the content, including formula sheets, chapters, and topics, that you upload or create on the platform. It is forbidden to upload content that is:",
+          "We reserve the right to remove content that violates these terms."
+        ],
+        "list": [
+          "Illegal or infringing on third-party rights",
+          "Offensive, defamatory, or discriminatory",
+          "Containing malware or harmful code"
+        ]
+      },
+      {
+        "title": "5. Intellectual property",
+        "paragraphs": [
+          "Content created by the user remains their property. By using the service, the user grants the platform a limited, non-exclusive, non-transferable license to store and deliver that content solely for the purpose of operating the service."
+        ]
+      },
+      {
+        "title": "6. Limitation of liability",
+        "paragraphs": [
+          "The platform is not liable for data loss, service interruptions, or damages resulting from the use or inability to use the service. The service is provided \"as is\" without warranties of any kind."
+        ]
+      },
+      {
+        "title": "7. Account deletion",
+        "paragraphs": [
+          "Users may request deletion of their account at any time. Following deletion, all personal data and associated content will be removed within 30 days, unless a different retention period is required by law."
+        ]
+      },
+      {
+        "title": "8. Changes to the terms",
+        "paragraphs": [
+          "We reserve the right to modify these terms at any time. Changes will be communicated to users and will take effect from the publication date. Continued use of the service after publication of the changes constitutes acceptance of the updated terms."
+        ]
+      },
+      {
+        "title": "9. Governing law",
+        "paragraphs": [
+          "These terms are governed by Italian law. For any dispute, jurisdiction lies with the court of the service owner's place of residence, unless otherwise required by consumer protection law."
+        ]
+      },
+      {
+        "title": "10. Contact",
+        "paragraphs": [
+          "For any question regarding these terms, you can contact us by email."
+        ]
+      }
+    ]
+  },
+  "deleteAccount": {
+    "reauthErrorLog": "Re-authentication error:",
+    "reauthError": "Error during re-authentication",
+    "deleteError": "Error while deleting the account",
+    "button": "Delete your account and all your data",
+    "title": "Account deletion",
+    "description": "Are you sure you want to delete your account? All your formula sheets will be deleted with it. This action cannot be undone."
+  }
+}
