@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/src/components/ui/dialog";
@@ -15,6 +16,7 @@ import { Button } from "@/src/components/ui/button";
 import { Separator } from "@/src/components/ui/separator";
 import { Textarea } from "@/src/components/ui/textarea";
 import { Spinner } from "../ui/spinner";
+import { usePathname } from "next/navigation";
 
 const FEEDBACK_POPUP_DISABLED_KEY = "feedback_popup_disabled";
 const ACCOUNT_POPUP_KEY = "new-account-popup-closed";
@@ -22,6 +24,8 @@ const ACCOUNT_POPUP_KEY = "new-account-popup-closed";
 const RATING_LABELS = ["Pessimo", "Scarso", "Nella media", "Buono", "Ottimo"];
 
 export default function FeedbackWidget() {
+  const pathname = usePathname();
+
   const [visible, setVisible] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -102,6 +106,10 @@ export default function FeedbackWidget() {
 
   const activeRating = hover ?? rating;
 
+  if (pathname.startsWith("/editor")) {
+    return null;
+  }
+
   return (
     <>
       <button
@@ -115,7 +123,10 @@ export default function FeedbackWidget() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-130">
           <DialogHeader>
-            <DialogTitle className="text-sm font-medium">Feedback</DialogTitle>
+            <DialogTitle className="flex items-center gap-2 text-lg">
+              <MessageCircle size={18} className="text-primary" />
+              Feedback{" "}
+            </DialogTitle>
           </DialogHeader>
 
           {submitted ? (
@@ -149,8 +160,6 @@ export default function FeedbackWidget() {
                 </div>
               </div>
 
-              <Separator />
-
               <Textarea
                 ref={textareaRef}
                 value={text}
@@ -159,30 +168,26 @@ export default function FeedbackWidget() {
                 className="min-h-22.5 text-sm"
               />
 
-              <div className="flex items-center justify-between gap-2 pt-1">
-                <button
-                  type="button"
-                  onClick={disableAutomaticPopup}
-                  className="text-xs text-muted-foreground transition hover:text-foreground hover:underline"
-                >
-                  Non mostrare più
-                </button>
-
-                <Button
-                  size="sm"
-                  onClick={submit}
-                  disabled={loading}
-                  className="text-xs"
-                >
-                  {loading ? (
-                    <Spinner />
-                  ) : (
-                    <Send className="h-3 w-3" />
+              <DialogFooter>
+                <div className="flex items-center justify-end gap-2 pt-1">
+                  {localStorage.getItem(FEEDBACK_POPUP_DISABLED_KEY) !==
+                    "true" && (
+                    <Button
+                      type="button"
+                      onClick={disableAutomaticPopup}
+                      variant="link"
+                    >
+                      Non mostrare più
+                    </Button>
                   )}
 
-                  <span className="ml-1">Invia</span>
-                </Button>
-              </div>
+                  <Button size="lg" onClick={submit} disabled={loading}>
+                    {loading ? <Spinner /> : <Send className="h-3 w-3" />}
+
+                    <span className="ml-1">Invia</span>
+                  </Button>
+                </div>
+              </DialogFooter>
             </div>
           )}
         </DialogContent>
