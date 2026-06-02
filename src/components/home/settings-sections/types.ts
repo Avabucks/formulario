@@ -26,14 +26,3 @@ export type StructureCapitolo = {
   sortOrder: number;
   argomenti: StructureArgomento[];
 };
-
-export type FormularioStructure = {
-  capitoli: StructureCapitolo[];
-  stats: {
-    capitoliCount: number;
-    argomentiCount: number;
-    emptyCapitoliCount: number;
-    emptyArgomentiCount: number;
-    untitledArgomentiCount: number;
-  };
-};

@@ -24,7 +24,6 @@ import {
   TooltipTrigger,
 } from "../ui/tooltip";
 import { EditSection } from "./settings-sections/edit-section";
-import { FormularioStructureSection } from "./settings-sections/formulario-structure-section";
 import { InfoSection } from "./settings-sections/info-section";
 import { SettingsFooter } from "./settings-sections/settings-footer";
 import { SettingsHeader } from "./settings-sections/settings-header";
@@ -32,7 +31,6 @@ import { SettingsSidebar } from "./settings-sections/settings-sidebar";
 import { ShareSection } from "./settings-sections/share-section";
 import {
   Formulario,
-  FormularioStructure,
   SettingsSection,
 } from "./settings-sections/types";
 
@@ -41,7 +39,6 @@ export function FormularioSettings({
 }: Readonly<{ formularioId: string }>) {
   const router = useRouter();
   const [formulario, setFormulario] = useState<Formulario>();
-  const [structure, setStructure] = useState<FormularioStructure>();
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [open, setOpen] = useState(false);
@@ -53,42 +50,34 @@ export function FormularioSettings({
   useEffect(() => {
     let ignore = false;
 
-    Promise.resolve()
-      .then(() => {
-        if (ignore) return undefined;
+Promise.resolve()
+  .then(() => {
+    if (ignore) return;
 
-        setLoading(true);
-        setLoadError(false);
+    setLoading(true);
+    setLoadError(false);
 
-        return Promise.all([
-          fetchJson<Formulario>(`/api/formulari/${formularioId}`),
-          fetchJson<FormularioStructure>(
-            `/api/formulari/${formularioId}/structure`,
-          ),
-        ]);
-      })
-      .then((result) => {
-        if (ignore || !result) return;
+    return fetchJson<Formulario>(`/api/formulari/${formularioId}`);
+  })
+  .then((result) => {
+    if (ignore || !result) return;
 
-        const [formularioData, structureData] = result;
-
-        setFormulario(formularioData);
-        setStructure(structureData);
-        setEdited(false);
-        setActiveSection(formularioData.editable ? "edit" : "info");
-      })
-      .catch(() => {
-        if (!ignore) {
-          setLoadError(true);
-          toast.error("Errore durante il caricamento del formulario.", {
-            position: "bottom-center",
-          });
-        }
-      })
-      .finally(() => {
-        if (!ignore) setLoading(false);
+    setFormulario(result);
+    setEdited(false);
+    setActiveSection(result.editable ? "edit" : "info");
+  })
+  .catch(() => {
+    if (!ignore) {
+      setLoadError(true);
+      toast.error("Errore durante il caricamento del formulario.", {
+        position: "bottom-center",
       });
-
+    }
+  })
+  .finally(() => {
+    if (!ignore) setLoading(false);
+  });
+  
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "I" && (e.metaKey || e.ctrlKey) && e.shiftKey) {
         e.preventDefault();
@@ -127,7 +116,7 @@ export function FormularioSettings({
 
   const dialogContent = () => {
     if (loading) return <SettingsLoading />;
-    if (loadError || !formulario || !structure) return <SettingsLoadError />;
+    if (loadError || !formulario) return <SettingsLoadError />;
 
     return (
       <>
@@ -151,14 +140,6 @@ export function FormularioSettings({
                   setFormulario={setFormulario}
                   edited={edited}
                   setEdited={setEdited}
-                />
-              )}
-              {activeSection === "structure" && (
-                <FormularioStructureSection
-                  key={formularioId}
-                  editable={formulario.editable}
-                  structure={structure}
-                  onStructureChange={setStructure}
                 />
               )}
               {activeSection === "qr" && formulario.visibility !== 0 && (
