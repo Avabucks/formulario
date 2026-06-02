@@ -164,14 +164,14 @@ export default function FeedbackWidget() {
                 <div className="flex items-center justify-end gap-2 pt-1">
                   {localStorage.getItem(FEEDBACK_POPUP_DISABLED_KEY) !==
                     "true" && (
-                      <Button
-                        type="button"
-                        onClick={disableAutomaticPopup}
-                        variant="link"
-                      >
-                        Non mostrare più
-                      </Button>
-                    )}
+                    <Button
+                      type="button"
+                      onClick={disableAutomaticPopup}
+                      variant="link"
+                    >
+                      Non mostrare più
+                    </Button>
+                  )}
 
                   <Button size="lg" onClick={submit} disabled={loading}>
                     {loading ? <Spinner /> : <Send className="h-3 w-3" />}

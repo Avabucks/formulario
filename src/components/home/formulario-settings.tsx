@@ -29,10 +29,7 @@ import { SettingsFooter } from "./settings-sections/settings-footer";
 import { SettingsHeader } from "./settings-sections/settings-header";
 import { SettingsSidebar } from "./settings-sections/settings-sidebar";
 import { ShareSection } from "./settings-sections/share-section";
-import {
-  Formulario,
-  SettingsSection,
-} from "./settings-sections/types";
+import { Formulario, SettingsSection } from "./settings-sections/types";
 
 export function FormularioSettings({
   formularioId,
@@ -50,34 +47,34 @@ export function FormularioSettings({
   useEffect(() => {
     let ignore = false;
 
-Promise.resolve()
-  .then(() => {
-    if (ignore) return;
+    Promise.resolve()
+      .then(() => {
+        if (ignore) return;
 
-    setLoading(true);
-    setLoadError(false);
+        setLoading(true);
+        setLoadError(false);
 
-    return fetchJson<Formulario>(`/api/formulari/${formularioId}`);
-  })
-  .then((result) => {
-    if (ignore || !result) return;
+        return fetchJson<Formulario>(`/api/formulari/${formularioId}`);
+      })
+      .then((result) => {
+        if (ignore || !result) return;
 
-    setFormulario(result);
-    setEdited(false);
-    setActiveSection(result.editable ? "edit" : "info");
-  })
-  .catch(() => {
-    if (!ignore) {
-      setLoadError(true);
-      toast.error("Errore durante il caricamento del formulario.", {
-        position: "bottom-center",
+        setFormulario(result);
+        setEdited(false);
+        setActiveSection(result.editable ? "edit" : "info");
+      })
+      .catch(() => {
+        if (!ignore) {
+          setLoadError(true);
+          toast.error("Errore durante il caricamento del formulario.", {
+            position: "bottom-center",
+          });
+        }
+      })
+      .finally(() => {
+        if (!ignore) setLoading(false);
       });
-    }
-  })
-  .finally(() => {
-    if (!ignore) setLoading(false);
-  });
-  
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "I" && (e.metaKey || e.ctrlKey) && e.shiftKey) {
         e.preventDefault();
