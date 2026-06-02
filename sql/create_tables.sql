@@ -62,3 +62,13 @@ CREATE TABLE IF NOT EXISTS preferiti (
   formulario_id VARCHAR(255) NOT NULL REFERENCES formulari(beautiful_id) ON DELETE CASCADE,
   UNIQUE(user_uid, formulario_id)
 );
+--
+-- Table structure for table 'feedback'
+--
+CREATE TABLE IF NOT EXISTS feedback (
+  id SERIAL PRIMARY KEY,
+  user_uid VARCHAR(255) NOT NULL,
+  rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
+  testo TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

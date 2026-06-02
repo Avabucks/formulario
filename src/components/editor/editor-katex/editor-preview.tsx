@@ -231,8 +231,7 @@ export const EditorPreview = memo(function EditorPreview({
           const sourceHeading = markdownHeadings[index];
           return {
             id: `preview-heading-${index}`,
-            level:
-              sourceHeading?.level ?? (Number.isNaN(level) ? 1 : level),
+            level: sourceHeading?.level ?? (Number.isNaN(level) ? 1 : level),
             title,
             sourceTitle: sourceHeading?.title ?? title,
             element,
@@ -424,7 +423,10 @@ export const EditorPreview = memo(function EditorPreview({
               showNavigatorTemporarily();
             }}
           >
-            <div ref={navigatorListRef} className="max-h-80 overflow-y-auto p-1">
+            <div
+              ref={navigatorListRef}
+              className="max-h-80 overflow-y-auto p-1"
+            >
               {headings.map((heading) => (
                 <button
                   key={heading.id}

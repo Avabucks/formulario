@@ -1,22 +1,43 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { cn } from "@/src/lib/utils";
 
-const isMac =
-  typeof navigator !== "undefined" &&
-  /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
-
-const keyMap: Record<string, string> = {
-  Ctrl: isMac ? "⌘" : "Ctrl",
-  Alt: isMac ? "⌥" : "Alt",
-  Shift: isMac ? "⇧" : "Shift",
-};
-
-function resolveKey(key: string): string {
-  return keyMap[key] ?? key;
+function detectMac() {
+  if (typeof navigator === "undefined") return false;
+  return /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
 }
 
-function Kbd({ className, children, ...props }: React.ComponentProps<"kbd">) {
+function useIsMac() {
+  const [isMac, setIsMac] = useState(false);
+
+  useEffect(() => {
+    setIsMac(detectMac());
+  }, []);
+
+  return isMac;
+}
+
+const keyMap: Record<string, (isMac: boolean) => string> = {
+  Ctrl: (isMac) => (isMac ? "⌘" : "Ctrl"),
+  Alt: (isMac) => (isMac ? "⌥" : "Alt"),
+  Shift: (isMac) => (isMac ? "⇧" : "Shift"),
+};
+
+function resolveKey(key: string, isMac: boolean): string {
+  return keyMap[key]?.(isMac) ?? key;
+}
+
+export function Kbd({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<"kbd">) {
+  const isMac = useIsMac();
+
   const resolved =
-    typeof children === "string" ? resolveKey(children) : children;
+    typeof children === "string" ? resolveKey(children, isMac) : children;
+
   return (
     <kbd
       data-slot="kbd"
@@ -31,14 +52,12 @@ function Kbd({ className, children, ...props }: React.ComponentProps<"kbd">) {
   );
 }
 
-function KbdGroup({ className, ...props }: React.ComponentProps<"div">) {
+export function KbdGroup({ className, ...props }: React.ComponentProps<"div">) {
   return (
-    <kbd
+    <div
       data-slot="kbd-group"
       className={cn("gap-1 inline-flex items-center", className)}
       {...props}
     />
   );
 }
-
-export { Kbd, KbdGroup };

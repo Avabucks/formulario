@@ -8,6 +8,7 @@ import { ThemeProvider } from "../components/theme/theme-provider";
 import "../styles/editor.css";
 import "../styles/globals.css";
 import { UmamiTracker } from "../components/analytics/umami-tracker";
+import FeedbackWidget from "../components/home/feedback-widget";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -68,7 +69,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -95,6 +95,7 @@ export default function RootLayout({
           <main className="flex flex-1 flex-col">{children}</main>
           <Toaster />
           <UmamiTracker />
+          <FeedbackWidget />
         </ThemeProvider>
       </body>
     </html>

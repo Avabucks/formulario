@@ -4,38 +4,38 @@ FormulaBase è una web app per creare, organizzare e condividere formulari scien
 
 ## Funzionalità principali
 
-* Autenticazione Google tramite Firebase
-* Sessioni server-side con `iron-session`
-* Database PostgreSQL per utenti, formulari, capitoli, argomenti e preferiti
-* Editor Markdown/LaTeX con Monaco Editor
-* Anteprima KaTeX e strumenti di formattazione
-* Generazione contenuti tramite Gemini e Groq
-* Formulari privati, condivisi o pubblici nella community
-* Sistema di preferiti, visualizzazioni, ricerca e duplicazione formulari
-* Condivisione tramite link e QR code
-* Tema chiaro/scuro con UI basata su Radix UI e shadcn/ui
+- Autenticazione Google tramite Firebase
+- Sessioni server-side con `iron-session`
+- Database PostgreSQL per utenti, formulari, capitoli, argomenti e preferiti
+- Editor Markdown/LaTeX con Monaco Editor
+- Anteprima KaTeX e strumenti di formattazione
+- Generazione contenuti tramite Gemini e Groq
+- Formulari privati, condivisi o pubblici nella community
+- Sistema di preferiti, visualizzazioni, ricerca e duplicazione formulari
+- Condivisione tramite link e QR code
+- Tema chiaro/scuro con UI basata su Radix UI e shadcn/ui
 
 ## Stack tecnologico
 
-* Next.js 16 (App Router)
-* React 19
-* TypeScript
-* Tailwind CSS 4
-* PostgreSQL (`pg`)
-* Firebase Auth + Firebase Admin
-* Monaco Editor
-* KaTeX, React Markdown e Mermaid
-* Gemini API e Groq API
+- Next.js 16 (App Router)
+- React 19
+- TypeScript
+- Tailwind CSS 4
+- PostgreSQL (`pg`)
+- Firebase Auth + Firebase Admin
+- Monaco Editor
+- KaTeX, React Markdown e Mermaid
+- Gemini API e Groq API
 
 ## Requisiti
 
 Prima di iniziare assicurati di avere:
 
-* Node.js 20 o superiore
-* npm
-* Un database PostgreSQL
-* Un progetto Firebase con autenticazione Google abilitata
-* Una chiave API Gemini e/o Groq per le funzionalità AI
+- Node.js 20 o superiore
+- npm
+- Un database PostgreSQL
+- Un progetto Firebase con autenticazione Google abilitata
+- Una chiave API Gemini e/o Groq per le funzionalità AI
 
 ## Setup locale
 
@@ -176,11 +176,11 @@ sql/create_tables.sql
 
 Lo script crea le seguenti tabelle:
 
-* `users` → utenti autenticati tramite Firebase
-* `formulari` → formulari creati o duplicati dagli utenti
-* `capitoli` → sezioni ordinate dei formulari
-* `argomenti` → contenuti Markdown/LaTeX associati ai capitoli
-* `preferiti` → relazione tra utenti e formulari salvati
+- `users` → utenti autenticati tramite Firebase
+- `formulari` → formulari creati o duplicati dagli utenti
+- `capitoli` → sezioni ordinate dei formulari
+- `argomenti` → contenuti Markdown/LaTeX associati ai capitoli
+- `preferiti` → relazione tra utenti e formulari salvati
 
 Viene inoltre abilitata l'estensione PostgreSQL `pg_trgm`, utilizzata per migliorare le ricerche testuali.
 
@@ -190,15 +190,14 @@ Viene inoltre abilitata l'estensione PostgreSQL `pg_trgm`, utilizzata per miglio
 2. Il backend verifica l'ID token tramite Firebase Admin
 3. L'utente viene creato o aggiornato nel database PostgreSQL
 4. I formulari vengono gestiti tramite:
+   - `/home`
+   - `/formulario/[formularioId]`
+   - `/capitolo/[capitoloId]`
+   - `/editor/[argomentoId]`
 
-   * `/home`
-   * `/formulario/[formularioId]`
-   * `/capitolo/[capitoloId]`
-   * `/editor/[argomentoId]`
 5. Le API in `src/app/api` gestiscono:
-
-   * salvataggio contenuti
-   * struttura formulari
-   * preferiti
-   * visibilità
-   * richieste AI
+   - salvataggio contenuti
+   - struttura formulari
+   - preferiti
+   - visibilità
+   - richieste AI

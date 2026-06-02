@@ -231,44 +231,32 @@ function MermaidBlock({ code }: Readonly<{ code: string }>) {
 
 export const markdownComponents: Components = {
   h1: ({ children }) => (
-    <h1
-      className="text-(--editor-title) text-[2em] font-semibold leading-9 mb-7"
-    >
+    <h1 className="text-(--editor-title) text-[2em] font-semibold leading-9 mb-7">
       {children}
     </h1>
   ),
   h2: ({ children }) => (
-    <h2
-      className="text-(--editor-title) text-[1.5em] font-semibold leading-6 mb-6"
-    >
+    <h2 className="text-(--editor-title) text-[1.5em] font-semibold leading-6 mb-6">
       {children}
     </h2>
   ),
   h3: ({ children }) => (
-    <h3
-      className="text-(--editor-title) text-[1.2em] font-semibold leading-5 mb-3"
-    >
+    <h3 className="text-(--editor-title) text-[1.2em] font-semibold leading-5 mb-3">
       {children}
     </h3>
   ),
   h4: ({ children }) => (
-    <h4
-      className="text-(--editor-title) text-[1em] font-semibold leading-4 mb-3"
-    >
+    <h4 className="text-(--editor-title) text-[1em] font-semibold leading-4 mb-3">
       {children}
     </h4>
   ),
   h5: ({ children }) => (
-    <h5
-      className="text-(--editor-title) text-[0.875em] font-semibold leading-3 mb-3"
-    >
+    <h5 className="text-(--editor-title) text-[0.875em] font-semibold leading-3 mb-3">
       {children}
     </h5>
   ),
   h6: ({ children }) => (
-    <h6
-      className="text-(--editor-title)/60 text-[0.85em] font-semibold mb-3"
-    >
+    <h6 className="text-(--editor-title)/60 text-[0.85em] font-semibold mb-3">
       {children}
     </h6>
   ),
