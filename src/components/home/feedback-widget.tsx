@@ -81,7 +81,7 @@ export default function FeedbackWidget() {
 
       if (!res.ok) {
         toast.error(data?.error ?? "Errore invio feedback", {
-          position: "top-center",
+          position: "bottom-center",
         });
 
         return;
@@ -91,7 +91,7 @@ export default function FeedbackWidget() {
       localStorage.setItem(FEEDBACK_POPUP_DISABLED_KEY, "true");
     } catch {
       toast.error("Errore invio feedback", {
-        position: "top-center",
+        position: "bottom-center",
       });
     } finally {
       setLoading(false);
