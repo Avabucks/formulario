@@ -211,7 +211,7 @@ export default async function Admin({
                   formulariModificati[0].total.toLocaleString("it-IT"),
                 )}
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground mt-1">
                 di cui {formatNumber(formulariModificati[0].today)} modificati
                 oggi
               </p>
