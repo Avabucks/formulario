@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageCircle, Send } from "lucide-react";
+import { MessageCircle, Send, Star } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -22,8 +22,8 @@ const ACCOUNT_POPUP_KEY = "new-account-popup-closed";
 const RATING_LABELS = ["Pessimo", "Scarso", "Nella media", "Buono", "Ottimo"];
 
 export default function FeedbackWidget() {
-  const [visible, setVisible] = useState(false);
   const [open, setOpen] = useState(false);
+  const [popupDisabled, setPopupDisabled] = useState(false);
 
   const [submitted, setSubmitted] = useState(false);
   const [rating, setRating] = useState(5);
@@ -34,15 +34,14 @@ export default function FeedbackWidget() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    const popupDisabled =
+    const isPopupDisabled =
       localStorage.getItem(FEEDBACK_POPUP_DISABLED_KEY) === "true";
-
     const accountPopupClosed =
       localStorage.getItem(ACCOUNT_POPUP_KEY) === "true";
 
-    setVisible(true);
+    setPopupDisabled(isPopupDisabled);
 
-    if (!popupDisabled && accountPopupClosed) {
+    if (!isPopupDisabled && accountPopupClosed) {
       setOpen(true);
     }
   }, []);
@@ -59,6 +58,7 @@ export default function FeedbackWidget() {
 
   const disableAutomaticPopup = () => {
     localStorage.setItem(FEEDBACK_POPUP_DISABLED_KEY, "true");
+    setPopupDisabled(true);
     setOpen(false);
   };
 
@@ -68,13 +68,8 @@ export default function FeedbackWidget() {
 
       const res = await fetch("/api/feedback", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          rating,
-          testo: text,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rating, testo: text }),
       });
 
       const data = await res.json();
@@ -83,22 +78,18 @@ export default function FeedbackWidget() {
         toast.error(data?.error ?? "Errore invio feedback", {
           position: "bottom-center",
         });
-
         return;
       }
 
       setSubmitted(true);
       localStorage.setItem(FEEDBACK_POPUP_DISABLED_KEY, "true");
+      setPopupDisabled(true);
     } catch {
-      toast.error("Errore invio feedback", {
-        position: "bottom-center",
-      });
+      toast.error("Errore invio feedback", { position: "bottom-center" });
     } finally {
       setLoading(false);
     }
   };
-
-  if (!visible) return null;
 
   const activeRating = hover ?? rating;
 
@@ -117,7 +108,7 @@ export default function FeedbackWidget() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-lg">
               <MessageCircle size={18} className="text-primary" />
-              Feedback{" "}
+              Feedback
             </DialogTitle>
           </DialogHeader>
 
@@ -128,25 +119,30 @@ export default function FeedbackWidget() {
           ) : (
             <div className="space-y-4">
               <div className="space-y-2">
-                <div className="flex gap-1">
+                <div className="flex gap-1" onMouseLeave={() => setHover(null)}>
                   {Array.from({ length: 5 }).map((_, i) => {
                     const value = i + 1;
-
                     return (
                       <button
                         key={value}
                         type="button"
                         onMouseEnter={() => setHover(value)}
-                        onMouseLeave={() => setHover(null)}
                         onClick={() => setRating(value)}
-                        className="text-lg leading-none text-muted-foreground transition hover:text-foreground"
+                        className="transition"
                       >
-                        {value <= activeRating ? "★" : "☆"}
+                        <Star
+                          className="h-5 w-5 transition"
+                          stroke="oklch(79.5% 0.184 86.047)"
+                          fill={
+                            value <= activeRating
+                              ? "oklch(79.5% 0.184 86.047)"
+                              : "transparent"
+                          }
+                        />
                       </button>
                     );
                   })}
                 </div>
-
                 <div className="text-xs text-muted-foreground">
                   {RATING_LABELS[activeRating - 1]}
                 </div>
@@ -162,8 +158,7 @@ export default function FeedbackWidget() {
 
               <DialogFooter>
                 <div className="flex items-center justify-end gap-2 pt-1">
-                  {localStorage.getItem(FEEDBACK_POPUP_DISABLED_KEY) !==
-                    "true" && (
+                  {!popupDisabled && (
                     <Button
                       type="button"
                       onClick={disableAutomaticPopup}
@@ -172,10 +167,8 @@ export default function FeedbackWidget() {
                       Non mostrare più
                     </Button>
                   )}
-
                   <Button size="lg" onClick={submit} disabled={loading}>
                     {loading ? <Spinner /> : <Send className="h-3 w-3" />}
-
                     <span className="ml-1">Invia</span>
                   </Button>
                 </div>

@@ -72,7 +72,9 @@ export function LoginForm({
 
   useEffect(() => {
     signOut(auth).then(() => {
-      ['email', 'name', 'photoURL'].forEach(key => localStorage.removeItem(key));
+      ["email", "name", "photoURL"].forEach((key) =>
+        localStorage.removeItem(key),
+      );
     });
   }, []);
 

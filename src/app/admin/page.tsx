@@ -1,5 +1,10 @@
 import packageJson from "@/package.json";
 import { DatePicker } from "@/src/components/admin/date-picker";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/src/components/ui/avatar";
 import { Badge } from "@/src/components/ui/badge";
 import {
   Card,
@@ -11,7 +16,7 @@ import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { formatNumber } from "@/src/lib/utils";
 import { getIronSession } from "iron-session";
-import { FileText, TrendingUp, Users } from "lucide-react";
+import { FileText, Star, TrendingUp, Users } from "lucide-react";
 import { Metadata } from "next";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -67,6 +72,13 @@ export default async function Admin({
                 )::int AS today
             FROM formulari`,
       [selectedDate],
+    );
+
+    const { rows: feedback } = await pool.query(
+      `SELECT f.rating, f.testo, f.created_at, u.display_name, u.foto_profilo
+   FROM feedback f
+   JOIN users u ON u.uid = f.user_uid
+   ORDER BY f.created_at DESC`,
     );
 
     return (
@@ -147,6 +159,64 @@ export default async function Admin({
                     - dollars from tokens (con sotto la divisione tra input e output)
                 </div>
                 */}
+
+        <h2 className="text-xl font-semibold">Feedback</h2>
+        <div className="space-y-3">
+          {feedback.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              Nessun feedback ricevuto.
+            </p>
+          ) : (
+            feedback.map((f) => (
+              <Card key={`${f.display_name}-${f.created_at}`}>
+                <CardContent className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-7 w-7">
+                        <AvatarImage
+                          src={f.foto_profilo}
+                          alt={f.display_name}
+                        />
+                        <AvatarFallback className="text-xs">
+                          {f.display_name.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm font-medium">
+                        {f.display_name}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-0.5">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star
+                          key={i}
+                          className="h-4 w-4"
+                          stroke="oklch(79.5% 0.184 86.047)"
+                          fill={
+                            i < f.rating
+                              ? "oklch(79.5% 0.184 86.047)"
+                              : "transparent"
+                          }
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex items-end justify-between gap-4">
+                    <p className="text-sm text-muted-foreground">{f.testo}</p>
+                    <span className="text-xs text-muted-foreground shrink-0">
+                      {new Date(f.created_at).toLocaleDateString("it-IT", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </div>
       </div>
     );
   }
