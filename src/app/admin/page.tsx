@@ -16,7 +16,14 @@ import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { formatNumber } from "@/src/lib/utils";
 import { getIronSession } from "iron-session";
-import { BarChart2, FileText, Star, TrendingUp, Users } from "lucide-react";
+import {
+  BarChart2,
+  FileText,
+  Pencil,
+  Star,
+  TrendingUp,
+  Users,
+} from "lucide-react";
 import { Metadata } from "next";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -74,14 +81,25 @@ export default async function Admin({
             COUNT(*) FILTER (
                 WHERE data_creazione::date = $1::date
                   AND owner_uid NOT IN ('EHawFI6rMdRGaY7qQTOUdl9pAGl2', 'ihXvO40BU4NQzQEeeBNBDP6Mcuj2')
-            )::int AS today,
+            )::int AS today
 
-            COUNT(*) FILTER (
-                WHERE data_modifica::timestamp >= data_creazione::timestamp + INTERVAL '1 day'
-                  AND data_creazione::date <= $1::date
-                  AND owner_uid NOT IN ('EHawFI6rMdRGaY7qQTOUdl9pAGl2', 'ihXvO40BU4NQzQEeeBNBDP6Mcuj2')
-            )::int AS modified
         FROM formulari`,
+      [selectedDate],
+    );
+
+    const { rows: formulariModificati } = await pool.query(
+      `SELECT
+          COUNT(*) FILTER (
+              WHERE f.data_modifica::timestamp >= f.data_creazione::timestamp + INTERVAL '1 day'
+                AND f.data_creazione::date <= $1::date
+                AND f.owner_uid NOT IN ('EHawFI6rMdRGaY7qQTOUdl9pAGl2', 'ihXvO40BU4NQzQEeeBNBDP6Mcuj2')
+          )::int AS total,
+          COUNT(*) FILTER (
+              WHERE f.data_modifica::timestamp >= f.data_creazione::timestamp + INTERVAL '1 day'
+                AND f.data_modifica::date = $1::date
+                AND f.owner_uid NOT IN ('EHawFI6rMdRGaY7qQTOUdl9pAGl2', 'ihXvO40BU4NQzQEeeBNBDP6Mcuj2')
+          )::int AS today
+      FROM formulari f`,
       [selectedDate],
     );
 
@@ -119,7 +137,7 @@ export default async function Admin({
         </div>
 
         <h2 className="text-xl font-semibold">Generali</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
@@ -174,8 +192,28 @@ export default async function Admin({
                 )}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                di cui {formatNumber(formulari[0].modified)} modificati dopo il
-                giorno di creazione
+                creati complessivamente
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                Formulari modificati
+              </CardTitle>
+              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-foreground/10">
+                <Pencil className="h-4 w-4 text-foreground/50" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-medium">
+                {formatNumber(
+                  formulariModificati[0].total.toLocaleString("it-IT"),
+                )}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                di cui {formatNumber(formulariModificati[0].today)} modificati
+                oggi
               </p>
             </CardContent>
           </Card>
