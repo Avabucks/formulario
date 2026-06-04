@@ -92,12 +92,12 @@ export default async function Admin({
           COUNT(*) FILTER (
               WHERE f.data_modifica::timestamp >= f.data_creazione::timestamp + INTERVAL '1 day'
                 AND f.data_creazione::date <= $1::date
-                AND f.owner_uid NOT IN ('EHawFI6rMdRGaY7qQTOUdl9pAGl2', 'ihXvO40BU4NQzQEeeBNBDP6Mcuj2')
+                AND f.author_uid NOT IN ('EHawFI6rMdRGaY7qQTOUdl9pAGl2', 'ihXvO40BU4NQzQEeeBNBDP6Mcuj2')
           )::int AS total,
           COUNT(*) FILTER (
               WHERE f.data_modifica::timestamp >= f.data_creazione::timestamp + INTERVAL '1 day'
                 AND f.data_modifica::date = $1::date
-                AND f.owner_uid NOT IN ('EHawFI6rMdRGaY7qQTOUdl9pAGl2', 'ihXvO40BU4NQzQEeeBNBDP6Mcuj2')
+                AND f.author_uid NOT IN ('EHawFI6rMdRGaY7qQTOUdl9pAGl2', 'ihXvO40BU4NQzQEeeBNBDP6Mcuj2')
           )::int AS today
       FROM formulari f`,
       [selectedDate],
