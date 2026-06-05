@@ -26,10 +26,12 @@ export default function Home() {
 
 // - [EDITOR]
 // - refactor formatting-utils
+// - aggiungere link tra pagine
 
 // - [GENERALI]
 // - report che manda mail a admin (mail nell'env) solo se la formula non è tua (in impostazioni)
 // - aggiornare video e formulario di benvenuto
+// - aggiungere move to con command
 
 // - [PREMIUM]
 // - abbonamento che ti da accesso illimitato a creazione formulari e tokens cosi e piu preciso ma senza scrivere il ilmite, semplicemente quando finiscono esce popup
