@@ -53,6 +53,9 @@ export async function POST(req: NextRequest) {
   );
   const uid = session.uid;
 
+  if (!uid)
+    return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
+
   // check if user exists
   const { rows: users } = await pool.query(
     `SELECT id FROM users WHERE uid = $1`,
