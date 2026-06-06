@@ -35,7 +35,7 @@ const HEADING_SELECTOR = "h1, h2, h3, h4, h5, h6";
 const SCROLL_OFFSET = 48;
 const HEADING_SCROLL_NUDGE_PX = 6;
 const SCROLLBAR_HOVER_ZONE_PX = 28;
-const NAVIGATOR_HIDE_DELAY_MS = 500;
+const NAVIGATOR_HIDE_DELAY_MS = 700;
 
 type PreviewHeading = {
   id: string;
@@ -302,7 +302,6 @@ export const EditorPreview = memo(function EditorPreview({
       top: Math.max(0, nextScrollTop),
       behavior: "smooth",
     });
-    setActiveHeadingId(heading.id);
   };
 
   const handleContainerMouseMove = (event: MouseEvent<HTMLDivElement>) => {
@@ -349,7 +348,7 @@ export const EditorPreview = memo(function EditorPreview({
             <div
               style={{
                 width: A4_WIDTH_PX,
-                paddingBottom: 48,
+                paddingBottom: 90,
                 transform: `scale(${scale})`,
                 transformOrigin: "top left",
                 position: "absolute",
@@ -408,10 +407,10 @@ export const EditorPreview = memo(function EditorPreview({
 
         {headings.length > 0 && (
           <div
-            className={`absolute top-4 right-4 z-10 hidden max-h-[calc(100%-5rem)] w-56 overflow-hidden rounded-lg border bg-background/95 shadow-sm backdrop-blur-sm transition-opacity duration-200 lg:block ${
+            className={`absolute top-4 right-4 z-10 hidden max-h-[calc(100%-5rem)] w-56 overflow-hidden rounded-lg border bg-background/95 shadow-sm backdrop-blur-sm transition duration-300 lg:block ${
               navigatorVisible
-                ? "pointer-events-auto opacity-100"
-                : "pointer-events-none opacity-0"
+                ? "pointer-events-auto opacity-100 translate-x-0"
+                : "pointer-events-none opacity-0 translate-x-4"
             }`}
             onMouseEnter={() => {
               navigatorHoverRef.current = true;
@@ -433,9 +432,9 @@ export const EditorPreview = memo(function EditorPreview({
                   type="button"
                   data-heading-id={heading.id}
                   onClick={() => handleHeadingClick(heading)}
-                  className={`flex min-h-8 w-full items-center rounded-md py-1.5 pr-2 text-left text-xs transition-colors hover:bg-accent hover:text-accent-foreground ${
+                  className={`flex min-h-8 w-full items-center rounded-md py-1.5 pr-2 text-left text-xs hover:underline hover:text-accent-foreground ${
                     activeHeadingId === heading.id
-                      ? "bg-accent text-accent-foreground"
+                      ? "text-accent-foreground bg-accent"
                       : "text-muted-foreground"
                   }`}
                   style={{ paddingLeft: 8 + (heading.level - 1) * 10 }}
