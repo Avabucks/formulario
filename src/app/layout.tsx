@@ -8,6 +8,7 @@ import { UmamiTracker } from "../components/analytics/umami-tracker";
 import { ThemeProvider } from "../components/theme/theme-provider";
 import "../styles/editor.css";
 import "../styles/globals.css";
+import AnalyticsLoader from "../components/analytics/google-analytics";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -94,6 +95,7 @@ export default function RootLayout({
           <main className="flex flex-1 flex-col">{children}</main>
           <Toaster />
           <UmamiTracker />
+          <AnalyticsLoader />
         </ThemeProvider>
       </body>
     </html>
