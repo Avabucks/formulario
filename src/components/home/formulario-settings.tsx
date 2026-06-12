@@ -29,6 +29,7 @@ import { SettingsFooter } from "./settings-sections/settings-footer";
 import { SettingsHeader } from "./settings-sections/settings-header";
 import { SettingsSidebar } from "./settings-sections/settings-sidebar";
 import { ShareSection } from "./settings-sections/share-section";
+import { ExportSection } from "./settings-sections/export-section";
 import { Formulario, SettingsSection } from "./settings-sections/types";
 
 export function FormularioSettings({
@@ -141,6 +142,12 @@ export function FormularioSettings({
               )}
               {activeSection === "qr" && formulario.visibility !== 0 && (
                 <ShareSection link={shareUrl} title={formulario.titolo} />
+              )}
+              {activeSection === "export" && (
+                <ExportSection
+                  formularioId={formularioId}
+                  formularioTitle={formulario.titolo}
+                />
               )}
             </div>
           </ScrollArea>

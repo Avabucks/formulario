@@ -9,6 +9,11 @@ import {
   PenOff,
   Redo2,
   Undo2,
+  Download,
+  FileJson,
+  FileText,
+  FileCode,
+  Printer,
 } from "lucide-react";
 import type { Selection } from "monaco-editor";
 import { useTheme } from "next-themes";
@@ -27,6 +32,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import { Exporter } from "@/src/lib/export-utils";
+import slugify from "slugify";
 import { EditorInput } from "./editor-katex/editor-input";
 import { EditorPreview } from "./editor-katex/editor-preview";
 import { FormattingBold } from "./editor-katex/tools/formatting-bold";
@@ -58,6 +71,82 @@ export function EditorPage({
   const [resizableSize, setResizableSize] = useState<number>(40);
   const [isFocused, setIsFocused] = useState(false);
   const [selection, setSelection] = useState<Selection | null>(null);
+
+  const ExportNoteButton = () => {
+    const handleExportMarkdown = () => {
+      const firstLine = textAreaContent?.split("\n")[0] ?? "";
+      const rawTitle = firstLine.startsWith("#") ? firstLine.replace(/^#+\s*/, "") : "Senza titolo";
+      const cleanFilename = slugify(rawTitle, { lower: true, strict: true }) || "nota";
+      Exporter.markdown.exportNote({
+        id: argomentoId,
+        title: rawTitle,
+        content: textAreaContent
+      }, cleanFilename);
+    };
+
+    const handleExportJson = () => {
+      const firstLine = textAreaContent?.split("\n")[0] ?? "";
+      const rawTitle = firstLine.startsWith("#") ? firstLine.replace(/^#+\s*/, "") : "Senza titolo";
+      const cleanFilename = slugify(rawTitle, { lower: true, strict: true }) || "nota";
+      Exporter.json.exportNote({
+        id: argomentoId,
+        title: rawTitle,
+        content: textAreaContent
+      }, cleanFilename);
+    };
+
+    const handleExportLatex = () => {
+      const firstLine = textAreaContent?.split("\n")[0] ?? "";
+      const rawTitle = firstLine.startsWith("#") ? firstLine.replace(/^#+\s*/, "") : "Senza titolo";
+      const cleanFilename = slugify(rawTitle, { lower: true, strict: true }) || "nota";
+      Exporter.latex.exportNote({
+        id: argomentoId,
+        title: rawTitle,
+        content: textAreaContent
+      }, cleanFilename);
+    };
+
+    const handleExportPdf = () => {
+      window.open(`/export/argomento/${argomentoId}`, "_blank");
+    };
+
+    return (
+      <DropdownMenu>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon" className="relative">
+                  <Download size={16} />
+                </Button>
+              </DropdownMenuTrigger>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Esporta nota</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuItem onClick={handleExportPdf} className="flex gap-2 items-center cursor-pointer">
+            <Printer className="h-4 w-4" />
+            <span>Esporta come PDF</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleExportMarkdown} className="flex gap-2 items-center cursor-pointer">
+            <FileText className="h-4 w-4" />
+            <span>Esporta come Markdown (.md)</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleExportLatex} className="flex gap-2 items-center cursor-pointer">
+            <FileCode className="h-4 w-4" />
+            <span>Esporta come LaTeX (.tex)</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleExportJson} className="flex gap-2 items-center cursor-pointer">
+            <FileJson className="h-4 w-4" />
+            <span>Esporta come JSON (.json)</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  };
 
   const editorRef = useRef<any>(null);
   const monacoRef = useRef<Monaco | null>(null);
@@ -369,7 +458,8 @@ export function EditorPage({
         </Toggle>
       </div>
 
-      <div className="flex border-l items-center px-3 gap-3">
+      <div className="flex border-l items-center px-3 gap-2">
+        <ExportNoteButton />
         <FormularioSettings formularioId={formularioId} />
       </div>
     </div>
@@ -432,6 +522,7 @@ export function EditorPage({
               </div>
 
               <div className="flex border-l items-center px-3 gap-2 h-full">
+                <ExportNoteButton />
                 <FormularioSettings formularioId={formularioId} />
               </div>
             </div>

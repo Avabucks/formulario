@@ -11,7 +11,7 @@ export type Formulario = {
   editable: boolean;
 };
 
-export type SettingsSection = "info" | "edit" | "structure" | "qr";
+export type SettingsSection = "info" | "edit" | "structure" | "qr" | "export";
 
 export type StructureArgomento = {
   id: string;

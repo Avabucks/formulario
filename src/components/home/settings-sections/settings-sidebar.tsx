@@ -42,16 +42,12 @@ export function SettingsSidebar({
             onClick={() => setActiveSection("qr")}
           />
         )}
-        <button
-          disabled
-          className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-left text-muted-foreground/50 cursor-not-allowed"
-        >
-          <Download size={15} />
-          <span className="hidden md:flex">Esporta</span>
-          <span className="hidden md:flex ml-auto text-xs border border-border rounded-full px-2 py-0.5 bg-secondary">
-            Soon
-          </span>
-        </button>
+        <SettingsSidebarButton
+          active={activeSection === "export"}
+          icon={<Download size={15} />}
+          label="Esporta"
+          onClick={() => setActiveSection("export")}
+        />
       </nav>
     </div>
   );
