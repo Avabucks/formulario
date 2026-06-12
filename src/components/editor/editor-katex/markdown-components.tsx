@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Copy, Download, Lightbulb } from "lucide-react";
+import { Check, Copy, Download, Lightbulb, ExternalLink, Loader2, ShieldCheck, ShieldAlert, ShieldQuestion } from "lucide-react";
 import mermaid from "mermaid";
 import { useTheme } from "next-themes";
 import { useEffect, useRef, useState } from "react";
@@ -13,6 +13,157 @@ import {
 import { toast } from "sonner";
 import { Button } from "../../ui/button";
 import { Spinner } from "../../ui/spinner";
+import { useRouter } from "next/navigation";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../../ui/dialog";
+
+export const LinkComponent = ({ href, children }: any) => {
+  const router = useRouter();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [safetyCheck, setSafetyCheck] = useState<'loading' | 'safe' | 'unsafe' | 'notexists' | 'unchecked'>('unchecked');
+
+  if (!href) return <span>{children}</span>;
+
+  const isInternal = href.startsWith("/") || href.startsWith(process.env.NEXT_PUBLIC_APP_URL || "");
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isInternal) {
+      const topicMatch = href.match(/\/editor\/topic\/([a-zA-Z0-9_-]+)/);
+      if (topicMatch) {
+        const id = topicMatch[1];
+        router.push(`/editor/${id}`);
+      } else {
+        router.push(href);
+      }
+    } else {
+      setDialogOpen(true);
+    }
+  };
+
+  let domain = "";
+  if (!isInternal) {
+    try {
+      const url = new URL(href);
+      domain = url.hostname;
+      if (domain.startsWith("www.")) {
+        domain = domain.substring(4);
+      }
+    } catch {
+      domain = href;
+    }
+  }
+
+  useEffect(() => {
+    if (dialogOpen && !isInternal) {
+      setSafetyCheck("loading");
+      fetch(`/api/security/check-link?domain=${encodeURIComponent(domain)}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data?.safe === false) {
+            if (data.reason === "domain_not_found") setSafetyCheck("notexists")
+            else setSafetyCheck("unsafe");
+          } else {
+            setSafetyCheck("safe");
+          }
+        })
+        .catch(() => {
+          setSafetyCheck("unchecked");
+        });
+    }
+  }, [dialogOpen, isInternal, domain]);
+
+  const handleOpenExternal = () => {
+    window.open(href, "_blank", "noopener,noreferrer");
+    setDialogOpen(false);
+  };
+
+  return (
+    <>
+      <a
+        href={href}
+        onClick={handleClick}
+        className="text-primary hover:underline font-semibold cursor-pointer"
+      >
+        {children}
+      </a>
+
+      {!isInternal && (
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <ExternalLink className="h-4 w-4 text-primary" />
+                Sito Esterno
+              </DialogTitle>
+            </DialogHeader>
+            <DialogDescription className="space-y-4">
+              <span>Stai per aprire un sito esterno. Vuoi continuare verso:</span>
+              <span className="block text-base font-bold text-primary mt-2 select-all break-all">
+                {domain}
+              </span>
+
+              <span className="mt-4 pt-3 border-t border-border flex items-center gap-2 text-xs">
+                {safetyCheck === "loading" && (
+                  <>
+                    <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
+                    <span className="text-muted-foreground">Verifica di sicurezza in corso...</span>
+                  </>
+                )}
+                {safetyCheck === "safe" && (
+                  <>
+                    <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
+                    <span className="text-emerald-600 font-medium dark:text-emerald-400">Nessuna minaccia rilevata (Verificato)</span>
+                  </>
+                )}
+                {safetyCheck === "unsafe" && (
+                  <>
+                    <ShieldAlert className="h-3.5 w-3.5 text-destructive animate-pulse" />
+                    <span className="text-destructive font-bold">Attenzione! Questo sito è stato segnalato come non sicuro.</span>
+                  </>
+                )}
+                {safetyCheck === "unchecked" && (
+                  <>
+                    <ShieldQuestion className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="text-muted-foreground">Verifica di sicurezza non disponibile.</span>
+                  </>
+                )}
+                {safetyCheck === "notexists" && (
+                  <>
+                    <ShieldQuestion className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="text-muted-foreground">Dominio non trovato.</span>
+                  </>
+                )}
+              </span>
+            </DialogDescription>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline">Annulla</Button>
+              </DialogClose>
+              <DialogClose asChild>
+                <Button
+                  variant={safetyCheck === "unsafe" ? "destructive" : "default"}
+                  onClick={handleOpenExternal}
+                  className="gap-2"
+                >
+                  <ExternalLink size={15} />
+                  Apri
+                </Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
+  );
+};
 
 export const CodeBlock = ({ className, children, node, ...props }: any) => {
   const match = /language-(\w+)/.exec(className || "");
@@ -36,7 +187,7 @@ export const CodeBlock = ({ className, children, node, ...props }: any) => {
 
   if (isBlock) {
     return (
-      <pre className="bg-foreground/8 border border-foreground/10 rounded-[6px] text-[#e36209] dark:text-[#e3b341] p-2 text-[85%] font-mono overflow-x-auto mb-5">
+      <pre className="my-6 bg-muted/50 border border-border rounded-lg p-4 text-[85%] font-mono overflow-x-auto text-foreground/90 leading-relaxed shadow-xs">
         <code>{children}</code>
       </pre>
     );
@@ -45,7 +196,7 @@ export const CodeBlock = ({ className, children, node, ...props }: any) => {
   // Caso 4: Inline code
   return (
     <code
-      className="bg-foreground/8 border border-foreground/10 text-[#e36209] dark:text-[#e3b341] px-1.5 py-0.5 rounded text-[85%] font-mono"
+      className="bg-muted border border-border/80 text-rose-600 dark:text-amber-400 px-1.5 py-0.5 rounded-md text-[85%] font-mono font-medium"
       {...props}
     >
       {children}
@@ -231,87 +382,95 @@ function MermaidBlock({ code }: Readonly<{ code: string }>) {
 
 export const markdownComponents: Components = {
   h1: ({ children }) => (
-    <h1 className="text-(--editor-title) text-[2em] font-semibold leading-9 mb-7">
+    <h1 className="text-(--editor-title) text-[2.2em] font-bold tracking-tight mb-6 pb-1 leading-tight">
       {children}
     </h1>
   ),
   h2: ({ children }) => (
-    <h2 className="text-(--editor-title) text-[1.5em] font-semibold leading-6 mb-6">
+    <h2 className="text-(--editor-title) text-[1.6em] font-bold tracking-tight mt-6 mb-5 pb-1 leading-snug">
       {children}
     </h2>
   ),
   h3: ({ children }) => (
-    <h3 className="text-(--editor-title) text-[1.2em] font-semibold leading-5 mb-3">
+    <h3 className="text-(--editor-title) text-[1.3em] font-semibold mt-6 mb-4 leading-normal">
       {children}
     </h3>
   ),
   h4: ({ children }) => (
-    <h4 className="text-(--editor-title) text-[1em] font-semibold leading-4 mb-3">
+    <h4 className="text-(--editor-title) text-[1.1em] font-semibold mt-5 mb-3 leading-normal">
       {children}
     </h4>
   ),
   h5: ({ children }) => (
-    <h5 className="text-(--editor-title) text-[0.875em] font-semibold leading-3 mb-3">
+    <h5 className="text-(--editor-title) text-[0.95em] font-semibold mt-4 mb-2">
       {children}
     </h5>
   ),
   h6: ({ children }) => (
-    <h6 className="text-(--editor-title)/60 text-[0.85em] font-semibold mb-3">
+    <h6 className="text-(--editor-title)/70 text-[0.85em] font-semibold mt-4 mb-2">
       {children}
     </h6>
   ),
   p: ({ children }) => (
-    <p className="leading-[1.8] text-base font-sans mb-5">{children}</p>
+    <p className="leading-relaxed text-[15px] md:text-[16px] mb-5 text-foreground/90 font-sans">
+      {children}
+    </p>
   ),
-  ul: ({ children }) => <ul className="pl-9 space-y-2 mb-5">{children}</ul>,
-  ol: ({ children }) => <ol className="pl-9 space-y-2 mb-5">{children}</ol>,
-  li: ({ children }) => <li className="leading-9 text-[1rem]">{children}</li>,
+  ul: ({ children }) => (
+    <ul className="list-disc pl-8 space-y-1.5 mb-5 text-foreground/80">
+      {children}
+    </ul>
+  ),
+  ol: ({ children }) => (
+    <ol className="list-decimal pl-8 space-y-1.5 mb-5 text-foreground/80">
+      {children}
+    </ol>
+  ),
+  li: ({ children }) => (
+    <li className="leading-relaxed text-[15px] md:text-[16px] text-foreground/90">
+      {children}
+    </li>
+  ),
   strong: ({ children }) => (
     <strong className="text-(--editor-title) font-semibold">{children}</strong>
   ),
   em: ({ children }) => <em className="italic">{children}</em>,
   del: ({ children }) => <del className="line-through">{children}</del>,
-  hr: () => <hr className="mb-5 border-0 h-0.5 bg-foreground/20 rounded" />,
+  hr: () => <hr className="mb-5 border-0 h-px bg-foreground/20 rounded" />,
   blockquote: ({ children }) => (
-    <blockquote className="flex gap-5 border-l-4 border-primary px-4 pt-5 mb-5 bg-primary/5 rounded-r-md [&>p]:m-0 [&>p]:p-0 [&>p]:inline">
-      <span className="flex items-center mt-[-1] mb-5">
-        <Lightbulb className="fill-primary" size={18} />
-      </span>
-      <span className="text-foreground">{children}</span>
+    <blockquote className="my-6 pl-5 pr-4 py-3 bg-muted/40 border-l-4 border-primary rounded-r-lg text-muted-foreground flex gap-3.5 items-start [&>p]:m-0 [&>p]:leading-relaxed">
+      <Lightbulb className="text-primary shrink-0 mt-0.5" size={18} />
+      <div className="flex-1 not-italic text-foreground/95">{children}</div>
     </blockquote>
   ),
   code: CodeBlock,
   img: ({ src, alt }) => (
-    <img src={src} alt={alt} className="max-w-full my-4 rounded-[6px]" />
+    <img src={src} alt={alt} className="max-w-full h-auto my-6 rounded-lg border border-border shadow-md mx-auto block" />
   ),
-  a: ({ href, children }) => (
-    <span
-      title={href}
-      className="text-muted-foreground cursor-not-allowed mb-5"
-    >
-      {children}
-    </span>
-  ),
+  a: LinkComponent,
   table: ({ children }) => (
-    <div className="overflow-auto mb-5">
-      <table className="w-full border-collapse text-[16px]">{children}</table>
+    <div className="overflow-x-auto my-6 border border-border rounded-lg bg-card/50 shadow-xs">
+      <table className="w-full border-collapse text-[15px] text-left">{children}</table>
     </div>
   ),
-  thead: ({ children }) => <thead>{children}</thead>,
+  thead: ({ children }) => <thead className="bg-muted/50 border-b border-border">{children}</thead>,
   tbody: ({ children }) => <tbody>{children}</tbody>,
   tr: ({ children }) => (
-    <tr className="border-t border-(--editor-title)/30">{children}</tr>
+    <tr className="hover:bg-muted/20 transition-colors border-b border-border/30 last:border-b-0">{children}</tr>
   ),
   th: ({ children, ...props }) => (
     <th
       {...props}
-      className="px-3.25 py-1.5 border border-(--editor-title)/30 font-semibold text-left bg-(--editor-title)/10"
+      className="px-4 py-3 font-semibold text-foreground border-r border-border/40 last:border-r-0"
     >
       {children}
     </th>
   ),
   td: ({ children, ...props }) => (
-    <td {...props} className="px-3.25 py-1.5 border border-(--editor-title)/30">
+    <td
+      {...props}
+      className="px-4 py-3 text-muted-foreground border-r border-border/30 last:border-r-0"
+    >
       {children}
     </td>
   ),
