@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
   }
 
   const resolver = new dns.Resolver();
-  resolver.setServers(["1.1.1.2", "1.0.0.2"]);
+  resolver.setServers(["1.1.1.3", "1.0.0.3"]);
 
   return new Promise<NextResponse>((resolve) => {
     resolver.resolve4(cleanDomain, (err, addresses) => {
