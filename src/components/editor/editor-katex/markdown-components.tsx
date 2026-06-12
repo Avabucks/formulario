@@ -105,7 +105,7 @@ export const LinkComponent = ({ href, children }: any) => {
       <a
         href={href}
         onClick={handleClick}
-        className="text-primary hover:underline font-semibold cursor-pointer"
+        className="text-violet-600 dark:text-violet-400 underline underline-offset-4 decoration-violet-600/30 hover:decoration-violet-600 dark:decoration-violet-400/30 dark:hover:decoration-violet-400 font-semibold cursor-pointer transition-colors"
       >
         {children}
       </a>
@@ -447,12 +447,12 @@ export const markdownComponents: Components = {
     </p>
   ),
   ul: ({ children }) => (
-    <ul className="list-disc pl-8 space-y-1.5 mb-5 text-foreground/80">
+    <ul className="list-disc pl-8 space-y-2.5 mb-5 text-foreground/80 [&_ul]:mb-0 [&_ol]:mb-0 [&_ul]:mt-2.5 [&_ol]:mt-2.5">
       {children}
     </ul>
   ),
   ol: ({ children }) => (
-    <ol className="list-decimal pl-8 space-y-1.5 mb-5 text-foreground/80">
+    <ol className="list-decimal pl-8 space-y-2.5 mb-5 text-foreground/80 [&_ul]:mb-0 [&_ol]:mb-0 [&_ul]:mt-2.5 [&_ol]:mt-2.5">
       {children}
     </ol>
   ),
@@ -468,7 +468,7 @@ export const markdownComponents: Components = {
   del: ({ children }) => <del className="line-through">{children}</del>,
   hr: () => <hr className="mb-5 border-0 h-px bg-foreground/20 rounded" />,
   blockquote: ({ children }) => (
-    <blockquote className="my-6 pl-5 pr-4 py-3 bg-muted/40 border-l-4 border-primary rounded-r-lg text-muted-foreground flex gap-3.5 items-start [&>p]:m-0 [&>p]:leading-relaxed">
+    <blockquote className="my-6 pl-5 pr-4 py-3 bg-muted/40 border-l-4 border-primary rounded-r-lg text-muted-foreground flex gap-3.5 items-start [&>div>*:last-child]:mb-0">
       <Lightbulb className="text-primary shrink-0 mt-0.5" size={18} />
       <div className="flex-1 not-italic text-foreground/95">{children}</div>
     </blockquote>
@@ -494,14 +494,14 @@ export const markdownComponents: Components = {
   ),
   tbody: ({ children }) => <tbody>{children}</tbody>,
   tr: ({ children }) => (
-    <tr className="hover:bg-muted/20 transition-colors border-b border-border/30 last:border-b-0">
+    <tr className="border-b border-foreground/10 last:border-b-0">
       {children}
     </tr>
   ),
   th: ({ children, ...props }) => (
     <th
       {...props}
-      className="px-4 py-3 font-semibold text-foreground border-r border-border/40 last:border-r-0"
+      className="px-4 py-3 font-semibold text-foreground border-r border-foreground/10 last:border-r-0"
     >
       {children}
     </th>
@@ -509,7 +509,7 @@ export const markdownComponents: Components = {
   td: ({ children, ...props }) => (
     <td
       {...props}
-      className="px-4 py-3 text-muted-foreground border-r border-border/30 last:border-r-0"
+      className="px-4 py-3 text-muted-foreground border-r border-foreground/10 last:border-r-0"
     >
       {children}
     </td>
