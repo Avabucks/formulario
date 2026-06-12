@@ -41,7 +41,6 @@ export const LinkComponent = ({ href, children }: any) => {
     "loading" | "safe" | "unsafe" | "notexists" | "unchecked"
   >("unchecked");
 
-  if (!href) return <span>{children}</span>;
 
   const isInternal =
     href.startsWith("/") ||
@@ -74,7 +73,7 @@ export const LinkComponent = ({ href, children }: any) => {
       domain = href;
     }
   }
-
+  
   useEffect(() => {
     if (dialogOpen && !isInternal) {
       setSafetyCheck("loading");
@@ -94,6 +93,8 @@ export const LinkComponent = ({ href, children }: any) => {
     }
   }, [dialogOpen, isInternal, domain]);
 
+  if (!href) return <span>{children}</span>;
+
   const handleOpenExternal = () => {
     window.open(href, "_blank", "noopener,noreferrer");
     setDialogOpen(false);
@@ -110,7 +111,10 @@ export const LinkComponent = ({ href, children }: any) => {
       </a>
 
       {!isInternal && (
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <Dialog open={dialogOpen} onOpenChange={(open) => {
+          setDialogOpen(open);
+          if (!open) setSafetyCheck("unchecked");
+        }}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
