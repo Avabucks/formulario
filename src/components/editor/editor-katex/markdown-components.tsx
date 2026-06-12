@@ -1,6 +1,16 @@
 "use client";
 
-import { Check, Copy, Download, Lightbulb, ExternalLink, Loader2, ShieldCheck, ShieldAlert, ShieldQuestion } from "lucide-react";
+import {
+  Check,
+  Copy,
+  Download,
+  Lightbulb,
+  ExternalLink,
+  Loader2,
+  ShieldCheck,
+  ShieldAlert,
+  ShieldQuestion,
+} from "lucide-react";
 import mermaid from "mermaid";
 import { useTheme } from "next-themes";
 import { useEffect, useRef, useState } from "react";
@@ -27,11 +37,15 @@ import {
 export const LinkComponent = ({ href, children }: any) => {
   const router = useRouter();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [safetyCheck, setSafetyCheck] = useState<'loading' | 'safe' | 'unsafe' | 'notexists' | 'unchecked'>('unchecked');
+  const [safetyCheck, setSafetyCheck] = useState<
+    "loading" | "safe" | "unsafe" | "notexists" | "unchecked"
+  >("unchecked");
 
   if (!href) return <span>{children}</span>;
 
-  const isInternal = href.startsWith("/") || href.startsWith(process.env.NEXT_PUBLIC_APP_URL || "");
+  const isInternal =
+    href.startsWith("/") ||
+    href.startsWith(process.env.NEXT_PUBLIC_APP_URL || "");
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -68,7 +82,7 @@ export const LinkComponent = ({ href, children }: any) => {
         .then((res) => res.json())
         .then((data) => {
           if (data?.safe === false) {
-            if (data.reason === "domain_not_found") setSafetyCheck("notexists")
+            if (data.reason === "domain_not_found") setSafetyCheck("notexists");
             else setSafetyCheck("unsafe");
           } else {
             setSafetyCheck("safe");
@@ -105,7 +119,9 @@ export const LinkComponent = ({ href, children }: any) => {
               </DialogTitle>
             </DialogHeader>
             <DialogDescription className="space-y-4">
-              <span>Stai per aprire un sito esterno. Vuoi continuare verso:</span>
+              <span>
+                Stai per aprire un sito esterno. Vuoi continuare verso:
+              </span>
               <span className="block text-base font-bold text-primary mt-2 select-all break-all">
                 {domain}
               </span>
@@ -114,31 +130,41 @@ export const LinkComponent = ({ href, children }: any) => {
                 {safetyCheck === "loading" && (
                   <>
                     <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
-                    <span className="text-muted-foreground">Verifica di sicurezza in corso...</span>
+                    <span className="text-muted-foreground">
+                      Verifica di sicurezza in corso...
+                    </span>
                   </>
                 )}
                 {safetyCheck === "safe" && (
                   <>
                     <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
-                    <span className="text-emerald-600 font-medium dark:text-emerald-400">Nessuna minaccia rilevata (Verificato)</span>
+                    <span className="text-emerald-600 font-medium dark:text-emerald-400">
+                      Nessuna minaccia rilevata (Verificato)
+                    </span>
                   </>
                 )}
                 {safetyCheck === "unsafe" && (
                   <>
                     <ShieldAlert className="h-3.5 w-3.5 text-destructive animate-pulse" />
-                    <span className="text-destructive font-bold">Attenzione! Questo sito è stato segnalato come non sicuro.</span>
+                    <span className="text-destructive font-bold">
+                      Attenzione! Questo sito è stato segnalato come non sicuro.
+                    </span>
                   </>
                 )}
                 {safetyCheck === "unchecked" && (
                   <>
                     <ShieldQuestion className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span className="text-muted-foreground">Verifica di sicurezza non disponibile.</span>
+                    <span className="text-muted-foreground">
+                      Verifica di sicurezza non disponibile.
+                    </span>
                   </>
                 )}
                 {safetyCheck === "notexists" && (
                   <>
                     <ShieldQuestion className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span className="text-muted-foreground">Dominio non trovato.</span>
+                    <span className="text-muted-foreground">
+                      Dominio non trovato.
+                    </span>
                   </>
                 )}
               </span>
@@ -445,18 +471,28 @@ export const markdownComponents: Components = {
   ),
   code: CodeBlock,
   img: ({ src, alt }) => (
-    <img src={src} alt={alt} className="max-w-full h-auto my-6 rounded-lg border border-border shadow-md mx-auto block" />
+    <img
+      src={src}
+      alt={alt}
+      className="max-w-full h-auto my-6 rounded-lg border border-border shadow-md mx-auto block"
+    />
   ),
   a: LinkComponent,
   table: ({ children }) => (
     <div className="overflow-x-auto my-6 border border-border rounded-lg bg-card/50 shadow-xs">
-      <table className="w-full border-collapse text-[15px] text-left">{children}</table>
+      <table className="w-full border-collapse text-[15px] text-left">
+        {children}
+      </table>
     </div>
   ),
-  thead: ({ children }) => <thead className="bg-muted/50 border-b border-border">{children}</thead>,
+  thead: ({ children }) => (
+    <thead className="bg-muted/50 border-b border-border">{children}</thead>
+  ),
   tbody: ({ children }) => <tbody>{children}</tbody>,
   tr: ({ children }) => (
-    <tr className="hover:bg-muted/20 transition-colors border-b border-border/30 last:border-b-0">{children}</tr>
+    <tr className="hover:bg-muted/20 transition-colors border-b border-border/30 last:border-b-0">
+      {children}
+    </tr>
   ),
   th: ({ children, ...props }) => (
     <th

@@ -1,12 +1,15 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import dns from "node:dns";
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const domain = searchParams.get("domain");
 
   if (!domain) {
-    return NextResponse.json({ error: "Dominio obbligatorio" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Dominio obbligatorio" },
+      { status: 400 },
+    );
   }
 
   let cleanDomain = domain.trim().toLowerCase();
@@ -24,7 +27,7 @@ export async function GET(request: Request) {
   const resolver = new dns.Resolver();
   resolver.setServers(["1.1.1.2", "1.0.0.2"]);
 
-  return new Promise((resolve) => {
+  return new Promise<NextResponse>((resolve) => {
     resolver.resolve4(cleanDomain, (err, addresses) => {
       if (err?.code === "ENOTFOUND") {
         resolve(NextResponse.json({ safe: false, reason: "domain_not_found" }));
