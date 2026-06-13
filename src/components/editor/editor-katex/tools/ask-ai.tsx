@@ -19,6 +19,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/src/components/ui/tooltip";
+import { loadAnalytics } from "@/src/lib/firebase";
+import { logEvent } from "firebase/analytics";
 import { Check, Wand2, X } from "lucide-react";
 import type { editor } from "monaco-editor";
 import { useEffect, useState } from "react";
@@ -82,6 +84,13 @@ export function AskAIButton({
       }
 
       (globalThis as unknown as { umami?: any }).umami?.track("generated_ai");
+      const analytics = await loadAnalytics()
+      if (analytics) {
+        logEvent(analytics, 'generate_lead', {
+          method: 'generated_ai',
+        })
+        console.log('Evento generate_lead tracciato con successo!')
+      }
       setResult(data.text);
     } catch (error: any) {
       console.error(error.message);

@@ -25,6 +25,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
+import { loadAnalytics } from "@/src/lib/firebase";
+import { logEvent } from "firebase/analytics";
 
 export default function ForumlarioAdd({
   allowKey = true,
@@ -62,6 +64,13 @@ export default function ForumlarioAdd({
         (globalThis as unknown as { umami?: any }).umami?.track(
           "created_formulario",
         );
+        const analytics = await loadAnalytics()
+        if (analytics) {
+          logEvent(analytics, 'generate_lead', {
+            method: 'created_formulario',
+          })
+          console.log('Evento generate_lead tracciato con successo!')
+        }
         router.refresh();
       }),
       {

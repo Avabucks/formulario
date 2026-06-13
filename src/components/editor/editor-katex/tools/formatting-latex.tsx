@@ -37,6 +37,8 @@ import type { editor, Selection } from "monaco-editor";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import formulasData from "@/src/data/formulas.json";
+import { loadAnalytics } from "@/src/lib/firebase";
+import { logEvent } from "firebase/analytics";
 
 type SnippetController = {
   insert: (snippet: string) => void;
@@ -217,7 +219,7 @@ export function FormattingLatex({
     }
   };
 
-  const handleFormulaSelect = (snippet: string) => {
+  const handleFormulaSelect = async (snippet: string) => {
     setOpen(false);
     setQuery("");
     setActiveTab("formule");
@@ -264,6 +266,13 @@ export function FormattingLatex({
     (globalThis as unknown as { umami?: any }).umami?.track(
       "selected_formula_latex",
     );
+    const analytics = await loadAnalytics()
+    if (analytics) {
+      logEvent(analytics, 'generate_lead', {
+        method: 'selected_formula_latex',
+      })
+      console.log('Evento generate_lead tracciato con successo!')
+    }
   };
 
   useEffect(() => {
@@ -431,21 +440,19 @@ export function FormattingLatex({
                   tabIndex={-1}
                   onClick={() => setActiveTabAndScroll(t.id)}
                   className={`px-3 py-1.5 text-sm whitespace-nowrap flex items-center gap-1.5 transition-colors
-                                        ${
-                                          activeTab === t.id
-                                            ? "border-b-2 border-primary font-medium"
-                                            : "text-muted-foreground hover:text-foreground"
-                                        }`}
+                                        ${activeTab === t.id
+                      ? "border-b-2 border-primary font-medium"
+                      : "text-muted-foreground hover:text-foreground"
+                    }`}
                 >
                   {t.label}
                   {query && (
                     <span
                       className={`text-xs rounded-full px-1.5 py-0.5 
-                                            ${
-                                              tabCounts[t.id] > 0
-                                                ? "bg-primary/15 text-primary"
-                                                : "bg-muted text-muted-foreground"
-                                            }`}
+                                            ${tabCounts[t.id] > 0
+                          ? "bg-primary/15 text-primary"
+                          : "bg-muted text-muted-foreground"
+                        }`}
                     >
                       {tabCounts[t.id]}
                     </span>
