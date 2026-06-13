@@ -42,12 +42,18 @@ export const LinkComponent = ({ href, children }: any) => {
   >("unchecked");
 
 
+  const isMail = href.startsWith("mailto:");
+
   const isInternal =
     href.startsWith("/") ||
     href.startsWith(process.env.NEXT_PUBLIC_APP_URL || "");
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
+    if (isMail) {
+      window.location.href = href;
+      return;
+    }
     if (isInternal) {
       const topicMatch = href.match(/\/editor\/topic\/([a-zA-Z0-9_-]+)/);
       if (topicMatch) {
@@ -73,7 +79,7 @@ export const LinkComponent = ({ href, children }: any) => {
       domain = href;
     }
   }
-  
+
   useEffect(() => {
     if (dialogOpen && !isInternal) {
       setSafetyCheck("loading");
@@ -113,7 +119,6 @@ export const LinkComponent = ({ href, children }: any) => {
       {!isInternal && (
         <Dialog open={dialogOpen} onOpenChange={(open) => {
           setDialogOpen(open);
-          if (!open) setSafetyCheck("unchecked");
         }}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
@@ -133,7 +138,7 @@ export const LinkComponent = ({ href, children }: any) => {
               <span className="mt-4 pt-3 border-t border-border flex items-center gap-2 text-xs">
                 {safetyCheck === "loading" && (
                   <>
-                    <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
+                    <Spinner />
                     <span className="text-muted-foreground">
                       Verifica di sicurezza in corso...
                     </span>
@@ -182,9 +187,10 @@ export const LinkComponent = ({ href, children }: any) => {
                   variant={safetyCheck === "unsafe" ? "destructive" : "default"}
                   onClick={handleOpenExternal}
                   className="gap-2"
+                  disabled={safetyCheck === "loading"}
                 >
                   <ExternalLink size={15} />
-                  Apri
+                  {safetyCheck === "loading" ? <Spinner /> : "Apri"}
                 </Button>
               </DialogClose>
             </DialogFooter>
