@@ -1,525 +1,62 @@
 "use client";
 
-import {
-  Check,
-  Copy,
-  Download,
-  Lightbulb,
-  ExternalLink,
-  Loader2,
-  ShieldCheck,
-  ShieldAlert,
-  ShieldQuestion,
-} from "lucide-react";
-import mermaid from "mermaid";
-import { useTheme } from "next-themes";
-import { useEffect, useRef, useState } from "react";
 import { Components } from "react-markdown";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { LinkComponent } from "./markdown-components/link";
+import { CodeBlock } from "./markdown-components/code";
 import {
-  oneDark,
-  oneLight,
-} from "react-syntax-highlighter/dist/esm/styles/prism";
-import { toast } from "sonner";
-import { Button } from "../../ui/button";
-import { Spinner } from "../../ui/spinner";
-import { useRouter } from "next/navigation";
+  H1Component,
+  H2Component,
+  H3Component,
+  H4Component,
+  H5Component,
+  H6Component,
+} from "./markdown-components/headings";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../../ui/dialog";
-
-export const LinkComponent = ({ href, children }: any) => {
-  const router = useRouter();
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [safetyCheck, setSafetyCheck] = useState<
-    "loading" | "safe" | "unsafe" | "notexists" | "unchecked"
-  >("unchecked");
-
-
-  const isMail = href.startsWith("mailto:");
-
-  const isInternal =
-    href.startsWith("/") ||
-    href.startsWith(process.env.NEXT_PUBLIC_APP_URL || "");
-
-  const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (isMail) {
-      window.location.href = href;
-      return;
-    }
-    if (isInternal) {
-      const topicMatch = href.match(/\/editor\/topic\/([a-zA-Z0-9_-]+)/);
-      if (topicMatch) {
-        const id = topicMatch[1];
-        router.push(`/editor/${id}`);
-      } else {
-        router.push(href);
-      }
-    } else {
-      setDialogOpen(true);
-    }
-  };
-
-  let domain = "";
-  if (!isInternal) {
-    try {
-      const url = new URL(href);
-      domain = url.hostname;
-      if (domain.startsWith("www.")) {
-        domain = domain.substring(4);
-      }
-    } catch {
-      domain = href;
-    }
-  }
-
-  useEffect(() => {
-    if (dialogOpen && !isInternal) {
-      setSafetyCheck("loading");
-      fetch(`/api/security/check-link?domain=${encodeURIComponent(domain)}`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data?.safe === false) {
-            if (data.reason === "domain_not_found") setSafetyCheck("notexists");
-            else setSafetyCheck("unsafe");
-          } else {
-            setSafetyCheck("safe");
-          }
-        })
-        .catch(() => {
-          setSafetyCheck("unchecked");
-        });
-    }
-  }, [dialogOpen, isInternal, domain]);
-
-  if (!href) return <span>{children}</span>;
-
-  const handleOpenExternal = () => {
-    window.open(href, "_blank", "noopener,noreferrer");
-    setDialogOpen(false);
-  };
-
-  return (
-    <>
-      <a
-        href={href}
-        onClick={handleClick}
-        className="text-violet-600 dark:text-violet-400 underline underline-offset-4 decoration-violet-600/30 hover:decoration-violet-600 dark:decoration-violet-400/30 dark:hover:decoration-violet-400 font-semibold cursor-pointer transition-colors"
-      >
-        {children}
-      </a>
-
-      {!isInternal && (
-        <Dialog open={dialogOpen} onOpenChange={(open) => {
-          setDialogOpen(open);
-        }}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <ExternalLink className="h-4 w-4 text-primary" />
-                Sito Esterno
-              </DialogTitle>
-            </DialogHeader>
-            <DialogDescription className="space-y-4">
-              <span>
-                Stai per aprire un sito esterno. Vuoi continuare verso:
-              </span>
-              <span className="block text-base font-bold text-primary mt-2 select-all break-all">
-                {domain}
-              </span>
-
-              <span className="mt-4 pt-3 border-t border-border flex items-center gap-2 text-xs">
-                {safetyCheck === "loading" && (
-                  <>
-                    <Spinner />
-                    <span className="text-muted-foreground">
-                      Verifica di sicurezza in corso...
-                    </span>
-                  </>
-                )}
-                {safetyCheck === "safe" && (
-                  <>
-                    <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
-                    <span className="text-emerald-600 font-medium dark:text-emerald-400">
-                      Nessuna minaccia rilevata (Verificato)
-                    </span>
-                  </>
-                )}
-                {safetyCheck === "unsafe" && (
-                  <>
-                    <ShieldAlert className="h-3.5 w-3.5 text-destructive animate-pulse" />
-                    <span className="text-destructive font-bold">
-                      Attenzione! Questo sito è stato segnalato come non sicuro.
-                    </span>
-                  </>
-                )}
-                {safetyCheck === "unchecked" && (
-                  <>
-                    <ShieldQuestion className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span className="text-muted-foreground">
-                      Verifica di sicurezza non disponibile.
-                    </span>
-                  </>
-                )}
-                {safetyCheck === "notexists" && (
-                  <>
-                    <ShieldQuestion className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span className="text-muted-foreground">
-                      Dominio non trovato.
-                    </span>
-                  </>
-                )}
-              </span>
-            </DialogDescription>
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button variant="outline">Annulla</Button>
-              </DialogClose>
-              <DialogClose asChild>
-                <Button
-                  variant={safetyCheck === "unsafe" ? "destructive" : "default"}
-                  onClick={handleOpenExternal}
-                  className="gap-2"
-                  disabled={safetyCheck === "loading"}
-                >
-                  <ExternalLink size={15} />
-                  {safetyCheck === "loading" ? <Spinner /> : "Apri"}
-                </Button>
-              </DialogClose>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      )}
-    </>
-  );
-};
-
-export const CodeBlock = ({ className, children, node, ...props }: any) => {
-  const match = /language-(\w+)/.exec(className || "");
-  const language = match ? match[1] : "";
-  const codeString = String(children).replace(/\n$/, "");
-
-  // Caso 1: Mermaid
-  if (language === "mermaid") {
-    return <MermaidBlock code={codeString} />;
-  }
-
-  // Caso 2: Blocco con linguaggio (SyntaxHighlighter)
-  if (language) {
-    return <SyntaxBlock language={language} codeString={codeString} />;
-  }
-
-  // Caso 3: Blocco senza linguaggio (Multiriga)
-  const isBlock =
-    node?.position?.start.line !== node?.position?.end.line ||
-    codeString.includes("\n");
-
-  if (isBlock) {
-    return (
-      <pre className="my-6 bg-muted/50 border border-border rounded-lg p-4 text-[85%] font-mono overflow-x-auto text-foreground/90 leading-relaxed shadow-xs">
-        <code>{children}</code>
-      </pre>
-    );
-  }
-
-  // Caso 4: Inline code
-  return (
-    <code
-      className="bg-muted border border-border/80 text-rose-600 dark:text-amber-400 px-1.5 py-0.5 rounded-md text-[85%] font-mono font-medium"
-      {...props}
-    >
-      {children}
-    </code>
-  );
-};
-
-function SyntaxBlock({
-  language,
-  codeString,
-}: Readonly<{ language: string; codeString: string }>) {
-  const { resolvedTheme } = useTheme();
-  const style = resolvedTheme === "dark" ? oneDark : oneLight;
-
-  const [copied, setCopied] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
-
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(codeString);
-    setCopied(true);
-    toast.success("Codice copiato con successo.", {
-      position: "bottom-center",
-    });
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  return (
-    <div className="relative my-6 w-full rounded-lg border border-foreground/10 overflow-hidden group">
-      <div className="flex items-center justify-between px-4 py-1 border-b bg-muted">
-        <span className="text-[12px] lowercase font-mono">{language}</span>
-        <Button variant="ghost" size="icon" onClick={handleCopy}>
-          {copied ? (
-            <Check className="h-3.5 w-3.5" />
-          ) : (
-            <Copy className="h-3.5 w-3.5" />
-          )}
-          <span className="sr-only">Copy code</span>
-        </Button>
-      </div>
-      <div className="relative bg-foreground/7">
-        <SyntaxHighlighter
-          language={language}
-          style={mounted ? style : oneLight}
-          customStyle={{
-            margin: 0,
-            padding: "1rem",
-            fontSize: "13px",
-            lineHeight: "1.6",
-            background: "var(--muted)",
-            whiteSpace: "pre-wrap",
-            wordBreak: "break-word",
-          }}
-          codeTagProps={{
-            style: {
-              textShadow: "none",
-              whiteSpace: "pre-wrap",
-              wordBreak: "break-word",
-            },
-            className: "font-mono",
-          }}
-        >
-          {codeString}
-        </SyntaxHighlighter>
-      </div>
-    </div>
-  );
-}
-
-function MermaidBlock({ code }: Readonly<{ code: string }>) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [loading, setLoading] = useState(true);
-  const { resolvedTheme } = useTheme();
-
-  useEffect(() => {
-    const renderChart = async () => {
-      if (!ref.current) return;
-
-      setLoading(true);
-      ref.current.innerHTML = "";
-
-      try {
-        mermaid.initialize({
-          startOnLoad: false,
-          theme: resolvedTheme === "dark" ? "dark" : "default",
-          securityLevel: "strict",
-        });
-
-        const isValid = await mermaid.parse(code, { suppressErrors: true });
-
-        if (isValid) {
-          const id = `mermaid-svg-${Math.random().toString(36).substring(2, 9)}`;
-          const { svg } = await mermaid.render(id, code);
-
-          if (ref.current) {
-            ref.current.innerHTML = svg;
-          }
-        }
-      } catch (error: any) {
-        console.warn("Mermaid error:", error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    renderChart();
-  }, [code, resolvedTheme]);
-
-  const handleDownload = () => {
-    const svgElement = ref.current?.querySelector("svg");
-    if (!svgElement) return;
-
-    const clonedSvg = svgElement.cloneNode(true) as SVGSVGElement;
-
-    const width = svgElement.viewBox.baseVal.width || svgElement.clientWidth;
-    const height = svgElement.viewBox.baseVal.height || svgElement.clientHeight;
-    clonedSvg.setAttribute("width", width.toString());
-    clonedSvg.setAttribute("height", height.toString());
-
-    const svgData = new XMLSerializer().serializeToString(clonedSvg);
-
-    const uint8Array = new TextEncoder().encode(svgData);
-    const binString = Array.from(uint8Array, (byte) =>
-      String.fromCodePoint(byte),
-    ).join("");
-    const svgBase64 = btoa(binString);
-    const imgSource = `data:image/svg+xml;base64,${svgBase64}`;
-
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    const img = new Image();
-
-    const scale = 2;
-    canvas.width = width * scale;
-    canvas.height = height * scale;
-
-    img.onload = () => {
-      if (ctx) {
-        ctx.fillStyle = resolvedTheme === "dark" ? "#1a1a1a" : "#ffffff";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        ctx.scale(scale, scale);
-        ctx.drawImage(img, 0, 0, width, height);
-
-        try {
-          const pngUrl = canvas.toDataURL("image/png");
-          const downloadLink = document.createElement("a");
-          downloadLink.href = pngUrl;
-          downloadLink.download = `diagramma-${Date.now()}.png`;
-          downloadLink.click();
-        } catch (e) {
-          console.error(
-            "Errore durante l'esportazione: il canvas è ancora tainted.",
-            e,
-          );
-        }
-      }
-    };
-
-    img.src = imgSource;
-  };
-
-  return (
-    <div className="relative flex flex-col items-center bg-foreground/5 rounded-lg p-4 mb-5 w-full overflow-hidden border border-foreground/10">
-      {loading && <Spinner />}
-
-      {!loading && (
-        <Button
-          onClick={handleDownload}
-          className="absolute top-2 right-2"
-          size="icon"
-          variant="outline"
-        >
-          <Download size={18} />
-        </Button>
-      )}
-
-      <div ref={ref} className="flex justify-center w-full overflow-x-auto" />
-    </div>
-  );
-}
+  UlComponent,
+  OlComponent,
+  LiComponent,
+} from "./markdown-components/lists";
+import {
+  TableComponent,
+  TheadComponent,
+  TbodyComponent,
+  TrComponent,
+  ThComponent,
+  TdComponent,
+} from "./markdown-components/table";
+import { PComponent } from "./markdown-components/p";
+import { StrongComponent } from "./markdown-components/strong";
+import { EmComponent } from "./markdown-components/em";
+import { DelComponent } from "./markdown-components/del";
+import { HrComponent } from "./markdown-components/hr";
+import { BlockquoteComponent } from "./markdown-components/blockquote";
+import { ImgComponent } from "./markdown-components/img";
 
 export const markdownComponents: Components = {
-  h1: ({ children }) => (
-    <h1 className="text-(--editor-title) text-[2.2em] font-bold tracking-tight mb-6 pb-1 leading-tight">
-      {children}
-    </h1>
-  ),
-  h2: ({ children }) => (
-    <h2 className="text-(--editor-title) text-[1.6em] font-bold tracking-tight mt-6 mb-5 pb-1 leading-snug">
-      {children}
-    </h2>
-  ),
-  h3: ({ children }) => (
-    <h3 className="text-(--editor-title) text-[1.3em] font-semibold mt-6 mb-4 leading-normal">
-      {children}
-    </h3>
-  ),
-  h4: ({ children }) => (
-    <h4 className="text-(--editor-title) text-[1.1em] font-semibold mt-5 mb-3 leading-normal">
-      {children}
-    </h4>
-  ),
-  h5: ({ children }) => (
-    <h5 className="text-(--editor-title) text-[0.95em] font-semibold mt-4 mb-2">
-      {children}
-    </h5>
-  ),
-  h6: ({ children }) => (
-    <h6 className="text-(--editor-title)/70 text-[0.85em] font-semibold mt-4 mb-2">
-      {children}
-    </h6>
-  ),
-  p: ({ children }) => (
-    <p className="leading-relaxed text-[15px] md:text-[16px] mb-5 text-foreground/90 font-sans">
-      {children}
-    </p>
-  ),
-  ul: ({ children }) => (
-    <ul className="list-disc pl-8 space-y-2.5 mb-5 text-foreground/80 [&_ul]:mb-0 [&_ol]:mb-0 [&_ul]:mt-2.5 [&_ol]:mt-2.5">
-      {children}
-    </ul>
-  ),
-  ol: ({ children }) => (
-    <ol className="list-decimal pl-8 space-y-2.5 mb-5 text-foreground/80 [&_ul]:mb-0 [&_ol]:mb-0 [&_ul]:mt-2.5 [&_ol]:mt-2.5">
-      {children}
-    </ol>
-  ),
-  li: ({ children }) => (
-    <li className="leading-relaxed text-[15px] md:text-[16px] text-foreground/90">
-      {children}
-    </li>
-  ),
-  strong: ({ children }) => (
-    <strong className="text-(--editor-title) font-semibold">{children}</strong>
-  ),
-  em: ({ children }) => <em className="italic">{children}</em>,
-  del: ({ children }) => <del className="line-through">{children}</del>,
-  hr: () => <hr className="mb-5 border-0 h-px bg-foreground/20 rounded" />,
-  blockquote: ({ children }) => (
-    <blockquote className="my-6 pl-5 pr-4 py-3 bg-muted/40 border-l-4 border-primary rounded-r-lg text-muted-foreground flex gap-3.5 items-start [&>div>*:last-child]:mb-0">
-      <Lightbulb className="text-primary shrink-0 mt-0.5" size={18} />
-      <div className="flex-1 not-italic text-foreground/95">{children}</div>
-    </blockquote>
-  ),
+  h1: H1Component,
+  h2: H2Component,
+  h3: H3Component,
+  h4: H4Component,
+  h5: H5Component,
+  h6: H6Component,
+  p: PComponent,
+  ul: UlComponent,
+  ol: OlComponent,
+  li: LiComponent,
+  strong: StrongComponent,
+  em: EmComponent,
+  del: DelComponent,
+  hr: HrComponent,
+  blockquote: BlockquoteComponent,
   code: CodeBlock,
-  img: ({ src, alt }) => (
-    <img
-      src={src}
-      alt={alt}
-      className="max-w-full h-auto my-6 rounded-lg border border-border shadow-md mx-auto block"
-    />
-  ),
+  img: ImgComponent,
   a: LinkComponent,
-  table: ({ children }) => (
-    <div className="overflow-x-auto my-6 border border-border rounded-lg bg-card/50 shadow-xs">
-      <table className="w-full border-collapse text-[15px] text-left">
-        {children}
-      </table>
-    </div>
-  ),
-  thead: ({ children }) => (
-    <thead className="bg-muted/50 border-b border-border">{children}</thead>
-  ),
-  tbody: ({ children }) => <tbody>{children}</tbody>,
-  tr: ({ children }) => (
-    <tr className="border-b border-foreground/10 last:border-b-0">
-      {children}
-    </tr>
-  ),
-  th: ({ children, ...props }) => (
-    <th
-      {...props}
-      className="px-4 py-3 font-semibold text-foreground border-r border-foreground/10 last:border-r-0"
-    >
-      {children}
-    </th>
-  ),
-  td: ({ children, ...props }) => (
-    <td
-      {...props}
-      className="px-4 py-3 text-muted-foreground border-r border-foreground/10 last:border-r-0"
-    >
-      {children}
-    </td>
-  ),
+  table: TableComponent,
+  thead: TheadComponent,
+  tbody: TbodyComponent,
+  tr: TrComponent,
+  th: ThComponent,
+  td: TdComponent,
 };
 
 // TODO: checkbox
