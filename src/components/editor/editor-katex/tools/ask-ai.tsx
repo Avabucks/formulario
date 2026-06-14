@@ -10,7 +10,6 @@ import {
   DialogTrigger,
 } from "@/src/components/ui/dialog";
 import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
-import { ScrollArea } from "@/src/components/ui/scroll-area";
 import { Spinner } from "@/src/components/ui/spinner";
 import { Textarea } from "@/src/components/ui/textarea";
 import {
@@ -20,10 +19,11 @@ import {
   TooltipTrigger,
 } from "@/src/components/ui/tooltip";
 import { loadAnalytics } from "@/src/lib/firebase";
+import { DiffEditor } from "@monaco-editor/react";
 import { logEvent } from "firebase/analytics";
 import { Check, Wand2, X } from "lucide-react";
 import type { editor } from "monaco-editor";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 const loadingMessages = [
@@ -49,6 +49,12 @@ export function AskAIButton({
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [loadingText, setLoadingText] = useState(loadingMessages[0]);
+
+  const diffEditorRef = useRef<editor.IStandaloneDiffEditor | null>(null);
+
+  const handleDiffEditorDidMount = (editor: editor.IStandaloneDiffEditor) => {
+    diffEditorRef.current = editor;
+  };
 
   useEffect(() => {
     if (!loading) return;
@@ -110,8 +116,7 @@ export function AskAIButton({
     const model = editor.getModel();
     if (!model) return;
 
-    const sel = editor.getSelection();
-    const range = sel ?? {
+    const range = {
       startLineNumber: 1,
       startColumn: 1,
       endLineNumber: model.getLineCount(),
@@ -224,20 +229,29 @@ export function AskAIButton({
           )}
 
           {result && !loading && (
-            <div className="flex flex-col gap-2 over">
+            <div className="flex flex-col gap-2">
               <span className="text-sm font-medium text-muted-foreground">
                 Anteprima risposta
               </span>
-              <ScrollArea className="relative rounded-xl border bg-muted/20 shadow-inner max-h-72">
-                <div className="p-4 text-sm leading-relaxed whitespace-pre-wrap">
-                  <div className="absolute top-2 right-2">
-                    <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                      AI
-                    </span>
-                  </div>
-                  {result}
-                </div>
-              </ScrollArea>
+              <div className="relative rounded-xl border overflow-hidden">
+                <DiffEditor
+                  onMount={handleDiffEditorDidMount}
+                  height="300px"
+                  original={editorRef.current?.getValue() ?? ""}
+                  modified={result}
+                  language="markdown-math"
+                  theme="markdown-math-theme"
+                  options={{
+                    lineNumbers: "off",
+                    links: false,
+                    minimap: { enabled: false },
+                    automaticLayout: true,
+                    wordWrap: "on",
+                    quickSuggestions: false,
+                    readOnly: true,
+                  }}
+                />
+              </div>
             </div>
           )}
         </div>
