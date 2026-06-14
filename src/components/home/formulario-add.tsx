@@ -14,7 +14,7 @@ import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 import { Switch } from "@/src/components/ui/switch";
 import { Textarea } from "@/src/components/ui/textarea";
-import { Plus } from "lucide-react";
+import { Plus, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -34,6 +34,13 @@ export default function ForumlarioAdd({
 }: Readonly<{ allowKey?: boolean; showLabel?: boolean }>) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [template, setTemplate] = useState<"empty" | "ai">("empty");
+
+  useEffect(() => {
+    if (!open) {
+      setTemplate("empty");
+    }
+  }, [open]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -45,7 +52,7 @@ export default function ForumlarioAdd({
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [open]);
+  }, [open, allowKey]);
 
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -120,6 +127,69 @@ export default function ForumlarioAdd({
             <DialogTitle>Aggiungi un formulario</DialogTitle>
           </DialogHeader>
           <FieldGroup>
+            <Field>
+              <Label>Come vuoi iniziare?</Label>
+              <div className="flex flex-col gap-3 w-full mt-1.5">
+                <div
+                  onClick={() => setTemplate("empty")}
+                  className={`flex items-center justify-between p-3.5 rounded-xl border-2 transition-all duration-200 cursor-pointer ${
+                    template === "empty"
+                      ? "border-brand-purple bg-brand-purple/10"
+                      : "border-border bg-background hover:bg-muted/30"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`flex items-center justify-center p-2 rounded-lg transition-colors duration-200 ${
+                      template === "empty"
+                        ? "bg-brand-purple/20 text-brand-purple"
+                        : "bg-muted text-muted-foreground"
+                    }`}>
+                      <Plus size={18} />
+                    </div>
+                    <div className="flex flex-col text-left">
+                      <span className="font-semibold text-sm">Parti da vuoto</span>
+                      <span className="text-xs text-muted-foreground/80">Inizia con un formulario vuoto e aggiungi formule a mano</span>
+                    </div>
+                  </div>
+                  <div className={`flex items-center justify-center w-5 h-5 rounded-full border-2 transition-colors duration-200 ${
+                    template === "empty"
+                      ? "border-brand-purple"
+                      : "border-muted-foreground/30"
+                  }`}>
+                    {template === "empty" && (
+                      <div className="w-2.5 h-2.5 rounded-full bg-brand-purple" />
+                    )}
+                  </div>
+                </div>
+
+                <div
+                  onClick={() => {
+                    toast.info("La generazione automatica con AI sarà disponibile a breve!", {
+                      position: "bottom-center",
+                    });
+                  }}
+                  className="flex items-center justify-between p-3.5 rounded-xl border-2 border-border bg-background/50 opacity-60 cursor-not-allowed transition-all duration-200"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-center p-2 rounded-lg bg-muted text-muted-foreground">
+                      <Sparkles size={18} />
+                    </div>
+                    <div className="flex flex-col text-left">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-sm text-muted-foreground">Genera con AI</span>
+                        <span className="inline-flex items-center rounded-full bg-brand-purple/10 px-2 py-0.5 text-[10px] font-semibold text-brand-purple border border-brand-purple/30 uppercase tracking-wider">
+                          Premium
+                        </span>
+                      </div>
+                      <span className="text-xs text-muted-foreground/80">Genera automaticamente il formulario caricando i tuoi file</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-center w-5 h-5 rounded-full border-2 border-muted-foreground/20">
+                    {/* Unchecked */}
+                  </div>
+                </div>
+              </div>
+            </Field>
             <Field>
               <Label htmlFor="titolo-1">Titolo del formulario</Label>
               <Input

@@ -31,7 +31,7 @@ export async function Header() {
         <Button
           asChild
           variant="ghost"
-          className="gap-1.5 bg-purple-500/10 px-2 text-purple-700 shadow-none hover:bg-purple-500/20 hover:text-purple-900 focus-visible:border-purple-400/40 focus-visible:ring-purple-500/20 dark:bg-purple-400/10 dark:text-purple-300 dark:hover:bg-purple-400/20 dark:hover:text-purple-100 md:px-3"
+          className="gap-1.5 bg-brand-purple/10 px-2 text-brand-purple shadow-none hover:bg-brand-purple/20 focus-visible:border-brand-purple/40 focus-visible:ring-brand-purple/20 md:px-3"
         >
           <Link
             href="https://ko-fi.com/formulabase"

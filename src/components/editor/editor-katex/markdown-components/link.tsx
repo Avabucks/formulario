@@ -97,7 +97,7 @@ export const LinkComponent = ({ href, children }: any) => {
       <a
         href={href}
         onClick={handleClick}
-        className="text-violet-600 dark:text-violet-400 underline underline-offset-4 decoration-violet-600/30 hover:decoration-violet-600 dark:decoration-violet-400/30 dark:hover:decoration-violet-400 font-semibold cursor-pointer transition-colors"
+        className="text-brand-purple underline underline-offset-4 decoration-brand-purple/30 hover:decoration-brand-purple font-semibold cursor-pointer transition-colors"
       >
         {children}
       </a>
