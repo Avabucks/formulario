@@ -266,12 +266,13 @@ export function FormattingLatex({
     (globalThis as unknown as { umami?: any }).umami?.track(
       "selected_formula_latex",
     );
-    const analytics = await loadAnalytics()
-    if (analytics) {
-      logEvent(analytics, 'generate_lead', {
-        method: 'selected_formula_latex',
-      })
-      console.log('Evento generate_lead tracciato con successo!')
+    try {
+      const analytics = await loadAnalytics();
+      if (analytics) {
+        logEvent(analytics, "selected_formula_latex");
+      }
+    } catch (error) {
+      console.error("Errore nel tracciamento dell'evento:", error);
     }
   };
 

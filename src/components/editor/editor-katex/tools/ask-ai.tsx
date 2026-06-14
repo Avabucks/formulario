@@ -85,12 +85,14 @@ export function AskAIButton({
 
       (globalThis as unknown as { umami?: any }).umami?.track("generated_ai");
       const analytics = await loadAnalytics()
-      if (analytics) {
-        logEvent(analytics, 'generate_lead', {
-          method: 'generated_ai',
-        })
-        console.log('Evento generate_lead tracciato con successo!')
-      }
+        try {
+          const analytics = await loadAnalytics();
+          if (analytics) {
+            logEvent(analytics, "generated_ai");
+          }
+        } catch (error) {
+          console.error("Errore nel tracciamento dell'evento:", error);
+        }
       setResult(data.text);
     } catch (error: any) {
       console.error(error.message);
