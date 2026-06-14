@@ -233,7 +233,7 @@ export function AiTemplateCardFeedback({ likedAi, onLike }: { likedAi: boolean; 
           position: "bottom-center",
         });
       }}
-      className="flex items-center justify-between p-3.5 rounded-xl border border-dashed border-border bg-muted/10 dark:bg-muted/5 transition-all duration-200 cursor-default"
+      className="flex gap-2 items-center justify-between p-3.5 rounded-xl border border-dashed border-border bg-muted/10 dark:bg-muted/5 transition-all duration-200 cursor-default"
     >
       <div className="flex items-center gap-3">
         <div className="flex items-center justify-center p-2 rounded-lg bg-muted/80 text-muted-foreground/80">
@@ -255,12 +255,12 @@ export function AiTemplateCardFeedback({ likedAi, onLike }: { likedAi: boolean; 
           onClick={onLike}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-semibold transition-all duration-300 active:scale-95 ${
             likedAi
-              ? "border-red-200 dark:border-red-900/40 bg-red-500/10 text-red-600 dark:text-red-400 cursor-default"
-              : "border-border bg-transparent hover:bg-red-50 hover:text-red-500 hover:border-red-200 dark:hover:bg-red-950/20 dark:hover:border-red-900 cursor-pointer"
+              ? "border-brand-purple/30 bg-brand-purple/10 text-brand-purple cursor-default"
+              : "border-border bg-transparent hover:text-brand-purple hover:border-brand-purple/30 hover:bg-brand-purple/10 cursor-pointer"
           }`}
           disabled={likedAi}
         >
-          <Heart size={13} className={likedAi ? "fill-red-500" : ""} />
+          <Heart size={13} className={likedAi ? "fill-current" : ""} />
           <span className="text-nowrap">{likedAi ? "Votato" : "Ti piace?"}</span>
         </button>
       </div>
