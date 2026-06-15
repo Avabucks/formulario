@@ -11,7 +11,7 @@
     {
       "title": "Formattazione",
       "shortcuts": [
-        { "label": "Chiedi all'AI", "keys": ["Alt", "A"] },
+        { "label": "Genera con AI", "keys": ["Alt", "A"] },
         { "label": "Grassetto", "keys": ["Ctrl", "B"] },
         { "label": "Corsivo", "keys": ["Ctrl", "I"] },
         { "label": "Citazione", "keys": ["Ctrl", "Shift", "Q"] },

@@ -70,7 +70,6 @@ export function AskAIButton({
     if (!prompt.trim()) return;
     const currentContext = result || (editorRef.current?.getValue() ?? "");
     setLoading(true);
-    setResult(null);
     try {
       const res = await fetch("/api/groq", {
         method: "POST",
@@ -91,7 +90,6 @@ export function AskAIButton({
       }
 
       (globalThis as unknown as { umami?: any }).umami?.track("generated_ai");
-      const analytics = await loadAnalytics()
         try {
           const analytics = await loadAnalytics();
           if (analytics) {
@@ -131,8 +129,6 @@ export function AskAIButton({
 
   const handleClose = () => {
     setOpen(false);
-    setPrompt("");
-    setResult(null);
   };
 
   useEffect(() => {
@@ -167,7 +163,7 @@ export function AskAIButton({
             <DialogTrigger asChild>
               <Button variant="outline">
                 <Wand2 size={16} />
-                Chiedi all'AI
+                Genera con AI
               </Button>
             </DialogTrigger>
           </TooltipTrigger>
@@ -186,7 +182,7 @@ export function AskAIButton({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-lg">
             <Wand2 size={18} className="text-primary" />
-            Chiedi all'AI
+            Genera con AI
           </DialogTitle>
         </DialogHeader>
 
