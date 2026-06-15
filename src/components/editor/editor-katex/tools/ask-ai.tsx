@@ -68,6 +68,7 @@ export function AskAIButton({
 
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
+    const currentContext = result || (editorRef.current?.getValue() ?? "");
     setLoading(true);
     setResult(null);
     try {
@@ -76,7 +77,7 @@ export function AskAIButton({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           prompt,
-          context: editorRef.current?.getValue() ?? "",
+          context: currentContext,
         }),
       });
 
@@ -130,6 +131,8 @@ export function AskAIButton({
 
   const handleClose = () => {
     setOpen(false);
+    setPrompt("");
+    setResult(null);
   };
 
   useEffect(() => {
