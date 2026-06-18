@@ -213,6 +213,27 @@ export default function ForumlarioAdd({
                 placeholder="Descrivi il formulario"
               />
             </Field>
+            <Field className="flex flex-row items-center justify-between rounded-lg border p-3.5 shadow-xs">
+              <div className="space-y-0.5 pr-2">
+                <Label htmlFor="share-discord">Mostra su Discord</Label>
+                <div className="text-xs text-muted-foreground/80">
+                  Condividi la creazione nel canale{" "}
+                  <a
+                    href="https://discord.com/channels/1517246750551703678/1517261759281369191"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline text-brand-purple hover:text-brand-purple/80"
+                  >
+                    #nuovi-formulari
+                  </a>
+                </div>
+              </div>
+              <Switch
+                id="share-discord"
+                name="shareDiscord"
+                defaultChecked={false}
+              />
+            </Field>
           </FieldGroup>
           <DialogFooter>
             <DialogClose asChild>
