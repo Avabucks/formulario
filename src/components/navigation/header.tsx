@@ -1,7 +1,7 @@
 import { Button } from "@/src/components/ui/button";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { getIronSession } from "iron-session";
-import { ArrowRight, Coffee, Pi } from "lucide-react";
+import { ArrowRight, Pi } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { AvatarLogic } from "../auth/avatar-logic";
@@ -38,16 +38,6 @@ export async function Header() {
         <Button asChild variant="ghost">
           <Link href="/community/page/1">Community</Link>
         </Button>
-        <Button asChild variant="ghost" className="gap-1.5">
-          <Link
-            href="https://discord.gg/uuRuWtteZ"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <DiscordIcon className="h-4 w-4" />
-            <span className="hidden sm:inline">Discord</span>
-          </Link>
-        </Button>
       </div>
       <div className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2">
         <Button
@@ -56,15 +46,13 @@ export async function Header() {
           className="gap-1.5 bg-brand-purple/10 px-2 text-brand-purple shadow-none hover:bg-brand-purple/20 focus-visible:border-brand-purple/40 focus-visible:ring-brand-purple/20 md:px-3"
         >
           <Link
-            href="https://ko-fi.com/formulabase"
+            href="https://discord.gg/uuRuWtteZ"
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="Supporta FormulaBase su Ko-fi"
+            aria-label="Entra nel server Discord"
           >
-            <Coffee className="h-4 w-4" />
-            <span>
-              Supporta<span className="hidden md:inline"> il progetto</span>
-            </span>
+            <DiscordIcon className="h-4 w-4" />
+            <span>Discord</span>
           </Link>
         </Button>
       </div>

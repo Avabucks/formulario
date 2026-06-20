@@ -19,6 +19,7 @@ import { signOut } from "firebase/auth";
 import {
   BadgeInfo,
   Book,
+  Coffee,
   Keyboard,
   LogOutIcon,
   Settings,
@@ -100,6 +101,16 @@ export function AvatarLogic() {
             <Keyboard />
             Scorciatoie da tastiera
           </DropdownMenuItem>
+          <Link
+            href="https://ko-fi.com/formulabase"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <DropdownMenuItem>
+              <Coffee />
+              Supporta il progetto
+            </DropdownMenuItem>
+          </Link>
           <DropdownMenuSeparator />
           <DropdownMenuItem variant="destructive" onClick={handleLogout}>
             <LogOutIcon />

@@ -71,7 +71,6 @@ export async function POST(request: Request) {
     if (shareDiscord && webhookUrl) {
       const authorName = users[0]?.displayName || "Uno studente";
       const appUrl = process.env.NEXT_PUBLIC_APP_URL;
-      const formularioUrl = `${appUrl}/formulario/${beautiful_id}`;
 
       fetch(webhookUrl, {
         method: "POST",
@@ -82,19 +81,6 @@ export async function POST(request: Request) {
               title: `📚 Nuovo Formulario Creato!`,
               description: `**${authorName}** ha appena creato un nuovo formulario su [FormulaBase](${appUrl}).`,
               color: 5814783,
-              fields: [
-                {
-                  name: "Titolo",
-                  value: titolo,
-                  inline: true,
-                },
-                {
-                  name: "Descrizione",
-                  value: descrizione || "*Nessuna descrizione*",
-                  inline: false,
-                },
-              ],
-              url: formularioUrl,
               timestamp: new Date().toISOString(),
               footer: {
                 text: "FormulaBase Community",
