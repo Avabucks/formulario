@@ -92,7 +92,7 @@ export function DiscordDialog({
                 />
               </div>
               {/* Logo Discord */}
-              <div className="w-16 h-16 bg-[#70728f] rounded-full flex items-center justify-center border-4 border-[#1e1f22] p-3.5 z-20">
+              <div className="w-16 h-16 bg-[#5865F2] rounded-full flex items-center justify-center border-4 border-[#1e1f22] p-3.5 z-20">
                 <DiscordIcon className="w-full h-full fill-current text-white" />
               </div>
             </div>
