@@ -84,7 +84,7 @@ export function DiscordDialog({
             {/* Loghi in modalità Stack sovrapposta */}
             <div className="flex -space-x-3 items-center">
               {/* Logo del Sito (FormulaBase) */}
-              <div className="w-16 h-16 bg-background rounded-full flex items-center justify-center border-4 border-[#1e1f22] p-2.5 z-10">
+              <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center border-4 border-[#1e1f22] p-2.5 z-10">
                 <img
                   src="/icon0.svg"
                   alt="FormulaBase Logo"
