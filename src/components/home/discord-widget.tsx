@@ -128,8 +128,8 @@ export function DiscordDialog({
                         />
                       ))}
                       {widgetData.presence_count > 5 && (
-                        <div className="w-6 h-6 rounded-full bg-[#313338] border-2 border-[#1e1f22] flex items-center justify-center text-[9px] font-bold text-[#b5bac1]">
-                          +{widgetData.presence_count - 5}
+                        <div className="min-w-6 h-6 px-1 rounded-full bg-[#313338] border-2 border-[#1e1f22] flex items-center justify-center text-[9px] font-bold text-[#b5bac1]">
+                          {widgetData.presence_count - 5 > 99 ? "99+" : `+${widgetData.presence_count - 5}`}
                         </div>
                       )}
                     </div>
