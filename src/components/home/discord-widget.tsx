@@ -15,6 +15,22 @@ import { Button } from "@/src/components/ui/button";
 
 const DISCORD_POPUP_DISABLED_KEY = "discord_popup_disabled";
 const ACCOUNT_POPUP_KEY = "new-account-popup-closed";
+const GUILD_ID = "1517246750551703678";
+
+interface DiscordMember {
+  id: string;
+  username: string;
+  avatar_url: string;
+  status: string;
+}
+
+interface DiscordWidgetData {
+  id: string;
+  name: string;
+  instant_invite: string;
+  presence_count: number;
+  members: DiscordMember[];
+}
 
 export function DiscordIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -39,6 +55,21 @@ export function DiscordDialog({
   showDisableOption?: boolean;
   disableAutomaticPopup?: () => void;
 }) {
+  const [widgetData, setWidgetData] = useState<DiscordWidgetData | null>(null);
+
+  // Recupera i dati reali della presenza sul server se abilitato nelle impostazioni Discord
+  useEffect(() => {
+    if (!open) return;
+
+    fetch(`https://discord.com/api/guilds/${GUILD_ID}/widget.json`)
+      .then((res) => {
+        if (res.ok) return res.json();
+        throw new Error("Widget non abilitato");
+      })
+      .then((data) => setWidgetData(data))
+      .catch(() => setWidgetData(null));
+  }, [open]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md p-0 overflow-hidden">
@@ -74,12 +105,44 @@ export function DiscordDialog({
               <h4 className="text-base font-bold text-white leading-tight">
                 FormulaBase Community
               </h4>
-              <span className="text-xs text-[#23a55a] font-medium flex items-center justify-center gap-1.5 pt-0.5">
-                <span className="relative flex h-2 w-2">
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#23a55a]"></span>
+
+              {widgetData ? (
+                <div className="space-y-2 pt-1">
+                  <span className="text-xs text-[#23a55a] font-medium flex items-center justify-center gap-1.5">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#23a55a] opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#23a55a]"></span>
+                    </span>
+                    {widgetData.presence_count} online
+                  </span>
+                  
+                  {widgetData.members && widgetData.members.length > 0 && (
+                    <div className="flex -space-x-1.5 justify-center">
+                      {widgetData.members.slice(0, 5).map((member) => (
+                        <img
+                          key={member.id}
+                          src={member.avatar_url}
+                          alt={member.username}
+                          title={member.username}
+                          className="w-6 h-6 rounded-full border-2 border-[#1e1f22]"
+                        />
+                      ))}
+                      {widgetData.presence_count > 5 && (
+                        <div className="w-6 h-6 rounded-full bg-[#313338] border-2 border-[#1e1f22] flex items-center justify-center text-[9px] font-bold text-[#b5bac1]">
+                          +{widgetData.presence_count - 5}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <span className="text-xs text-[#23a55a] font-medium flex items-center justify-center gap-1.5 pt-0.5">
+                  <span className="relative flex h-2 w-2">
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#23a55a]"></span>
+                  </span>
+                  Community Ufficiale
                 </span>
-                Community Ufficiale
-              </span>
+              )}
             </div>
           </div>
         </div>
@@ -89,7 +152,7 @@ export function DiscordDialog({
           <DialogHeader>
             <DialogTitle className="text-lg font-bold tracking-tight text-foreground">
               Unisciti a FormulaBase su Discord
-              </DialogTitle>
+            </DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground leading-relaxed">
             Il nostro server ufficiale è il punto di ritrovo ideale per:
