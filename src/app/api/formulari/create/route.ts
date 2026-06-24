@@ -29,7 +29,6 @@ export async function POST(request: Request) {
   const formData = await request.formData();
   const titolo = formData.get("titolo") as string;
   const descrizione = formData.get("descrizione") as string;
-  const shareDiscord = formData.get("shareDiscord") === "on";
 
   if (!titolo)
     return NextResponse.json(
@@ -66,30 +65,6 @@ export async function POST(request: Request) {
     );
 
     await client.query("COMMIT");
-
-    const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
-    if (shareDiscord && webhookUrl) {
-      const authorName = users[0]?.displayName || "Uno studente";
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL;
-
-      fetch(webhookUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          embeds: [
-            {
-              title: `📚 Nuovo Formulario Creato!`,
-              description: `**${authorName}** ha appena creato un nuovo formulario su [FormulaBase](${appUrl}).`,
-              color: 5814783,
-              timestamp: new Date().toISOString(),
-              footer: {
-                text: "FormulaBase Community",
-              },
-            },
-          ],
-        }),
-      }).catch((err) => console.error("Errore webhook Discord:", err));
-    }
 
     revalidatePath("/home");
     return NextResponse.json({ success: true, formulario_id: beautiful_id });

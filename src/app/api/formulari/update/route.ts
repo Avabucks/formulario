@@ -34,6 +34,20 @@ export async function PUT(request: Request) {
     );
 
   try {
+    // Recupera la visibilità precedente per evitare notifiche duplicate ad ogni modifica
+    const { rows: currentFormulari } = await pool.query(
+      `SELECT visibility FROM formulari WHERE beautiful_id = $1 AND owner_uid = $2`,
+      [id, uid],
+    );
+
+    if (currentFormulari.length === 0)
+      return NextResponse.json(
+        { error: "Formulario non trovato o non autorizzato" },
+        { status: 404 },
+      );
+
+    const oldVisibility = currentFormulari[0].visibility;
+
     const result = await pool.query(
       `UPDATE formulari 
              SET titolo = $1, descrizione = $2, visibility = $3
@@ -53,6 +67,35 @@ export async function PUT(request: Request) {
             WHERE beautiful_id = $1`,
       [id],
     );
+
+    // Notifica Discord solo se il formulario diventa pubblico per la prima volta (visibility 2)
+    const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+    if (oldVisibility !== 2 && visibility === 2 && webhookUrl) {
+      const { rows: users } = await pool.query(
+        `SELECT display_name as "displayName" FROM users WHERE uid = $1`,
+        [uid],
+      );
+      const authorName = users[0]?.displayName || "Uno studente";
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+
+      fetch(webhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          embeds: [
+            {
+              title: `📚 Nuovo Formulario Pubblicato!`,
+              description: `**${authorName}** ha appena reso pubblico il formulario [**${titolo}**](${appUrl}/formulario/${id}).`,
+              color: 5814783,
+              timestamp: new Date().toISOString(),
+              footer: {
+                text: "FormulaBase Community",
+              },
+            },
+          ],
+        }),
+      }).catch((err) => console.error("Errore webhook Discord:", err));
+    }
 
     revalidatePath("/home");
     return NextResponse.json({ success: true });
