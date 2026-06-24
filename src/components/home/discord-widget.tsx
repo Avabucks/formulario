@@ -217,14 +217,6 @@ interface FloatingAvatar {
   username: string;
 }
 
-const FALLBACK_MEMBERS: DiscordMember[] = [
-  { id: "fb-1", username: "Matteo", avatar_url: "https://api.dicebear.com/7.x/adventurer/svg?seed=Matteo", status: "online" },
-  { id: "fb-2", username: "Sofia", avatar_url: "https://api.dicebear.com/7.x/adventurer/svg?seed=Sofia", status: "online" },
-  { id: "fb-3", username: "Davide", avatar_url: "https://api.dicebear.com/7.x/adventurer/svg?seed=Davide", status: "online" },
-  { id: "fb-4", username: "Chiara", avatar_url: "https://api.dicebear.com/7.x/adventurer/svg?seed=Chiara", status: "online" },
-  { id: "fb-5", username: "Alessandro", avatar_url: "https://api.dicebear.com/7.x/adventurer/svg?seed=Alessandro", status: "online" },
-];
-
 export default function DiscordWidget() {
   const [open, setOpen] = useState(false);
   const [popupDisabled, setPopupDisabled] = useState(false);
@@ -260,12 +252,10 @@ export default function DiscordWidget() {
 
   // Avvia l'intervallo ogni 10 secondi per far fluttuare un avatar random
   useEffect(() => {
-    const activeList = members.length > 0 ? members : FALLBACK_MEMBERS;
-    if (activeList.length === 0) return;
+    if (members.length === 0) return;
 
     const interval = setInterval(() => {
-      const currentList = members.length > 0 ? members : FALLBACK_MEMBERS;
-      const randomMember = currentList[Math.floor(Math.random() * currentList.length)];
+      const randomMember = members[Math.floor(Math.random() * members.length)];
       
       const newFloating: FloatingAvatar = {
         id: Math.random().toString(36).substring(2, 9),
