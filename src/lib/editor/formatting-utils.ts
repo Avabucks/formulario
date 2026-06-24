@@ -1,15 +1,50 @@
-import type { editor } from "monaco-editor";
+import type { editor, Selection } from "monaco-editor";
 
-// REGEX
-export const getH1Regex = () => /^#\s(.+)$/gm;
-export const getH2Regex = () => /^##\s(.+)$/gm;
-export const getH3Regex = () => /^###\s(.+)$/gm;
-export const getH4Regex = () => /^####\s(.+)$/gm;
-export const getH5Regex = () => /^#####\s(.+)$/gm;
-export const getH6Regex = () => /^######\s(.+)$/gm;
+// Helper functions for Monaco Editor contexts and offsets
+function getEditorContext(
+  editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
+) {
+  const editor = editorRef.current;
+  if (!editor) return null;
+  const model = editor.getModel();
+  if (!model) return null;
+  const selection = editor.getSelection();
+  if (!selection) return null;
+  return { editor, model, selection };
+}
+
+function getSelectionOffsets(model: editor.ITextModel, selection: Selection) {
+  const startOffset = model.getOffsetAt({
+    lineNumber: selection.startLineNumber,
+    column: selection.startColumn,
+  });
+  const endOffset = model.getOffsetAt({
+    lineNumber: selection.endLineNumber,
+    column: selection.endColumn,
+  });
+  return { startOffset, endOffset };
+}
+
+function getAdjustedEndLine(selection: Selection): number {
+  return selection.endColumn === 1 &&
+    selection.endLineNumber > selection.startLineNumber
+    ? selection.endLineNumber - 1
+    : selection.endLineNumber;
+}
+
+// REGEX Helpers and Constants
+const makeHeaderRegex = (level: number) => () =>
+  new RegExp(`^${"#".repeat(level)}\\s(.+)$`, "gm");
+
+export const getH1Regex = makeHeaderRegex(1);
+export const getH2Regex = makeHeaderRegex(2);
+export const getH3Regex = makeHeaderRegex(3);
+export const getH4Regex = makeHeaderRegex(4);
+export const getH5Regex = makeHeaderRegex(5);
+export const getH6Regex = makeHeaderRegex(6);
 
 export const getBoldRegex = () => /\*\*(.+?)\*\*/g;
-export const getItalicRegex = () => /_(. +?)_/g;
+export const getItalicRegex = () => /_(.+?)_/g; // Fixed typo: changed /_(. +?)_/g to /_(.+?)_/g
 export const getQuoteRegex = () => /^>\s/;
 
 export const getOrderedListRegex = () => /^\s*\d+\.\s/;
@@ -21,29 +56,18 @@ export function getIsActiveWord(
   editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
   getRegex: () => RegExp,
 ): boolean {
-  if (!editorRef.current) return false;
+  const ctx = getEditorContext(editorRef);
+  if (!ctx) return false;
 
-  const model = editorRef.current.getModel();
-  if (!model) return false;
-
+  const { model, selection } = ctx;
   const fullText = model.getValue();
   const regex = getRegex();
 
-  const sel = editorRef.current.getSelection();
-  if (!sel) return false;
-
   const cursorOffset = model.getOffsetAt({
-    lineNumber: sel.positionLineNumber,
-    column: sel.positionColumn,
+    lineNumber: selection.positionLineNumber,
+    column: selection.positionColumn,
   });
-  const startOffset = model.getOffsetAt({
-    lineNumber: sel.startLineNumber,
-    column: sel.startColumn,
-  });
-  const endOffset = model.getOffsetAt({
-    lineNumber: sel.endLineNumber,
-    column: sel.endColumn,
-  });
+  const { startOffset, endOffset } = getSelectionOffsets(model, selection);
 
   const isCursor = startOffset === endOffset;
 
@@ -77,25 +101,12 @@ export function handleWordToggle(
     match: RegExpExecArray,
   ) => number,
 ) {
-  const editor = editorRef.current;
-  if (!editor) return false;
+  const ctx = getEditorContext(editorRef);
+  if (!ctx) return false;
 
-  const model = editor.getModel();
-  if (!model) return;
-
+  const { editor, model, selection } = ctx;
   const fullText = model.getValue();
-
-  const sel = editor.getSelection();
-  if (!sel) return false;
-
-  const startOffset = model.getOffsetAt({
-    lineNumber: sel.startLineNumber,
-    column: sel.startColumn,
-  });
-  const endOffset = model.getOffsetAt({
-    lineNumber: sel.endLineNumber,
-    column: sel.endColumn,
-  });
+  const { startOffset, endOffset } = getSelectionOffsets(model, selection);
 
   const raw = fullText.slice(startOffset, endOffset);
   const trimmedText = raw.trim();
@@ -103,6 +114,7 @@ export function handleWordToggle(
   const trimStart = startOffset + leadingSpaces;
   const trimEnd = trimStart + trimmedText.length;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const controller = editor.getContribution("snippetController2") as any;
   if (!controller) return false;
 
@@ -155,15 +167,16 @@ export function getIsActiveList(
   editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
   getLineRegex: () => RegExp,
 ): boolean {
-  if (!editorRef.current) return false;
+  const ctx = getEditorContext(editorRef);
+  if (!ctx) return false;
 
-  const model = editorRef.current.getModel();
-  if (!model) return false;
+  const { model, selection } = ctx;
 
-  const sel = editorRef.current.getSelection();
-  if (!sel) return false;
-
-  for (let line = sel.startLineNumber; line <= sel.endLineNumber; line++) {
+  for (
+    let line = selection.startLineNumber;
+    line <= selection.endLineNumber;
+    line++
+  ) {
     const lineContent = model.getLineContent(line);
     if (!getLineRegex().test(lineContent)) return false;
   }
@@ -177,28 +190,22 @@ export function handleListToggle(
   addPrefix: (line: string, index: number) => string,
   removePrefix: (line: string) => string,
 ) {
-  if (!editorRef.current) return;
-  const model = editorRef.current.getModel();
-  if (!model) return;
+  const ctx = getEditorContext(editorRef);
+  if (!ctx) return;
 
-  const sel = editorRef.current.getSelection();
-  if (!sel) return;
-
-  const endLine =
-    sel.endColumn === 1 && sel.endLineNumber > sel.startLineNumber
-      ? sel.endLineNumber - 1
-      : sel.endLineNumber;
+  const { editor, model, selection } = ctx;
+  const endLine = getAdjustedEndLine(selection);
 
   const edits = [];
   for (
-    let lineNumber = sel.startLineNumber;
-    lineNumber <= sel.endLineNumber;
+    let lineNumber = selection.startLineNumber;
+    lineNumber <= selection.endLineNumber;
     lineNumber++
   ) {
     const lineContent = model.getLineContent(lineNumber);
     const newContent = isActive
       ? removePrefix(lineContent)
-      : addPrefix(lineContent, lineNumber - sel.startLineNumber);
+      : addPrefix(lineContent, lineNumber - selection.startLineNumber);
 
     edits.push({
       range: {
@@ -214,25 +221,23 @@ export function handleListToggle(
   model.pushEditOperations([], edits, () => null);
 
   const lastLineContent = model.getLineContent(endLine);
-  editorRef.current.setSelection({
+  editor.setSelection({
     startLineNumber: endLine,
     startColumn: lastLineContent.length + 1,
     endLineNumber: endLine,
     endColumn: lastLineContent.length + 1,
   });
-  editorRef.current.focus();
+  editor.focus();
 }
 
 export function getIsActiveCode(
   editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
 ): { language: string | null } | null {
-  if (!editorRef.current) return null;
-  const model = editorRef.current.getModel();
-  if (!model) return null;
-  const sel = editorRef.current.getSelection();
-  if (!sel) return null;
+  const ctx = getEditorContext(editorRef);
+  if (!ctx) return null;
 
-  const cursorLine = sel.startLineNumber;
+  const { model, selection } = ctx;
+  const cursorLine = selection.startLineNumber;
   let blockStart: number | null = null;
   let language: string | null = null;
 
@@ -266,27 +271,21 @@ export function handleBlockToggle(
   closeMarker: string,
   newLanguage?: string | null,
 ) {
-  if (!editorRef.current) return;
-  const model = editorRef.current.getModel();
-  if (!model) return;
+  const ctx = getEditorContext(editorRef);
+  if (!ctx) return;
 
-  const sel = editorRef.current.getSelection();
-  if (!sel) return;
-
+  const { editor, model, selection } = ctx;
   const totalLines = model.getLineCount();
 
   if (blockState === null) {
     // Calcola la selezione escludendo il trailing newline vuoto
-    const endLine =
-      sel.endColumn === 1 && sel.endLineNumber > sel.startLineNumber
-        ? sel.endLineNumber - 1
-        : sel.endLineNumber;
+    const endLine = getAdjustedEndLine(selection);
 
     const startCol = 1;
     const endCol = model.getLineContent(endLine).length + 1;
 
     const selectedText = model.getValueInRange({
-      startLineNumber: sel.startLineNumber,
+      startLineNumber: selection.startLineNumber,
       startColumn: startCol,
       endLineNumber: endLine,
       endColumn: endCol,
@@ -299,7 +298,7 @@ export function handleBlockToggle(
       [
         {
           range: {
-            startLineNumber: sel.startLineNumber,
+            startLineNumber: selection.startLineNumber,
             startColumn: startCol,
             endLineNumber: endLine,
             endColumn: endCol,
@@ -311,19 +310,20 @@ export function handleBlockToggle(
     );
 
     // Cursore alla fine del blocco inserito
-    const newEndLine = sel.startLineNumber + selectedText.split("\n").length;
+    const newEndLine =
+      selection.startLineNumber + selectedText.split("\n").length;
     const newEndCol = closeMarker.length + 1;
-    editorRef.current.setSelection({
+    editor.setSelection({
       startLineNumber: newEndLine,
       startColumn: newEndCol,
       endLineNumber: newEndLine,
       endColumn: newEndCol,
     });
-    editorRef.current.focus();
+    editor.focus();
   } else {
     // Trova le righe dei marker (apertura può avere suffisso lingua)
     let openLine = -1;
-    for (let l = sel.startLineNumber; l >= 1; l--) {
+    for (let l = selection.startLineNumber; l >= 1; l--) {
       const lineContent = model.getLineContent(l).trim();
       if (
         lineContent === openMarker ||
@@ -356,11 +356,11 @@ export function handleBlockToggle(
         ],
         () => null,
       );
-      editorRef.current.focus();
+      editor.focus();
       return;
     }
     let closeLine = -1;
-    for (let l = sel.endLineNumber; l <= totalLines; l++) {
+    for (let l = selection.endLineNumber; l <= totalLines; l++) {
       if (model.getLineContent(l).trim() === closeMarker) {
         closeLine = l;
         break;
@@ -401,13 +401,13 @@ export function handleBlockToggle(
     const newEndLine = closeLine - 2; // -2: rimossa apertura e chiusura
     const safeEndLine = Math.max(1, Math.min(newEndLine, model.getLineCount()));
     const endCol = model.getLineContent(safeEndLine).length + 1;
-    editorRef.current.setSelection({
+    editor.setSelection({
       startLineNumber: safeEndLine,
       startColumn: endCol,
       endLineNumber: safeEndLine,
       endColumn: endCol,
     });
-    setTimeout(() => editorRef.current?.focus(), 0);
+    setTimeout(() => editor.focus(), 0);
   }
 }
 
@@ -419,15 +419,12 @@ export function getIsActiveLatex(
   matchEnd: number;
   lineNumber: number;
 } | null {
-  if (!editorRef.current) return null;
-  const model = editorRef.current.getModel();
-  if (!model) return null;
+  const ctx = getEditorContext(editorRef);
+  if (!ctx) return null;
 
-  const sel = editorRef.current.getSelection();
-  if (!sel) return null;
-
-  const cursorLine = sel.startLineNumber;
-  const cursorCol = sel.startColumn; // 1-based (Monaco standard)
+  const { model, selection } = ctx;
+  const cursorLine = selection.startLineNumber;
+  const cursorCol = selection.startColumn; // 1-based (Monaco standard)
   const lineContent = model.getLineContent(cursorLine);
 
   const inlinePatterns = [
@@ -503,8 +500,8 @@ export function getIsActiveLatex(
 
 export function checkActiveLatexOrCode(
   editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
-) {
+): boolean {
   const code = getIsActiveCode(editorRef);
   const latex = getIsActiveLatex(editorRef);
-  if (latex?.kind === "double" || code) return true;
+  return !!(latex?.kind === "double" || code);
 }
