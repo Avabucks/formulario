@@ -1,5 +1,5 @@
 import packageJson from "@/package.json";
-import FeedbackWidget from "@/src/components/home/feedback-widget";
+import DiscordWidget from "@/src/components/home/discord-widget";
 import ForumlarioAdd from "@/src/components/home/formulario-add";
 import { FormularioCard } from "@/src/components/home/formulario-card";
 import { Header } from "@/src/components/navigation/header";
@@ -288,7 +288,7 @@ export default async function Home() {
           </TabsContent>
         </Tabs>
       </div>
-      <FeedbackWidget />
+      <DiscordWidget />
     </>
   );
 }
