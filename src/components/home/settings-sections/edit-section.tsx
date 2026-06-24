@@ -103,19 +103,34 @@ export function EditSection({
               />
             </div>
             {formulario.visibility >= 1 && (
-              <div className="flex items-center justify-between">
-                <Label htmlFor="visibility-2">Condividi con la community</Label>
-                <Switch
-                  id="visibility-2"
-                  checked={formulario.visibility === 2}
-                  onCheckedChange={(checked) => {
-                    setFormulario({
-                      ...formulario,
-                      visibility: checked ? 2 : 1,
-                    });
-                    setEdited(true);
-                  }}
-                />
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="visibility-2">Condividi con la community</Label>
+                  <Switch
+                    id="visibility-2"
+                    checked={formulario.visibility === 2}
+                    onCheckedChange={(checked) => {
+                      setFormulario({
+                        ...formulario,
+                        visibility: checked ? 2 : 1,
+                      });
+                      setEdited(true);
+                    }}
+                  />
+                </div>
+                {formulario.visibility === 2 && (
+                  <p className="text-muted-foreground text-xs leading-normal">
+                    Condividendo con la community, invierai anche una notifica sul canale Discord{" "}
+                    <a
+                      href="https://discord.gg/dDPywaqQN"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-brand-purple hover:underline font-semibold"
+                    >
+                      #nuovi-formulari
+                    </a>
+                  </p>
+                )}
               </div>
             )}
             <input

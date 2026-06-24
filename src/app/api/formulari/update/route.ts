@@ -86,7 +86,7 @@ export async function PUT(request: Request) {
             {
               title: `📚 Nuovo Formulario Pubblicato!`,
               description: `**${authorName}** ha appena reso pubblico il formulario [**${titolo}**](${appUrl}/formulario/${id}).`,
-              color: 5814783,
+              color: 0x610a9e,
               timestamp: new Date().toISOString(),
               footer: {
                 text: "FormulaBase Community",
