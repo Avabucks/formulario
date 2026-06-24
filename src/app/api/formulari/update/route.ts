@@ -68,34 +68,7 @@ export async function PUT(request: Request) {
       [id],
     );
 
-    // Notifica Discord solo se il formulario diventa pubblico per la prima volta (visibility 2)
-    const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
-    if (oldVisibility !== 2 && visibility === 2 && webhookUrl) {
-      const { rows: users } = await pool.query(
-        `SELECT display_name as "displayName" FROM users WHERE uid = $1`,
-        [uid],
-      );
-      const authorName = users[0]?.displayName || "Uno studente";
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL;
 
-      fetch(webhookUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          embeds: [
-            {
-              title: `📚 Nuovo Formulario Pubblicato!`,
-              description: `**${authorName}** ha appena reso pubblico il formulario [**${titolo}**](${appUrl}/formulario/${id}).`,
-              color: 0x610a9e,
-              timestamp: new Date().toISOString(),
-              footer: {
-                text: "FormulaBase Community",
-              },
-            },
-          ],
-        }),
-      }).catch((err) => console.error("Errore webhook Discord:", err));
-    }
 
     revalidatePath("/home");
     return NextResponse.json({ success: true });
