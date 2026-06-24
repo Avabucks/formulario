@@ -43,14 +43,14 @@ export const getH4Regex = makeHeaderRegex(4);
 export const getH5Regex = makeHeaderRegex(5);
 export const getH6Regex = makeHeaderRegex(6);
 
-export const getBoldRegex = () => /\*\*(.+?)\*\*/g;
-export const getItalicRegex = () => /_(.+?)_/g; // Fixed typo: changed /_(. +?)_/g to /_(.+?)_/g
+export const getBoldRegex = () => /\*\*(.*?)\*\*/g;
+export const getItalicRegex = () => /_(.*?)_/g; // Fixed typo: changed /_(. +?)_/g to /_(.+?)_/g
 export const getQuoteRegex = () => /^>\s/;
 
 export const getOrderedListRegex = () => /^\s*\d+\.\s/;
 export const getUnorderedListRegex = () => /^\s*[-*]\s/;
 
-export const getCodeInlineRegex = () => /`(.+?)`/g;
+export const getCodeInlineRegex = () => /`(.*?)`/g;
 
 export function getIsActiveWord(
   editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
@@ -157,7 +157,6 @@ export function handleWordToggle(
       }
     }
   }
-  if (trimmedText === "") return false;
   const text = wrap(trimmedText);
   controller.insert(text);
   setTimeout(() => editor.focus(), 0);
