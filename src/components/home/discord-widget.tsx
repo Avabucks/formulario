@@ -211,9 +211,25 @@ export function DiscordDialog({
   );
 }
 
+interface FloatingAvatar {
+  id: string;
+  avatarUrl: string;
+  username: string;
+}
+
+const FALLBACK_MEMBERS: DiscordMember[] = [
+  { id: "fb-1", username: "Matteo", avatar_url: "https://api.dicebear.com/7.x/adventurer/svg?seed=Matteo", status: "online" },
+  { id: "fb-2", username: "Sofia", avatar_url: "https://api.dicebear.com/7.x/adventurer/svg?seed=Sofia", status: "online" },
+  { id: "fb-3", username: "Davide", avatar_url: "https://api.dicebear.com/7.x/adventurer/svg?seed=Davide", status: "online" },
+  { id: "fb-4", username: "Chiara", avatar_url: "https://api.dicebear.com/7.x/adventurer/svg?seed=Chiara", status: "online" },
+  { id: "fb-5", username: "Alessandro", avatar_url: "https://api.dicebear.com/7.x/adventurer/svg?seed=Alessandro", status: "online" },
+];
+
 export default function DiscordWidget() {
   const [open, setOpen] = useState(false);
   const [popupDisabled, setPopupDisabled] = useState(false);
+  const [members, setMembers] = useState<DiscordMember[]>([]);
+  const [floatingAvatars, setFloatingAvatars] = useState<FloatingAvatar[]>([]);
 
   useEffect(() => {
     const isPopupDisabled =
@@ -228,6 +244,46 @@ export default function DiscordWidget() {
     }
   }, []);
 
+  // Recupera i membri online all'avvio per l'animazione floating
+  useEffect(() => {
+    fetch(`https://discord.com/api/guilds/${GUILD_ID}/widget.json`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: DiscordWidgetData | null) => {
+        if (data && data.members) {
+          setMembers(data.members);
+        }
+      })
+      .catch((err) => {
+        console.error("Errore fetch widget per widget floating avatar:", err);
+      });
+  }, []);
+
+  // Avvia l'intervallo ogni 10 secondi per far fluttuare un avatar random
+  useEffect(() => {
+    const activeList = members.length > 0 ? members : FALLBACK_MEMBERS;
+    if (activeList.length === 0) return;
+
+    const interval = setInterval(() => {
+      const currentList = members.length > 0 ? members : FALLBACK_MEMBERS;
+      const randomMember = currentList[Math.floor(Math.random() * currentList.length)];
+      
+      const newFloating: FloatingAvatar = {
+        id: Math.random().toString(36).substring(2, 9),
+        avatarUrl: randomMember.avatar_url || "https://cdn.discordapp.com/embed/avatars/0.png",
+        username: randomMember.username,
+      };
+
+      setFloatingAvatars((prev) => [...prev, newFloating]);
+
+      // Rimuove l'avatar dopo 6.1 secondi (durata dell'animazione)
+      setTimeout(() => {
+        setFloatingAvatars((prev) => prev.filter((item) => item.id !== newFloating.id));
+      }, 6100);
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [members]);
+
   const disableAutomaticPopup = () => {
     localStorage.setItem(DISCORD_POPUP_DISABLED_KEY, "true");
     setPopupDisabled(true);
@@ -236,6 +292,54 @@ export default function DiscordWidget() {
 
   return (
     <>
+      <style>{`
+        @keyframes discordFloatUp {
+          0% {
+            transform: translate(-50%, -50%);
+          }
+          100% {
+            transform: translate(-50%, calc(-50% - 70px));
+          }
+        }
+        @keyframes discordScaleFade {
+          0% {
+            transform: scale(0.9);
+            opacity: 1;
+          }
+          20% {
+            opacity: 1;
+          }
+          100% {
+            transform: scale(0.65);
+            opacity: 0;
+          }
+        }
+        .animate-discord-float {
+          animation: discordFloatUp 5.8s cubic-bezier(0.1, 0.76, 0.55, 0.94) forwards;
+        }
+        .animate-discord-scale-fade {
+          animation: discordScaleFade 5.8s cubic-bezier(0.21, 0.87, 0.44, 0.98) forwards;
+        }
+      `}</style>
+
+      {/* Container per gli avatar fluttuanti */}
+      <div className="fixed bottom-6 right-6 z-40 w-12 h-12 pointer-events-none">
+        {floatingAvatars.map((item) => (
+          <div
+            key={item.id}
+            className="absolute left-1/2 top-1/2 animate-discord-float"
+          >
+            <div className="animate-discord-scale-fade relative w-9 h-9 rounded-full bg-[#313338] shadow-[0_4px_10px_rgba(0,0,0,0.25)] overflow-hidden flex items-center justify-center">
+              <img
+                src={item.avatarUrl}
+                alt={item.username}
+                className="w-full h-full object-cover rounded-full"
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
       <button
         onClick={() => setOpen(true)}
         className="fixed bottom-6 right-6 z-50 w-12 h-12 flex items-center justify-center rounded-full bg-[#5865F2] hover:bg-[#4752c4] text-white transition-all cursor-pointer shadow-none border-none"
