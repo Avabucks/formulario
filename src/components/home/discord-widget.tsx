@@ -32,7 +32,7 @@ interface DiscordWidgetData {
   members: DiscordMember[];
 }
 
-export function DiscordIcon(props: React.SVGProps<SVGSVGElement>) {
+export function DiscordIcon(props: Readonly<React.SVGProps<SVGSVGElement>>) {
   return (
     <svg
       viewBox="0 0 127.14 96.36"
@@ -49,12 +49,12 @@ export function DiscordDialog({
   onOpenChange,
   showDisableOption = false,
   disableAutomaticPopup,
-}: {
+}: Readonly<{
   open: boolean;
   onOpenChange: (open: boolean) => void;
   showDisableOption?: boolean;
   disableAutomaticPopup?: () => void;
-}) {
+}>) {
   const [widgetData, setWidgetData] = useState<DiscordWidgetData | null>(null);
 
   // Recupera i dati reali della presenza sul server se abilitato nelle impostazioni Discord
@@ -74,7 +74,7 @@ export function DiscordDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md p-0 overflow-hidden">
         {/* Card nello stile dell'invito ufficiale di Discord con loghi sovrapposti */}
-        <div className="w-full aspect-[2/1] bg-[#1e1f22] flex flex-col items-center justify-center p-6 border-b border-[#2b2d31] relative overflow-hidden select-none">
+        <div className="w-full aspect-2/1 bg-[#1e1f22] flex flex-col items-center justify-center p-6 border-b border-[#2b2d31] relative overflow-hidden select-none">
           {/* Filigrana Discord logo */}
           <div className="absolute -right-6 -bottom-6 opacity-[0.03] pointer-events-none text-white">
             <DiscordIcon className="w-36 h-36 fill-current" />
@@ -92,7 +92,7 @@ export function DiscordDialog({
                 />
               </div>
               {/* Logo Discord */}
-              <div className="w-16 h-16 bg-[#5865F2] rounded-full flex items-center justify-center border-4 border-[#1e1f22] p-3.5 z-20">
+              <div className="w-16 h-16 bg-[#70728f] rounded-full flex items-center justify-center border-4 border-[#1e1f22] p-3.5 z-20">
                 <DiscordIcon className="w-full h-full fill-current text-white" />
               </div>
             </div>
@@ -159,19 +159,19 @@ export function DiscordDialog({
           </p>
           <ul className="text-sm text-muted-foreground space-y-2 pt-1 leading-relaxed">
             <li className="flex items-start gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-white border border-foreground/30 mt-2 flex-shrink-0" />
-              <span>Condividere formule e formulari</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-white border border-foreground/30 mt-2 shrink-0" />
+              <span>Condividere formulari e appunti</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-white border border-foreground/30 mt-2 flex-shrink-0" />
+              <span className="w-1.5 h-1.5 rounded-full bg-white border border-foreground/30 mt-2 shrink-0" />
               <span>Ricevere supporto per i tuoi studi</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-white border border-foreground/30 mt-2 flex-shrink-0" />
+              <span className="w-1.5 h-1.5 rounded-full bg-white border border-foreground/30 mt-2 shrink-0" />
               <span>Segnalare bug o suggerire idee per la piattaforma</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-white border border-foreground/30 mt-2 flex-shrink-0" />
+              <span className="w-1.5 h-1.5 rounded-full bg-white border border-foreground/30 mt-2 shrink-0" />
               <span>Collaborare con gli altri membri della community</span>
             </li>
           </ul>
@@ -241,7 +241,7 @@ export default function DiscordWidget() {
     fetch(`https://discord.com/api/guilds/${GUILD_ID}/widget.json`)
       .then((res) => (res.ok ? res.json() : null))
       .then((data: DiscordWidgetData | null) => {
-        if (data && data.members) {
+        if (data?.members) {
           setMembers(data.members);
         }
       })
