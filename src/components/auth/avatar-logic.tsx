@@ -30,6 +30,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { KbShortcuts } from "../navigation/kb-shortcuts";
 import { NewAccountPopup } from "../home/new-account-popup";
+import { DiscordDialog, DiscordIcon } from "../home/discord-widget";
 
 export function AvatarLogic() {
   const router = useRouter();
@@ -38,6 +39,7 @@ export function AvatarLogic() {
 
   const [openOBPopup, setOpenOBPopup] = useState<boolean>(false);
   const [openKbShortcut, setOpenKbShortcut] = useState<boolean>(false);
+  const [openDiscord, setOpenDiscord] = useState<boolean>(false);
 
   useEffect(() => {
     setName(localStorage.getItem("name"));
@@ -92,6 +94,7 @@ export function AvatarLogic() {
               Community
             </DropdownMenuItem>
           </Link>
+
           <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={() => setOpenOBPopup(true)}>
             <BadgeInfo />
@@ -100,6 +103,11 @@ export function AvatarLogic() {
           <DropdownMenuItem onSelect={() => setOpenKbShortcut(true)}>
             <Keyboard />
             Scorciatoie da tastiera
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onSelect={() => setOpenDiscord(true)}>
+            <DiscordIcon className="size-4" />
+            Entra su Disocord
           </DropdownMenuItem>
           <Link
             href="https://ko-fi.com/formulabase"
@@ -120,6 +128,7 @@ export function AvatarLogic() {
       </DropdownMenu>
       <NewAccountPopup setOpen={setOpenOBPopup} open={openOBPopup} />
       <KbShortcuts setOpen={setOpenKbShortcut} open={openKbShortcut} />
+      <DiscordDialog open={openDiscord} onOpenChange={setOpenDiscord} />
     </>
   );
 }

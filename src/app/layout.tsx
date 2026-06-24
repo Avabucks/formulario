@@ -9,6 +9,7 @@ import { ThemeProvider } from "../components/theme/theme-provider";
 import "../styles/editor.css";
 import "../styles/globals.css";
 import AnalyticsLoader from "../components/analytics/google-analytics";
+import DiscordWidget from "../components/home/discord-widget";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -93,6 +94,7 @@ export default function RootLayout({
             showSpinner={false}
           />
           <main className="flex flex-1 flex-col">{children}</main>
+          <DiscordWidget />
           <Toaster />
           <UmamiTracker />
           <AnalyticsLoader />
