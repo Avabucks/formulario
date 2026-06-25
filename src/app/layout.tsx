@@ -52,12 +52,20 @@ export const metadata: Metadata = {
   openGraph: {
     title: `${packageJson.displayName} - Formulario digitale`,
     description: `Crea, organizza e condividi i tuoi formulari e cheat sheet con ${packageJson.displayName}. Usa l'editor avanzato e l'assistente AI per generare formule e appunti in pochi secondi.`,
-    images: ["/social.png"],
+    images: [
+      {
+        url: "/social.png",
+        width: 1200,
+        height: 630,
+        alt: `${packageJson.displayName} - Formulario digitale`,
+      },
+    ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: `${packageJson.displayName} - Formulario digitale`,
     description: `Crea, organizza e condividi i tuoi formulari e cheat sheet con ${packageJson.displayName}. Usa l'editor avanzato e l'assistente AI per generare formule e appunti in pochi secondi.`,
+    images: ["/social.png"],
   },
   appleWebApp: {
     title: `${packageJson.displayName}`,
