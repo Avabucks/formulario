@@ -280,12 +280,12 @@ export function EditorPage({
       <TabsList variant="line" className="h-8 p-0 bg-transparent gap-0">
         <TabsTrigger value="edit" className="gap-1.5 px-3 py-1 text-xs font-semibold cursor-pointer">
           <PenLine size={13.5} />
-          <span className="hidden sm:inline">Scrittura</span>
+          <span className="hidden sm:inline">Editor</span>
         </TabsTrigger>
         {!isMobile && (
           <TabsTrigger value="divided" className="gap-1.5 px-3 py-1 text-xs font-semibold cursor-pointer">
             <Columns2 size={13.5} />
-            <span className="hidden sm:inline">Diviso</span>
+            <span className="hidden sm:inline">Dividi</span>
           </TabsTrigger>
         )}
         <TabsTrigger value="preview" className="gap-1.5 px-3 py-1 text-xs font-semibold cursor-pointer">

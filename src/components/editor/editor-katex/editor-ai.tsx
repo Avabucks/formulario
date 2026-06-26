@@ -227,7 +227,6 @@ export function EditorAI({
               {isExpanded ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
             </Button>
           )}
-          <Sparkles size={14} className="text-foreground/80" />
           <span className="font-semibold text-foreground">Genera con l'AI</span>
         </div>
         {messages.length > 1 && (
