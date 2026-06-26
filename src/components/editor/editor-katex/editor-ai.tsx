@@ -6,7 +6,7 @@ import { Textarea } from "@/src/components/ui/textarea";
 import { loadAnalytics } from "@/src/lib/firebase";
 import { DiffEditor } from "@monaco-editor/react";
 import { logEvent } from "firebase/analytics";
-import { Check, Sparkles, X, SendHorizontal, Trash2, User } from "lucide-react";
+import { Check, Sparkles, X, ArrowUp, Trash2, User, Bot } from "lucide-react";
 import type { editor } from "monaco-editor";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -225,12 +225,16 @@ export function EditorAI({
         {messages.map((msg) => (
           <div key={msg.id} className="flex gap-3 items-start">
 
-            {/* Avatar / Icon (Neutral colors) */}
-            <div className={`size-6 rounded-md flex items-center justify-center border shrink-0 text-xs font-semibold bg-muted border-border text-muted-foreground`}>
+            {/* Avatar / Icon */}
+            <div className={`size-7 rounded-md flex items-center justify-center shrink-0 text-xs font-semibold select-none border ${
+              msg.sender === "user" 
+                ? "bg-muted border-border text-muted-foreground" 
+                : "bg-primary border-primary text-primary-foreground"
+            }`}>
               {msg.sender === "user" ? (
-                <User size={13} />
+                <User size={13.5} className="text-muted-foreground" />
               ) : (
-                <Sparkles size={13} className="text-foreground" />
+                <Bot size={13.5} />
               )}
             </div>
 
@@ -253,8 +257,12 @@ export function EditorAI({
 
               {/* AI Generation State: Loading */}
               {msg.status === "loading" && (
-                <div className="flex items-center gap-2 py-1 text-xs text-muted-foreground animate-pulse">
-                  <Spinner className="size-3" />
+                <div className="flex items-center gap-2 py-1 text-xs text-muted-foreground select-none">
+                  <div className="flex space-x-1 items-center h-2 mr-1">
+                    <div className="size-1 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <div className="size-1 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <div className="size-1 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
                   <span>{loadingText}</span>
                 </div>
               )}
@@ -272,11 +280,7 @@ export function EditorAI({
                   {!msg.applied && !msg.discarded ? (
                     <div className="flex flex-col gap-2">
 
-                      {/* Pull-request style file preview header (Monochrome) */}
                       <div className="border border-border rounded-lg overflow-hidden bg-background">
-                        <div className="flex items-center px-3 py-1.5 border-b bg-muted/40 text-[11px] text-muted-foreground font-mono">
-                          <span>formulario_diff.md</span>
-                        </div>
                         <div className="h-56 w-full min-w-0">
                           <DiffEditor
                             height="100%"
@@ -303,17 +307,18 @@ export function EditorAI({
 
                       <div className="flex items-center gap-2 justify-end">
                         <Button
-                          variant="outline"
+                          variant="destructive"
                           size="sm"
-                          className="h-7 text-xs px-2.5 gap-1 border-rose-200 dark:border-rose-950 text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 hover:text-rose-500 hover:border-rose-500/30 transition-all cursor-pointer"
+                          className="h-7 text-xs px-2.5 gap-1 cursor-pointer"
                           onClick={() => handleDiscard(msg.id)}
                         >
                           <X size={12} />
                           Scarta
                         </Button>
                         <Button
+                          variant="default"
                           size="sm"
-                          className="h-7 text-xs px-2.5 gap-1 bg-emerald-600 text-white hover:bg-emerald-500 hover:shadow-xs hover:shadow-emerald-500/15 border border-emerald-600 transition-all font-semibold cursor-pointer"
+                          className="h-7 text-xs px-2.5 gap-1 cursor-pointer"
                           onClick={() => handleAccept(msg.id, msg.suggestedContent ?? "")}
                         >
                           <Check size={12} />
@@ -388,12 +393,12 @@ export function EditorAI({
               size="icon"
               onClick={handleSend}
               disabled={loading || !prompt.trim()}
-              className="size-7 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
+              className="size-7 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-30 transition-colors"
             >
               {loading ? (
                 <Spinner className="size-3" />
               ) : (
-                <SendHorizontal size={13} />
+                <ArrowUp size={14} className="stroke-[2.5]" />
               )}
             </Button>
           </div>

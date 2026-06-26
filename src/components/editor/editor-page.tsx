@@ -31,7 +31,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
-import { EditorInput } from "./editor-katex/editor-input";
+import { EditorInput, SyncStatus } from "./editor-katex/editor-input";
 import { EditorPreview } from "./editor-katex/editor-preview";
 import { FormattingBold } from "./editor-katex/tools/formatting-bold";
 import { FormattingCodeBlock } from "./editor-katex/tools/formatting-code-block";
@@ -82,6 +82,8 @@ export function EditorPage({
   const [edited, setEdited] = useState<boolean>(false);
   const [switchView, setSwitchView] = useState<"preview" | "divided" | "edit">("preview");
   const [showAI, setShowAI] = useState<boolean>(false);
+  const [saveLoading, setSaveLoading] = useState<boolean>(false);
+  const [saveError, setSaveError] = useState<boolean>(false);
   const [resizableSize, setResizableSize] = useState<number>(40);
   const [isFocused, setIsFocused] = useState(false);
   const [selection, setSelection] = useState<Selection | null>(null);
@@ -272,40 +274,25 @@ export function EditorPage({
     monacoRef.current.editor.setTheme("markdown-math-theme");
   }, [resolvedTheme, monacoReady]);
 
-  const tabsList = [
-    { id: "edit", label: "Scrittura", icon: PenLine, show: true },
-    { id: "divided", label: "Diviso", icon: Columns2, show: !isMobile },
-    { id: "preview", label: "Anteprima", icon: Eye, show: true }
-  ] as const;
-
   const viewTabs = (
-    <div className="relative bg-muted/40 p-0.5 rounded-full border border-border/80 flex items-center gap-0.5 shadow-xs select-none shrink-0">
-      {tabsList.filter(tab => tab.show).map((tab) => {
-        const Icon = tab.icon;
-        const isActive = switchView === tab.id;
-        return (
-          <button
-            key={tab.id}
-            onClick={() => setSwitchView(tab.id as any)}
-            className={`relative px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-colors duration-200 cursor-pointer select-none outline-none ${
-              isActive 
-                ? "text-foreground" 
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            {isActive && (
-              <motion.div
-                layoutId="activeViewTab"
-                className="absolute inset-0 bg-background rounded-full shadow-sm border border-border/40"
-                transition={{ type: "spring", stiffness: 350, damping: 30 }}
-              />
-            )}
-            <Icon size={13.5} className="relative z-10" />
-            <span className="relative z-10 hidden sm:inline">{tab.label}</span>
-          </button>
-        );
-      })}
-    </div>
+    <Tabs value={switchView} onValueChange={(val) => setSwitchView(val as any)} className="gap-0 select-none shrink-0">
+      <TabsList variant="line" className="h-8 p-0 bg-transparent gap-0">
+        <TabsTrigger value="edit" className="gap-1.5 px-3 py-1 text-xs font-semibold cursor-pointer">
+          <PenLine size={13.5} />
+          <span className="hidden sm:inline">Scrittura</span>
+        </TabsTrigger>
+        {!isMobile && (
+          <TabsTrigger value="divided" className="gap-1.5 px-3 py-1 text-xs font-semibold cursor-pointer">
+            <Columns2 size={13.5} />
+            <span className="hidden sm:inline">Diviso</span>
+          </TabsTrigger>
+        )}
+        <TabsTrigger value="preview" className="gap-1.5 px-3 py-1 text-xs font-semibold cursor-pointer">
+          <Eye size={13.5} />
+          <span className="hidden sm:inline">Anteprima</span>
+        </TabsTrigger>
+      </TabsList>
+    </Tabs>
   );
 
   const toolbar = (
@@ -379,7 +366,7 @@ export function EditorPage({
           </TooltipProvider>
         </div>
 
-        {switchView !== "preview" && (
+        {switchView !== "preview" && !isMobile && (
           <>
             <div className="h-6 w-[1px] bg-border/60 mx-1 shrink-0" />
 
@@ -458,13 +445,9 @@ export function EditorPage({
             variant={showAI ? "default" : "outline"}
             size="sm"
             onClick={() => setShowAI(!showAI)}
-            className={`h-8 rounded-full text-xs font-semibold gap-1.5 transition-all select-none cursor-pointer ${
-              showAI 
-                ? "bg-primary text-primary-foreground shadow-sm shadow-primary/25 border-primary" 
-                : "text-muted-foreground hover:text-foreground border-border/80"
-            }`}
+            className="h-8 gap-1.5 select-none cursor-pointer"
           >
-            <Sparkles size={13.5} className={showAI ? "animate-pulse" : ""} />
+            <Sparkles size={14} className={showAI ? "animate-pulse" : ""} />
             <span>Chiedi all'AI</span>
           </Button>
         )}
@@ -487,6 +470,10 @@ export function EditorPage({
       setEdited={setEdited}
       handleEditorDidMount={handleEditorDidMount}
       editable={editable}
+      saveLoading={saveLoading}
+      setSaveLoading={setSaveLoading}
+      saveError={saveError}
+      setSaveError={setSaveError}
     />
   );
 
@@ -556,15 +543,19 @@ export function EditorPage({
             >
               {preview}
             </div>
+
+            {editable && !loading && (
+              <SyncStatus error={saveError} loading={saveLoading} />
+            )}
           </div>
 
           {/* AI Chat Sidebar */}
-          {showAI && editable && (
+          {editable && (
             <div className={`h-full border-l bg-background flex flex-col z-20 shrink-0 shadow-lg ${
               isMobile 
                 ? "absolute inset-0 w-full" 
                 : "w-[350px]"
-            }`}>
+            } ${showAI ? "" : "hidden"}`}>
               <EditorAI editorRef={editorRef} onClose={() => setShowAI(false)} />
             </div>
           )}

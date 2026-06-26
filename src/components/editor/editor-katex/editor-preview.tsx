@@ -413,7 +413,7 @@ export const EditorPreview = memo(function EditorPreview({
 
         {headings.length > 0 && (
           <div
-            className={`absolute top-4 right-4 z-10 max-h-[calc(100%-5rem)] w-56 overflow-hidden rounded-lg border bg-background/95 shadow-sm backdrop-blur-sm transition duration-300 ${navigatorVisible
+            className={`absolute top-4 right-6 z-10 max-h-[calc(100%-5rem)] w-56 overflow-hidden rounded-lg border bg-background/95 shadow-sm backdrop-blur-sm transition duration-300 ${navigatorVisible
               ? "pointer-events-auto opacity-100 translate-x-0"
               : "pointer-events-none opacity-0 translate-x-4"
               }`}
