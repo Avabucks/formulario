@@ -94,10 +94,10 @@ export function EditorAI({
           prev.map((msg) =>
             msg.id === aiMessageId
               ? {
-                  ...msg,
-                  status: "error",
-                  text: data.error ?? "Si è verificato un errore durante l'elaborazione.",
-                }
+                ...msg,
+                status: "error",
+                text: data.error ?? "Si è verificato un errore durante l'elaborazione.",
+              }
               : msg
           )
         );
@@ -118,11 +118,11 @@ export function EditorAI({
         prev.map((msg) =>
           msg.id === aiMessageId
             ? {
-                ...msg,
-                status: "success",
-                originalContent: currentContext,
-                suggestedContent: data.text,
-              }
+              ...msg,
+              status: "success",
+              originalContent: currentContext,
+              suggestedContent: data.text,
+            }
             : msg
         )
       );
@@ -131,10 +131,10 @@ export function EditorAI({
         prev.map((msg) =>
           msg.id === aiMessageId
             ? {
-                ...msg,
-                status: "error",
-                text: "Errore di rete. Controlla la tua connessione.",
-              }
+              ...msg,
+              status: "error",
+              text: "Errore di rete. Controlla la tua connessione.",
+            }
             : msg
         )
       );
@@ -187,12 +187,12 @@ export function EditorAI({
 
   return (
     <div className="flex flex-col h-full bg-background border-r border-border text-sm">
-      
+
       {/* Header (Shadcn style - strict monochrome) */}
       <div className="flex items-center justify-between p-4 border-b">
         <div className="flex items-center gap-2">
           <Sparkles size={15} className="text-foreground" />
-          <span className="font-semibold text-foreground">Assistente AI</span>
+          Chiedi all'AI
         </div>
         {messages.length > 1 && (
           <Button
@@ -211,7 +211,7 @@ export function EditorAI({
       <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-6">
         {messages.map((msg) => (
           <div key={msg.id} className="flex gap-3 items-start">
-            
+
             {/* Avatar / Icon (Neutral colors) */}
             <div className={`size-6 rounded-md flex items-center justify-center border shrink-0 text-xs font-semibold bg-muted border-border text-muted-foreground`}>
               {msg.sender === "user" ? (
@@ -223,7 +223,7 @@ export function EditorAI({
 
             {/* Content box */}
             <div className="flex-1 flex flex-col gap-1 min-w-0">
-              
+
               {/* Message Header */}
               <div className="flex items-center gap-1.5">
                 <span className="font-semibold text-xs text-foreground">
@@ -258,7 +258,7 @@ export function EditorAI({
                 <div className="flex flex-col gap-2.5 mt-2 w-full max-w-full">
                   {!msg.applied && !msg.discarded ? (
                     <div className="flex flex-col gap-2">
-                      
+
                       {/* Pull-request style file preview header (Monochrome) */}
                       <div className="border border-border rounded-lg overflow-hidden bg-background">
                         <div className="flex items-center justify-between px-3 py-1.5 border-b bg-muted/40 text-[11px] text-muted-foreground font-mono">

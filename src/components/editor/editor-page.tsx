@@ -231,6 +231,12 @@ export function EditorPage({
   }, [isMobile, switchView]);
 
   useEffect(() => {
+    if (!editable && switchView === "ai") {
+      setSwitchView("preview");
+    }
+  }, [editable, switchView]);
+
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const isZ = e.key.toLowerCase() === "z";
       const isY = e.key.toLowerCase() === "y";
@@ -263,6 +269,33 @@ export function EditorPage({
 
     monacoRef.current.editor.setTheme("markdown-math-theme");
   }, [resolvedTheme, monacoReady]);
+
+  const viewTabs = (
+    <Tabs value={switchView} onValueChange={(val) => setSwitchView(val as any)}>
+      <TabsList className="bg-muted/50 p-0.5 h-8">
+        <TabsTrigger value="edit" className="gap-1.5 px-2 py-1 text-xs font-medium">
+          <PenLine size={14} />
+          <span className="hidden sm:inline">Scrittura</span>
+        </TabsTrigger>
+        {editable && (
+          <TabsTrigger value="ai" className="gap-1.5 px-2 py-1 text-xs font-medium">
+            <Sparkles size={14} />
+            <span className="hidden sm:inline">Chiedi all'AI</span>
+          </TabsTrigger>
+        )}
+        {!isMobile && (
+          <TabsTrigger value="divided" className="gap-1.5 px-2 py-1 text-xs font-medium">
+            <Columns2 size={14} />
+            <span className="hidden sm:inline">Diviso</span>
+          </TabsTrigger>
+        )}
+        <TabsTrigger value="preview" className="gap-1.5 px-2 py-1 text-xs font-medium">
+          <Eye size={14} />
+          <span className="hidden sm:inline">Anteprima</span>
+        </TabsTrigger>
+      </TabsList>
+    </Tabs>
+  );
 
   const toolbar = (
     <div className="flex w-full border-b min-h-15 overflow-x-auto">
@@ -395,28 +428,7 @@ export function EditorPage({
       </div>
 
       <div className="flex border-l items-center px-3 gap-3">
-        <Tabs value={switchView} onValueChange={(val) => setSwitchView(val as any)}>
-          <TabsList className="bg-muted/50 p-0.5 h-8">
-            <TabsTrigger value="edit" className="gap-1.5 px-2 py-1 text-xs font-medium">
-              <PenLine size={14} />
-              <span className="hidden sm:inline">Scrittura</span>
-            </TabsTrigger>
-            <TabsTrigger value="ai" className="gap-1.5 px-2 py-1 text-xs font-medium">
-              <Sparkles size={14} />
-              <span className="hidden sm:inline">Chiedi all'AI</span>
-            </TabsTrigger>
-            {!isMobile && (
-              <TabsTrigger value="divided" className="gap-1.5 px-2 py-1 text-xs font-medium">
-                <Columns2 size={14} />
-                <span className="hidden sm:inline">Diviso</span>
-              </TabsTrigger>
-            )}
-            <TabsTrigger value="preview" className="gap-1.5 px-2 py-1 text-xs font-medium">
-              <Eye size={14} />
-              <span className="hidden sm:inline">Anteprima</span>
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+        {viewTabs}
       </div>
 
       <div className="flex border-l items-center px-3 gap-3">
@@ -452,11 +464,15 @@ export function EditorPage({
           {editable ? (
             toolbar
           ) : (
-            <div className="flex w-full border-b min-h-15 justify-between items-center">
+            <div className="flex w-full border-b min-h-15 justify-between items-center overflow-x-auto">
               <div className="flex flex-1 items-center gap-2 px-4 text-sm text-muted-foreground">
                 <PenOff size={16} />
                 <TakeFormulario formularioId={formularioId} />
-                <span className="hidden md:flex">per modifcare</span>
+                <span className="hidden md:flex">per modificare</span>
+              </div>
+
+              <div className="flex border-l items-center px-3 gap-3">
+                {viewTabs}
               </div>
 
               <div className="flex border-l items-center px-3 gap-2 h-full">
