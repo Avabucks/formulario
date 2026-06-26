@@ -1,12 +1,20 @@
 "use client";
 
 import { Button } from "@/src/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/src/components/ui/dialog";
 import { Spinner } from "@/src/components/ui/spinner";
 import { Textarea } from "@/src/components/ui/textarea";
 import { loadAnalytics } from "@/src/lib/firebase";
 import { DiffEditor } from "@monaco-editor/react";
 import { logEvent } from "firebase/analytics";
-import { Check, Sparkles, X, ArrowUp, Trash2, User, Bot } from "lucide-react";
+import { Check, Sparkles, X, ArrowUp, Trash2, User, Bot, Maximize2, Minimize2, GitCompare } from "lucide-react";
 import type { editor } from "monaco-editor";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -31,9 +39,13 @@ type Message = {
 export function EditorAI({
   editorRef,
   onClose,
+  isExpanded = false,
+  onToggleExpand,
 }: Readonly<{
   editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
   onClose?: () => void;
+  isExpanded?: boolean;
+  onToggleExpand?: () => void;
 }>) {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -204,6 +216,17 @@ export function EditorAI({
               <X size={15} />
             </Button>
           )}
+          {onToggleExpand && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onToggleExpand}
+              className="size-7 text-muted-foreground hover:text-foreground hidden md:flex"
+              title={isExpanded ? "Riduci larghezza chat" : "Allarga larghezza chat"}
+            >
+              {isExpanded ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+            </Button>
+          )}
           <Sparkles size={14} className="text-foreground/80" />
           <span className="font-semibold text-foreground">Genera con l'AI</span>
         </div>
@@ -279,9 +302,76 @@ export function EditorAI({
                 <div className="flex flex-col gap-2.5 mt-2 w-full max-w-full">
                   {!msg.applied && !msg.discarded ? (
                     <div className="flex flex-col gap-2">
-
-                      <div className="border border-border rounded-lg overflow-hidden bg-background">
-                        <div className="h-56 w-full min-w-0">
+                      <div className="border border-border rounded-lg overflow-hidden bg-background flex flex-col">
+                        <div className="flex items-center justify-between px-3 py-1.5 bg-muted/40 border-b border-border text-[11px] text-muted-foreground font-medium select-none">
+                          <span className="flex items-center gap-1">
+                            <GitCompare size={11} className="text-muted-foreground" />
+                            Anteprima differenze
+                          </span>
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="size-5 text-muted-foreground hover:text-foreground cursor-pointer"
+                                title="Confronto a schermo intero"
+                              >
+                                <Maximize2 size={11} />
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[90vw] h-[90vh] flex flex-col">
+                              <DialogHeader>
+                                <DialogTitle className="flex items-center gap-2 text-base">
+                                  <GitCompare size={16} className="text-foreground/80" />
+                                  Confronto modifiche
+                                </DialogTitle>
+                              </DialogHeader>
+                              <div className="flex-1 min-h-0 border rounded-lg overflow-hidden mt-2 bg-background">
+                                <DiffEditor
+                                  height="100%"
+                                  original={msg.originalContent ?? ""}
+                                  modified={msg.suggestedContent ?? ""}
+                                  language="markdown-math"
+                                  theme="markdown-math-theme"
+                                  options={{
+                                    lineNumbers: "on",
+                                    links: false,
+                                    minimap: { enabled: true },
+                                    automaticLayout: true,
+                                    wordWrap: "on",
+                                    quickSuggestions: false,
+                                    readOnly: true,
+                                  }}
+                                />
+                              </div>
+                              <DialogFooter className="gap-2 mt-4 shrink-0">
+                                <DialogTrigger asChild>
+                                  <Button
+                                    variant="destructive"
+                                    size="sm"
+                                    className="h-8 text-xs px-3 gap-1 cursor-pointer"
+                                    onClick={() => handleDiscard(msg.id)}
+                                  >
+                                    <X size={13} />
+                                    Scarta
+                                  </Button>
+                                </DialogTrigger>
+                                <DialogTrigger asChild>
+                                  <Button
+                                    variant="default"
+                                    size="sm"
+                                    className="h-8 text-xs px-3 gap-1 cursor-pointer"
+                                    onClick={() => handleAccept(msg.id, msg.suggestedContent ?? "")}
+                                  >
+                                    <Check size={13} />
+                                    Applica modifiche
+                                  </Button>
+                                </DialogTrigger>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+                        </div>
+                        <div className={`w-full min-w-0 transition-all duration-300 ${isExpanded ? "h-96" : "h-56"}`}>
                           <DiffEditor
                             height="100%"
                             original={msg.originalContent ?? ""}
@@ -299,11 +389,11 @@ export function EditorAI({
                               scrollbar: {
                                 verticalScrollbarSize: 6,
                                 horizontalScrollbarSize: 6,
-                              }
-                            }}
-                          />
+                                }
+                              }}
+                            />
+                          </div>
                         </div>
-                      </div>
 
                       <div className="flex items-center gap-2 justify-end">
                         <Button

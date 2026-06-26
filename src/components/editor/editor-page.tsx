@@ -82,6 +82,7 @@ export function EditorPage({
   const [edited, setEdited] = useState<boolean>(false);
   const [switchView, setSwitchView] = useState<"preview" | "divided" | "edit">("preview");
   const [showAI, setShowAI] = useState<boolean>(false);
+  const [isAiExpanded, setIsAiExpanded] = useState<boolean>(false);
   const [saveLoading, setSaveLoading] = useState<boolean>(false);
   const [saveError, setSaveError] = useState<boolean>(false);
   const [resizableSize, setResizableSize] = useState<number>(40);
@@ -551,12 +552,19 @@ export function EditorPage({
 
           {/* AI Chat Sidebar */}
           {editable && (
-            <div className={`h-full border-l bg-background flex flex-col z-20 shrink-0 shadow-lg ${
+            <div className={`h-full border-l bg-background flex flex-col z-20 shrink-0 transition-all duration-300 shadow-lg ${
               isMobile 
                 ? "absolute inset-0 w-full" 
-                : "w-[350px]"
+                : isAiExpanded 
+                  ? "w-[650px]" 
+                  : "w-[350px]"
             } ${showAI ? "" : "hidden"}`}>
-              <EditorAI editorRef={editorRef} onClose={() => setShowAI(false)} />
+              <EditorAI 
+                editorRef={editorRef} 
+                onClose={() => setShowAI(false)} 
+                isExpanded={isAiExpanded}
+                onToggleExpand={() => setIsAiExpanded(!isAiExpanded)}
+              />
             </div>
           )}
         </div>
