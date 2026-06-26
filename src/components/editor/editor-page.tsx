@@ -10,6 +10,7 @@ import {
   PenLine,
   PenOff,
   Redo2,
+  Sparkles,
   Undo2,
 } from "lucide-react";
 import type { Selection } from "monaco-editor";
@@ -42,7 +43,7 @@ import { FormattingOrderedList } from "./editor-katex/tools/formatting-ordered";
 import { FormattingQuote } from "./editor-katex/tools/formatting-quote";
 import { FormattingTable } from "./editor-katex/tools/formatting-table";
 import { FormattingUnorderedList } from "./editor-katex/tools/formatting-unordered";
-import { AskAIButton } from "./editor-katex/tools/ask-ai";
+import { EditorAI } from "./editor-katex/editor-ai";
 
 const darkRules = [
   { token: "math.display", foreground: "4EC9B0" },
@@ -78,7 +79,7 @@ export function EditorPage({
   const [markdownContent, setMarkdownContent] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [edited, setEdited] = useState<boolean>(false);
-  const [switchView, setSwitchView] = useState<"preview" | "divided" | "edit">("preview");
+  const [switchView, setSwitchView] = useState<"preview" | "divided" | "edit" | "ai">("preview");
   const [resizableSize, setResizableSize] = useState<number>(40);
   const [isFocused, setIsFocused] = useState(false);
   const [selection, setSelection] = useState<Selection | null>(null);
@@ -391,9 +392,6 @@ export function EditorPage({
           />
         </div>
 
-        <div className="flex items-center gap-3 px-3 h-full">
-          <AskAIButton editorRef={editorRef} />
-        </div>
       </div>
 
       <div className="flex border-l items-center px-3 gap-3">
@@ -402,6 +400,10 @@ export function EditorPage({
             <TabsTrigger value="edit" className="gap-1.5 px-2 py-1 text-xs font-medium">
               <PenLine size={14} />
               <span className="hidden sm:inline">Scrittura</span>
+            </TabsTrigger>
+            <TabsTrigger value="ai" className="gap-1.5 px-2 py-1 text-xs font-medium">
+              <Sparkles size={14} />
+              <span className="hidden sm:inline">Chiedi all'AI</span>
             </TabsTrigger>
             {!isMobile && (
               <TabsTrigger value="divided" className="gap-1.5 px-2 py-1 text-xs font-medium">
@@ -467,26 +469,36 @@ export function EditorPage({
 
 
         <div className="flex flex-1 min-h-0 w-full relative">
+          {/* Left panel (Editor or AI Chat) */}
           <div
             className="h-full flex flex-col min-w-0"
             style={{
               display: switchView === "preview" ? "none" : "flex",
-              width: switchView === "divided" ? `${resizableSize}%` : "100%",
+              width: (!isMobile && (switchView === "divided" || switchView === "ai")) ? `${resizableSize}%` : "100%",
             }}
           >
-            {input}
+            <div className="flex-1 h-full flex flex-col" style={{ display: switchView === "ai" ? "none" : "flex" }}>
+              {input}
+            </div>
+            <div className="flex-1 h-full flex flex-col" style={{ display: switchView === "ai" ? "flex" : "none" }}>
+              <EditorAI editorRef={editorRef} />
+            </div>
           </div>
-          {switchView === "divided" && (
+          
+          {/* Divider */}
+          {!isMobile && (switchView === "divided" || switchView === "ai") && (
             <div
               className="w-1 bg-border/50 hover:bg-muted-foreground/30 hover:w-1.5 transition-all cursor-col-resize h-full select-none"
               onMouseDown={handleMouseDown}
             />
           )}
+
+          {/* Right panel (Preview) */}
           <div
             className="h-full flex flex-col min-w-0"
             style={{
-              display: switchView === "edit" ? "none" : "flex",
-              width: switchView === "divided" ? `${100 - resizableSize}%` : "100%",
+              display: (switchView === "preview" || (!isMobile && (switchView === "divided" || switchView === "ai"))) ? "flex" : "none",
+              width: (!isMobile && (switchView === "divided" || switchView === "ai")) ? `${100 - resizableSize}%` : "100%",
             }}
           >
             {preview}
