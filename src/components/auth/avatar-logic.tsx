@@ -71,14 +71,19 @@ export function AvatarLogic() {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <Link href="/settings">
-            <DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer">
               <Avatar size="sm" className="mt-0.5">
                 {photoURL && <AvatarImage src={photoURL} alt="foto profilo" />}
                 <AvatarFallback>
                   {name?.substring(0, 1).toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
-              {name}
+              <div className="flex flex-col">
+                <span className="font-medium text-sm leading-none">{name}</span>
+                <span className="text-[11px] text-muted-foreground mt-0.5">
+                  Impostazioni profilo
+                </span>
+              </div>
             </DropdownMenuItem>
           </Link>
           <DropdownMenuSeparator />
