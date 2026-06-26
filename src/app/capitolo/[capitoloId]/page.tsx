@@ -80,15 +80,6 @@ export default async function Capitolo({
   );
   const uid = session.uid;
 
-  // check if user exists
-  const { rows: users } = await pool.query(
-    `SELECT id FROM users WHERE uid = $1`,
-    [uid],
-  );
-  if (users.length === 0) {
-    redirect("/api/auth/logout");
-  }
-
   // Check if user has access to the capitolo (owner or public)
   const { rows: capitoloRows, rowCount } = await pool.query(
     `SELECT C.beautiful_id AS "id", COALESCE(C.titolo, 'Senza titolo') AS "titolo", C.formulario,
@@ -98,17 +89,32 @@ export default async function Capitolo({
             LEFT JOIN users U_A ON F.author_uid = U_A.uid
             WHERE C.beautiful_id = $1
             AND (F.owner_uid = $2 OR F.visibility > 0)`,
-    [capitoloId, uid],
+    [capitoloId, uid || null],
   );
 
   if (rowCount === 0) {
-    redirect("/home");
+    if (uid) {
+      redirect("/home");
+    } else {
+      redirect("/login");
+    }
   }
 
   const capitolo = {
     ...capitoloRows[0],
-    editable: capitoloRows[0].ownerUid === uid,
+    editable: uid ? capitoloRows[0].ownerUid === uid : false,
   };
+
+  // check if logged in user exists in db
+  if (uid) {
+    const { rows: users } = await pool.query(
+      `SELECT id FROM users WHERE uid = $1`,
+      [uid],
+    );
+    if (users.length === 0) {
+      redirect("/api/auth/logout");
+    }
+  }
 
   const breadcrumbs = [
     { label: "Home", href: "/" },

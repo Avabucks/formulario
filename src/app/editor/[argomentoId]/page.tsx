@@ -79,15 +79,6 @@ export default async function Argomento({
   );
   const uid = session.uid;
 
-  // check if user exists
-  const { rows: users } = await pool.query(
-    `SELECT id FROM users WHERE uid = $1`,
-    [uid],
-  );
-  if (users.length === 0) {
-    redirect("/api/auth/logout");
-  }
-
   // Check if user has access to the capitolo (owner or public)
   const { rows: argomentoRows, rowCount } = await pool.query(
     `SELECT A.beautiful_id AS "id",
@@ -100,11 +91,15 @@ export default async function Argomento({
             LEFT JOIN users U_A ON F.author_uid = U_A.uid
             WHERE A.beautiful_id = $1
             AND (F.owner_uid = $2 OR F.visibility > 0)`,
-    [argomentoId, uid],
+    [argomentoId, uid || null],
   );
 
   if (rowCount === 0) {
-    redirect("/home");
+    if (uid) {
+      redirect("/home");
+    } else {
+      redirect("/login");
+    }
   }
 
   const { content, ...argomentoData } = argomentoRows[0];
@@ -116,8 +111,19 @@ export default async function Argomento({
   const argomento = {
     ...argomentoData,
     titolo,
-    editable: argomentoRows[0].ownerUid === uid,
+    editable: uid ? argomentoRows[0].ownerUid === uid : false,
   };
+
+  // check if logged in user exists in db
+  if (uid) {
+    const { rows: users } = await pool.query(
+      `SELECT id FROM users WHERE uid = $1`,
+      [uid],
+    );
+    if (users.length === 0) {
+      redirect("/api/auth/logout");
+    }
+  }
 
   const breadcrumbs = [
     { label: "Home", href: "/" },

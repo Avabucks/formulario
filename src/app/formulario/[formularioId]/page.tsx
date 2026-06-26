@@ -80,15 +80,6 @@ export default async function Formulario({
   );
   const uid = session.uid;
 
-  // check if user exists
-  const { rows: users } = await pool.query(
-    `SELECT id FROM users WHERE uid = $1`,
-    [uid],
-  );
-  if (users.length === 0) {
-    redirect("/api/auth/logout");
-  }
-
   // Check if user has access to the formulario (owner or public)
   const { rows: formularioRows, rowCount } = await pool.query(
     `SELECT F.beautiful_id AS "id", F.titolo, F.owner_uid as "ownerUid", U_A.display_name AS "nomeAutore", F.data_creazione as "dataCreazione",
@@ -97,17 +88,32 @@ export default async function Formulario({
          LEFT JOIN users U_A ON F.author_uid = U_A.uid
          WHERE F.beautiful_id = $1
            AND (F.owner_uid = $2 OR F.visibility > 0)`,
-    [formularioId, uid],
+    [formularioId, uid || null],
   );
 
   if (rowCount === 0) {
-    redirect("/home");
+    if (uid) {
+      redirect("/home");
+    } else {
+      redirect("/login");
+    }
   }
 
   const formulario = {
     ...formularioRows[0],
-    editable: formularioRows[0].ownerUid === uid,
+    editable: uid ? formularioRows[0].ownerUid === uid : false,
   };
+
+  // check if logged in user exists in db
+  if (uid) {
+    const { rows: users } = await pool.query(
+      `SELECT id FROM users WHERE uid = $1`,
+      [uid],
+    );
+    if (users.length === 0) {
+      redirect("/api/auth/logout");
+    }
+  }
 
   const breadcrumbs = [
     { label: "Home", href: "/" },
