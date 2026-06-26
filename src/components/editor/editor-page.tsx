@@ -16,7 +16,7 @@ import { useEffect, useRef, useState } from "react";
 import { FormularioSettings } from "../home/formulario-settings";
 import { TakeFormulario } from "../home/take-formulario";
 import { Button } from "../ui/button";
-import { Kbd, KbdGroup } from "../ui/kbd";
+import { Kbd, KbdGroup, useIsMac } from "../ui/kbd";
 import { ResizablePanel, ResizablePanelGroup } from "../ui/resizable";
 import { Separator } from "../ui/separator";
 import { Spinner } from "../ui/spinner";
@@ -62,6 +62,7 @@ export function EditorPage({
   const editorRef = useRef<any>(null);
   const monacoRef = useRef<Monaco | null>(null);
   const [monacoReady, setMonacoReady] = useState(false);
+  const isMac = useIsMac();
 
   const undoBtnRef = useRef<HTMLButtonElement>(null);
   const redoBtnRef = useRef<HTMLButtonElement>(null);
@@ -176,11 +177,17 @@ export function EditorPage({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "z" && (e.ctrlKey || e.metaKey)) {
+      const isZ = e.key.toLowerCase() === "z";
+      const isY = e.key.toLowerCase() === "y";
+
+      if (isZ && (e.ctrlKey || e.metaKey) && !e.shiftKey) {
         e.preventDefault();
         handleUndo();
       }
-      if (e.key === "y" && (e.ctrlKey || e.metaKey)) {
+      if (
+        (isY && (e.ctrlKey || e.metaKey) && !e.shiftKey) ||
+        (isZ && (e.ctrlKey || e.metaKey) && e.shiftKey)
+      ) {
         e.preventDefault();
         handleRedo();
       }
@@ -268,11 +275,21 @@ export function EditorPage({
             <TooltipContent className="pr-1.5">
               <div className="flex items-center gap-2">
                 Ripristina
-                <KbdGroup className="hidden md:flex">
-                  <Kbd>Ctrl</Kbd>
-                  <span>+</span>
-                  <Kbd>Y</Kbd>
-                </KbdGroup>
+                {isMac ? (
+                  <KbdGroup className="hidden md:flex">
+                    <Kbd>Ctrl</Kbd>
+                    <span>+</span>
+                    <Kbd>Shift</Kbd>
+                    <span>+</span>
+                    <Kbd>Z</Kbd>
+                  </KbdGroup>
+                ) : (
+                  <KbdGroup className="hidden md:flex">
+                    <Kbd>Ctrl</Kbd>
+                    <span>+</span>
+                    <Kbd>Y</Kbd>
+                  </KbdGroup>
+                )}
               </div>
             </TooltipContent>
           </Tooltip>

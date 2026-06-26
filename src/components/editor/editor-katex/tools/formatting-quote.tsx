@@ -44,8 +44,9 @@ export function FormattingQuote({
     if (!editor) return;
 
     const disposable = editor.onKeyDown((e) => {
+      const isKeyQ = e.browserEvent.key.toLowerCase() === "q" || e.code === "KeyQ";
       if (
-        e.code === "KeyQ" &&
+        isKeyQ &&
         (e.ctrlKey || e.metaKey) &&
         e.shiftKey &&
         isFocused

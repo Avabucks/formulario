@@ -46,7 +46,8 @@ export function FormattingBold({
     if (!editor) return;
 
     const disposable = editor.onKeyDown((e) => {
-      if ((e.ctrlKey || e.metaKey) && e.code === "KeyB" && isFocused) {
+      const isKeyB = e.browserEvent.key.toLowerCase() === "b" || e.code === "KeyB";
+      if ((e.ctrlKey || e.metaKey) && isKeyB && isFocused) {
         e.preventDefault();
         e.stopPropagation();
         handleToggle();

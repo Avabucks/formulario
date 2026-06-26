@@ -76,16 +76,16 @@ export function FormularioSettings({
       });
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "I" && (e.metaKey || e.ctrlKey) && e.shiftKey) {
+      if (e.key.toLowerCase() === "i" && (e.metaKey || e.ctrlKey) && e.shiftKey) {
         e.preventDefault();
         setOpen((prev) => !prev);
       }
     };
 
-    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown, true);
     return () => {
       ignore = true;
-      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("keydown", handleKeyDown, true);
     };
   }, [formularioId]);
 

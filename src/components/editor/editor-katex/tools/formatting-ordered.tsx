@@ -43,7 +43,8 @@ export function FormattingOrderedList({
     if (!editor) return;
 
     const disposable = editor.onKeyDown((e) => {
-      if ((e.ctrlKey || e.metaKey) && e.code === "Digit7" && isFocused) {
+      const isDigit7 = e.browserEvent.key === "7" || e.code === "Digit7";
+      if ((e.ctrlKey || e.metaKey) && isDigit7 && isFocused) {
         e.preventDefault();
         e.stopPropagation();
         handleToggle();

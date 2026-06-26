@@ -45,7 +45,8 @@ export function FormattingCodeInline({
     if (!editor) return;
 
     const disposable = editor.onKeyDown((e) => {
-      if ((e.ctrlKey || e.metaKey) && e.code === "KeyJ" && isFocused) {
+      const isKeyJ = e.browserEvent.key.toLowerCase() === "j" || e.code === "KeyJ";
+      if ((e.ctrlKey || e.metaKey) && isKeyJ && isFocused) {
         e.preventDefault();
         e.stopPropagation();
         handleToggle();

@@ -142,6 +142,12 @@ export function FormattingHeaders({
     const disposable = editor.onKeyDown((e) => {
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && isFocused) {
         const actions: Record<string, () => void> = {
+          "1": () => triggerHeading(getH1Regex, "#"),
+          "2": () => triggerHeading(getH2Regex, "##"),
+          "3": () => triggerHeading(getH3Regex, "###"),
+          "4": () => triggerHeading(getH4Regex, "####"),
+          "5": () => triggerHeading(getH5Regex, "#####"),
+          "6": () => triggerHeading(getH6Regex, "######"),
           Digit1: () => triggerHeading(getH1Regex, "#"),
           Digit2: () => triggerHeading(getH2Regex, "##"),
           Digit3: () => triggerHeading(getH3Regex, "###"),
@@ -149,7 +155,8 @@ export function FormattingHeaders({
           Digit5: () => triggerHeading(getH5Regex, "#####"),
           Digit6: () => triggerHeading(getH6Regex, "######"),
         };
-        const action = actions[e.code];
+        const key = e.browserEvent.key;
+        const action = actions[key] || actions[e.code];
         if (action) {
           e.preventDefault();
           e.stopPropagation();

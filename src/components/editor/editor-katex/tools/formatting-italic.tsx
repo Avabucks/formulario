@@ -46,7 +46,8 @@ export function FormattingItalic({
     if (!editor) return;
 
     const disposable = editor.onKeyDown((e) => {
-      if ((e.ctrlKey || e.metaKey) && e.code === "KeyI" && isFocused) {
+      const isKeyI = e.browserEvent.key.toLowerCase() === "i" || e.code === "KeyI";
+      if ((e.ctrlKey || e.metaKey) && isKeyI && isFocused) {
         e.preventDefault();
         e.stopPropagation();
         handleToggle();

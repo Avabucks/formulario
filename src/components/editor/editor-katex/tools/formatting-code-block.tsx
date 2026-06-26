@@ -76,10 +76,11 @@ export function FormattingCodeBlock({
     if (!editor) return;
 
     const disposable = editor.onKeyDown((e) => {
+      const isKeyU = e.browserEvent.key.toLowerCase() === "u" || e.code === "KeyU";
       if (
         (e.ctrlKey || e.metaKey) &&
         e.shiftKey &&
-        e.code === "KeyU" &&
+        isKeyU &&
         isFocused
       ) {
         e.preventDefault();

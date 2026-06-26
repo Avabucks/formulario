@@ -53,7 +53,8 @@ export function FormattingDivider({
     if (!editor) return;
 
     const disposable = editor.onKeyDown((e) => {
-      if ((e.ctrlKey || e.metaKey) && e.code === "Digit9" && isFocused) {
+      const isDigit9 = e.browserEvent.key === "9" || e.code === "Digit9";
+      if ((e.ctrlKey || e.metaKey) && isDigit9 && isFocused) {
         e.preventDefault();
         e.stopPropagation();
         handleToggle();

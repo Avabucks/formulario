@@ -281,10 +281,12 @@ export function FormattingLatex({
     if (!editor) return;
 
     const disposable = editor.onKeyDown((e) => {
+      const isKeyG = e.browserEvent.key.toLowerCase() === "g" || e.code === "KeyG";
+      const isKeyH = e.browserEvent.key.toLowerCase() === "h" || e.code === "KeyH";
       if (
         (e.ctrlKey || e.metaKey) &&
         e.shiftKey &&
-        e.code === "KeyG" &&
+        isKeyG &&
         isFocused
       ) {
         e.preventDefault();
@@ -294,7 +296,7 @@ export function FormattingLatex({
       if (
         (e.ctrlKey || e.metaKey) &&
         e.shiftKey &&
-        e.code === "KeyH" &&
+        isKeyH &&
         isFocused
       ) {
         e.preventDefault();

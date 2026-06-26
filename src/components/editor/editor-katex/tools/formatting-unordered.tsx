@@ -44,7 +44,8 @@ export function FormattingUnorderedList({
     if (!editor) return;
 
     const disposable = editor.onKeyDown((e) => {
-      if ((e.ctrlKey || e.metaKey) && e.code === "Digit8" && isFocused) {
+      const isDigit8 = e.browserEvent.key === "8" || e.code === "Digit8";
+      if ((e.ctrlKey || e.metaKey) && isDigit8 && isFocused) {
         e.preventDefault();
         e.stopPropagation();
         handleToggle();
