@@ -245,6 +245,7 @@ export function EditorPage({
     const handleKeyDown = (e: KeyboardEvent) => {
       const isZ = e.key.toLowerCase() === "z";
       const isY = e.key.toLowerCase() === "y";
+      const isA = e.key.toLowerCase() === "a";
 
       if (isZ && (e.ctrlKey || e.metaKey) && !e.shiftKey) {
         e.preventDefault();
@@ -257,10 +258,14 @@ export function EditorPage({
         e.preventDefault();
         handleRedo();
       }
+      if (isA && e.altKey && editable) {
+        e.preventDefault();
+        setShowAI((prev) => !prev);
+      }
     };
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [handleUndo, handleRedo]);
+  }, [handleUndo, handleRedo, editable]);
 
   useEffect(() => {
     if (!monacoRef.current) return;
@@ -442,15 +447,31 @@ export function EditorPage({
       {/* Right: View Selector & Settings */}
       <div className="flex items-center gap-3 shrink-0">
         {editable && (
-          <Button
-            variant={showAI ? "default" : "outline"}
-            size="sm"
-            onClick={() => setShowAI(!showAI)}
-            className="h-8 gap-1.5 select-none cursor-pointer"
-          >
-            <Sparkles size={14} className={showAI ? "animate-pulse" : ""} />
-            <span>Chiedi all'AI</span>
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant={showAI ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setShowAI(!showAI)}
+                  className="h-8 gap-1.5 select-none cursor-pointer"
+                >
+                  <Sparkles size={14} className={showAI ? "animate-pulse" : ""} />
+                  <span>{"Chiedi all'AI"}</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="pr-1.5">
+                <div className="flex items-center gap-2">
+                  {"Chiedi all'AI"}
+                  <KbdGroup>
+                    <Kbd>Alt</Kbd>
+                    <span>+</span>
+                    <Kbd>A</Kbd>
+                  </KbdGroup>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         )}
         <div className="h-6 w-[1px] bg-border/60" />
         {viewTabs}
