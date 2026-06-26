@@ -57,12 +57,20 @@ export async function generateMetadata({
     openGraph: {
       title: `${capitolo.titolo} - ${packageJson.displayName}`,
       description: capitolo.descrizione,
-      images: ["/social.png"],
+      images: [
+        {
+          url: "/social.png",
+          width: 1200,
+          height: 630,
+          alt: `${capitolo.titolo} - ${packageJson.displayName}`,
+        },
+      ],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title: `${capitolo.titolo} - ${packageJson.displayName}`,
       description: capitolo.descrizione,
+      images: ["/social.png"],
     },
   };
 }
