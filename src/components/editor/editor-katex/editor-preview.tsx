@@ -7,7 +7,6 @@ import "katex/dist/katex.min.css";
 import { Maximize2, Scan, ZoomIn, ZoomOut } from "lucide-react";
 import {
   memo,
-  type MouseEvent,
   useCallback,
   useEffect,
   useId,
@@ -20,9 +19,9 @@ import rehypeKatex from "rehype-katex";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
-import { InlineLatex } from "./inline-latex";
 import { markdownComponents } from "./markdown-components";
 import { useIsMobile } from "@/src/hooks/useIsMobile";
+import { OutlineNavigator, type PreviewHeading } from "./outline-navigator";
 
 const remarkPlugins = [remarkMath, remarkBreaks, remarkGfm];
 const rehypePlugins = [rehypeKatex];
@@ -35,16 +34,9 @@ const ZOOM_MAX = 3;
 const HEADING_SELECTOR = "h1, h2, h3, h4, h5, h6";
 const SCROLL_OFFSET = 48;
 const HEADING_SCROLL_NUDGE_PX = 6;
-const SCROLLBAR_HOVER_ZONE_PX = 28;
 const NAVIGATOR_HIDE_DELAY_MS = 700;
 
-type PreviewHeading = {
-  id: string;
-  level: number;
-  title: string;
-  sourceTitle: string;
-  element: HTMLElement;
-};
+
 
 function extractMarkdownHeadings(markdown: string) {
   const headings: Array<{ level: number; title: string }> = [];
@@ -70,6 +62,8 @@ function extractMarkdownHeadings(markdown: string) {
   return headings;
 }
 
+
+
 export const EditorPreview = memo(function EditorPreview({
   markdownContent,
 }: Readonly<{ markdownContent: string }>) {
@@ -82,11 +76,12 @@ export const EditorPreview = memo(function EditorPreview({
   const [navigatorVisible, setNavigatorVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const navigatorListRef = useRef<HTMLDivElement>(null);
   const navigatorHoverRef = useRef(false);
   const navigatorHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
+  const clickedHeadingRef = useRef<string | null>(null);
+  const clickTimeRef = useRef<number>(0);
 
   const processedContent = useMemo(() => {
     return markdownContent.replaceAll(
@@ -199,6 +194,40 @@ export const EditorPreview = memo(function EditorPreview({
     const container = containerRef.current;
     if (!container || headings.length === 0) return;
 
+    // Check if we are currently scrolling to a clicked heading
+    if (clickedHeadingRef.current) {
+      const timeSinceClick = Date.now() - clickTimeRef.current;
+      if (timeSinceClick < 800) {
+        setActiveHeadingId(clickedHeadingRef.current);
+        return;
+      }
+
+      // After the smooth scroll should have finished (800ms), check if we have scrolled away
+      const headingClick = headings.find((h) => h.id === clickedHeadingRef.current);
+      if (headingClick) {
+        const containerTop = container.getBoundingClientRect().top;
+        const headingTop = headingClick.element.getBoundingClientRect().top;
+        const targetScrollTop =
+          container.scrollTop +
+          headingTop -
+          containerTop -
+          SCROLL_OFFSET +
+          HEADING_SCROLL_NUDGE_PX;
+
+        const maxScrollTop = container.scrollHeight - container.clientHeight;
+        const expectedScrollTop = Math.max(0, Math.min(maxScrollTop, targetScrollTop));
+
+        // If the scroll position is still close to the expected scroll target, keep it active
+        if (Math.abs(container.scrollTop - expectedScrollTop) <= 10) {
+          setActiveHeadingId(clickedHeadingRef.current);
+          return;
+        } else {
+          // The user has scrolled away manually! Release the lock
+          clickedHeadingRef.current = null;
+        }
+      }
+    }
+
     const containerTop = container.getBoundingClientRect().top;
     const scrollLine = containerTop + SCROLL_OFFSET;
     let active = headings[0];
@@ -273,23 +302,15 @@ export const EditorPreview = memo(function EditorPreview({
     };
   }, [headings, showNavigatorTemporarily, updateActiveHeading]);
 
-  useEffect(() => {
-    if (!navigatorVisible || !activeHeadingId) return;
 
-    const list = navigatorListRef.current;
-    const activeButton = list?.querySelector<HTMLButtonElement>(
-      `[data-heading-id="${activeHeadingId}"]`,
-    );
 
-    activeButton?.scrollIntoView({
-      block: "nearest",
-      inline: "nearest",
-    });
-  }, [activeHeadingId, navigatorVisible]);
-
-  const handleHeadingClick = (heading: PreviewHeading) => {
+  const handleHeadingClick = useCallback((heading: PreviewHeading) => {
     const container = containerRef.current;
     if (!container) return;
+
+    clickedHeadingRef.current = heading.id;
+    clickTimeRef.current = Date.now();
+    setActiveHeadingId(heading.id);
 
     const containerTop = container.getBoundingClientRect().top;
     const headingTop = heading.element.getBoundingClientRect().top;
@@ -304,29 +325,7 @@ export const EditorPreview = memo(function EditorPreview({
       top: Math.max(0, nextScrollTop),
       behavior: "smooth",
     });
-  };
-
-  const handleContainerMouseMove = (event: MouseEvent<HTMLDivElement>) => {
-    const container = containerRef.current;
-    if (!container || headings.length === 0) return;
-
-    const rect = container.getBoundingClientRect();
-    const isNearScrollbar =
-      rect.right - event.clientX <= SCROLLBAR_HOVER_ZONE_PX;
-
-    if (isNearScrollbar) {
-      clearNavigatorHideTimer();
-      setNavigatorVisible(true);
-    } else if (!navigatorHoverRef.current) {
-      scheduleNavigatorHide();
-    }
-  };
-
-  const handleContainerMouseLeave = () => {
-    if (navigatorHoverRef.current) return;
-    scheduleNavigatorHide();
-  };
-
+  }, []);
   const previewMarkdown = () => (
     <div
       ref={contentRef}
@@ -347,8 +346,6 @@ export const EditorPreview = memo(function EditorPreview({
       <div
         ref={containerRef}
         className="group/container flex-1 overflow-auto"
-        onMouseMove={handleContainerMouseMove}
-        onMouseLeave={handleContainerMouseLeave}
         style={{
           backgroundColor: "hsl(var(--sidebar-background, var(--secondary)))",
         }}
@@ -411,47 +408,16 @@ export const EditorPreview = memo(function EditorPreview({
           </div>
         </div>
 
-        {headings.length > 0 && (
-          <div
-            className={`absolute top-4 right-6 z-10 max-h-[calc(100%-5rem)] w-56 overflow-hidden rounded-lg border bg-background/95 shadow-sm backdrop-blur-sm transition duration-300 ${navigatorVisible
-              ? "pointer-events-auto opacity-100 translate-x-0"
-              : "pointer-events-none opacity-0 translate-x-4"
-              }`}
-            onMouseEnter={() => {
-              navigatorHoverRef.current = true;
-              clearNavigatorHideTimer();
-              setNavigatorVisible(true);
-            }}
-            onMouseLeave={() => {
-              navigatorHoverRef.current = false;
-              showNavigatorTemporarily();
-            }}
-          >
-            <div
-              ref={navigatorListRef}
-              className="max-h-80 overflow-y-auto p-1"
-            >
-              {headings.map((heading) => (
-                <button
-                  key={heading.id}
-                  type="button"
-                  data-heading-id={heading.id}
-                  onClick={() => handleHeadingClick(heading)}
-                  className={`flex min-h-8 w-full items-center rounded-md py-1.5 pr-2 text-left text-xs hover:underline hover:text-accent-foreground ${activeHeadingId === heading.id
-                    ? "text-accent-foreground bg-accent"
-                    : "text-muted-foreground"
-                    }`}
-                  style={{ paddingLeft: 8 + (heading.level - 1) * 10 }}
-                  title={heading.title}
-                >
-                  <span className="line-clamp-2 leading-4">
-                    <InlineLatex>{heading.sourceTitle}</InlineLatex>
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+        <OutlineNavigator
+          headings={headings}
+          activeHeadingId={activeHeadingId}
+          navigatorVisible={navigatorVisible}
+          setNavigatorVisible={setNavigatorVisible}
+          navigatorHoverRef={navigatorHoverRef}
+          clearNavigatorHideTimer={clearNavigatorHideTimer}
+          showNavigatorTemporarily={showNavigatorTemporarily}
+          onHeadingClick={handleHeadingClick}
+        />
 
         {/* Floating zoom toolbar — bottom center */}
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 pointer-events-none opacity-0 group-hover/container:opacity-100 transition-opacity duration-300">
