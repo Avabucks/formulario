@@ -30,8 +30,10 @@ type Message = {
 
 export function EditorAI({
   editorRef,
+  onClose,
 }: Readonly<{
   editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
+  onClose?: () => void;
 }>) {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -189,10 +191,21 @@ export function EditorAI({
     <div className="flex flex-col h-full bg-background border-r border-border text-sm">
 
       {/* Header (Shadcn style - strict monochrome) */}
-      <div className="flex items-center justify-between p-4 border-b">
+      <div className="flex items-center justify-between p-3 border-b">
         <div className="flex items-center gap-2">
-          <Sparkles size={15} className="text-foreground" />
-          Chiedi all'AI
+          {onClose && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="size-7 text-muted-foreground hover:text-foreground"
+              title="Chiudi chat"
+            >
+              <X size={15} />
+            </Button>
+          )}
+          <Sparkles size={14} className="text-foreground/80" />
+          <span className="font-semibold text-foreground">Genera con l'AI</span>
         </div>
         {messages.length > 1 && (
           <Button
@@ -261,11 +274,8 @@ export function EditorAI({
 
                       {/* Pull-request style file preview header (Monochrome) */}
                       <div className="border border-border rounded-lg overflow-hidden bg-background">
-                        <div className="flex items-center justify-between px-3 py-1.5 border-b bg-muted/40 text-[11px] text-muted-foreground font-mono">
+                        <div className="flex items-center px-3 py-1.5 border-b bg-muted/40 text-[11px] text-muted-foreground font-mono">
                           <span>formulario_diff.md</span>
-                          <span className="text-[10px] bg-foreground/10 text-foreground border border-border px-1.5 py-0.2 rounded-md font-semibold">
-                            Proposta di Modifica
-                          </span>
                         </div>
                         <div className="h-56 w-full min-w-0">
                           <DiffEditor
@@ -291,12 +301,11 @@ export function EditorAI({
                         </div>
                       </div>
 
-                      {/* Action buttons (Shadcn style default/outline) */}
                       <div className="flex items-center gap-2 justify-end">
                         <Button
                           variant="outline"
                           size="sm"
-                          className="h-7 text-xs px-2.5 gap-1"
+                          className="h-7 text-xs px-2.5 gap-1 border-rose-200 dark:border-rose-950 text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 hover:text-rose-500 hover:border-rose-500/30 transition-all cursor-pointer"
                           onClick={() => handleDiscard(msg.id)}
                         >
                           <X size={12} />
@@ -304,7 +313,7 @@ export function EditorAI({
                         </Button>
                         <Button
                           size="sm"
-                          className="h-7 text-xs px-2.5 gap-1 bg-primary text-primary-foreground hover:bg-primary/90"
+                          className="h-7 text-xs px-2.5 gap-1 bg-emerald-600 text-white hover:bg-emerald-500 hover:shadow-xs hover:shadow-emerald-500/15 border border-emerald-600 transition-all font-semibold cursor-pointer"
                           onClick={() => handleAccept(msg.id, msg.suggestedContent ?? "")}
                         >
                           <Check size={12} />

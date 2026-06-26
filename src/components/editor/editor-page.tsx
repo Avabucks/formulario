@@ -24,6 +24,7 @@ import { Separator } from "../ui/separator";
 import { Spinner } from "../ui/spinner";
 import { Toggle } from "../ui/toggle";
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
+import { motion } from "framer-motion";
 import {
   Tooltip,
   TooltipContent,
@@ -79,7 +80,8 @@ export function EditorPage({
   const [markdownContent, setMarkdownContent] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [edited, setEdited] = useState<boolean>(false);
-  const [switchView, setSwitchView] = useState<"preview" | "divided" | "edit" | "ai">("preview");
+  const [switchView, setSwitchView] = useState<"preview" | "divided" | "edit">("preview");
+  const [showAI, setShowAI] = useState<boolean>(false);
   const [resizableSize, setResizableSize] = useState<number>(40);
   const [isFocused, setIsFocused] = useState(false);
   const [selection, setSelection] = useState<Selection | null>(null);
@@ -231,10 +233,10 @@ export function EditorPage({
   }, [isMobile, switchView]);
 
   useEffect(() => {
-    if (!editable && switchView === "ai") {
-      setSwitchView("preview");
+    if (!editable && showAI) {
+      setShowAI(false);
     }
-  }, [editable, switchView]);
+  }, [editable, showAI]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -270,168 +272,205 @@ export function EditorPage({
     monacoRef.current.editor.setTheme("markdown-math-theme");
   }, [resolvedTheme, monacoReady]);
 
+  const tabsList = [
+    { id: "edit", label: "Scrittura", icon: PenLine, show: true },
+    { id: "divided", label: "Diviso", icon: Columns2, show: !isMobile },
+    { id: "preview", label: "Anteprima", icon: Eye, show: true }
+  ] as const;
+
   const viewTabs = (
-    <Tabs value={switchView} onValueChange={(val) => setSwitchView(val as any)}>
-      <TabsList className="bg-muted/50 p-0.5 h-8">
-        <TabsTrigger value="edit" className="gap-1.5 px-2 py-1 text-xs font-medium">
-          <PenLine size={14} />
-          <span className="hidden sm:inline">Scrittura</span>
-        </TabsTrigger>
-        {editable && (
-          <TabsTrigger value="ai" className="gap-1.5 px-2 py-1 text-xs font-medium">
-            <Sparkles size={14} />
-            <span className="hidden sm:inline">Chiedi all'AI</span>
-          </TabsTrigger>
-        )}
-        {!isMobile && (
-          <TabsTrigger value="divided" className="gap-1.5 px-2 py-1 text-xs font-medium">
-            <Columns2 size={14} />
-            <span className="hidden sm:inline">Diviso</span>
-          </TabsTrigger>
-        )}
-        <TabsTrigger value="preview" className="gap-1.5 px-2 py-1 text-xs font-medium">
-          <Eye size={14} />
-          <span className="hidden sm:inline">Anteprima</span>
-        </TabsTrigger>
-      </TabsList>
-    </Tabs>
+    <div className="relative bg-muted/40 p-0.5 rounded-full border border-border/80 flex items-center gap-0.5 shadow-xs select-none shrink-0">
+      {tabsList.filter(tab => tab.show).map((tab) => {
+        const Icon = tab.icon;
+        const isActive = switchView === tab.id;
+        return (
+          <button
+            key={tab.id}
+            onClick={() => setSwitchView(tab.id as any)}
+            className={`relative px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-colors duration-200 cursor-pointer select-none outline-none ${
+              isActive 
+                ? "text-foreground" 
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {isActive && (
+              <motion.div
+                layoutId="activeViewTab"
+                className="absolute inset-0 bg-background rounded-full shadow-sm border border-border/40"
+                transition={{ type: "spring", stiffness: 350, damping: 30 }}
+              />
+            )}
+            <Icon size={13.5} className="relative z-10" />
+            <span className="relative z-10 hidden sm:inline">{tab.label}</span>
+          </button>
+        );
+      })}
+    </div>
   );
 
   const toolbar = (
-    <div className="flex w-full border-b min-h-15 overflow-x-auto">
-      <div className="flex gap-3 border-r items-center px-3">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                ref={undoBtnRef}
-                variant="outline"
-                size="icon"
-                onClick={handleUndo}
-                onMouseDown={(e) => e.preventDefault()}
-              >
-                <Undo2 size={16} />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent className="pr-1.5">
-              <div className="flex items-center gap-2">
-                Annulla
-                <KbdGroup className="hidden md:flex">
-                  <Kbd>Ctrl</Kbd>
-                  <span>+</span>
-                  <Kbd>Z</Kbd>
-                </KbdGroup>
-              </div>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                ref={redoBtnRef}
-                variant="outline"
-                size="icon"
-                onClick={handleRedo}
-                onMouseDown={(e) => e.preventDefault()}
-              >
-                <Redo2 size={16} />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent className="pr-1.5">
-              <div className="flex items-center gap-2">
-                Ripristina
-                {isMac ? (
+    <div className="flex w-full border-b bg-background/95 backdrop-blur-xs min-h-[60px] items-center justify-between px-4 py-2 gap-4 overflow-x-auto select-none">
+      {/* Left: History & Formatting Tray */}
+      <div className="flex flex-1 items-center gap-3 min-w-0">
+        {/* History Capsule */}
+        <div className="flex items-center gap-0.5 bg-muted/30 p-0.5 rounded-lg border border-border/40 shadow-xs shrink-0">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  ref={undoBtnRef}
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleUndo}
+                  onMouseDown={(e) => e.preventDefault()}
+                  className="size-7 rounded-md text-muted-foreground hover:text-foreground"
+                >
+                  <Undo2 size={15} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="pr-1.5">
+                <div className="flex items-center gap-2">
+                  Annulla
                   <KbdGroup className="hidden md:flex">
                     <Kbd>Ctrl</Kbd>
-                    <span>+</span>
-                    <Kbd>Shift</Kbd>
                     <span>+</span>
                     <Kbd>Z</Kbd>
                   </KbdGroup>
-                ) : (
-                  <KbdGroup className="hidden md:flex">
-                    <Kbd>Ctrl</Kbd>
-                    <span>+</span>
-                    <Kbd>Y</Kbd>
-                  </KbdGroup>
-                )}
-              </div>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
 
-      <div className="flex flex-1 items-center">
-        <div className="flex flex-1 items-center gap-3 h-full px-3">
-          <FormattingHeaders
-            _selection={selection}
-            editorRef={editorRef}
-            isFocused={isFocused}
-          />
-          <FormattingBold
-            _selection={selection}
-            editorRef={editorRef}
-            isFocused={isFocused}
-          />
-          <FormattingItalic
-            _selection={selection}
-            editorRef={editorRef}
-            isFocused={isFocused}
-          />
-          <FormattingQuote
-            _selection={selection}
-            editorRef={editorRef}
-            isFocused={isFocused}
-          />
-
-          <FormattingOrderedList
-            _selection={selection}
-            editorRef={editorRef}
-            isFocused={isFocused}
-          />
-          <FormattingUnorderedList
-            _selection={selection}
-            editorRef={editorRef}
-            isFocused={isFocused}
-          />
-
-          <FormattingTable
-            _selection={selection}
-            editorRef={editorRef}
-            isFocused={isFocused}
-          />
-          <FormattingDivider
-            _selection={selection}
-            editorRef={editorRef}
-            isFocused={isFocused}
-          />
-
-          <FormattingCodeInline
-            _selection={selection}
-            editorRef={editorRef}
-            isFocused={isFocused}
-          />
-          <FormattingCodeBlock
-            _selection={selection}
-            editorRef={editorRef}
-            isFocused={isFocused}
-          />
-
-          <FormattingLatex
-            _selection={selection}
-            editorRef={editorRef}
-            isFocused={isFocused}
-          />
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  ref={redoBtnRef}
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleRedo}
+                  onMouseDown={(e) => e.preventDefault()}
+                  className="size-7 rounded-md text-muted-foreground hover:text-foreground"
+                >
+                  <Redo2 size={15} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="pr-1.5">
+                <div className="flex items-center gap-2">
+                  Ripristina
+                  {isMac ? (
+                    <KbdGroup className="hidden md:flex">
+                      <Kbd>Ctrl</Kbd>
+                      <span>+</span>
+                      <Kbd>Shift</Kbd>
+                      <span>+</span>
+                      <Kbd>Z</Kbd>
+                    </KbdGroup>
+                  ) : (
+                    <KbdGroup className="hidden md:flex">
+                      <Kbd>Ctrl</Kbd>
+                      <span>+</span>
+                      <Kbd>Y</Kbd>
+                    </KbdGroup>
+                  )}
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
 
+        {switchView !== "preview" && (
+          <>
+            <div className="h-6 w-[1px] bg-border/60 mx-1 shrink-0" />
+
+            {/* Formatting Tray */}
+            <div className="flex items-center gap-1 p-0.5 overflow-x-auto scrollbar-none max-w-full">
+              <FormattingHeaders
+                _selection={selection}
+                editorRef={editorRef}
+                isFocused={isFocused}
+              />
+              <FormattingBold
+                _selection={selection}
+                editorRef={editorRef}
+                isFocused={isFocused}
+              />
+              <FormattingItalic
+                _selection={selection}
+                editorRef={editorRef}
+                isFocused={isFocused}
+              />
+              <FormattingQuote
+                _selection={selection}
+                editorRef={editorRef}
+                isFocused={isFocused}
+              />
+
+              <div className="w-[1px] h-4 bg-border/60 mx-1 shrink-0" />
+
+              <FormattingOrderedList
+                _selection={selection}
+                editorRef={editorRef}
+                isFocused={isFocused}
+              />
+              <FormattingUnorderedList
+                _selection={selection}
+                editorRef={editorRef}
+                isFocused={isFocused}
+              />
+              <FormattingDivider
+                _selection={selection}
+                editorRef={editorRef}
+                isFocused={isFocused}
+              />
+
+              <div className="w-[1px] h-4 bg-border/60 mx-1 shrink-0" />
+
+              <FormattingTable
+                _selection={selection}
+                editorRef={editorRef}
+                isFocused={isFocused}
+              />
+              <FormattingCodeInline
+                _selection={selection}
+                editorRef={editorRef}
+                isFocused={isFocused}
+              />
+              <FormattingCodeBlock
+                _selection={selection}
+                editorRef={editorRef}
+                isFocused={isFocused}
+              />
+              <FormattingLatex
+                _selection={selection}
+                editorRef={editorRef}
+                isFocused={isFocused}
+              />
+            </div>
+          </>
+        )}
       </div>
 
-      <div className="flex border-l items-center px-3 gap-3">
+      {/* Right: View Selector & Settings */}
+      <div className="flex items-center gap-3 shrink-0">
+        {editable && (
+          <Button
+            variant={showAI ? "default" : "outline"}
+            size="sm"
+            onClick={() => setShowAI(!showAI)}
+            className={`h-8 rounded-full text-xs font-semibold gap-1.5 transition-all select-none cursor-pointer ${
+              showAI 
+                ? "bg-primary text-primary-foreground shadow-sm shadow-primary/25 border-primary" 
+                : "text-muted-foreground hover:text-foreground border-border/80"
+            }`}
+          >
+            <Sparkles size={13.5} className={showAI ? "animate-pulse" : ""} />
+            <span>Chiedi all'AI</span>
+          </Button>
+        )}
+        <div className="h-6 w-[1px] bg-border/60" />
         {viewTabs}
-      </div>
-
-      <div className="flex border-l items-center px-3 gap-3">
+        <div className="h-6 w-[1px] bg-border/60" />
         <FormularioSettings formularioId={formularioId} />
       </div>
     </div>
@@ -464,18 +503,19 @@ export function EditorPage({
           {editable ? (
             toolbar
           ) : (
-            <div className="flex w-full border-b min-h-15 justify-between items-center overflow-x-auto">
-              <div className="flex flex-1 items-center gap-2 px-4 text-sm text-muted-foreground">
-                <PenOff size={16} />
+            <div className="flex w-full border-b bg-background/95 backdrop-blur-xs min-h-[60px] items-center justify-between px-4 py-2 gap-4 overflow-x-auto select-none">
+              {/* Left: TakeFormulario */}
+              <div className="flex items-center gap-3 shrink-0">
                 <TakeFormulario formularioId={formularioId} />
-                <span className="hidden md:flex">per modificare</span>
               </div>
 
-              <div className="flex border-l items-center px-3 gap-3">
+              {/* Center spacer */}
+              <div className="flex-1" />
+
+              {/* Right: View Selector & Settings */}
+              <div className="flex items-center gap-3 shrink-0">
                 {viewTabs}
-              </div>
-
-              <div className="flex border-l items-center px-3 gap-2 h-full">
+                <div className="h-6 w-[1px] bg-border/60" />
                 <FormularioSettings formularioId={formularioId} />
               </div>
             </div>
@@ -484,41 +524,50 @@ export function EditorPage({
       )}
 
 
-        <div className="flex flex-1 min-h-0 w-full relative">
-          {/* Left panel (Editor or AI Chat) */}
-          <div
-            className="h-full flex flex-col min-w-0"
-            style={{
-              display: switchView === "preview" ? "none" : "flex",
-              width: (!isMobile && (switchView === "divided" || switchView === "ai")) ? `${resizableSize}%` : "100%",
-            }}
-          >
-            <div className="flex-1 h-full flex flex-col" style={{ display: switchView === "ai" ? "none" : "flex" }}>
+        <div className="flex flex-1 min-h-0 w-full relative overflow-hidden">
+          {/* Main Area: Editor and/or Preview */}
+          <div className="flex-1 h-full flex relative min-w-0">
+            {/* Left panel (Editor) */}
+            <div
+              className="h-full flex flex-col min-w-0"
+              style={{
+                display: switchView === "preview" ? "none" : "flex",
+                width: (!isMobile && switchView === "divided") ? `${resizableSize}%` : "100%",
+              }}
+            >
               {input}
             </div>
-            <div className="flex-1 h-full flex flex-col" style={{ display: switchView === "ai" ? "flex" : "none" }}>
-              <EditorAI editorRef={editorRef} />
+
+            {/* Divider */}
+            {!isMobile && switchView === "divided" && (
+              <div
+                className="w-1 bg-border/50 hover:bg-muted-foreground/30 hover:w-1.5 transition-all cursor-col-resize h-full select-none"
+                onMouseDown={handleMouseDown}
+              />
+            )}
+
+            {/* Right panel (Preview) */}
+            <div
+              className="h-full flex flex-col min-w-0"
+              style={{
+                display: (switchView === "preview" || (!isMobile && switchView === "divided")) ? "flex" : "none",
+                width: (!isMobile && switchView === "divided") ? `${100 - resizableSize}%` : "100%",
+              }}
+            >
+              {preview}
             </div>
           </div>
-          
-          {/* Divider */}
-          {!isMobile && (switchView === "divided" || switchView === "ai") && (
-            <div
-              className="w-1 bg-border/50 hover:bg-muted-foreground/30 hover:w-1.5 transition-all cursor-col-resize h-full select-none"
-              onMouseDown={handleMouseDown}
-            />
-          )}
 
-          {/* Right panel (Preview) */}
-          <div
-            className="h-full flex flex-col min-w-0"
-            style={{
-              display: (switchView === "preview" || (!isMobile && (switchView === "divided" || switchView === "ai"))) ? "flex" : "none",
-              width: (!isMobile && (switchView === "divided" || switchView === "ai")) ? `${100 - resizableSize}%` : "100%",
-            }}
-          >
-            {preview}
-          </div>
+          {/* AI Chat Sidebar */}
+          {showAI && editable && (
+            <div className={`h-full border-l bg-background flex flex-col z-20 shrink-0 shadow-lg ${
+              isMobile 
+                ? "absolute inset-0 w-full" 
+                : "w-[350px]"
+            }`}>
+              <EditorAI editorRef={editorRef} onClose={() => setShowAI(false)} />
+            </div>
+          )}
         </div>
     </div>
   );
