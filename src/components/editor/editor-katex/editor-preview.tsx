@@ -22,6 +22,7 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import { InlineLatex } from "./inline-latex";
 import { markdownComponents } from "./markdown-components";
+import { useIsMobile } from "@/src/hooks/useIsMobile";
 
 const remarkPlugins = [remarkMath, remarkBreaks, remarkGfm];
 const rehypePlugins = [rehypeKatex];
@@ -73,6 +74,7 @@ export const EditorPreview = memo(function EditorPreview({
   markdownContent,
 }: Readonly<{ markdownContent: string }>) {
   const patternId = `cross-${useId()}`;
+  const isMobile = useIsMobile();
   const [scale, setScale] = useState(1);
   const [fitMode, setFitMode] = useState<"manual" | "fit">("manual");
   const [headings, setHeadings] = useState<PreviewHeading[]>([]);
@@ -325,7 +327,22 @@ export const EditorPreview = memo(function EditorPreview({
     scheduleNavigatorHide();
   };
 
-  return (
+  const previewMarkdown = () => (
+    <div
+      ref={contentRef}
+      className="editor p-4 md:p-9 leading-loose relative"
+    >
+      <ReactMarkdown
+        remarkPlugins={remarkPlugins}
+        rehypePlugins={rehypePlugins}
+        components={markdownComponents}
+      >
+        {processedContent}
+      </ReactMarkdown>
+    </div>
+  )
+
+  const desktopView = () => (
     <div className="flex flex-col flex-1 h-full w-full min-w-0 overflow-hidden relative">
       <div
         ref={containerRef}
@@ -388,18 +405,7 @@ export const EditorPreview = memo(function EditorPreview({
                   />
                 </svg>
 
-                <div
-                  ref={contentRef}
-                  className="editor p-9 leading-loose relative"
-                >
-                  <ReactMarkdown
-                    remarkPlugins={remarkPlugins}
-                    rehypePlugins={rehypePlugins}
-                    components={markdownComponents}
-                  >
-                    {processedContent}
-                  </ReactMarkdown>
-                </div>
+                {previewMarkdown()}
               </div>
             </div>
           </div>
@@ -407,11 +413,10 @@ export const EditorPreview = memo(function EditorPreview({
 
         {headings.length > 0 && (
           <div
-            className={`absolute top-4 right-4 z-10 max-h-[calc(100%-5rem)] w-56 overflow-hidden rounded-lg border bg-background/95 shadow-sm backdrop-blur-sm transition duration-300 ${
-              navigatorVisible
-                ? "pointer-events-auto opacity-100 translate-x-0"
-                : "pointer-events-none opacity-0 translate-x-4"
-            }`}
+            className={`absolute top-4 right-4 z-10 max-h-[calc(100%-5rem)] w-56 overflow-hidden rounded-lg border bg-background/95 shadow-sm backdrop-blur-sm transition duration-300 ${navigatorVisible
+              ? "pointer-events-auto opacity-100 translate-x-0"
+              : "pointer-events-none opacity-0 translate-x-4"
+              }`}
             onMouseEnter={() => {
               navigatorHoverRef.current = true;
               clearNavigatorHideTimer();
@@ -432,11 +437,10 @@ export const EditorPreview = memo(function EditorPreview({
                   type="button"
                   data-heading-id={heading.id}
                   onClick={() => handleHeadingClick(heading)}
-                  className={`flex min-h-8 w-full items-center rounded-md py-1.5 pr-2 text-left text-xs hover:underline hover:text-accent-foreground ${
-                    activeHeadingId === heading.id
-                      ? "text-accent-foreground bg-accent"
-                      : "text-muted-foreground"
-                  }`}
+                  className={`flex min-h-8 w-full items-center rounded-md py-1.5 pr-2 text-left text-xs hover:underline hover:text-accent-foreground ${activeHeadingId === heading.id
+                    ? "text-accent-foreground bg-accent"
+                    : "text-muted-foreground"
+                    }`}
                   style={{ paddingLeft: 8 + (heading.level - 1) * 10 }}
                   title={heading.title}
                 >
@@ -510,6 +514,47 @@ export const EditorPreview = memo(function EditorPreview({
           </div>
         </div>
       </div>
+    </div>
+  );
+
+  const mobileView = () => (
+    <div className="flex-1 w-full overflow-y-auto" ref={containerRef}>
+      <div className="relative w-full min-h-full bg-background">
+        <svg
+          className="absolute inset-0 h-full w-full opacity-[0.08] pointer-events-none"
+          xmlns="http://www.w3.org/2000/svg"
+          preserveAspectRatio="none"
+        >
+          <defs>
+            <pattern
+              id={patternId}
+              width="22"
+              height="22"
+              patternUnits="userSpaceOnUse"
+            >
+              <path
+                d="M16 0v22M0 16h22"
+                stroke="currentColor"
+                strokeWidth="0.5"
+                fill="none"
+              />
+            </pattern>
+          </defs>
+          <rect
+            width="100%"
+            height="100%"
+            fill={`url(#${patternId})`}
+          />
+        </svg>
+
+        {previewMarkdown()}
+      </div>
+    </div>
+  )
+
+  return (
+    <div className="flex flex-col flex-1 h-full w-full min-w-0 overflow-hidden relative">
+      {isMobile ? mobileView() : desktopView()}
     </div>
   );
 });

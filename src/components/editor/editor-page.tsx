@@ -4,8 +4,10 @@ import { useIsMobile } from "@/src/hooks/useIsMobile";
 import { Monaco } from "@monaco-editor/react";
 import {
   ArrowRightLeft,
+  Columns2,
   Eye,
   EyeClosed,
+  PenLine,
   PenOff,
   Redo2,
   Undo2,
@@ -17,10 +19,10 @@ import { FormularioSettings } from "../home/formulario-settings";
 import { TakeFormulario } from "../home/take-formulario";
 import { Button } from "../ui/button";
 import { Kbd, KbdGroup, useIsMac } from "../ui/kbd";
-import { ResizablePanel, ResizablePanelGroup } from "../ui/resizable";
 import { Separator } from "../ui/separator";
 import { Spinner } from "../ui/spinner";
 import { Toggle } from "../ui/toggle";
+import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 import {
   Tooltip,
   TooltipContent,
@@ -42,19 +44,41 @@ import { FormattingTable } from "./editor-katex/tools/formatting-table";
 import { FormattingUnorderedList } from "./editor-katex/tools/formatting-unordered";
 import { AskAIButton } from "./editor-katex/tools/ask-ai";
 
+const darkRules = [
+  { token: "math.display", foreground: "4EC9B0" },
+  { token: "math.inline", foreground: "4EC9B0" },
+  { token: "math.content", foreground: "CE9178" },
+  { token: "markdown.blockquote", foreground: "6A9955" },
+  { token: "markdown.code.inline", foreground: "D7BA7D" },
+  { token: "markdown.code.block", foreground: "D7BA7D" },
+  { token: "strong", foreground: "C586C0" },
+  { token: "markup.bold.italic", foreground: "E06C75" },
+];
+
+const lightRules = [
+  { token: "math.display", foreground: "267F99" },
+  { token: "math.inline", foreground: "267F99" },
+  { token: "math.content", foreground: "A31515" },
+  { token: "markdown.blockquote", foreground: "008000" },
+  { token: "markdown.code.inline", foreground: "795E26" },
+  { token: "markdown.code.block", foreground: "795E26" },
+  { token: "strong", foreground: "7B2FBE" },
+  { token: "markup.bold.italic", foreground: "C0392B" },
+];
+
 export function EditorPage({
   argomentoId,
   editable,
   formularioId,
 }: Readonly<{ argomentoId: string; editable: boolean; formularioId: string }>) {
-  const isMobile = useIsMobile();
   const { resolvedTheme } = useTheme();
+  const isMobile = useIsMobile();
 
   const [textAreaContent, setTextAreaContent] = useState<string>("");
   const [markdownContent, setMarkdownContent] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [edited, setEdited] = useState<boolean>(false);
-  const [switchView, setSwitchView] = useState<boolean>(false);
+  const [switchView, setSwitchView] = useState<"preview" | "divided" | "edit">("preview");
   const [resizableSize, setResizableSize] = useState<number>(40);
   const [isFocused, setIsFocused] = useState(false);
   const [selection, setSelection] = useState<Selection | null>(null);
@@ -67,6 +91,29 @@ export function EditorPage({
   const undoBtnRef = useRef<HTMLButtonElement>(null);
   const redoBtnRef = useRef<HTMLButtonElement>(null);
 
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startSize = resizableSize;
+    const container = e.currentTarget.parentElement;
+    if (!container) return;
+    const containerWidth = container.getBoundingClientRect().width;
+
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      const deltaX = moveEvent.clientX - startX;
+      const deltaPercent = (deltaX / containerWidth) * 100;
+      setResizableSize(Math.max(20, Math.min(80, startSize + deltaPercent)));
+    };
+
+    const handleMouseUp = () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+  };
+
   const updateSelection = (editor: any) => {
     const sel = editor.getSelection();
     if (!sel) return;
@@ -76,6 +123,15 @@ export function EditorPage({
   function handleEditorDidMount(editor: any, monaco: Monaco) {
     editorRef.current = editor;
     monacoRef.current = monaco;
+
+    monaco.editor.defineTheme("markdown-math-theme", {
+      base: resolvedTheme === "dark" ? "vs-dark" : "vs",
+      inherit: true,
+      rules: resolvedTheme === "dark" ? darkRules : lightRules,
+      colors: {},
+    });
+    monaco.editor.setTheme("markdown-math-theme");
+
     setMonacoReady(true);
 
     monaco.languages.register({ id: "markdown-math" });
@@ -161,19 +217,17 @@ export function EditorPage({
   }, []);
 
   useEffect(() => {
-    if (isMobile) {
-      setSwitchView(false);
-    } else if (!editable) setSwitchView(true);
-
-    setMonacoReady(false);
-  }, [isMobile]);
-
-  useEffect(() => {
     if (edited) {
       return;
     }
     setMarkdownContent(textAreaContent);
   }, [edited]);
+
+  useEffect(() => {
+    if (isMobile && switchView === "divided") {
+      setSwitchView("preview");
+    }
+  }, [isMobile, switchView]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -198,28 +252,6 @@ export function EditorPage({
 
   useEffect(() => {
     if (!monacoRef.current) return;
-
-    const darkRules = [
-      { token: "math.display", foreground: "4EC9B0" },
-      { token: "math.inline", foreground: "4EC9B0" },
-      { token: "math.content", foreground: "CE9178" },
-      { token: "markdown.blockquote", foreground: "6A9955" },
-      { token: "markdown.code.inline", foreground: "D7BA7D" },
-      { token: "markdown.code.block", foreground: "D7BA7D" },
-      { token: "strong", foreground: "C586C0" },
-      { token: "markup.bold.italic", foreground: "E06C75" },
-    ];
-
-    const lightRules = [
-      { token: "math.display", foreground: "267F99" },
-      { token: "math.inline", foreground: "267F99" },
-      { token: "math.content", foreground: "A31515" },
-      { token: "markdown.blockquote", foreground: "008000" },
-      { token: "markdown.code.inline", foreground: "795E26" },
-      { token: "markdown.code.block", foreground: "795E26" },
-      { token: "strong", foreground: "7B2FBE" },
-      { token: "markup.bold.italic", foreground: "C0392B" },
-    ];
 
     monacoRef.current.editor.defineTheme("markdown-math-theme", {
       base: resolvedTheme === "dark" ? "vs-dark" : "vs",
@@ -364,26 +396,25 @@ export function EditorPage({
         </div>
       </div>
 
-      {/* Mobile */}
-      <div className="flex md:hidden border-l items-center px-3 gap-3">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => setSwitchView((prev) => !prev)}
-        >
-          <ArrowRightLeft size={16} />
-        </Button>
-      </div>
-
-      {/* Desktop */}
-      <div className="hidden md:flex border-l items-center px-3 gap-3">
-        <Toggle
-          variant="outline"
-          pressed={switchView}
-          onClick={() => setSwitchView((prev) => !prev)}
-        >
-          {switchView ? <Eye size={16} /> : <EyeClosed size={16} />}
-        </Toggle>
+      <div className="flex border-l items-center px-3 gap-3">
+        <Tabs value={switchView} onValueChange={(val) => setSwitchView(val as any)}>
+          <TabsList className="bg-muted/50 p-0.5 h-8">
+            <TabsTrigger value="edit" className="gap-1.5 px-2 py-1 text-xs font-medium">
+              <PenLine size={14} />
+              <span className="hidden sm:inline">Scrittura</span>
+            </TabsTrigger>
+            {!isMobile && (
+              <TabsTrigger value="divided" className="gap-1.5 px-2 py-1 text-xs font-medium">
+                <Columns2 size={14} />
+                <span className="hidden sm:inline">Diviso</span>
+              </TabsTrigger>
+            )}
+            <TabsTrigger value="preview" className="gap-1.5 px-2 py-1 text-xs font-medium">
+              <Eye size={14} />
+              <span className="hidden sm:inline">Anteprima</span>
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
 
       <div className="flex border-l items-center px-3 gap-3">
@@ -426,28 +457,6 @@ export function EditorPage({
                 <span className="hidden md:flex">per modifcare</span>
               </div>
 
-              {/* Mobile */}
-              <div className="flex md:hidden border-l items-center px-3 gap-3 h-full">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setSwitchView((prev) => !prev)}
-                >
-                  <ArrowRightLeft size={16} />
-                </Button>
-              </div>
-
-              {/* Desktop */}
-              <div className="hidden md:flex border-l items-center px-3 gap-3 h-full">
-                <Toggle
-                  variant="outline"
-                  pressed={switchView}
-                  onClick={() => setSwitchView((prev) => !prev)}
-                >
-                  {switchView ? <Eye size={16} /> : <EyeClosed size={16} />}
-                </Toggle>
-              </div>
-
               <div className="flex border-l items-center px-3 gap-2 h-full">
                 <FormularioSettings formularioId={formularioId} />
               </div>
@@ -456,43 +465,33 @@ export function EditorPage({
         </>
       )}
 
-      {isMobile ? (
-        <div className="md:hidden flex-1 min-h-0 overflow-auto">
-          <div className={switchView ? "block h-full" : "hidden"}>{input}</div>
-          <div className={switchView ? "hidden" : "block h-full"}>
+
+        <div className="flex flex-1 min-h-0 w-full relative">
+          <div
+            className="h-full flex flex-col min-w-0"
+            style={{
+              display: switchView === "preview" ? "none" : "flex",
+              width: switchView === "divided" ? `${resizableSize}%` : "100%",
+            }}
+          >
+            {input}
+          </div>
+          {switchView === "divided" && (
+            <div
+              className="w-1 bg-border/50 hover:bg-muted-foreground/30 hover:w-1.5 transition-all cursor-col-resize h-full select-none"
+              onMouseDown={handleMouseDown}
+            />
+          )}
+          <div
+            className="h-full flex flex-col min-w-0"
+            style={{
+              display: switchView === "edit" ? "none" : "flex",
+              width: switchView === "divided" ? `${100 - resizableSize}%` : "100%",
+            }}
+          >
             {preview}
           </div>
         </div>
-      ) : (
-        <div className="hidden md:flex flex-1 min-h-0">
-          <ResizablePanelGroup
-            onLayoutChanged={(sizes) => {
-              if (sizes.input) setResizableSize(sizes.input);
-            }}
-            orientation="horizontal"
-          >
-            <div style={{ display: switchView ? "none" : "contents" }}>
-              <ResizablePanel
-                id="input"
-                collapsedSize={resizableSize}
-                minSize="20%"
-                defaultSize="40%"
-              >
-                {input}
-              </ResizablePanel>
-              <Separator orientation="vertical" />
-            </div>
-            <ResizablePanel
-              id="preview"
-              collapsedSize={100 - resizableSize}
-              minSize="20%"
-              defaultSize="60%"
-            >
-              {preview}
-            </ResizablePanel>
-          </ResizablePanelGroup>
-        </div>
-      )}
     </div>
   );
 }

@@ -98,6 +98,7 @@ export function EditorInput({
         defaultValue={textAreaContent}
         onMount={handleEditorDidMount}
         onChange={handleChange}
+        theme="markdown-math-theme"
         options={{
           readOnly: !editable,
           links: false,
