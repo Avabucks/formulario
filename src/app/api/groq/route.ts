@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
       : prompt;
 
     const completion = await groq.chat.completions.create({
-      model: "llama-3.1-8b-instant",
+      model: "openai/gpt-oss-120b",
       temperature: 0.5,
       messages: [
         { role: "system", content: SYSTEM_INSTRUCTION },
