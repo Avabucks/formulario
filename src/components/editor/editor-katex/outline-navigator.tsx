@@ -45,7 +45,18 @@ export function OutlineNavigator({
     if (!navigatorVisible || !activeHeadingId) return;
 
     const list = navigatorListRef.current;
-    const activeButton = list?.querySelector<HTMLButtonElement>(
+    if (!list) return;
+
+    const isFirst = headings.length > 0 && activeHeadingId === headings[0].id;
+    if (isFirst) {
+      list.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+      return;
+    }
+
+    const activeButton = list.querySelector<HTMLButtonElement>(
       `[data-heading-id="${activeHeadingId}"]`,
     );
 
@@ -53,7 +64,7 @@ export function OutlineNavigator({
       block: "nearest",
       inline: "nearest",
     });
-  }, [activeHeadingId, navigatorVisible]);
+  }, [activeHeadingId, navigatorVisible, headings]);
 
   if (headings.length === 0) return null;
 
@@ -87,7 +98,7 @@ export function OutlineNavigator({
               type="button"
               data-heading-id={heading.id}
               onClick={() => onHeadingClick(heading)}
-              className={`relative flex min-h-7 w-full items-center rounded-md py-1 pr-2 text-left text-[11px] transition-all duration-150 ${
+              className={`relative flex min-h-7 w-full items-center rounded-md py-1 pr-2 text-left text-[11px] ${
                 activeHeadingId === heading.id
                   ? "text-primary bg-primary/10 shadow-xs"
                   : "text-muted-foreground hover:bg-muted/40 hover:text-foreground"
@@ -96,7 +107,7 @@ export function OutlineNavigator({
               title={heading.title}
             >
               {activeHeadingId === heading.id && (
-                <span className="absolute left-2 w-0.5 h-3 rounded-full bg-primary" />
+                <span className="absolute left-1.5 w-0.5 h-3 rounded-full bg-primary" />
               )}
               <span className="line-clamp-2 leading-4">
                 <InlineLatex>{heading.sourceTitle}</InlineLatex>
@@ -108,7 +119,7 @@ export function OutlineNavigator({
 
       {/* Dash Outline Minimap */}
       <div
-        className="absolute right-6 top-1/2 -translate-y-1/2 z-10 flex flex-col items-end gap-1.5 py-4 px-2 rounded-full bg-background/25 border border-transparent shadow-xs backdrop-blur-xs transition-all duration-300 group/outline max-h-[70vh] overflow-y-auto scrollbar-none"
+        className="absolute right-6 top-1/2 -translate-y-1/2 z-10 flex flex-col items-end gap-1.5 py-4 px-2 rounded-full backdrop-blur-xs transition-all duration-300 group/outline max-h-[70vh] overflow-y-auto scrollbar-none"
         style={{ scrollbarWidth: "none" }}
         onMouseEnter={() => {
           navigatorHoverRef.current = true;
@@ -126,10 +137,10 @@ export function OutlineNavigator({
             key={heading.id}
             type="button"
             onClick={() => onHeadingClick(heading)}
-            className={`z-10 h-[2px] rounded-full transition-all duration-200 focus:outline-none ${
+            className={`z-10 h-0.5 rounded-full focus:outline-none ${
               activeHeadingId === heading.id
                 ? "bg-primary opacity-100 scale-y-150 shadow-[0_0_6px_hsl(var(--primary)/0.4)]"
-                : "bg-muted-foreground/30 group-hover/outline:bg-muted-foreground/50 hover:!bg-primary/80 opacity-60 hover:opacity-100 hover:scale-y-150"
+                : "bg-muted-foreground/30 group-hover/outline:bg-muted-foreground/50 hover:bg-primary/80! opacity-60 hover:opacity-100 hover:scale-y-150"
             }`}
             style={{
               width: `${getDashWidth(heading.level)}px`,

@@ -456,7 +456,7 @@ export function EditorPage({
                   onClick={() => setShowAI(!showAI)}
                   className="h-8 gap-1.5 select-none cursor-pointer"
                 >
-                  <Sparkles size={14} className={showAI ? "animate-pulse" : ""} />
+                  <Sparkles size={14} />
                   <span>{"Chiedi all'AI"}</span>
                 </Button>
               </TooltipTrigger>

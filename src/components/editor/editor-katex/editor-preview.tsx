@@ -312,6 +312,15 @@ export const EditorPreview = memo(function EditorPreview({
     clickTimeRef.current = Date.now();
     setActiveHeadingId(heading.id);
 
+    const isFirst = headings.length > 0 && heading.id === headings[0].id;
+    if (isFirst) {
+      container.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+      return;
+    }
+
     const containerTop = container.getBoundingClientRect().top;
     const headingTop = heading.element.getBoundingClientRect().top;
     const nextScrollTop =
@@ -325,7 +334,7 @@ export const EditorPreview = memo(function EditorPreview({
       top: Math.max(0, nextScrollTop),
       behavior: "smooth",
     });
-  }, []);
+  }, [headings]);
   const previewMarkdown = () => (
     <div
       ref={contentRef}
