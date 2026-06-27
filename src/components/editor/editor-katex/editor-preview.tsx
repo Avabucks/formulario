@@ -173,7 +173,7 @@ export const EditorPreview = memo(function EditorPreview({
       cancelAnimationFrame(frame);
       observer.disconnect();
     };
-  }, [fitMode, computeFitScale]);
+  }, [fitMode, computeFitScale, isMobile]);
 
   useEffect(() => {
     const init = () => {
@@ -188,7 +188,7 @@ export const EditorPreview = memo(function EditorPreview({
     };
 
     requestAnimationFrame(() => requestAnimationFrame(init));
-  }, [handleFitWidth]);
+  }, [handleFitWidth, isMobile]);
 
   const updateActiveHeading = useCallback(() => {
     const container = containerRef.current;
@@ -278,7 +278,7 @@ export const EditorPreview = memo(function EditorPreview({
     });
 
     return () => cancelAnimationFrame(frame);
-  }, [processedContent, markdownHeadings]);
+  }, [processedContent, markdownHeadings, isMobile]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -300,7 +300,7 @@ export const EditorPreview = memo(function EditorPreview({
       container.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", updateActiveHeading);
     };
-  }, [headings, showNavigatorTemporarily, updateActiveHeading]);
+  }, [headings, showNavigatorTemporarily, updateActiveHeading, isMobile]);
 
 
 
