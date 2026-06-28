@@ -243,9 +243,12 @@ export function EditorPage({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      const isZ = e.key.toLowerCase() === "z";
-      const isY = e.key.toLowerCase() === "y";
-      const isA = e.key.toLowerCase() === "a";
+      const isZ = e.key.toLowerCase() === "z" || e.code === "KeyZ";
+      const isY = e.key.toLowerCase() === "y" || e.code === "KeyY";
+      const isA = e.key.toLowerCase() === "a" || e.code === "KeyA";
+      const isDigit1 = e.key === "1" || e.code === "Digit1";
+      const isDigit2 = e.key === "2" || e.code === "Digit2";
+      const isDigit3 = e.key === "3" || e.code === "Digit3";
 
       if (isZ && (e.ctrlKey || e.metaKey) && !e.shiftKey) {
         e.preventDefault();
@@ -262,10 +265,22 @@ export function EditorPage({
         e.preventDefault();
         setShowAI((prev) => !prev);
       }
+      if (e.altKey) {
+        if (isDigit1) {
+          e.preventDefault();
+          setSwitchView("edit");
+        } else if (isDigit2 && !isMobile) {
+          e.preventDefault();
+          setSwitchView("divided");
+        } else if (isDigit3) {
+          e.preventDefault();
+          setSwitchView("preview");
+        }
+      }
     };
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [handleUndo, handleRedo, editable]);
+  }, [handleUndo, handleRedo, editable, isMobile]);
 
   useEffect(() => {
     if (!monacoRef.current) return;
