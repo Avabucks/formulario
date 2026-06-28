@@ -316,7 +316,7 @@ export function EditorPage({
                   size="icon"
                   onClick={handleUndo}
                   onMouseDown={(e) => e.preventDefault()}
-                  className="size-7 rounded-md text-muted-foreground hover:text-foreground"
+                  className="size-7 rounded-mdtext-foreground"
                 >
                   <Undo2 size={15} />
                 </Button>
@@ -343,7 +343,7 @@ export function EditorPage({
                   size="icon"
                   onClick={handleRedo}
                   onMouseDown={(e) => e.preventDefault()}
-                  className="size-7 rounded-md text-muted-foreground hover:text-foreground"
+                  className="size-7 rounded-mdtext-foreground"
                 >
                   <Redo2 size={15} />
                 </Button>
@@ -374,7 +374,7 @@ export function EditorPage({
 
         {switchView !== "preview" && !isMobile && (
           <>
-            <div className="h-6 w-[1px] bg-border/60 mx-1 shrink-0" />
+            <div className="h-6 w-px bg-border mx-1 shrink-0" />
 
             {/* Formatting Tray */}
             <div className="flex items-center gap-1 p-0.5 overflow-x-auto scrollbar-none max-w-full">
@@ -399,7 +399,7 @@ export function EditorPage({
                 isFocused={isFocused}
               />
 
-              <div className="w-[1px] h-4 bg-border/60 mx-1 shrink-0" />
+              <div className="w-px h-4 bg-border mx-1 shrink-0" />
 
               <FormattingOrderedList
                 _selection={selection}
@@ -411,19 +411,22 @@ export function EditorPage({
                 editorRef={editorRef}
                 isFocused={isFocused}
               />
+
+              <div className="w-px h-4 bg-border mx-1 shrink-0" />
+
               <FormattingDivider
                 _selection={selection}
                 editorRef={editorRef}
                 isFocused={isFocused}
               />
-
-              <div className="w-[1px] h-4 bg-border/60 mx-1 shrink-0" />
-
               <FormattingTable
                 _selection={selection}
                 editorRef={editorRef}
                 isFocused={isFocused}
               />
+
+              <div className="w-px h-4 bg-border mx-1 shrink-0" />
+
               <FormattingCodeInline
                 _selection={selection}
                 editorRef={editorRef}
@@ -434,6 +437,9 @@ export function EditorPage({
                 editorRef={editorRef}
                 isFocused={isFocused}
               />
+
+              <div className="w-px h-4 bg-border mx-1 shrink-0" />
+
               <FormattingLatex
                 _selection={selection}
                 editorRef={editorRef}
@@ -473,9 +479,9 @@ export function EditorPage({
             </Tooltip>
           </TooltipProvider>
         )}
-        <div className="h-6 w-[1px] bg-border/60" />
+        <div className="h-6 w-[1px] bg-border" />
         {viewTabs}
-        <div className="h-6 w-[1px] bg-border/60" />
+        <div className="h-6 w-[1px] bg-border" />
         <FormularioSettings formularioId={formularioId} />
       </div>
     </div>
@@ -524,7 +530,7 @@ export function EditorPage({
               {/* Right: View Selector & Settings */}
               <div className="flex items-center gap-3 shrink-0">
                 {viewTabs}
-                <div className="h-6 w-[1px] bg-border/60" />
+                <div className="h-6 w-[1px] bg-border" />
                 <FormularioSettings formularioId={formularioId} />
               </div>
             </div>

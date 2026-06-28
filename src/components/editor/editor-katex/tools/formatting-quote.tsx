@@ -59,11 +59,8 @@ export function FormattingQuote({
     return () => disposable.dispose();
   }, [isFocused, editorRef.current]);
 
-  if (checkActiveLatexOrCode(editorRef) && isFocused) return null;
-
   return (
-    <>
-      <TooltipProvider>
+    <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
             <Toggle
@@ -91,7 +88,5 @@ export function FormattingQuote({
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      <Separator orientation="vertical" />
-    </>
   );
 }

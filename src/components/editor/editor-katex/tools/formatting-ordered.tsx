@@ -53,8 +53,6 @@ export function FormattingOrderedList({
     return () => disposable.dispose();
   }, [isFocused, editorRef.current]);
 
-  if (checkActiveLatexOrCode(editorRef) && isFocused) return null;
-
   return (
     <TooltipProvider>
       <Tooltip>

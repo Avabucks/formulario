@@ -90,13 +90,6 @@ export function FormattingCodeBlock({
     return () => disposable.dispose();
   }, [isFocused, editorRef.current]);
 
-  if (
-    (getIsActiveLatex(editorRef) ||
-      (getIsActiveWord(editorRef, getCodeInlineRegex) && !isActive)) &&
-    isFocused
-  )
-    return null;
-
   return (
     <>
       <TooltipProvider>
@@ -176,7 +169,6 @@ export function FormattingCodeBlock({
           </CommandList>
         </Command>
       </CommandDialog>
-      <Separator orientation="vertical" />
     </>
   );
 }

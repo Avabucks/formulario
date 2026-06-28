@@ -63,17 +63,8 @@ export function FormattingDivider({
     return () => disposable.dispose();
   }, [isFocused, editorRef.current]);
 
-  if (
-    (checkActiveLatexOrCode(editorRef) ||
-      getIsActiveLatex(editorRef) ||
-      getIsActiveWord(editorRef, getCodeInlineRegex)) &&
-    isFocused
-  )
-    return null;
-
   return (
-    <>
-      <TooltipProvider>
+    <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
             <Toggle
@@ -101,7 +92,5 @@ export function FormattingDivider({
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      <Separator orientation="vertical" />
-    </>
   );
 }

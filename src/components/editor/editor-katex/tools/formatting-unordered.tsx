@@ -54,11 +54,8 @@ export function FormattingUnorderedList({
     return () => disposable.dispose();
   }, [isFocused, editorRef.current]);
 
-  if (checkActiveLatexOrCode(editorRef) && isFocused) return null;
-
   return (
-    <>
-      <TooltipProvider>
+    <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
             <Toggle
@@ -86,7 +83,5 @@ export function FormattingUnorderedList({
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      <Separator orientation="vertical" />
-    </>
   );
 }
