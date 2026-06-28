@@ -88,10 +88,10 @@ export function FormattingTable({
     if (!editor) return;
 
     const disposable = editor.onKeyDown((e) => {
+      const isKeyT = e.browserEvent.key.toLowerCase() === "t" || e.code === "KeyT";
       if (
-        (e.ctrlKey || e.metaKey) &&
-        e.shiftKey &&
-        e.browserEvent.key === ";" &&
+        e.altKey &&
+        isKeyT &&
         isFocused
       ) {
         e.preventDefault();
@@ -123,11 +123,9 @@ export function FormattingTable({
             <div className="flex items-center gap-2">
               Tabella
               <KbdGroup className="hidden md:flex">
-                <Kbd>Ctrl</Kbd>
+                <Kbd>Alt</Kbd>
                 <span>+</span>
-                <Kbd>Shift</Kbd>
-                <span>+</span>
-                <Kbd>;</Kbd>
+                <Kbd>T</Kbd>
               </KbdGroup>
             </div>
           </TooltipContent>
