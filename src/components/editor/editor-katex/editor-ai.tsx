@@ -89,7 +89,13 @@ export function EditorAI({
       { id: aiMessageId, sender: "ai", status: "loading" },
     ]);
 
-    const currentContext = editorRef.current?.getValue() ?? "";
+    const lastAiSuggestion = [...messages]
+      .reverse()
+      .find((msg) => msg.sender === "ai" && msg.status === "success" && msg.suggestedContent);
+
+    const currentContext = (lastAiSuggestion && !lastAiSuggestion.applied && !lastAiSuggestion.discarded)
+      ? (lastAiSuggestion.suggestedContent ?? "")
+      : (editorRef.current?.getValue() ?? "");
 
     try {
       const res = await fetch("/api/groq", {
@@ -98,6 +104,7 @@ export function EditorAI({
         body: JSON.stringify({
           prompt: userPrompt,
           context: currentContext,
+          messages: messages,
         }),
       });
 
