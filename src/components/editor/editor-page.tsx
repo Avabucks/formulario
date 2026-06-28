@@ -81,6 +81,7 @@ export function EditorPage({
   const [loading, setLoading] = useState<boolean>(true);
   const [edited, setEdited] = useState<boolean>(false);
   const [switchView, setSwitchView] = useState<"preview" | "divided" | "edit">("preview");
+  const [hasSetInitialView, setHasSetInitialView] = useState<boolean>(false);
   const [showAI, setShowAI] = useState<boolean>(false);
   const [isAiExpanded, setIsAiExpanded] = useState<boolean>(false);
   const [saveLoading, setSaveLoading] = useState<boolean>(false);
@@ -228,6 +229,16 @@ export function EditorPage({
     }
     setMarkdownContent(textAreaContent);
   }, [edited]);
+
+  useEffect(() => {
+    if (!loading && !hasSetInitialView) {
+      const content = textAreaContent ?? "";
+      if (content.trim() === "") {
+        setSwitchView(isMobile ? "edit" : "divided");
+      }
+      setHasSetInitialView(true);
+    }
+  }, [loading, isMobile, textAreaContent, hasSetInitialView]);
 
   useEffect(() => {
     if (isMobile && switchView === "divided") {
