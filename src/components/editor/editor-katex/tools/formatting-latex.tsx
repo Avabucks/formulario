@@ -307,13 +307,6 @@ export function FormattingLatex({
     return () => disposable.dispose();
   }, [isFocused, editorRef.current]);
 
-  if (
-    (getIsActiveCode(editorRef) ||
-      getIsActiveWord(editorRef, getCodeInlineRegex)) &&
-    isFocused
-  )
-    return null;
-
   return (
     <>
       {/* Toggle $ — nascosto se block o double attivi */}

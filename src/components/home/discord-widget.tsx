@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 
 import {
@@ -218,6 +219,7 @@ interface FloatingAvatar {
 }
 
 export default function DiscordWidget() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [popupDisabled, setPopupDisabled] = useState(false);
   const [members, setMembers] = useState<DiscordMember[]>([]);
@@ -279,6 +281,8 @@ export default function DiscordWidget() {
     setPopupDisabled(true);
     setOpen(false);
   };
+
+  if (pathname.startsWith("/editor")) return null;
 
   return (
     <>

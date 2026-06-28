@@ -55,12 +55,6 @@ export function FormattingCodeInline({
     return () => disposable.dispose();
   }, [isFocused, editorRef.current]);
 
-  if (
-    (checkActiveLatexOrCode(editorRef) || getIsActiveLatex(editorRef)) &&
-    isFocused
-  )
-    return null;
-
   return (
     <TooltipProvider>
       <Tooltip>

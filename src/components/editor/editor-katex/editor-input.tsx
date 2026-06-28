@@ -15,6 +15,10 @@ export function EditorInput({
   setEdited,
   handleEditorDidMount,
   editable,
+  saveLoading,
+  setSaveLoading,
+  saveError,
+  setSaveError,
 }: Readonly<{
   argomentoId: string;
   textAreaContent: string;
@@ -26,15 +30,16 @@ export function EditorInput({
     monaco: Monaco,
   ) => void;
   editable: boolean;
+  saveLoading: boolean;
+  setSaveLoading: (value: boolean) => void;
+  saveError: boolean;
+  setSaveError: (value: boolean) => void;
 }>) {
   const router = useRouter();
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
-
   const save = (content: string) => {
-    setLoading(true);
-    setError(false);
+    setSaveLoading(true);
+    setSaveError(false);
     fetch("/api/editor/save", {
       method: "POST",
       body: JSON.stringify({ argomentoId, content }),
@@ -42,15 +47,15 @@ export function EditorInput({
     })
       .then(async (res) => {
         if (!res.ok) {
-          setError(true);
+          setSaveError(true);
           const text = await res.text();
           throw new Error(text);
         }
         router.refresh();
       })
-      .catch(() => setError(true))
+      .catch(() => setSaveError(true))
       .finally(() => {
-        setLoading(false);
+        setSaveLoading(false);
         setEdited(false);
       });
   };
@@ -79,8 +84,8 @@ export function EditorInput({
 
   useEffect(() => {
     if (!edited) return;
-    setLoading(true);
-    setError(false);
+    setSaveLoading(true);
+    setSaveError(false);
     const timeout = setTimeout(() => save(textAreaContent), 1000);
     return () => clearTimeout(timeout);
   }, [textAreaContent]);
@@ -92,12 +97,13 @@ export function EditorInput({
 
   return (
     <div className="relative h-full overflow-hidden group">
-      <NavigationBlocker blocked={loading} />
+      <NavigationBlocker blocked={saveLoading} />
       <Editor
         defaultLanguage="markdown-math"
         defaultValue={textAreaContent}
         onMount={handleEditorDidMount}
         onChange={handleChange}
+        theme="markdown-math-theme"
         options={{
           readOnly: !editable,
           links: false,
@@ -108,36 +114,36 @@ export function EditorInput({
         }}
         loading={<Spinner />}
       />
-      {loading ? (
-        <div className="absolute right-3 bottom-3">
-          <Spinner />
-        </div>
-      ) : (
-        <SyncStatus error={error} loading={loading} />
-      )}
     </div>
   );
 }
 
-const SyncStatus = ({
+export const SyncStatus = ({
   error,
   loading,
 }: {
   error: boolean;
   loading: boolean;
 }) => {
+  if (loading)
+    return (
+      <div className="absolute right-6 bottom-3 flex items-center justify-center bg-muted/80 text-muted-foreground rounded-md p-1.5 backdrop-blur-xs">
+        <Spinner className="size-3.5" />
+      </div>
+    );
+
   if (error)
     return (
-      <div className="absolute right-3 bottom-3 flex items-center gap-1.5 bg-destructive/10 text-destructive rounded-md px-2 py-1 text-xs group-hover:opacity-30 duration-300">
+      <div className="absolute right-6 bottom-3 flex items-center gap-1.5 bg-destructive/10 text-destructive rounded-md px-2 py-1 text-xs">
         <AlertTriangle className="size-3.5" />
-        <span>Modifiche non sincronizzate</span>
+        <span>Non sincronizzato</span>
       </div>
     );
 
   return (
-    <div className="absolute right-3 bottom-3 flex items-center gap-1.5 bg-green-100 text-green-700 border border-green-200 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20 rounded-md px-2 py-1 text-xs group-hover:opacity-30 duration-300">
+    <div className="absolute right-6 bottom-3 flex items-center gap-1.5 bg-green-100 text-green-700 border border-green-200 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20 rounded-md px-2 py-1 text-xs">
       <CheckCheck className="size-3.5" />
-      <span>Modifiche sincronizzate</span>
+      <span>Sincronizzato</span>
     </div>
   );
 };

@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { prompt, context } = await req.json();
+    const { prompt, context, messages } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
       return NextResponse.json(
@@ -53,17 +53,39 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const apiMessages: any[] = [
+      { role: "system", content: SYSTEM_INSTRUCTION },
+    ];
+
+    if (messages && Array.isArray(messages)) {
+      for (const msg of messages) {
+        if (msg.status === "loading" || msg.status === "error") {
+          continue;
+        }
+
+        if (msg.sender === "user") {
+          if (msg.text?.trim()) {
+            apiMessages.push({ role: "user", content: msg.text.trim() });
+          }
+        } else if (msg.sender === "ai") {
+          const content = msg.suggestedContent ?? msg.text;
+          if (content?.trim()) {
+            apiMessages.push({ role: "assistant", content: content.trim() });
+          }
+        }
+      }
+    }
+
     const userMessage = context?.trim()
       ? `Documento:\n${context}\n\nRichiesta di modifica: ${prompt}`
       : prompt;
 
+    apiMessages.push({ role: "user", content: userMessage });
+
     const completion = await groq.chat.completions.create({
       model: "openai/gpt-oss-120b",
       temperature: 0.5,
-      messages: [
-        { role: "system", content: SYSTEM_INSTRUCTION },
-        { role: "user", content: userMessage },
-      ],
+      messages: apiMessages,
     });
 
     const usage = completion.usage;

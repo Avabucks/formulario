@@ -167,8 +167,6 @@ export function FormattingHeaders({
     return () => disposable.dispose();
   }, [isFocused, editorRef.current]);
 
-  if (checkActiveLatexOrCode(editorRef) && isFocused) return null;
-
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>

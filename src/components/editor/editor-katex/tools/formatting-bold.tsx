@@ -56,14 +56,6 @@ export function FormattingBold({
     return () => disposable.dispose();
   }, [isFocused, editorRef.current]);
 
-  if (
-    (checkActiveLatexOrCode(editorRef) ||
-      getIsActiveLatex(editorRef) ||
-      getIsActiveWord(editorRef, getCodeInlineRegex)) &&
-    isFocused
-  )
-    return null;
-
   return (
     <TooltipProvider>
       <Tooltip>
