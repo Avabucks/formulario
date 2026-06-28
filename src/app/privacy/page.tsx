@@ -5,8 +5,11 @@ import { Footer } from "@/src/components/landing/footer";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: `Privacy - ${packageJson.displayName}`,
-  description: `Crea, organizza e condividi i tuoi formulari e cheat sheet con ${packageJson.displayName}. Usa l'editor avanzato e l'assistente AI per generare formule e appunti in pochi secondi.`,
+  title: `Privacy Policy - ${packageJson.displayName}`,
+  description: `Informativa sul trattamento dei dati personali (Privacy Policy) di ${packageJson.displayName} ai sensi del Regolamento (UE) 2016/679 (GDPR).`,
+  alternates: {
+    canonical: "/privacy",
+  },
 };
 
 export default function PrivacyPage() {

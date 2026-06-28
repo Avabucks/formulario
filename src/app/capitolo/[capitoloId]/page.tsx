@@ -91,7 +91,7 @@ export default async function Capitolo({
   // Check if user has access to the capitolo (owner or public)
   const { rows: capitoloRows, rowCount } = await pool.query(
     `SELECT C.beautiful_id AS "id", COALESCE(C.titolo, 'Senza titolo') AS "titolo", C.formulario,
-            F.titolo AS "formularioTitolo", F.owner_uid as "ownerUid", U_A.display_name AS "nomeAutore", F.beautiful_id AS "formularioId"
+            F.titolo AS "formularioTitolo", F.descrizione AS "formularioDescrizione", F.visibility, F.owner_uid as "ownerUid", U_A.display_name AS "nomeAutore", F.beautiful_id AS "formularioId"
             FROM capitoli C
             JOIN formulari F ON F.beautiful_id = C.formulario
             LEFT JOIN users U_A ON F.author_uid = U_A.uid
@@ -178,8 +178,37 @@ export default async function Capitolo({
     </div>
   );
 
+  const showSchema = capitolo.visibility === 2;
+  const jsonLd = showSchema
+    ? {
+        "@context": "https://schema.org",
+        "@type": "CreativeWork",
+        name: `${capitolo.titolo} - ${capitolo.formularioTitolo}`,
+        description:
+          capitolo.formularioDescrizione ||
+          `Capitolo "${capitolo.titolo}" del formulario "${capitolo.formularioTitolo}".`,
+        author: {
+          "@type": "Person",
+          name: capitolo.nomeAutore || "FormulaBase User",
+        },
+        publisher: {
+          "@type": "Organization",
+          name: "FormulaBase",
+          url:
+            process.env.NEXT_PUBLIC_APP_URL ||
+            "https://formulario-five.vercel.app",
+        },
+      }
+    : null;
+
   return (
     <>
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
       <Header />
       <div className="flex flex-col gap-4 w-full px-2 md:px-6 pt-16 pb-5">
         <BreadcrumbLogic items={breadcrumbs} />

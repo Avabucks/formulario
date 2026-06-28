@@ -26,7 +26,10 @@ const SORT_MAP = {
 
 export const metadata: Metadata = {
   title: `Community - ${packageJson.displayName}`,
-  description: `Crea, organizza e condividi i tuoi formulari e cheat sheet con ${packageJson.displayName}. Usa l'editor avanzato e l'assistente AI per generare formule e appunti in pochi secondi.`,
+  description: `Esplora la community di ${packageJson.displayName}. Trova, consulta e condividi formulari, cheat sheet e formule di matematica, fisica e altre materie scientifiche.`,
+  alternates: {
+    canonical: "/community",
+  },
 };
 
 export default async function Capitolo({
