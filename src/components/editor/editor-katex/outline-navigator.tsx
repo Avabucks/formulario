@@ -72,7 +72,7 @@ export function OutlineNavigator({
     <>
       {/* Popover */}
       <div
-        className={`absolute right-15 top-1/2 -translate-y-1/2 z-10 max-h-[70vh] w-52 overflow-hidden rounded-xl border border-border/40 bg-background/85 shadow-lg backdrop-blur-md transition duration-300 ${
+        className={`absolute right-11 top-1/2 -translate-y-1/2 z-10 max-h-[70vh] w-52 overflow-hidden rounded-xl border border-border/40 bg-background shadow-lg transition duration-300 ${
           navigatorVisible
             ? "pointer-events-auto opacity-100 translate-x-0"
             : "pointer-events-none opacity-0 translate-x-1.5"
@@ -119,7 +119,7 @@ export function OutlineNavigator({
 
       {/* Dash Outline Minimap */}
       <div
-        className="absolute right-6 top-1/2 -translate-y-1/2 z-10 flex flex-col items-end gap-1.5 py-4 px-2 rounded-full backdrop-blur-xs transition-all duration-300 group/outline max-h-[70vh] overflow-y-auto scrollbar-none"
+        className="absolute right-5  bg-background top-1/2 -translate-y-1/2 z-10 flex flex-col items-end gap-1.5 transition-all duration-300 group/outline max-h-[70vh] overflow-y-auto scrollbar-none"
         style={{ scrollbarWidth: "none" }}
         onMouseEnter={() => {
           navigatorHoverRef.current = true;
