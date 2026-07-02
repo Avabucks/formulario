@@ -37,6 +37,7 @@
     {
       "title": "Editor",
       "shortcuts": [
+        { "label": "Tavolozza comandi", "keys": ["Ctrl", "Space"] },
         { "label": "Salva", "keys": ["Ctrl", "S"] },
         { "label": "Annulla", "keys": ["Ctrl", "Z"] },
         { "label": "Ripristina", "keys": ["Ctrl", "Y"] },
