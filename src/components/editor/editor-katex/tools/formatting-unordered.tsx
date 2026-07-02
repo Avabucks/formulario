@@ -25,12 +25,10 @@ export const toggleUnorderedList = (
 
 export function FormattingUnorderedList({
   editorRef,
-  isFocused,
   onSelect,
 }: Readonly<{
   _selection: Selection | null;
   editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
-  isFocused: boolean;
   onSelect?: () => void;
 }>) {
   const handleToggle = () => {

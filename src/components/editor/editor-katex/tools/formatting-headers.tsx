@@ -3,7 +3,6 @@
 import { CommandItem, CommandShortcut } from "@/src/components/ui/command";
 import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
 import {
-  checkActiveLatexOrCode,
   getH1Regex,
   getH2Regex,
   getH3Regex,
@@ -11,7 +10,7 @@ import {
   getH5Regex,
   getH6Regex,
   getIsActiveList,
-  handleListToggle,
+  handleListToggle
 } from "@/src/lib/editor/formatting-utils";
 import {
   Heading1,
@@ -50,7 +49,6 @@ export const toggleHeading = (
 
 function HeadingToggle({
   editorRef,
-  isFocused,
   getRegex,
   icon: Icon,
   label,
@@ -59,7 +57,6 @@ function HeadingToggle({
   onToggle,
 }: Readonly<{
   editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
-  isFocused: boolean;
   getRegex: () => RegExp;
   icon: React.ElementType;
   label: string;
@@ -84,8 +81,6 @@ function HeadingToggle({
     setTimeout(() => editorRef.current?.focus(), 0);
   };
 
-  if (checkActiveLatexOrCode(editorRef) && isFocused) return null;
-
   return (
     <CommandItem
       onSelect={handleToggle}
@@ -108,12 +103,10 @@ function HeadingToggle({
 
 export function FormattingHeaders({
   editorRef,
-  isFocused,
   onSelect,
 }: Readonly<{
   _selection: Selection | null;
   editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
-  isFocused: boolean;
   onSelect?: () => void;
 }>) {
   const onToggle = onSelect ?? (() => {});
@@ -122,7 +115,6 @@ export function FormattingHeaders({
     <>
       <HeadingToggle
         editorRef={editorRef}
-        isFocused={isFocused}
         getRegex={getH1Regex}
         icon={Heading1}
         label="Titolo 1"
@@ -132,7 +124,6 @@ export function FormattingHeaders({
       />
       <HeadingToggle
         editorRef={editorRef}
-        isFocused={isFocused}
         getRegex={getH2Regex}
         icon={Heading2}
         label="Titolo 2"
@@ -142,7 +133,6 @@ export function FormattingHeaders({
       />
       <HeadingToggle
         editorRef={editorRef}
-        isFocused={isFocused}
         getRegex={getH3Regex}
         icon={Heading3}
         label="Titolo 3"
@@ -152,7 +142,6 @@ export function FormattingHeaders({
       />
       <HeadingToggle
         editorRef={editorRef}
-        isFocused={isFocused}
         getRegex={getH4Regex}
         icon={Heading4}
         label="Titolo 4"
@@ -162,7 +151,6 @@ export function FormattingHeaders({
       />
       <HeadingToggle
         editorRef={editorRef}
-        isFocused={isFocused}
         getRegex={getH5Regex}
         icon={Heading5}
         label="Titolo 5"
@@ -172,7 +160,6 @@ export function FormattingHeaders({
       />
       <HeadingToggle
         editorRef={editorRef}
-        isFocused={isFocused}
         getRegex={getH6Regex}
         icon={Heading6}
         label="Titolo 6"

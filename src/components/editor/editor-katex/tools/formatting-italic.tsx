@@ -26,12 +26,10 @@ export const toggleItalic = (
 
 export function FormattingItalic({
   editorRef,
-  isFocused,
   onSelect,
 }: Readonly<{
   _selection: Selection | null;
   editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
-  isFocused: boolean;
   onSelect?: () => void;
 }>) {
   const handleToggle = () => {
