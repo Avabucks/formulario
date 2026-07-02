@@ -1,6 +1,7 @@
 "use client";
 
 import { useIsMobile } from "@/src/hooks/useIsMobile";
+import clsx from "clsx";
 import {
   Columns2,
   Eye,
@@ -13,6 +14,7 @@ import type { Selection } from "monaco-editor";
 import { useEffect, useRef, useState } from "react";
 import { FormularioSettings } from "../home/formulario-settings";
 import { TakeFormulario } from "../home/take-formulario";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Kbd, KbdGroup, useIsMac } from "../ui/kbd";
 import { Spinner } from "../ui/spinner";
@@ -27,9 +29,7 @@ import { EditorAI } from "./editor-katex/editor-ai";
 import { EditorInput, SyncStatus } from "./editor-katex/editor-input";
 import { EditorPreview } from "./editor-katex/editor-preview";
 import { FormattingCommand } from "./editor-katex/formatting-command";
-import { FormattingLatex } from "./editor-katex/tools/formatting-latex";
 import { ShortcutsListener } from "./editor-katex/shortcuts-listener";
-import clsx from "clsx";
 
 const MIN_RESIZABLE_SIZE = 20;
 const MAX_RESIZABLE_SIZE = 80;
@@ -43,6 +43,7 @@ export function EditorPage({
 
   const [textAreaContent, setTextAreaContent] = useState<string>("");
   const [markdownContent, setMarkdownContent] = useState<string>("");
+  const [user, setUser] = useState<{ display_name: string; foto_profilo: string } | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [edited, setEdited] = useState<boolean>(false);
   const [switchView, setSwitchView] = useState<"preview" | "divided" | "edit">("preview");
@@ -117,6 +118,7 @@ export function EditorPage({
       const data = await response.json();
       setTextAreaContent(data.content);
       setMarkdownContent(data.content);
+      setUser({ display_name: data.display_name, foto_profilo: data.foto_profilo });
       setLoading(false);
     } catch (error: any) {
       console.error(error.message);
@@ -199,6 +201,29 @@ export function EditorPage({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [handleUndo, handleRedo, editable, isMobile]);
 
+  const titleComponent = () => {
+    if (switchView === "preview" || !editable) return (
+      <div className="hidden md:flex items-center gap-3 py-1 rounded-md bg-background/50">
+        <Avatar className="h-7 w-7">
+          <AvatarImage src={user?.foto_profilo} alt={user?.display_name} />
+          <AvatarFallback className="text-xs font-medium">
+            {user?.display_name?.charAt(0)?.toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
+
+        <h1 className="text-sm font-medium text-foreground truncate">
+          {(() => {
+            const firstLine = markdownContent.split("\n", 1)[0]?.trim();
+
+            return firstLine?.startsWith("#")
+              ? firstLine.replace(/^#+\s*/, "")
+              : "Senza Titolo";
+          })()}
+        </h1>
+      </div>
+    )
+    return null;
+  }
 
   const viewTabs = (
     <Tabs value={switchView} onValueChange={(val) => setSwitchView(val as any)} className="gap-0 select-none shrink-0">
@@ -292,29 +317,20 @@ export function EditorPage({
           </TooltipProvider>
         </div>
 
-        {switchView !== "preview" && !isMobile && (
-          <>
-            <div className="h-6 w-px bg-border mx-1 shrink-0" />
+        <div className="h-6 w-px bg-border mx-1 shrink-0" />
 
-            {/* Formatting Tray */}
-            <div className="flex items-center gap-1 p-0.5 overflow-x-auto scrollbar-none max-w-full">
-              <FormattingCommand
-                _selection={selection}
-                editorRef={editorRef}
-                isFocused={isFocused}
-              />
-
-              <div className="w-px h-4 bg-border mx-1 shrink-0" />
-
-              <FormattingLatex
-                _selection={selection}
-                editorRef={editorRef}
-                isFocused={isFocused}
-              />
-            </div>
-          </>
+        {switchView !== "preview" && (
+          <FormattingCommand
+            _selection={selection}
+            editorRef={editorRef}
+            isFocused={isFocused}
+          />
         )}
+
+        {titleComponent()}
+
       </div>
+
 
       {/* Right: View Selector & Settings */}
       <div className="flex items-center gap-3 shrink-0">
@@ -329,7 +345,7 @@ export function EditorPage({
                   className="h-8 gap-1.5 select-none cursor-pointer"
                 >
                   <Sparkles size={14} />
-                  <span>{"Chiedi all'AI"}</span>
+                  <span className="hidden md:flex -mr-1.25">Chiedi all'</span> AI
                 </Button>
               </TooltipTrigger>
               <TooltipContent className="pr-1.5">
@@ -387,6 +403,8 @@ export function EditorPage({
         {/* Left: TakeFormulario */}
         <div className="flex items-center gap-3 shrink-0">
           <TakeFormulario formularioId={formularioId} />
+          <div className="h-6 w-px bg-border" />
+          {titleComponent()}
         </div>
 
         {/* Center spacer */}
@@ -398,6 +416,7 @@ export function EditorPage({
           <div className="h-6 w-px bg-border" />
           <FormularioSettings formularioId={formularioId} />
         </div>
+
       </div>
     );
   };

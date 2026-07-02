@@ -67,14 +67,13 @@ export function FormattingCommand({
           <TooltipTrigger asChild>
             <Button
               variant="outline"
-              size="icon"
-              className="h-8 w-8"
               onClick={() => setActiveDialog(!activeDialog)}
               disabled={!isFocused}
               onMouseDown={(e) => e.preventDefault()}
               aria-label="Apri tavolozza comandi"
             >
               <ChevronRight size={16} />
+              Esegui<span className="hidden md:flex"> Comando</span>
             </Button>
           </TooltipTrigger>
           <TooltipContent className="pr-1.5">
