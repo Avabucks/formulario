@@ -24,7 +24,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/src/components/ui/tooltip";
-import { ChevronRight, SquareTerminal, Radical, SquareRadical } from "lucide-react";
+import { ChevronRight, SquareTerminal, Radical, SquareRadical, Table } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 
 import { FormattingBold } from "./tools/formatting-bold";
@@ -37,6 +37,7 @@ import { FormattingOrderedList } from "./tools/formatting-ordered";
 import { FormattingQuote } from "./tools/formatting-quote";
 import { FormattingUnorderedList } from "./tools/formatting-unordered";
 import { FormattingLatex } from "./tools/formatting-latex";
+import { FormattingTable } from "./tools/formatting-table";
 import { useEffect, useState, useRef } from "react";
 
 export function FormattingCommand({
@@ -168,6 +169,24 @@ export function FormattingCommand({
                   editorRef={editorRef}
                   onSelect={handleSelect}
                 />
+                <CommandItem
+                  onSelect={() => {
+                    shouldPreventCloseFocus.current = true;
+                    handleSelect();
+                    window.dispatchEvent(new CustomEvent("editor:open-table"));
+                  }}
+                  className="flex items-center gap-2 cursor-pointer"
+                >
+                  <Table size={14} />
+                  <span>Tabella</span>
+                  <CommandShortcut className="ml-auto">
+                    <KbdGroup>
+                      <Kbd>Alt</Kbd>
+                      <span>+</span>
+                      <Kbd>T</Kbd>
+                    </KbdGroup>
+                  </CommandShortcut>
+                </CommandItem>
               </CommandGroup>
 
               {/* Categoria Codice */}
@@ -249,6 +268,7 @@ export function FormattingCommand({
 
       <FormattingCodeBlock editorRef={editorRef} />
       <FormattingLatex editorRef={editorRef} onlyDialog />
+      <FormattingTable editorRef={editorRef} onlyDialog />
     </>
   );
 }

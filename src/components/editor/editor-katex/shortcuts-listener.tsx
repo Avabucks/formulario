@@ -72,8 +72,18 @@ export function ShortcutsListener({
     const disposable = editor.onKeyDown((e) => {
       if (!isFocused) return;
 
+      if (e.altKey) {
+        const isKeyT = e.browserEvent.key.toLowerCase() === "t" || e.code === "KeyT";
+        if (isKeyT) {
+          e.preventDefault();
+          e.stopPropagation();
+          window.dispatchEvent(new CustomEvent("editor:open-table"));
+        }
+        return;
+      }
+
       const hasMeta = e.ctrlKey || e.metaKey;
-      if (!hasMeta || e.altKey) return;
+      if (!hasMeta) return;
 
       const key = e.browserEvent.key.toLowerCase();
       const code = e.code;

@@ -21,19 +21,19 @@ import {
   AlignRight,
   AlignJustify,
 } from "lucide-react";
-import type { editor, Selection } from "monaco-editor";
+import type { editor } from "monaco-editor";
 import { useEffect, useState } from "react";
 
 type TableAlignment = "default" | "left" | "center" | "right";
 
 export function FormattingTable({
-  _selection,
   editorRef,
-  isFocused,
+  isFocused = false,
+  onlyDialog = false,
 }: Readonly<{
-  _selection: Selection | null;
   editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
-  isFocused: boolean;
+  isFocused?: boolean;
+  onlyDialog?: boolean;
 }>) {
   const [open, setOpen] = useState(false);
   const [rows, setRows] = useState(3);
@@ -82,7 +82,9 @@ export function FormattingTable({
     const editor = editorRef.current;
     if (!editor) return;
 
-    const controller = editor.getContribution("snippetController2") as any;
+    const controller = editor.getContribution("snippetController2") as {
+      insert: (text: string) => void;
+    } | null;
     if (!controller) return;
 
     const position = editor.getPosition();
@@ -100,23 +102,107 @@ export function FormattingTable({
   };
 
   useEffect(() => {
-    const editor = editorRef.current;
-    if (!editor) return;
+    const handleOpen = () => {
+      setOpen(true);
+    };
+    window.addEventListener("editor:open-table", handleOpen);
+    return () => {
+      window.removeEventListener("editor:open-table", handleOpen);
+    };
+  }, []);
 
-    const disposable = editor.onKeyDown((e) => {
-      const isKeyT = e.browserEvent.key.toLowerCase() === "t" || e.code === "KeyT";
-      if (
-        e.altKey &&
-        isKeyT &&
-        isFocused
-      ) {
-        e.preventDefault();
-        e.stopPropagation();
-        setOpen((v) => !v);
-      }
-    });
-    return () => disposable.dispose();
-  }, [isFocused, editorRef.current]);
+  const dialog = (
+    <CommandDialog
+      open={open}
+      onOpenChange={(v) => {
+        setOpen(v);
+        if (!v) setTimeout(() => editorRef.current?.focus(), 0);
+      }}
+      className="max-w-[280px]"
+    >
+      <div
+        className="flex flex-col gap-4 p-4 outline-hidden"
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            insertTable(rows, cols, withHeader, align);
+          }
+        }}
+      >
+        <p className="text-sm font-semibold">Inserisci tabella</p>
+
+        <div className="grid grid-cols-2 gap-x-3 gap-y-3 items-center">
+          <Label className="text-xs text-muted-foreground">Righe</Label>
+          <NumberStepper value={rows} onChange={setRows} min={1} max={20} />
+
+          <Label className="text-xs text-muted-foreground">Colonne</Label>
+          <NumberStepper value={cols} onChange={setCols} min={1} max={10} />
+
+          <Label className="text-xs text-muted-foreground">Allineamento</Label>
+          <div className="flex items-center gap-1 justify-end">
+            {[
+              { value: "default", label: "Default", icon: AlignJustify },
+              { value: "left", label: "Sinistra", icon: AlignLeft },
+              { value: "center", label: "Centro", icon: AlignCenter },
+              { value: "right", label: "Destra", icon: AlignRight },
+            ].map((item) => {
+              const Icon = item.icon;
+              const isSelected = align === item.value;
+              return (
+                <TooltipProvider key={item.value}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Toggle
+                        size="sm"
+                        variant="outline"
+                        pressed={isSelected}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => setAlign(item.value as TableAlignment)}
+                        className={`h-7 w-7 p-0 ${
+                          isSelected ? "bg-muted text-foreground" : ""
+                        }`}
+                      >
+                        <Icon size={12} />
+                      </Toggle>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <span className="text-xs">{item.label}</span>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <Label
+            htmlFor="with-header"
+            className="text-xs text-muted-foreground cursor-pointer"
+          >
+            Intestazione
+          </Label>
+          <Switch
+            id="with-header"
+            checked={withHeader}
+            onCheckedChange={setWithHeader}
+          />
+        </div>
+
+        <Button
+          size="sm"
+          onClick={() => insertTable(rows, cols, withHeader, align)}
+          className="w-full"
+        >
+          Inserisci
+        </Button>
+      </div>
+    </CommandDialog>
+  );
+
+  if (onlyDialog) {
+    return dialog;
+  }
 
   return (
     <>
@@ -147,92 +233,7 @@ export function FormattingTable({
         </Tooltip>
       </TooltipProvider>
 
-      <CommandDialog
-        open={open}
-        onOpenChange={(v) => {
-          setOpen(v);
-          if (!v) setTimeout(() => editorRef.current?.focus(), 0);
-        }}
-        className="max-w-[280px]"
-      >
-        <div
-          className="flex flex-col gap-4 p-4 outline-hidden"
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              insertTable(rows, cols, withHeader, align);
-            }
-          }}
-        >
-          <p className="text-sm font-semibold">Inserisci tabella</p>
-
-          <div className="grid grid-cols-2 gap-x-3 gap-y-3 items-center">
-            <Label className="text-xs text-muted-foreground">Righe</Label>
-            <NumberStepper value={rows} onChange={setRows} min={1} max={20} />
-
-            <Label className="text-xs text-muted-foreground">Colonne</Label>
-            <NumberStepper value={cols} onChange={setCols} min={1} max={10} />
-
-            <Label className="text-xs text-muted-foreground">Allineamento</Label>
-            <div className="flex items-center gap-1 justify-end">
-              {[
-                { value: "default", label: "Default", icon: AlignJustify },
-                { value: "left", label: "Sinistra", icon: AlignLeft },
-                { value: "center", label: "Centro", icon: AlignCenter },
-                { value: "right", label: "Destra", icon: AlignRight },
-              ].map((item) => {
-                const Icon = item.icon;
-                const isSelected = align === item.value;
-                return (
-                  <TooltipProvider key={item.value}>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Toggle
-                          size="sm"
-                          variant="outline"
-                          pressed={isSelected}
-                          onMouseDown={(e) => e.preventDefault()}
-                          onClick={() => setAlign(item.value as TableAlignment)}
-                          className={`h-7 w-7 p-0 ${
-                            isSelected ? "bg-muted text-foreground" : ""
-                          }`}
-                        >
-                          <Icon size={12} />
-                        </Toggle>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <span className="text-xs">{item.label}</span>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <Label
-              htmlFor="with-header"
-              className="text-xs text-muted-foreground cursor-pointer"
-            >
-              Intestazione
-            </Label>
-            <Switch
-              id="with-header"
-              checked={withHeader}
-              onCheckedChange={setWithHeader}
-            />
-          </div>
-
-          <Button
-            size="sm"
-            onClick={() => insertTable(rows, cols, withHeader, align)}
-            className="w-full"
-          >
-            Inserisci
-          </Button>
-        </div>
-      </CommandDialog>
+      {dialog}
     </>
   );
 }
