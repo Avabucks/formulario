@@ -33,11 +33,9 @@ import { useEffect, useState } from "react";
 export function FormattingCommand({
   _selection,
   editorRef,
-  isFocused,
 }: Readonly<{
   _selection: Selection | null;
   editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
-  isFocused: boolean;
 }>) {
   const [activeDialog, setActiveDialog] = useState<boolean>(false);
 
@@ -47,14 +45,14 @@ export function FormattingCommand({
 
     const disposable = editor.onKeyDown((e) => {
       const isSpace = e.browserEvent.key === " " || e.browserEvent.code === "Space";
-      if ((e.ctrlKey || e.metaKey) && isSpace && isFocused) {
+      if ((e.ctrlKey || e.metaKey) && isSpace) {
         e.preventDefault();
         e.stopPropagation();
         setActiveDialog(!activeDialog);
       }
     });
     return () => disposable.dispose();
-  }, [isFocused, editorRef, activeDialog]);
+  }, [editorRef, activeDialog]);
 
   const handleSelect = () => {
     setActiveDialog(false);
@@ -68,7 +66,6 @@ export function FormattingCommand({
             <Button
               variant="outline"
               onClick={() => setActiveDialog(!activeDialog)}
-              disabled={!isFocused}
               onMouseDown={(e) => e.preventDefault()}
               aria-label="Apri tavolozza comandi"
             >

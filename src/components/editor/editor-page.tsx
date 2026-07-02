@@ -323,7 +323,6 @@ export function EditorPage({
           <FormattingCommand
             _selection={selection}
             editorRef={editorRef}
-            isFocused={isFocused}
           />
         )}
 
