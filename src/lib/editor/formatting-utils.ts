@@ -227,6 +227,41 @@ export function handleListToggle(
   editor.focus();
 }
 
+// --- Refactored Code Block Helpers ---
+
+interface CodeBlock {
+  startLine: number;
+  endLine: number;
+  language: string | null;
+}
+
+function findCodeBlocks(model: editor.ITextModel, maxLine: number): CodeBlock[] {
+  const blocks: CodeBlock[] = [];
+  let startLine: number | null = null;
+  let language: string | null = null;
+
+  for (let l = 1; l <= model.getLineCount(); l++) {
+    const content = model.getLineContent(l).trim();
+
+    if (startLine === null) {
+      if (content.startsWith("```")) {
+        const suffix = content.slice(3).trim();
+        language = suffix.length > 0 ? suffix : null;
+        startLine = l;
+      }
+    } else if (content === "```") {
+      blocks.push({ startLine, endLine: l, language });
+      startLine = null;
+      language = null;
+    }
+
+    if (l > maxLine && startLine === null) {
+      break;
+    }
+  }
+  return blocks;
+}
+
 export function getIsActiveCode(
   editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
 ): { language: string | null } | null {
@@ -235,28 +270,160 @@ export function getIsActiveCode(
 
   const { model, selection } = ctx;
   const cursorLine = selection.startLineNumber;
-  let blockStart: number | null = null;
-  let language: string | null = null;
+  const blocks = findCodeBlocks(model, cursorLine);
 
-  for (let l = 1; l <= model.getLineCount(); l++) {
-    const content = model.getLineContent(l).trim();
+  const activeBlock = blocks.find(
+    (b) => cursorLine >= b.startLine && cursorLine < b.endLine,
+  );
 
-    if (blockStart === null) {
-      if (content.startsWith("```")) {
-        const suffix = content.slice(3).trim();
-        language = suffix.length > 0 ? suffix : null;
-        blockStart = l;
-      }
-    } else if (content === "```") {
-        if (cursorLine >= blockStart && cursorLine < l) return { language };
-        blockStart = null;
-        language = null;
-      }
+  return activeBlock ? { language: activeBlock.language } : null;
+}
 
-    if (l > cursorLine && blockStart === null) break;
+function wrapInBlock(
+  editor: editor.IStandaloneCodeEditor,
+  model: editor.ITextModel,
+  selection: Selection,
+  openMarker: string,
+  closeMarker: string,
+) {
+  const endLine = getAdjustedEndLine(selection);
+  const startCol = 1;
+  const endCol = model.getLineContent(endLine).length + 1;
+
+  const selectedText = model.getValueInRange({
+    startLineNumber: selection.startLineNumber,
+    startColumn: startCol,
+    endLineNumber: endLine,
+    endColumn: endCol,
+  });
+
+  const newText = `${openMarker}\n${selectedText}\n${closeMarker}`;
+
+  model.pushEditOperations(
+    [],
+    [
+      {
+        range: {
+          startLineNumber: selection.startLineNumber,
+          startColumn: startCol,
+          endLineNumber: endLine,
+          endColumn: endCol,
+        },
+        text: newText,
+      },
+    ],
+    () => null,
+  );
+
+  const newEndLine = selection.startLineNumber + selectedText.split("\n").length;
+  const newEndCol = closeMarker.length + 1;
+  editor.setSelection({
+    startLineNumber: newEndLine,
+    startColumn: newEndCol,
+    endLineNumber: newEndLine,
+    endColumn: newEndCol,
+  });
+  editor.focus();
+}
+
+function findOpenLine(
+  model: editor.ITextModel,
+  startLine: number,
+  openMarker: string,
+): number {
+  for (let l = startLine; l >= 1; l--) {
+    const lineContent = model.getLineContent(l).trim();
+    if (
+      lineContent === openMarker ||
+      (lineContent.startsWith(openMarker) && lineContent.length > openMarker.length)
+    ) {
+      return l;
+    }
   }
+  return -1;
+}
 
-  return null;
+function findCloseLine(
+  model: editor.ITextModel,
+  startLine: number,
+  closeMarker: string,
+): number {
+  const totalLines = model.getLineCount();
+  for (let l = startLine; l <= totalLines; l++) {
+    if (model.getLineContent(l).trim() === closeMarker) {
+      return l;
+    }
+  }
+  return -1;
+}
+
+function updateBlockLanguage(
+  editor: editor.IStandaloneCodeEditor,
+  model: editor.ITextModel,
+  openLine: number,
+  openMarker: string,
+  newLanguage: string | null,
+) {
+  const newOpenLine = newLanguage ? `${openMarker}${newLanguage}` : openMarker;
+  const currentLineLength = model.getLineContent(openLine).length;
+  model.pushEditOperations(
+    [],
+    [
+      {
+        range: {
+          startLineNumber: openLine,
+          startColumn: 1,
+          endLineNumber: openLine,
+          endColumn: currentLineLength + 1,
+        },
+        text: newOpenLine,
+      },
+    ],
+    () => null,
+  );
+  editor.focus();
+}
+
+function unwrapBlock(
+  editor: editor.IStandaloneCodeEditor,
+  model: editor.ITextModel,
+  openLine: number,
+  closeLine: number,
+) {
+  const totalLines = model.getLineCount();
+  const edits = [
+    {
+      range: {
+        startLineNumber: closeLine,
+        startColumn: 1,
+        endLineNumber: closeLine < totalLines ? closeLine + 1 : closeLine,
+        endColumn: closeLine < totalLines ? 1 : model.getLineContent(closeLine).length + 1,
+      },
+      text: "",
+    },
+    {
+      range: {
+        startLineNumber: openLine,
+        startColumn: 1,
+        endLineNumber: openLine + 1,
+        endColumn: 1,
+      },
+      text: "",
+    },
+  ];
+
+  model.pushEditOperations([], edits, () => null);
+
+  const newEndLine = closeLine - 2;
+  const safeEndLine = Math.max(1, Math.min(newEndLine, model.getLineCount()));
+  const endCol = model.getLineContent(safeEndLine).length + 1;
+  editor.setSelection({
+    startLineNumber: safeEndLine,
+    startColumn: endCol,
+    endLineNumber: safeEndLine,
+    endColumn: endCol,
+  });
+  setTimeout(() => editor.focus(), 0);
 }
 
 export function handleBlockToggle(
@@ -270,158 +437,40 @@ export function handleBlockToggle(
   if (!ctx) return;
 
   const { editor, model, selection } = ctx;
-  const totalLines = model.getLineCount();
 
   if (blockState === null) {
-    // Calcola la selezione escludendo il trailing newline vuoto
-    const endLine = getAdjustedEndLine(selection);
-
-    const startCol = 1;
-    const endCol = model.getLineContent(endLine).length + 1;
-
-    const selectedText = model.getValueInRange({
-      startLineNumber: selection.startLineNumber,
-      startColumn: startCol,
-      endLineNumber: endLine,
-      endColumn: endCol,
-    });
-
-    const newText = `${openMarker}\n${selectedText}\n${closeMarker}`;
-
-    model.pushEditOperations(
-      [],
-      [
-        {
-          range: {
-            startLineNumber: selection.startLineNumber,
-            startColumn: startCol,
-            endLineNumber: endLine,
-            endColumn: endCol,
-          },
-          text: newText,
-        },
-      ],
-      () => null,
-    );
-
-    // Cursore alla fine del blocco inserito
-    const newEndLine =
-      selection.startLineNumber + selectedText.split("\n").length;
-    const newEndCol = closeMarker.length + 1;
-    editor.setSelection({
-      startLineNumber: newEndLine,
-      startColumn: newEndCol,
-      endLineNumber: newEndLine,
-      endColumn: newEndCol,
-    });
-    editor.focus();
-  } else {
-    // Trova le righe dei marker (apertura può avere suffisso lingua)
-    let openLine = -1;
-    for (let l = selection.startLineNumber; l >= 1; l--) {
-      const lineContent = model.getLineContent(l).trim();
-      if (
-        lineContent === openMarker ||
-        (lineContent.startsWith(openMarker) &&
-          lineContent.length > openMarker.length)
-      ) {
-        openLine = l;
-        break;
-      }
-    }
-
-    // Se è richiesto solo l'aggiornamento del linguaggio, sostituisce la riga di apertura
-    if (newLanguage !== undefined && openLine !== -1) {
-      const newOpenLine = newLanguage
-        ? `${openMarker}${newLanguage}`
-        : openMarker;
-      const currentLineLength = model.getLineContent(openLine).length;
-      model.pushEditOperations(
-        [],
-        [
-          {
-            range: {
-              startLineNumber: openLine,
-              startColumn: 1,
-              endLineNumber: openLine,
-              endColumn: currentLineLength + 1,
-            },
-            text: newOpenLine,
-          },
-        ],
-        () => null,
-      );
-      editor.focus();
-      return;
-    }
-    let closeLine = -1;
-    for (let l = selection.endLineNumber; l <= totalLines; l++) {
-      if (model.getLineContent(l).trim() === closeMarker) {
-        closeLine = l;
-        break;
-      }
-    }
-    if (openLine === -1 || closeLine === -1) return;
-
-    const edits = [];
-
-    // Rimuove la riga di chiusura (prima, per non spostare gli indici)
-    edits.push(
-      {
-        range: {
-          startLineNumber: closeLine,
-          startColumn: 1,
-          endLineNumber: closeLine < totalLines ? closeLine + 1 : closeLine,
-          endColumn:
-            closeLine < totalLines
-              ? 1
-              : model.getLineContent(closeLine).length + 1,
-        },
-        text: "",
-      },
-      {
-        range: {
-          startLineNumber: openLine,
-          startColumn: 1,
-          endLineNumber: openLine + 1,
-          endColumn: 1,
-        },
-        text: "",
-      },
-    );
-
-    model.pushEditOperations([], edits, () => null);
-
-    // Riposiziona il cursore alla fine del contenuto rimasto
-    const newEndLine = closeLine - 2; // -2: rimossa apertura e chiusura
-    const safeEndLine = Math.max(1, Math.min(newEndLine, model.getLineCount()));
-    const endCol = model.getLineContent(safeEndLine).length + 1;
-    editor.setSelection({
-      startLineNumber: safeEndLine,
-      startColumn: endCol,
-      endLineNumber: safeEndLine,
-      endColumn: endCol,
-    });
-    setTimeout(() => editor.focus(), 0);
+    wrapInBlock(editor, model, selection, openMarker, closeMarker);
+    return;
   }
+
+  const openLine = findOpenLine(model, selection.startLineNumber, openMarker);
+  if (openLine === -1) return;
+
+  if (newLanguage !== undefined) {
+    updateBlockLanguage(editor, model, openLine, openMarker, newLanguage);
+    return;
+  }
+
+  const closeLine = findCloseLine(model, selection.endLineNumber, closeMarker);
+  if (closeLine === -1) return;
+
+  unwrapBlock(editor, model, openLine, closeLine);
 }
 
-export function getIsActiveLatex(
-  editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
-): {
+// --- Refactored Latex Helpers ---
+
+interface LatexMatch {
   kind: "single" | "double";
   matchIndex: number;
   matchEnd: number;
   lineNumber: number;
-} | null {
-  const ctx = getEditorContext(editorRef);
-  if (!ctx) return null;
+}
 
-  const { model, selection } = ctx;
-  const cursorLine = selection.startLineNumber;
-  const cursorCol = selection.startColumn; // 1-based (Monaco standard)
-  const lineContent = model.getLineContent(cursorLine);
-
+function getInlineLatexMatch(
+  lineContent: string,
+  lineNumber: number,
+  cursorCol: number,
+): LatexMatch | null {
   const inlinePatterns = [
     {
       regex: /\$\$(?:[\s\S]*?)\$\$/g,
@@ -433,37 +482,48 @@ export function getIsActiveLatex(
       kind: "single" as const,
       delimiterLen: 1,
     },
-    { regex: /(?<!\$)\$\$(?!\$)/g, kind: "single" as const, delimiterLen: 1 }, // Caso vuoto $ $
+    {
+      regex: /(?<!\$)\$\$(?!\$)/g,
+      kind: "single" as const,
+      delimiterLen: 1,
+    },
   ];
 
-  for (const pattern of inlinePatterns) {
+  for (const { regex, kind, delimiterLen } of inlinePatterns) {
+    regex.lastIndex = 0;
     let match: RegExpExecArray | null;
-    while ((match = pattern.regex.exec(lineContent)) !== null) {
-      const startCol = match.index + 1; // Converti in 1-based
+    while ((match = regex.exec(lineContent)) !== null) {
+      const startCol = match.index + 1;
       const endCol = startCol + match[0].length;
 
-      // Verifica: cursore DOPO i primi dollari e PRIMA degli ultimi
-      if (
-        cursorCol > startCol + pattern.delimiterLen - 1 &&
-        cursorCol <= endCol - pattern.delimiterLen
-      ) {
+      const afterStartDelimiter = cursorCol > startCol + delimiterLen - 1;
+      const beforeEndDelimiter = cursorCol <= endCol - delimiterLen;
+
+      if (afterStartDelimiter && beforeEndDelimiter) {
         return {
-          kind: pattern.kind,
+          kind,
           matchIndex: match.index,
           matchEnd: match.index + match[0].length,
-          lineNumber: cursorLine,
+          lineNumber,
         };
       }
     }
   }
+  return null;
+}
 
+function getBlockLatexMatch(
+  model: editor.ITextModel,
+  cursorLine: number,
+  cursorCol: number,
+): LatexMatch | null {
   const fullText = model.getValue();
   const blockRegex = /\$\$([\s\S]*?)\$\$/g;
-  let blockMatch: RegExpExecArray | null;
+  let match: RegExpExecArray | null;
 
-  while ((blockMatch = blockRegex.exec(fullText)) !== null) {
-    const startOffset = blockMatch.index;
-    const endOffset = startOffset + blockMatch[0].length;
+  while ((match = blockRegex.exec(fullText)) !== null) {
+    const startOffset = match.index;
+    const endOffset = startOffset + match[0].length;
 
     const startPos = model.getPositionAt(startOffset);
     const endPos = model.getPositionAt(endOffset);
@@ -477,20 +537,40 @@ export function getIsActiveLatex(
       (cursorLine === endPos.lineNumber && cursorCol <= endPos.column - 2);
 
     if (isStrictlyAfterStart && isStrictlyBeforeEnd) {
+      const isStartLine = cursorLine === startPos.lineNumber;
+      const isEndLine = cursorLine === endPos.lineNumber;
+
+      const matchIndex = isStartLine ? startPos.column - 1 : 0;
+      const matchEnd = isEndLine
+        ? endPos.column - 1
+        : model.getLineContent(cursorLine).length;
+
       return {
         kind: "double",
-        matchIndex:
-          cursorLine === startPos.lineNumber ? startPos.column - 1 : 0,
-        matchEnd:
-          cursorLine === endPos.lineNumber
-            ? endPos.column - 1
-            : model.getLineContent(cursorLine).length,
+        matchIndex,
+        matchEnd,
         lineNumber: cursorLine,
       };
     }
   }
-
   return null;
+}
+
+export function getIsActiveLatex(
+  editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
+): LatexMatch | null {
+  const ctx = getEditorContext(editorRef);
+  if (!ctx) return null;
+
+  const { model, selection } = ctx;
+  const cursorLine = selection.startLineNumber;
+  const cursorCol = selection.startColumn;
+  const lineContent = model.getLineContent(cursorLine);
+
+  const inlineMatch = getInlineLatexMatch(lineContent, cursorLine, cursorCol);
+  if (inlineMatch) return inlineMatch;
+
+  return getBlockLatexMatch(model, cursorLine, cursorCol);
 }
 
 export function checkActiveLatexOrCode(
