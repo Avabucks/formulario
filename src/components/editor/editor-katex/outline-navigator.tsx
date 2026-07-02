@@ -71,7 +71,7 @@ export function OutlineNavigator({
   return (
     <>
       {/* Popover */}
-      <div
+      <nav
         className={`absolute right-11 top-1/2 -translate-y-1/2 z-10 max-h-[70vh] w-52 overflow-hidden rounded-xl border border-border/40 bg-background shadow-lg transition duration-300 ${
           navigatorVisible
             ? "pointer-events-auto opacity-100 translate-x-0"
@@ -115,10 +115,10 @@ export function OutlineNavigator({
             </button>
           ))}
         </div>
-      </div>
+      </nav>
 
       {/* Dash Outline Minimap */}
-      <div
+      <nav
         className="absolute right-5  bg-background top-1/2 -translate-y-1/2 z-10 flex flex-col items-end gap-1.5 transition-all duration-300 group/outline max-h-[70vh] overflow-y-auto scrollbar-none"
         style={{ scrollbarWidth: "none" }}
         onMouseEnter={() => {
@@ -148,7 +148,7 @@ export function OutlineNavigator({
             title={heading.title}
           />
         ))}
-      </div>
+      </nav>
     </>
   );
 }

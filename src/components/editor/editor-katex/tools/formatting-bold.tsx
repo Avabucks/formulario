@@ -9,12 +9,9 @@ import {
   TooltipTrigger,
 } from "@/src/components/ui/tooltip";
 import {
-  checkActiveLatexOrCode,
   getBoldRegex,
-  getCodeInlineRegex,
-  getIsActiveLatex,
   getIsActiveWord,
-  handleWordToggle,
+  handleWordToggle
 } from "@/src/lib/editor/formatting-utils";
 import { Bold } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";

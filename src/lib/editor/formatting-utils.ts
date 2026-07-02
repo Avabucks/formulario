@@ -34,7 +34,7 @@ function getAdjustedEndLine(selection: Selection): number {
 
 // REGEX Helpers and Constants
 const makeHeaderRegex = (level: number) => () =>
-  new RegExp(`^${"#".repeat(level)}\\s(.+)$`, "gm");
+  new RegExp(String.raw`^${"#".repeat(level)}\s(.+)$`, "gm");
 
 export const getH1Regex = makeHeaderRegex(1);
 export const getH2Regex = makeHeaderRegex(2);
@@ -79,13 +79,11 @@ export function getIsActiveWord(
         cursorOffset < match.index + match[0].length
       )
         return true;
-    } else {
-      if (
+    } else if (
         startOffset >= match.index &&
         endOffset <= match.index + match[0].length
       )
         return true;
-    }
   }
   return false;
 }
@@ -249,13 +247,11 @@ export function getIsActiveCode(
         language = suffix.length > 0 ? suffix : null;
         blockStart = l;
       }
-    } else {
-      if (content === "```") {
+    } else if (content === "```") {
         if (cursorLine >= blockStart && cursorLine < l) return { language };
         blockStart = null;
         language = null;
       }
-    }
 
     if (l > cursorLine && blockStart === null) break;
   }

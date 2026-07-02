@@ -9,12 +9,9 @@ import {
   TooltipTrigger,
 } from "@/src/components/ui/tooltip";
 import {
-  checkActiveLatexOrCode,
-  getCodeInlineRegex,
-  getIsActiveLatex,
   getIsActiveWord,
   getItalicRegex,
-  handleWordToggle,
+  handleWordToggle
 } from "@/src/lib/editor/formatting-utils";
 import { Italic } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";

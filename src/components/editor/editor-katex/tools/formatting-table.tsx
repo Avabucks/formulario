@@ -16,12 +16,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/src/components/ui/tooltip";
-import {
-  checkActiveLatexOrCode,
-  getCodeInlineRegex,
-  getIsActiveLatex,
-  getIsActiveWord,
-} from "@/src/lib/editor/formatting-utils";
 import { Minus, Plus, Table } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useEffect, useState } from "react";
@@ -153,13 +147,11 @@ export function FormattingTable({
             >
               Intestazione
             </Label>
-            <span onMouseDown={(e) => e.preventDefault()}>
-              <Switch
-                id="with-header"
-                checked={withHeader}
-                onCheckedChange={setWithHeader}
-              />
-            </span>
+            <Switch
+              id="with-header"
+              checked={withHeader}
+              onCheckedChange={setWithHeader}
+            />
           </div>
 
           <Button size="sm" onClick={handleInsert}>

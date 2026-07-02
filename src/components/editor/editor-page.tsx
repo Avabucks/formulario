@@ -1,8 +1,6 @@
 "use client";
 
 import { useIsMobile } from "@/src/hooks/useIsMobile";
-import { getOrderedListRegex, getUnorderedListRegex } from "@/src/lib/editor/formatting-utils";
-import { Monaco } from "@monaco-editor/react";
 import {
   Columns2,
   Eye,
@@ -12,7 +10,6 @@ import {
   Undo2
 } from "lucide-react";
 import type { Selection } from "monaco-editor";
-import { useTheme } from "next-themes";
 import { useEffect, useRef, useState } from "react";
 import { FormularioSettings } from "../home/formulario-settings";
 import { TakeFormulario } from "../home/take-formulario";
@@ -40,35 +37,16 @@ import { FormattingOrderedList } from "./editor-katex/tools/formatting-ordered";
 import { FormattingQuote } from "./editor-katex/tools/formatting-quote";
 import { FormattingTable } from "./editor-katex/tools/formatting-table";
 import { FormattingUnorderedList } from "./editor-katex/tools/formatting-unordered";
+import clsx from "clsx";
 
-const darkRules = [
-  { token: "math.display", foreground: "4EC9B0" },
-  { token: "math.inline", foreground: "4EC9B0" },
-  { token: "math.content", foreground: "CE9178" },
-  { token: "markdown.blockquote", foreground: "6A9955" },
-  { token: "markdown.code.inline", foreground: "D7BA7D" },
-  { token: "markdown.code.block", foreground: "D7BA7D" },
-  { token: "strong", foreground: "C586C0" },
-  { token: "markup.bold.italic", foreground: "E06C75" },
-];
-
-const lightRules = [
-  { token: "math.display", foreground: "267F99" },
-  { token: "math.inline", foreground: "267F99" },
-  { token: "math.content", foreground: "A31515" },
-  { token: "markdown.blockquote", foreground: "008000" },
-  { token: "markdown.code.inline", foreground: "795E26" },
-  { token: "markdown.code.block", foreground: "795E26" },
-  { token: "strong", foreground: "7B2FBE" },
-  { token: "markup.bold.italic", foreground: "C0392B" },
-];
+const MIN_RESIZABLE_SIZE = 20;
+const MAX_RESIZABLE_SIZE = 80;
 
 export function EditorPage({
   argomentoId,
   editable,
   formularioId,
 }: Readonly<{ argomentoId: string; editable: boolean; formularioId: string }>) {
-  const { resolvedTheme } = useTheme();
   const isMobile = useIsMobile();
 
   const [textAreaContent, setTextAreaContent] = useState<string>("");
@@ -86,8 +64,6 @@ export function EditorPage({
   const [selection, setSelection] = useState<Selection | null>(null);
 
   const editorRef = useRef<any>(null);
-  const monacoRef = useRef<Monaco | null>(null);
-  const [monacoReady, setMonacoReady] = useState(false);
   const isMac = useIsMac();
 
   const undoBtnRef = useRef<HTMLButtonElement>(null);
@@ -104,7 +80,7 @@ export function EditorPage({
     const handleMouseMove = (moveEvent: MouseEvent) => {
       const deltaX = moveEvent.clientX - startX;
       const deltaPercent = (deltaX / containerWidth) * 100;
-      setResizableSize(Math.max(20, Math.min(80, startSize + deltaPercent)));
+      setResizableSize(Math.max(MIN_RESIZABLE_SIZE, Math.min(MAX_RESIZABLE_SIZE, startSize + deltaPercent)));
     };
 
     const handleMouseUp = () => {
@@ -116,86 +92,22 @@ export function EditorPage({
     document.addEventListener("mouseup", handleMouseUp);
   };
 
-  const updateSelection = (editor: any) => {
-    const sel = editor.getSelection();
-    if (!sel) return;
-    setSelection(sel);
+  const handleSliderKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    let newSize;
+    if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
+      newSize = Math.max(MIN_RESIZABLE_SIZE, resizableSize - 1);
+    } else if (e.key === "ArrowRight" || e.key === "ArrowUp") {
+      newSize = Math.min(MAX_RESIZABLE_SIZE, resizableSize + 1);
+    } else if (e.key === "Home") {
+      newSize = MIN_RESIZABLE_SIZE;
+    } else if (e.key === "End") {
+      newSize = MAX_RESIZABLE_SIZE;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    setResizableSize(newSize);
   };
-
-  function handleEditorDidMount(editor: any, monaco: Monaco) {
-    editorRef.current = editor;
-    monacoRef.current = monaco;
-
-    monaco.editor.defineTheme("markdown-math-theme", {
-      base: resolvedTheme === "dark" ? "vs-dark" : "vs",
-      inherit: true,
-      rules: resolvedTheme === "dark" ? darkRules : lightRules,
-      colors: {},
-    });
-    monaco.editor.setTheme("markdown-math-theme");
-
-    setMonacoReady(true);
-
-    monaco.languages.register({ id: "markdown-math" });
-
-    monaco.languages.setMonarchTokensProvider("markdown-math", {
-      tokenizer: {
-        root: [
-          [/\$\$/, { token: "math.display", next: "@mathDisplay" }],
-          [/\$/, { token: "math.inline", next: "@mathInline" }],
-          [/^#{1,6}\s.*$/, "keyword"],
-          [/^\s*>.*$/, "markdown.blockquote"],
-          [/\*\*[^*]+\*\*/, "strong"],
-          [/^(`{3,}).*$/, { token: "markdown.code.block", next: "@codeBlock" }],
-          [/`[^`]+`/, "markdown.code.inline"],
-        ],
-        mathDisplay: [
-          [/[^$]+/, "math.content"],
-          [/\$\$/, { token: "math.display", next: "@pop" }],
-        ],
-        mathInline: [
-          [/[^$]+/, "math.content"],
-          [/\$/, { token: "math.inline", next: "@pop" }],
-        ],
-        codeBlock: [
-          [/^`{3,}$/, { token: "markdown.code.block", next: "@pop" }],
-          [/.*$/, "markdown.code.block"],
-        ],
-      },
-    });
-
-    editor.onDidChangeCursorSelection(() => updateSelection(editor));
-    editor.onDidChangeCursorPosition(() => updateSelection(editor));
-
-    editor.onDidBlurEditorWidget(() => {
-      setIsFocused(false);
-    });
-
-    editor.onDidFocusEditorWidget(() => {
-      setIsFocused(true);
-    });
-
-    editor.onKeyDown((e: any) => {
-      handleListEnter(editor, monaco, e);
-    });
-
-
-    const updateButtons = () => {
-      const model = editor.getModel();
-
-      if (model) {
-        if (undoBtnRef.current) undoBtnRef.current.disabled = !model.canUndo();
-        if (redoBtnRef.current) redoBtnRef.current.disabled = !model.canRedo();
-      }
-    };
-
-    editor.onDidChangeModelContent(() => {
-      updateButtons();
-    });
-    updateButtons();
-    if (undoBtnRef.current) undoBtnRef.current.disabled = true;
-    if (redoBtnRef.current) redoBtnRef.current.disabled = true;
-  }
 
   const handleUndo = () => {
     editorRef.current?.trigger("source", "undo", null);
@@ -253,58 +165,48 @@ export function EditorPage({
   }, [editable, showAI]);
 
   useEffect(() => {
+    const handleViewShortcut = (e: KeyboardEvent) => {
+      if (e.key === "1" || e.code === "Digit1") {
+        e.preventDefault();
+        setSwitchView("edit");
+      } else if ((e.key === "2" || e.code === "Digit2") && !isMobile) {
+        e.preventDefault();
+        setSwitchView("divided");
+      } else if (e.key === "3" || e.code === "Digit3") {
+        e.preventDefault();
+        setSwitchView("preview");
+      }
+    };
+
     const handleKeyDown = (e: KeyboardEvent) => {
       const isZ = e.key.toLowerCase() === "z" || e.code === "KeyZ";
       const isY = e.key.toLowerCase() === "y" || e.code === "KeyY";
       const isA = e.key.toLowerCase() === "a" || e.code === "KeyA";
-      const isDigit1 = e.key === "1" || e.code === "Digit1";
-      const isDigit2 = e.key === "2" || e.code === "Digit2";
-      const isDigit3 = e.key === "3" || e.code === "Digit3";
+      const hasMeta = e.ctrlKey || e.metaKey;
 
-      if (isZ && (e.ctrlKey || e.metaKey) && !e.shiftKey) {
+      if (isZ && hasMeta && !e.shiftKey) {
         e.preventDefault();
         handleUndo();
+        return;
       }
-      if (
-        (isY && (e.ctrlKey || e.metaKey) && !e.shiftKey) ||
-        (isZ && (e.ctrlKey || e.metaKey) && e.shiftKey)
-      ) {
+      if ((isY && hasMeta && !e.shiftKey) || (isZ && hasMeta && e.shiftKey)) {
         e.preventDefault();
         handleRedo();
+        return;
       }
       if (isA && e.altKey && editable) {
         e.preventDefault();
         setShowAI((prev) => !prev);
+        return;
       }
       if (e.altKey) {
-        if (isDigit1) {
-          e.preventDefault();
-          setSwitchView("edit");
-        } else if (isDigit2 && !isMobile) {
-          e.preventDefault();
-          setSwitchView("divided");
-        } else if (isDigit3) {
-          e.preventDefault();
-          setSwitchView("preview");
-        }
+        handleViewShortcut(e);
       }
     };
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [handleUndo, handleRedo, editable, isMobile]);
 
-  useEffect(() => {
-    if (!monacoRef.current) return;
-
-    monacoRef.current.editor.defineTheme("markdown-math-theme", {
-      base: resolvedTheme === "dark" ? "vs-dark" : "vs",
-      inherit: true,
-      rules: resolvedTheme === "dark" ? darkRules : lightRules,
-      colors: {},
-    });
-
-    monacoRef.current.editor.setTheme("markdown-math-theme");
-  }, [resolvedTheme, monacoReady]);
 
   const viewTabs = (
     <Tabs value={switchView} onValueChange={(val) => setSwitchView(val as any)} className="gap-0 select-none shrink-0">
@@ -522,7 +424,11 @@ export function EditorPage({
       setTextAreaContent={setTextAreaContent}
       edited={edited}
       setEdited={setEdited}
-      handleEditorDidMount={handleEditorDidMount}
+      editorRef={editorRef}
+      setSelection={setSelection}
+      setIsFocused={setIsFocused}
+      undoBtnRef={undoBtnRef}
+      redoBtnRef={redoBtnRef}
       editable={editable}
       saveLoading={saveLoading}
       setSaveLoading={setSaveLoading}
@@ -533,6 +439,31 @@ export function EditorPage({
 
   const input = !loading && editor;
 
+  const editorHeader = () => {
+    if (editable) {
+      return toolbar;
+    }
+
+    return (
+      <div className="flex w-full border-b bg-background/95 backdrop-blur-xs min-h-15 items-center justify-between px-4 py-2 gap-4 overflow-x-auto select-none">
+        {/* Left: TakeFormulario */}
+        <div className="flex items-center gap-3 shrink-0">
+          <TakeFormulario formularioId={formularioId} />
+        </div>
+
+        {/* Center spacer */}
+        <div className="flex-1" />
+
+        {/* Right: View Selector & Settings */}
+        <div className="flex items-center gap-3 shrink-0">
+          {viewTabs}
+          <div className="h-6 w-px bg-border" />
+          <FormularioSettings formularioId={formularioId} />
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="flex flex-1 flex-col min-h-0 border rounded-lg overflow-hidden">
       {loading ? (
@@ -540,30 +471,8 @@ export function EditorPage({
           <Spinner />
         </div>
       ) : (
-        <>
-          {editable ? (
-            toolbar
-          ) : (
-            <div className="flex w-full border-b bg-background/95 backdrop-blur-xs min-h-15 items-center justify-between px-4 py-2 gap-4 overflow-x-auto select-none">
-              {/* Left: TakeFormulario */}
-              <div className="flex items-center gap-3 shrink-0">
-                <TakeFormulario formularioId={formularioId} />
-              </div>
-
-              {/* Center spacer */}
-              <div className="flex-1" />
-
-              {/* Right: View Selector & Settings */}
-              <div className="flex items-center gap-3 shrink-0">
-                {viewTabs}
-                <div className="h-6 w-[1px] bg-border" />
-                <FormularioSettings formularioId={formularioId} />
-              </div>
-            </div>
-          )}
-        </>
+        editorHeader()
       )}
-
 
       <div className="flex flex-1 min-h-0 w-full relative overflow-hidden">
         {/* Main Area: Editor and/or Preview */}
@@ -582,8 +491,14 @@ export function EditorPage({
           {/* Divider */}
           {!isMobile && switchView === "divided" && (
             <div
-              className="w-1 bg-border/50 hover:bg-muted-foreground/30 hover:w-1.5 transition-all cursor-col-resize h-full select-none"
+              className="w-1 bg-border/50 hover:bg-muted-foreground/30 hover:w-1.5 transition-all cursor-col-resize h-full select-none outline-none focus-visible:bg-primary/50"
               onMouseDown={handleMouseDown}
+              onKeyDown={handleSliderKeyDown}
+              role="slider"
+              aria-valuenow={resizableSize}
+              aria-valuemin={MIN_RESIZABLE_SIZE}
+              aria-valuemax={MAX_RESIZABLE_SIZE}
+              tabIndex={0}
             />
           )}
 
@@ -605,12 +520,17 @@ export function EditorPage({
 
         {/* AI Chat Sidebar */}
         {editable && (
-          <div className={`h-full border-l bg-background flex flex-col z-20 shrink-0 transition-all duration-300 shadow-lg ${isMobile
-              ? "absolute inset-0 w-full"
-              : isAiExpanded
-                ? "w-162.5"
-                : "w-87.5"
-            } ${showAI ? "" : "hidden"}`}>
+          <div
+            className={clsx(
+              "h-full border-l bg-background flex flex-col z-20 shrink-0 transition-all duration-300 shadow-lg",
+              {
+                "absolute inset-0 w-full": isMobile,
+                "w-162.5": !isMobile && isAiExpanded,
+                "w-87.5": !isMobile && !isAiExpanded,
+                hidden: !showAI,
+              }
+            )}
+          >
             <EditorAI
               editorRef={editorRef}
               onClose={() => setShowAI(false)}
@@ -622,101 +542,5 @@ export function EditorPage({
       </div>
     </div>
   );
-}
-
-function handleUnorderedList(
-  editor: any,
-  monaco: any,
-  position: any,
-  lineContent: string,
-  textBeforeCursor: string
-): boolean {
-  const match = new RegExp(getUnorderedListRegex()).exec(textBeforeCursor);
-  if (!match) return false;
-
-  const marker = match[0];
-  const isEmpty = textBeforeCursor === marker;
-  const text = isEmpty ? (new RegExp(/^\s*/).exec(marker)?.[0] || "") : ("\n" + marker);
-  const range = isEmpty
-    ? new monaco.Range(position.lineNumber, 1, position.lineNumber, lineContent.length + 1)
-    : new monaco.Range(position.lineNumber, position.column, position.lineNumber, position.column);
-
-  editor.executeEdits("list-autocomplete", [
-    {
-      range,
-      text,
-      forceMoveMarkers: true,
-    },
-  ]);
-
-  return true;
-}
-
-function handleOrderedList(
-  editor: any,
-  monaco: any,
-  position: any,
-  lineContent: string,
-  textBeforeCursor: string
-): boolean {
-  const match = new RegExp(getOrderedListRegex()).exec(textBeforeCursor);
-  if (!match) return false;
-
-  const marker = match[0];
-  const isEmpty = textBeforeCursor === marker;
-
-  let text = "";
-  let range;
-
-  if (isEmpty) {
-    text = new RegExp(/^\s*/).exec(marker)?.[0] || "";
-    range = new monaco.Range(position.lineNumber, 1, position.lineNumber, lineContent.length + 1);
-  } else {
-    const numMatch = new RegExp(/\d+/).exec(marker);
-    const nextNum = numMatch ? Number.parseInt(numMatch[0], 10) + 1 : 1;
-    const nextMarker = marker.replace(/\d+/, nextNum.toString());
-    text = "\n" + nextMarker;
-    range = new monaco.Range(position.lineNumber, position.column, position.lineNumber, position.column);
-  }
-
-  editor.executeEdits("list-autocomplete", [
-    {
-      range,
-      text,
-      forceMoveMarkers: true,
-    },
-  ]);
-
-  return true;
-}
-
-function handleListEnter(editor: any, monaco: any, e: any): boolean {
-  if (e.keyCode !== monaco.KeyCode.Enter) return false;
-
-  const selection = editor.getSelection();
-  if (!selection?.isEmpty()) return false;
-
-  const position = editor.getPosition();
-  if (!position) return false;
-
-  const model = editor.getModel();
-  if (!model) return false;
-
-  const lineContent = model.getLineContent(position.lineNumber);
-  const textBeforeCursor = lineContent.substring(0, position.column - 1);
-
-  if (handleUnorderedList(editor, monaco, position, lineContent, textBeforeCursor)) {
-    e.preventDefault();
-    e.stopPropagation();
-    return true;
-  }
-
-  if (handleOrderedList(editor, monaco, position, lineContent, textBeforeCursor)) {
-    e.preventDefault();
-    e.stopPropagation();
-    return true;
-  }
-
-  return false;
 }
 

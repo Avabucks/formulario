@@ -19,12 +19,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/src/components/ui/tooltip";
+import formulasData from "@/src/data/formulas.json";
 import {
-  getCodeInlineRegex,
-  getIsActiveCode,
-  getIsActiveLatex,
-  getIsActiveWord,
+  getIsActiveLatex
 } from "@/src/lib/editor/formatting-utils";
+import { loadAnalytics } from "@/src/lib/firebase";
+import { logEvent } from "firebase/analytics";
 import katex from "katex";
 import "katex/dist/katex.min.css";
 import {
@@ -36,9 +36,6 @@ import {
 import type { editor, Selection } from "monaco-editor";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import formulasData from "@/src/data/formulas.json";
-import { loadAnalytics } from "@/src/lib/firebase";
-import { logEvent } from "firebase/analytics";
 
 type SnippetController = {
   insert: (snippet: string) => void;
@@ -478,8 +475,7 @@ export function FormattingLatex({
                 </div>
 
                 <div className="flex items-center gap-2 text-xs text-muted-foreground/70">
-                  <span className="h-px w-8 bg-border" /> oppure
-                  <span className="h-px w-8 bg-border" />
+                  <span className="h-px w-8 bg-border" /> oppure <span className="h-px w-8 bg-border" />
                 </div>
                 <Button
                   onClick={() => handleFormulaSelect("")}

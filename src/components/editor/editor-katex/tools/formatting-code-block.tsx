@@ -1,6 +1,5 @@
 "use client";
 
-import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
 import {
   Command,
   CommandDialog,
@@ -11,6 +10,7 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/src/components/ui/command";
+import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
 import { Toggle } from "@/src/components/ui/toggle";
 import {
   Tooltip,
@@ -18,18 +18,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/src/components/ui/tooltip";
+import languages from "@/src/data/languages.json";
 import {
-  getCodeInlineRegex,
   getIsActiveCode,
-  getIsActiveLatex,
-  getIsActiveWord,
-  handleBlockToggle,
+  handleBlockToggle
 } from "@/src/lib/editor/formatting-utils";
 import { Code, SquareTerminal, X } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useEffect, useState } from "react";
-import { Separator } from "@/src/components/ui/separator";
-import languages from "@/src/data/languages.json";
 
 const OPEN_MARKER = "```";
 const CLOSE_MARKER = "```";

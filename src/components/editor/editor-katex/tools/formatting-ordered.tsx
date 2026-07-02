@@ -9,10 +9,9 @@ import {
   TooltipTrigger,
 } from "@/src/components/ui/tooltip";
 import {
-  checkActiveLatexOrCode,
   getIsActiveList,
   getOrderedListRegex,
-  handleListToggle,
+  handleListToggle
 } from "@/src/lib/editor/formatting-utils";
 import { ListOrdered } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";

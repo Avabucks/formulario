@@ -1,7 +1,6 @@
 "use client";
 
 import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
-import { Separator } from "@/src/components/ui/separator";
 import { Toggle } from "@/src/components/ui/toggle";
 import {
   Tooltip,
@@ -10,10 +9,9 @@ import {
   TooltipTrigger,
 } from "@/src/components/ui/tooltip";
 import {
-  checkActiveLatexOrCode,
   getIsActiveList,
   getQuoteRegex,
-  handleListToggle,
+  handleListToggle
 } from "@/src/lib/editor/formatting-utils";
 import { Quote } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
