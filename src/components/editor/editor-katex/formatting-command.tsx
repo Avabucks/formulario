@@ -20,13 +20,13 @@ import { ChevronRight } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 
 import { FormattingBold } from "./tools/formatting-bold";
+import { FormattingCodeBlock } from "./tools/formatting-code-block";
 import { FormattingCodeInline } from "./tools/formatting-code-inline";
 import { FormattingDivider } from "./tools/formatting-divider";
 import { FormattingHeaders } from "./tools/formatting-headers";
 import { FormattingItalic } from "./tools/formatting-italic";
 import { FormattingOrderedList } from "./tools/formatting-ordered";
 import { FormattingQuote } from "./tools/formatting-quote";
-import { FormattingTable } from "./tools/formatting-table";
 import { FormattingUnorderedList } from "./tools/formatting-unordered";
 import { useEffect, useState } from "react";
 
@@ -154,6 +154,10 @@ export function FormattingCommand({
             <CommandGroup heading="Codice">
               <FormattingCodeInline
                 _selection={_selection}
+                editorRef={editorRef}
+                onSelect={handleSelect}
+              />
+              <FormattingCodeBlock
                 editorRef={editorRef}
                 onSelect={handleSelect}
               />

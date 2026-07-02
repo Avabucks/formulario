@@ -26,10 +26,8 @@ import {
 import { EditorAI } from "./editor-katex/editor-ai";
 import { EditorInput, SyncStatus } from "./editor-katex/editor-input";
 import { EditorPreview } from "./editor-katex/editor-preview";
-import { FormattingCodeBlock } from "./editor-katex/tools/formatting-code-block";
 import { FormattingCommand } from "./editor-katex/formatting-command";
 import { FormattingLatex } from "./editor-katex/tools/formatting-latex";
-import { FormattingTable } from "./editor-katex/tools/formatting-table";
 import { ShortcutsListener } from "./editor-katex/shortcuts-listener";
 import clsx from "clsx";
 
@@ -301,14 +299,6 @@ export function EditorPage({
             {/* Formatting Tray */}
             <div className="flex items-center gap-1 p-0.5 overflow-x-auto scrollbar-none max-w-full">
               <FormattingCommand
-                _selection={selection}
-                editorRef={editorRef}
-                isFocused={isFocused}
-              />
-
-              <div className="w-px h-4 bg-border mx-1 shrink-0" />
-
-              <FormattingCodeBlock
                 _selection={selection}
                 editorRef={editorRef}
                 isFocused={isFocused}

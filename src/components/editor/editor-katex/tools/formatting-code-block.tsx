@@ -9,22 +9,16 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
+  CommandShortcut,
 } from "@/src/components/ui/command";
 import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
-import { Toggle } from "@/src/components/ui/toggle";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/src/components/ui/tooltip";
 import languages from "@/src/data/languages.json";
 import {
   getIsActiveCode,
   handleBlockToggle
 } from "@/src/lib/editor/formatting-utils";
-import { Code, SquareTerminal, X } from "lucide-react";
-import type { editor, Selection } from "monaco-editor";
+import { Code, X, SquareTerminal } from "lucide-react";
+import type { editor } from "monaco-editor";
 import { useEffect, useState } from "react";
 
 const OPEN_MARKER = "```";
@@ -32,17 +26,29 @@ const CLOSE_MARKER = "```";
 
 const LANGUAGES = languages.toSorted((a, b) => a.label.localeCompare(b.label));
 
+export const toggleCodeBlock = (
+  editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
+) => {
+  const blockState = getIsActiveCode(editorRef);
+  handleBlockToggle(editorRef, blockState, OPEN_MARKER, CLOSE_MARKER);
+};
+
 export function FormattingCodeBlock({
-  _selection,
   editorRef,
-  isFocused,
+  onSelect,
 }: Readonly<{
-  _selection: Selection | null;
   editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
-  isFocused: boolean;
+  onSelect?: () => void;
 }>) {
   const [open, setOpen] = useState(false);
-  const blockState = getIsActiveCode(editorRef);
+  const [blockState, setBlockState] = useState<{ language: string | null } | null>(null);
+
+  useEffect(() => {
+    if (open) {
+      setBlockState(getIsActiveCode(editorRef));
+    }
+  }, [open, editorRef]);
+
   const isActive = blockState !== null;
 
   const handleSelect = (language: string | null) => {
@@ -67,59 +73,30 @@ export function FormattingCodeBlock({
     handleBlockToggle(editorRef, blockState, OPEN_MARKER, CLOSE_MARKER);
   };
 
-  useEffect(() => {
-    const editor = editorRef.current;
-    if (!editor) return;
-
-    const disposable = editor.onKeyDown((e) => {
-      const isKeyU = e.browserEvent.key.toLowerCase() === "u" || e.code === "KeyU";
-      if (
-        (e.ctrlKey || e.metaKey) &&
-        e.shiftKey &&
-        isKeyU &&
-        isFocused
-      ) {
-        e.preventDefault();
-        setOpen((v) => !v);
-      }
-    });
-    return () => disposable.dispose();
-  }, [isFocused, editorRef.current]);
+  const handleOpenBlock = () => {
+    setOpen(true);
+    onSelect?.();
+  };
 
   return (
     <>
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Toggle
-              variant="outline"
-              onMouseDown={(e) => e.preventDefault()}
-              aria-label="Codice in blocco"
-              pressed={isActive && isFocused}
-              disabled={!isFocused}
-              className="gap-1.5"
-              onClick={() => setOpen((v) => !v)}
-            >
-              <SquareTerminal size={16} />
-              {isActive && isFocused && blockState.language && (
-                <span>{blockState.language}</span>
-              )}
-            </Toggle>
-          </TooltipTrigger>
-          <TooltipContent className="pr-1.5">
-            <div className="flex items-center gap-2">
-              Codice in blocco
-              <KbdGroup className="hidden md:flex">
-                <Kbd>Ctrl</Kbd>
-                <span>+</span>
-                <Kbd>Shift</Kbd>
-                <span>+</span>
-                <Kbd>U</Kbd>
-              </KbdGroup>
-            </div>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <CommandItem
+        onSelect={handleOpenBlock}
+        className="flex items-center gap-2 cursor-pointer"
+      >
+        <SquareTerminal size={14} />
+        <span>Codice in blocco</span>
+        <CommandShortcut className="ml-auto">
+          <KbdGroup>
+            <Kbd>Ctrl</Kbd>
+            <span>+</span>
+            <Kbd>Shift</Kbd>
+            <span>+</span>
+            <Kbd>U</Kbd>
+          </KbdGroup>
+        </CommandShortcut>
+      </CommandItem>
+
       <CommandDialog
         open={open}
         onOpenChange={(v) => {
@@ -168,3 +145,7 @@ export function FormattingCodeBlock({
     </>
   );
 }
+
+
+
+
