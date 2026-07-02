@@ -1,13 +1,7 @@
 "use client";
 
+import { CommandItem, CommandShortcut } from "@/src/components/ui/command";
 import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
-import { Toggle } from "@/src/components/ui/toggle";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/src/components/ui/tooltip";
 import {
   getIsActiveWord,
   getItalicRegex,
@@ -18,17 +12,18 @@ import type { editor, Selection } from "monaco-editor";
 import { useEffect } from "react";
 
 export function FormattingItalic({
-  _selection,
   editorRef,
   isFocused,
+  onSelect,
 }: Readonly<{
   _selection: Selection | null;
   editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
   isFocused: boolean;
+  onSelect?: () => void;
 }>) {
   const isActive = getIsActiveWord(editorRef, getItalicRegex);
 
-  const handleToggle = () =>
+  const handleToggle = () => {
     handleWordToggle(
       editorRef,
       isActive,
@@ -37,6 +32,9 @@ export function FormattingItalic({
       (match) => match[1],
       (matchIndex, match) => matchIndex + match[1].length,
     );
+    onSelect?.();
+    setTimeout(() => editorRef.current?.focus(), 0);
+  };
 
   useEffect(() => {
     const editor = editorRef.current;
@@ -51,34 +49,22 @@ export function FormattingItalic({
       }
     });
     return () => disposable.dispose();
-  }, [isFocused, editorRef.current]);
+  }, [isFocused, editorRef]);
 
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Toggle
-            variant="outline"
-            onPressedChange={handleToggle}
-            onMouseDown={(e) => e.preventDefault()}
-            aria-label="Corsivo"
-            pressed={isActive && isFocused}
-            disabled={!isFocused}
-          >
-            <Italic size={16} />
-          </Toggle>
-        </TooltipTrigger>
-        <TooltipContent className="pr-1.5">
-          <div className="flex items-center gap-2">
-            Corsivo
-            <KbdGroup className="hidden md:flex">
-              <Kbd>Ctrl</Kbd>
-              <span>+</span>
-              <Kbd>I</Kbd>
-            </KbdGroup>
-          </div>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <CommandItem
+      onSelect={handleToggle}
+      className="flex items-center gap-2 cursor-pointer"
+    >
+      <Italic size={14} />
+      <span>Corsivo</span>
+      <CommandShortcut className="ml-auto">
+        <KbdGroup>
+          <Kbd>Ctrl</Kbd>
+          <span>+</span>
+          <Kbd>I</Kbd>
+        </KbdGroup>
+      </CommandShortcut>
+    </CommandItem>
   );
 }

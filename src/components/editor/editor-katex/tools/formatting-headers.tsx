@@ -1,18 +1,7 @@
 "use client";
 
+import { CommandItem, CommandShortcut } from "@/src/components/ui/command";
 import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/src/components/ui/popover";
-import { Toggle } from "@/src/components/ui/toggle";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/src/components/ui/tooltip";
 import {
   checkActiveLatexOrCode,
   getH1Regex,
@@ -25,7 +14,6 @@ import {
   handleListToggle,
 } from "@/src/lib/editor/formatting-utils";
 import {
-  Heading,
   Heading1,
   Heading2,
   Heading3,
@@ -34,7 +22,7 @@ import {
   Heading6,
 } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 function HeadingToggle({
   editorRef,
@@ -69,53 +57,41 @@ function HeadingToggle({
       (line) => line.replace(new RegExp(String.raw`^${prefix}\s`), ""),
     );
     onToggle();
+    setTimeout(() => editorRef.current?.focus(), 0);
   };
 
   if (checkActiveLatexOrCode(editorRef) && isFocused) return null;
 
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Toggle
-            variant="outline"
-            onPressedChange={handleToggle}
-            onMouseDown={(e) => e.preventDefault()}
-            aria-label={label}
-            pressed={isActive && isFocused}
-            disabled={!isFocused}
-          >
-            <Icon size={16} />
-          </Toggle>
-        </TooltipTrigger>
-        <TooltipContent className="pr-1.5">
-          <div className="flex items-center gap-2">
-            {label}
-            <KbdGroup className="hidden md:flex">
-              <Kbd>Ctrl</Kbd>
-              <span>+</span>
-              <Kbd>Shift</Kbd>
-              <span>+</span>
-              <Kbd>{shortcut}</Kbd>
-            </KbdGroup>
-          </div>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <CommandItem
+      onSelect={handleToggle}
+      className="flex items-center gap-2 cursor-pointer"
+    >
+      <Icon size={14} />
+      <span>{label}</span>
+      <CommandShortcut className="ml-auto">
+        <KbdGroup>
+          <Kbd>Ctrl</Kbd>
+          <span>+</span>
+          <Kbd>Shift</Kbd>
+          <span>+</span>
+          <Kbd>{shortcut}</Kbd>
+        </KbdGroup>
+      </CommandShortcut>
+    </CommandItem>
   );
 }
 
 export function FormattingHeaders({
-  _selection,
   editorRef,
   isFocused,
+  onSelect,
 }: Readonly<{
   _selection: Selection | null;
   editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
   isFocused: boolean;
+  onSelect?: () => void;
 }>) {
-  const [open, setOpen] = useState(false);
-
   const anyActive =
     getIsActiveList(editorRef, getH1Regex) ||
     getIsActiveList(editorRef, getH2Regex) ||
@@ -132,7 +108,8 @@ export function FormattingHeaders({
       (line) => `${prefix} ${line.replace(/^#{1,6}\s/, "")}`,
       (line) => line.replace(new RegExp(String.raw`^${prefix}\s`), ""),
     );
-    setOpen(false);
+    onSelect?.();
+    setTimeout(() => editorRef.current?.focus(), 0);
   };
 
   useEffect(() => {
@@ -165,88 +142,73 @@ export function FormattingHeaders({
       }
     });
     return () => disposable.dispose();
-  }, [isFocused, editorRef.current]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFocused, editorRef]);
+
+  const onToggle = onSelect ?? (() => {});
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Toggle
-          variant="outline"
-          onMouseDown={(e) => e.preventDefault()}
-          aria-label="Heading"
-          pressed={anyActive && isFocused}
-          disabled={!isFocused}
-        >
-          <Heading size={16} />
-        </Toggle>
-      </PopoverTrigger>
-      <PopoverContent
-        className="flex flex-row gap-2 w-fit"
-        onMouseDown={(e) => e.preventDefault()}
-        onOpenAutoFocus={(e) => e.preventDefault()}
-        onCloseAutoFocus={(e) => e.preventDefault()}
-      >
-        <HeadingToggle
-          editorRef={editorRef}
-          isFocused={isFocused}
-          getRegex={getH1Regex}
-          icon={Heading1}
-          label="Heading 1"
-          shortcut="1"
-          prefix="#"
-          onToggle={() => setOpen(false)}
-        />
-        <HeadingToggle
-          editorRef={editorRef}
-          isFocused={isFocused}
-          getRegex={getH2Regex}
-          icon={Heading2}
-          label="Heading 2"
-          shortcut="2"
-          prefix="##"
-          onToggle={() => setOpen(false)}
-        />
-        <HeadingToggle
-          editorRef={editorRef}
-          isFocused={isFocused}
-          getRegex={getH3Regex}
-          icon={Heading3}
-          label="Heading 3"
-          shortcut="3"
-          prefix="###"
-          onToggle={() => setOpen(false)}
-        />
-        <HeadingToggle
-          editorRef={editorRef}
-          isFocused={isFocused}
-          getRegex={getH4Regex}
-          icon={Heading4}
-          label="Heading 4"
-          shortcut="4"
-          prefix="####"
-          onToggle={() => setOpen(false)}
-        />
-        <HeadingToggle
-          editorRef={editorRef}
-          isFocused={isFocused}
-          getRegex={getH5Regex}
-          icon={Heading5}
-          label="Heading 5"
-          shortcut="5"
-          prefix="#####"
-          onToggle={() => setOpen(false)}
-        />
-        <HeadingToggle
-          editorRef={editorRef}
-          isFocused={isFocused}
-          getRegex={getH6Regex}
-          icon={Heading6}
-          label="Heading 6"
-          shortcut="6"
-          prefix="######"
-          onToggle={() => setOpen(false)}
-        />
-      </PopoverContent>
-    </Popover>
+    <>
+      <HeadingToggle
+        editorRef={editorRef}
+        isFocused={isFocused}
+        getRegex={getH1Regex}
+        icon={Heading1}
+        label="Titolo 1"
+        shortcut="1"
+        prefix="#"
+        onToggle={onToggle}
+      />
+      <HeadingToggle
+        editorRef={editorRef}
+        isFocused={isFocused}
+        getRegex={getH2Regex}
+        icon={Heading2}
+        label="Titolo 2"
+        shortcut="2"
+        prefix="##"
+        onToggle={onToggle}
+      />
+      <HeadingToggle
+        editorRef={editorRef}
+        isFocused={isFocused}
+        getRegex={getH3Regex}
+        icon={Heading3}
+        label="Titolo 3"
+        shortcut="3"
+        prefix="###"
+        onToggle={onToggle}
+      />
+      <HeadingToggle
+        editorRef={editorRef}
+        isFocused={isFocused}
+        getRegex={getH4Regex}
+        icon={Heading4}
+        label="Titolo 4"
+        shortcut="4"
+        prefix="####"
+        onToggle={onToggle}
+      />
+      <HeadingToggle
+        editorRef={editorRef}
+        isFocused={isFocused}
+        getRegex={getH5Regex}
+        icon={Heading5}
+        label="Titolo 5"
+        shortcut="5"
+        prefix="#####"
+        onToggle={onToggle}
+      />
+      <HeadingToggle
+        editorRef={editorRef}
+        isFocused={isFocused}
+        getRegex={getH6Regex}
+        icon={Heading6}
+        label="Titolo 6"
+        shortcut="6"
+        prefix="######"
+        onToggle={onToggle}
+      />
+    </>
   );
 }

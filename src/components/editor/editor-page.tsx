@@ -26,17 +26,11 @@ import {
 import { EditorAI } from "./editor-katex/editor-ai";
 import { EditorInput, SyncStatus } from "./editor-katex/editor-input";
 import { EditorPreview } from "./editor-katex/editor-preview";
-import { FormattingBold } from "./editor-katex/tools/formatting-bold";
 import { FormattingCodeBlock } from "./editor-katex/tools/formatting-code-block";
 import { FormattingCodeInline } from "./editor-katex/tools/formatting-code-inline";
-import { FormattingDivider } from "./editor-katex/tools/formatting-divider";
-import { FormattingHeaders } from "./editor-katex/tools/formatting-headers";
-import { FormattingItalic } from "./editor-katex/tools/formatting-italic";
+import { FormattingCommand } from "./editor-katex/formatting-command";
 import { FormattingLatex } from "./editor-katex/tools/formatting-latex";
-import { FormattingOrderedList } from "./editor-katex/tools/formatting-ordered";
-import { FormattingQuote } from "./editor-katex/tools/formatting-quote";
 import { FormattingTable } from "./editor-katex/tools/formatting-table";
-import { FormattingUnorderedList } from "./editor-katex/tools/formatting-unordered";
 import clsx from "clsx";
 
 const MIN_RESIZABLE_SIZE = 20;
@@ -62,6 +56,7 @@ export function EditorPage({
   const [resizableSize, setResizableSize] = useState<number>(40);
   const [isFocused, setIsFocused] = useState(false);
   const [selection, setSelection] = useState<Selection | null>(null);
+  const [activeDialog, setActiveDialog] = useState<"command" | "table" | null>(null);
 
   const editorRef = useRef<any>(null);
   const isMac = useIsMac();
@@ -306,47 +301,14 @@ export function EditorPage({
 
             {/* Formatting Tray */}
             <div className="flex items-center gap-1 p-0.5 overflow-x-auto scrollbar-none max-w-full">
-              <FormattingHeaders
+              <FormattingCommand
                 _selection={selection}
                 editorRef={editorRef}
                 isFocused={isFocused}
-              />
-              <FormattingBold
-                _selection={selection}
-                editorRef={editorRef}
-                isFocused={isFocused}
-              />
-              <FormattingItalic
-                _selection={selection}
-                editorRef={editorRef}
-                isFocused={isFocused}
-              />
-              <FormattingQuote
-                _selection={selection}
-                editorRef={editorRef}
-                isFocused={isFocused}
+                open={activeDialog === "command"}
+                onOpenChange={(open) => setActiveDialog(open ? "command" : null)}
               />
 
-              <div className="w-px h-4 bg-border mx-1 shrink-0" />
-
-              <FormattingOrderedList
-                _selection={selection}
-                editorRef={editorRef}
-                isFocused={isFocused}
-              />
-              <FormattingUnorderedList
-                _selection={selection}
-                editorRef={editorRef}
-                isFocused={isFocused}
-              />
-
-              <div className="w-px h-4 bg-border mx-1 shrink-0" />
-
-              <FormattingDivider
-                _selection={selection}
-                editorRef={editorRef}
-                isFocused={isFocused}
-              />
               <FormattingTable
                 _selection={selection}
                 editorRef={editorRef}

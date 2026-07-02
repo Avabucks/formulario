@@ -1,13 +1,7 @@
 "use client";
 
+import { CommandItem, CommandShortcut } from "@/src/components/ui/command";
 import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
-import { Toggle } from "@/src/components/ui/toggle";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/src/components/ui/tooltip";
 import {
   getIsActiveList,
   getQuoteRegex,
@@ -18,17 +12,18 @@ import type { editor, Selection } from "monaco-editor";
 import { useEffect } from "react";
 
 export function FormattingQuote({
-  _selection,
   editorRef,
   isFocused,
+  onSelect,
 }: Readonly<{
   _selection: Selection | null;
   editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
   isFocused: boolean;
+  onSelect?: () => void;
 }>) {
   const isActive = getIsActiveList(editorRef, getQuoteRegex);
 
-  const handleToggle = () =>
+  const handleToggle = () => {
     handleListToggle(
       editorRef,
       isActive,
@@ -36,6 +31,9 @@ export function FormattingQuote({
       (line) => `> ${line}`,
       (line) => line.replace(/^>\s/, ""),
     );
+    onSelect?.();
+    setTimeout(() => editorRef.current?.focus(), 0);
+  };
 
   useEffect(() => {
     const editor = editorRef.current;
@@ -55,36 +53,24 @@ export function FormattingQuote({
       }
     });
     return () => disposable.dispose();
-  }, [isFocused, editorRef.current]);
+  }, [isFocused, editorRef]);
 
   return (
-    <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Toggle
-              variant="outline"
-              onPressedChange={handleToggle}
-              onMouseDown={(e) => e.preventDefault()}
-              aria-label="Citazione"
-              pressed={isActive && isFocused}
-              disabled={!isFocused}
-            >
-              <Quote size={16} />
-            </Toggle>
-          </TooltipTrigger>
-          <TooltipContent className="pr-1.5">
-            <div className="flex items-center gap-2">
-              Citazione
-              <KbdGroup className="hidden md:flex">
-                <Kbd>Ctrl</Kbd>
-                <span>+</span>
-                <Kbd>Shift</Kbd>
-                <span>+</span>
-                <Kbd>Q</Kbd>
-              </KbdGroup>
-            </div>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+    <CommandItem
+      onSelect={handleToggle}
+      className="flex items-center gap-2 cursor-pointer"
+    >
+      <Quote size={14} />
+      <span>Citazione</span>
+      <CommandShortcut className="ml-auto">
+        <KbdGroup>
+          <Kbd>Ctrl</Kbd>
+          <span>+</span>
+          <Kbd>Shift</Kbd>
+          <span>+</span>
+          <Kbd>Q</Kbd>
+        </KbdGroup>
+      </CommandShortcut>
+    </CommandItem>
   );
 }

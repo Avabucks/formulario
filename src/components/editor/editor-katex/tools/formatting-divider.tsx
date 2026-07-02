@@ -1,31 +1,30 @@
 "use client";
 
+import { CommandItem, CommandShortcut } from "@/src/components/ui/command";
 import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
-import { Toggle } from "@/src/components/ui/toggle";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/src/components/ui/tooltip";
 import { Minus } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useEffect } from "react";
 
+type SnippetController = {
+  insert: (snippet: string) => void;
+};
+
 export function FormattingDivider({
-  _selection,
   editorRef,
   isFocused,
+  onSelect,
 }: Readonly<{
   _selection: Selection | null;
   editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
   isFocused: boolean;
+  onSelect?: () => void;
 }>) {
   const handleToggle = () => {
     const editor = editorRef.current;
     if (!editor) return false;
 
-    const controller = editor.getContribution("snippetController2") as any;
+    const controller = editor.getContribution("snippetController2") as unknown as SnippetController | undefined;
     if (!controller) return false;
 
     const position = editor.getPosition();
@@ -38,6 +37,7 @@ export function FormattingDivider({
 
     const text = isAtLineStart && isEmptyLine ? `\n---\n\n$1` : `\n\n---\n\n$1`;
     controller.insert(text);
+    onSelect?.();
     setTimeout(() => editor.focus(), 0);
   };
 
@@ -54,36 +54,25 @@ export function FormattingDivider({
       }
     });
     return () => disposable.dispose();
-  }, [isFocused, editorRef.current]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFocused, editorRef]);
 
   return (
-    <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Toggle
-              variant="outline"
-              onPressedChange={handleToggle}
-              onMouseDown={(e) => e.preventDefault()}
-              aria-label="Divisore"
-              pressed={false}
-              disabled={!isFocused}
-            >
-              <Minus size={16} />
-            </Toggle>
-          </TooltipTrigger>
-          <TooltipContent className="pr-1.5">
-            <div className="flex items-center gap-2">
-              Divisore
-              <KbdGroup className="hidden md:flex">
-                <Kbd>Ctrl</Kbd>
-                <span>+</span>
-                <Kbd>Shift</Kbd>
-                <span>+</span>
-                <Kbd>9</Kbd>
-              </KbdGroup>
-            </div>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+    <CommandItem
+      onSelect={handleToggle}
+      className="flex items-center gap-2 cursor-pointer"
+    >
+      <Minus size={14} />
+      <span>Linea divisoria</span>
+      <CommandShortcut className="ml-auto">
+        <KbdGroup>
+          <Kbd>Ctrl</Kbd>
+          <span>+</span>
+          <Kbd>Shift</Kbd>
+          <span>+</span>
+          <Kbd>9</Kbd>
+        </KbdGroup>
+      </CommandShortcut>
+    </CommandItem>
   );
 }

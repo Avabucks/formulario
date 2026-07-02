@@ -1,13 +1,7 @@
 "use client";
 
+import { CommandItem, CommandShortcut } from "@/src/components/ui/command";
 import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
-import { Toggle } from "@/src/components/ui/toggle";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/src/components/ui/tooltip";
 import {
   getIsActiveList,
   getUnorderedListRegex,
@@ -18,17 +12,18 @@ import type { editor, Selection } from "monaco-editor";
 import { useEffect } from "react";
 
 export function FormattingUnorderedList({
-  _selection,
   editorRef,
   isFocused,
+  onSelect,
 }: Readonly<{
   _selection: Selection | null;
   editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
   isFocused: boolean;
+  onSelect?: () => void;
 }>) {
   const isActive = getIsActiveList(editorRef, getUnorderedListRegex);
 
-  const handleToggle = () =>
+  const handleToggle = () => {
     handleListToggle(
       editorRef,
       isActive,
@@ -36,6 +31,9 @@ export function FormattingUnorderedList({
       (line) => `- ${line}`,
       (line) => line.replace(/^-\s/, ""),
     );
+    onSelect?.();
+    setTimeout(() => editorRef.current?.focus(), 0);
+  };
 
   useEffect(() => {
     const editor = editorRef.current;
@@ -50,36 +48,24 @@ export function FormattingUnorderedList({
       }
     });
     return () => disposable.dispose();
-  }, [isFocused, editorRef.current]);
+  }, [isFocused, editorRef]);
 
   return (
-    <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Toggle
-              variant="outline"
-              onPressedChange={handleToggle}
-              onMouseDown={(e) => e.preventDefault()}
-              aria-label="Lista non ordinata"
-              pressed={isActive && isFocused}
-              disabled={!isFocused}
-            >
-              <List size={16} />
-            </Toggle>
-          </TooltipTrigger>
-          <TooltipContent className="pr-1.5">
-            <div className="flex items-center gap-2">
-              Lista non ordinata
-              <KbdGroup className="hidden md:flex">
-                <Kbd>Ctrl</Kbd>
-                <span>+</span>
-                <Kbd>Shift</Kbd>
-                <span>+</span>
-                <Kbd>8</Kbd>
-              </KbdGroup>
-            </div>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+    <CommandItem
+      onSelect={handleToggle}
+      className="flex items-center gap-2 cursor-pointer"
+    >
+      <List size={14} />
+      <span>Elenco puntato</span>
+      <CommandShortcut className="ml-auto">
+        <KbdGroup>
+          <Kbd>Ctrl</Kbd>
+          <span>+</span>
+          <Kbd>Shift</Kbd>
+          <span>+</span>
+          <Kbd>8</Kbd>
+        </KbdGroup>
+      </CommandShortcut>
+    </CommandItem>
   );
 }
