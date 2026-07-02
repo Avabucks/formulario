@@ -31,6 +31,7 @@ import { FormattingCodeInline } from "./editor-katex/tools/formatting-code-inlin
 import { FormattingCommand } from "./editor-katex/formatting-command";
 import { FormattingLatex } from "./editor-katex/tools/formatting-latex";
 import { FormattingTable } from "./editor-katex/tools/formatting-table";
+import { ShortcutsListener } from "./editor-katex/shortcuts-listener";
 import clsx from "clsx";
 
 const MIN_RESIZABLE_SIZE = 20;
@@ -56,7 +57,6 @@ export function EditorPage({
   const [resizableSize, setResizableSize] = useState<number>(40);
   const [isFocused, setIsFocused] = useState(false);
   const [selection, setSelection] = useState<Selection | null>(null);
-  const [activeDialog, setActiveDialog] = useState<"command" | "table" | null>(null);
 
   const editorRef = useRef<any>(null);
   const isMac = useIsMac();
@@ -305,14 +305,6 @@ export function EditorPage({
                 _selection={selection}
                 editorRef={editorRef}
                 isFocused={isFocused}
-                open={activeDialog === "command"}
-                onOpenChange={(open) => setActiveDialog(open ? "command" : null)}
-              />
-
-              <FormattingTable
-                _selection={selection}
-                editorRef={editorRef}
-                isFocused={isFocused}
               />
 
               <div className="w-px h-4 bg-border mx-1 shrink-0" />
@@ -502,6 +494,11 @@ export function EditorPage({
           </div>
         )}
       </div>
+
+      <ShortcutsListener
+        editorRef={editorRef}
+        isFocused={isFocused}
+      />
     </div>
   );
 }

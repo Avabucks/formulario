@@ -9,7 +9,19 @@ import {
 } from "@/src/lib/editor/formatting-utils";
 import { ListOrdered } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
-import { useEffect } from "react";
+
+export const toggleOrderedList = (
+  editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
+) => {
+  const isActive = getIsActiveList(editorRef, getOrderedListRegex);
+  handleListToggle(
+    editorRef,
+    isActive,
+    getOrderedListRegex,
+    (line, index) => `${index + 1}. ${line}`,
+    (line) => line.replace(/^\d+\.\s/, ""),
+  );
+};
 
 export function FormattingOrderedList({
   editorRef,
@@ -21,34 +33,11 @@ export function FormattingOrderedList({
   isFocused: boolean;
   onSelect?: () => void;
 }>) {
-  const isActive = getIsActiveList(editorRef, getOrderedListRegex);
-
   const handleToggle = () => {
-    handleListToggle(
-      editorRef,
-      isActive,
-      getOrderedListRegex,
-      (line, index) => `${index + 1}. ${line}`,
-      (line) => line.replace(/^\d+\.\s/, ""),
-    );
+    toggleOrderedList(editorRef);
     onSelect?.();
     setTimeout(() => editorRef.current?.focus(), 0);
   };
-
-  useEffect(() => {
-    const editor = editorRef.current;
-    if (!editor) return;
-
-    const disposable = editor.onKeyDown((e) => {
-      const isDigit7 = e.browserEvent.key === "7" || e.code === "Digit7";
-      if ((e.ctrlKey || e.metaKey) && isDigit7 && isFocused) {
-        e.preventDefault();
-        e.stopPropagation();
-        handleToggle();
-      }
-    });
-    return () => disposable.dispose();
-  }, [isFocused, editorRef]);
 
   return (
     <CommandItem

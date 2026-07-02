@@ -9,7 +9,19 @@ import {
 } from "@/src/lib/editor/formatting-utils";
 import { List } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
-import { useEffect } from "react";
+
+export const toggleUnorderedList = (
+  editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
+) => {
+  const isActive = getIsActiveList(editorRef, getUnorderedListRegex);
+  handleListToggle(
+    editorRef,
+    isActive,
+    getUnorderedListRegex,
+    (line) => `- ${line}`,
+    (line) => line.replace(/^-\s/, ""),
+  );
+};
 
 export function FormattingUnorderedList({
   editorRef,
@@ -21,34 +33,11 @@ export function FormattingUnorderedList({
   isFocused: boolean;
   onSelect?: () => void;
 }>) {
-  const isActive = getIsActiveList(editorRef, getUnorderedListRegex);
-
   const handleToggle = () => {
-    handleListToggle(
-      editorRef,
-      isActive,
-      getUnorderedListRegex,
-      (line) => `- ${line}`,
-      (line) => line.replace(/^-\s/, ""),
-    );
+    toggleUnorderedList(editorRef);
     onSelect?.();
     setTimeout(() => editorRef.current?.focus(), 0);
   };
-
-  useEffect(() => {
-    const editor = editorRef.current;
-    if (!editor) return;
-
-    const disposable = editor.onKeyDown((e) => {
-      const isDigit8 = e.browserEvent.key === "8" || e.code === "Digit8";
-      if ((e.ctrlKey || e.metaKey) && isDigit8 && isFocused) {
-        e.preventDefault();
-        e.stopPropagation();
-        handleToggle();
-      }
-    });
-    return () => disposable.dispose();
-  }, [isFocused, editorRef]);
 
   return (
     <CommandItem

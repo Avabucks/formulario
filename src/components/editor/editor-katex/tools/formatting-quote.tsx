@@ -9,7 +9,19 @@ import {
 } from "@/src/lib/editor/formatting-utils";
 import { Quote } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
-import { useEffect } from "react";
+
+export const toggleQuote = (
+  editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
+) => {
+  const isActive = getIsActiveList(editorRef, getQuoteRegex);
+  handleListToggle(
+    editorRef,
+    isActive,
+    getQuoteRegex,
+    (line) => `> ${line}`,
+    (line) => line.replace(/^>\s/, ""),
+  );
+};
 
 export function FormattingQuote({
   editorRef,
@@ -21,39 +33,11 @@ export function FormattingQuote({
   isFocused: boolean;
   onSelect?: () => void;
 }>) {
-  const isActive = getIsActiveList(editorRef, getQuoteRegex);
-
   const handleToggle = () => {
-    handleListToggle(
-      editorRef,
-      isActive,
-      getQuoteRegex,
-      (line) => `> ${line}`,
-      (line) => line.replace(/^>\s/, ""),
-    );
+    toggleQuote(editorRef);
     onSelect?.();
     setTimeout(() => editorRef.current?.focus(), 0);
   };
-
-  useEffect(() => {
-    const editor = editorRef.current;
-    if (!editor) return;
-
-    const disposable = editor.onKeyDown((e) => {
-      const isKeyQ = e.browserEvent.key.toLowerCase() === "q" || e.code === "KeyQ";
-      if (
-        isKeyQ &&
-        (e.ctrlKey || e.metaKey) &&
-        e.shiftKey &&
-        isFocused
-      ) {
-        e.preventDefault();
-        e.stopPropagation();
-        handleToggle();
-      }
-    });
-    return () => disposable.dispose();
-  }, [isFocused, editorRef]);
 
   return (
     <CommandItem

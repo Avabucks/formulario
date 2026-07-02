@@ -22,7 +22,31 @@ import {
   Heading6,
 } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
-import { useEffect } from "react";
+
+export const toggleHeading = (
+  editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
+  level: number,
+) => {
+  const getRegex = [getH1Regex, getH2Regex, getH3Regex, getH4Regex, getH5Regex, getH6Regex][level - 1];
+  const prefix = "#".repeat(level);
+
+  const anyActive =
+    getIsActiveList(editorRef, getH1Regex) ||
+    getIsActiveList(editorRef, getH2Regex) ||
+    getIsActiveList(editorRef, getH3Regex) ||
+    getIsActiveList(editorRef, getH4Regex) ||
+    getIsActiveList(editorRef, getH5Regex) ||
+    getIsActiveList(editorRef, getH6Regex);
+
+  handleListToggle(
+    editorRef,
+    anyActive,
+    getRegex,
+    (line) => `${prefix} ${line.replace(/^#{1,6}\s/, "")}`,
+    (line) => line.replace(new RegExp(String.raw`^${prefix}\s`), ""),
+  );
+  setTimeout(() => editorRef.current?.focus(), 0);
+};
 
 function HeadingToggle({
   editorRef,
@@ -92,59 +116,6 @@ export function FormattingHeaders({
   isFocused: boolean;
   onSelect?: () => void;
 }>) {
-  const anyActive =
-    getIsActiveList(editorRef, getH1Regex) ||
-    getIsActiveList(editorRef, getH2Regex) ||
-    getIsActiveList(editorRef, getH3Regex) ||
-    getIsActiveList(editorRef, getH4Regex) ||
-    getIsActiveList(editorRef, getH5Regex) ||
-    getIsActiveList(editorRef, getH6Regex);
-
-  const triggerHeading = (getRegex: () => RegExp, prefix: string) => {
-    handleListToggle(
-      editorRef,
-      anyActive,
-      getRegex,
-      (line) => `${prefix} ${line.replace(/^#{1,6}\s/, "")}`,
-      (line) => line.replace(new RegExp(String.raw`^${prefix}\s`), ""),
-    );
-    onSelect?.();
-    setTimeout(() => editorRef.current?.focus(), 0);
-  };
-
-  useEffect(() => {
-    const editor = editorRef.current;
-    if (!editor) return;
-
-    const disposable = editor.onKeyDown((e) => {
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && isFocused) {
-        const actions: Record<string, () => void> = {
-          "1": () => triggerHeading(getH1Regex, "#"),
-          "2": () => triggerHeading(getH2Regex, "##"),
-          "3": () => triggerHeading(getH3Regex, "###"),
-          "4": () => triggerHeading(getH4Regex, "####"),
-          "5": () => triggerHeading(getH5Regex, "#####"),
-          "6": () => triggerHeading(getH6Regex, "######"),
-          Digit1: () => triggerHeading(getH1Regex, "#"),
-          Digit2: () => triggerHeading(getH2Regex, "##"),
-          Digit3: () => triggerHeading(getH3Regex, "###"),
-          Digit4: () => triggerHeading(getH4Regex, "####"),
-          Digit5: () => triggerHeading(getH5Regex, "#####"),
-          Digit6: () => triggerHeading(getH6Regex, "######"),
-        };
-        const key = e.browserEvent.key;
-        const action = actions[key] || actions[e.code];
-        if (action) {
-          e.preventDefault();
-          e.stopPropagation();
-          action();
-        }
-      }
-    });
-    return () => disposable.dispose();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isFocused, editorRef]);
-
   const onToggle = onSelect ?? (() => {});
 
   return (

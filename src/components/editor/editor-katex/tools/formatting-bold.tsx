@@ -9,7 +9,20 @@ import {
 } from "@/src/lib/editor/formatting-utils";
 import { Bold } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
-import { useEffect } from "react";
+
+export const toggleBold = (
+  editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
+) => {
+  const isActive = getIsActiveWord(editorRef, getBoldRegex);
+  handleWordToggle(
+    editorRef,
+    isActive,
+    getBoldRegex,
+    (text) => `**${text}$0**`,
+    (match) => match[1],
+    (matchIndex, match) => matchIndex + match[1].length,
+  );
+};
 
 export function FormattingBold({
   editorRef,
@@ -21,35 +34,11 @@ export function FormattingBold({
   isFocused: boolean;
   onSelect?: () => void;
 }>) {
-  const isActive = getIsActiveWord(editorRef, getBoldRegex);
-
   const handleToggle = () => {
-    handleWordToggle(
-      editorRef,
-      isActive,
-      getBoldRegex,
-      (text) => `**${text}$0**`,
-      (match) => match[1],
-      (matchIndex, match) => matchIndex + match[1].length,
-    );
+    toggleBold(editorRef);
     onSelect?.();
     setTimeout(() => editorRef.current?.focus(), 0);
   };
-
-  useEffect(() => {
-    const editor = editorRef.current;
-    if (!editor) return;
-
-    const disposable = editor.onKeyDown((e) => {
-      const isKeyB = e.browserEvent.key.toLowerCase() === "b" || e.code === "KeyB";
-      if ((e.ctrlKey || e.metaKey) && isKeyB && isFocused) {
-        e.preventDefault();
-        e.stopPropagation();
-        handleToggle();
-      }
-    });
-    return () => disposable.dispose();
-  }, [isFocused, editorRef]);
 
   return (
     <CommandItem

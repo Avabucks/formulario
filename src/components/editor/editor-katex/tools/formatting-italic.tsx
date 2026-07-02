@@ -9,7 +9,20 @@ import {
 } from "@/src/lib/editor/formatting-utils";
 import { Italic } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
-import { useEffect } from "react";
+
+export const toggleItalic = (
+  editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
+) => {
+  const isActive = getIsActiveWord(editorRef, getItalicRegex);
+  handleWordToggle(
+    editorRef,
+    isActive,
+    getItalicRegex,
+    (text) => `_${text}$0_`,
+    (match) => match[1],
+    (matchIndex, match) => matchIndex + match[1].length,
+  );
+};
 
 export function FormattingItalic({
   editorRef,
@@ -21,35 +34,11 @@ export function FormattingItalic({
   isFocused: boolean;
   onSelect?: () => void;
 }>) {
-  const isActive = getIsActiveWord(editorRef, getItalicRegex);
-
   const handleToggle = () => {
-    handleWordToggle(
-      editorRef,
-      isActive,
-      getItalicRegex,
-      (text) => `_${text}$0_`,
-      (match) => match[1],
-      (matchIndex, match) => matchIndex + match[1].length,
-    );
+    toggleItalic(editorRef);
     onSelect?.();
     setTimeout(() => editorRef.current?.focus(), 0);
   };
-
-  useEffect(() => {
-    const editor = editorRef.current;
-    if (!editor) return;
-
-    const disposable = editor.onKeyDown((e) => {
-      const isKeyI = e.browserEvent.key.toLowerCase() === "i" || e.code === "KeyI";
-      if ((e.ctrlKey || e.metaKey) && isKeyI && isFocused) {
-        e.preventDefault();
-        e.stopPropagation();
-        handleToggle();
-      }
-    });
-    return () => disposable.dispose();
-  }, [isFocused, editorRef]);
 
   return (
     <CommandItem
