@@ -46,18 +46,36 @@ const BLOCK_MARKER = "$$";
 const FORMULA_FIRST_USE_KEY = "formula_first_use_shown";
 
 export function FormattingLatex({
-  _selection,
   editorRef,
-  isFocused,
+  isFocused = false,
+  onlyDialog = false,
 }: Readonly<{
-  _selection: Selection | null;
   editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
-  isFocused: boolean;
+  isFocused?: boolean;
+  onlyDialog?: boolean;
 }>) {
   const [open, setOpen] = useState(false);
   const [pendingKind, setPendingKind] = useState<"single" | "double">("double");
 
-  const inlineState = getIsActiveLatex(editorRef);
+  const [inlineState, setInlineState] = useState<{ kind: "single" | "double" | "block" | null } | null>(null);
+
+  useEffect(() => {
+    if (open) {
+      setInlineState(getIsActiveLatex(editorRef));
+      return;
+    }
+
+    const editor = editorRef.current;
+    if (!editor) return;
+
+    const disposable = editor.onDidChangeCursorSelection(() => {
+      setInlineState(getIsActiveLatex(editorRef));
+    });
+
+    setInlineState(getIsActiveLatex(editorRef));
+
+    return () => disposable.dispose();
+  }, [open, editorRef]);
 
   const [query, setQuery] = useState("");
   const [activeTab, setActiveTab] = useState("formule");
@@ -107,6 +125,18 @@ export function FormattingLatex({
 
   const tabsRef = useRef<HTMLDivElement>(null);
 
+  const setActiveTabAndScroll = (id: string) => {
+    setActiveTab(id);
+    setTimeout(() => {
+      const activeBtn = tabsRef.current?.querySelector(`[data-tab="${id}"]`);
+      activeBtn?.scrollIntoView({
+        block: "nearest",
+        inline: "nearest",
+        behavior: "smooth",
+      });
+    }, 0);
+  };
+
   const tabCounts = useMemo(() => {
     const q = query.toLowerCase();
     return Object.fromEntries(
@@ -119,33 +149,12 @@ export function FormattingLatex({
     );
   }, [query, tabs]);
 
-  useEffect(() => {
-    if (!query) return;
-
-    const firstTabWithResults = tabs.find((t) => tabCounts[t.id] > 0);
-
-    if (firstTabWithResults) {
-      setActiveTabAndScroll(firstTabWithResults.id);
-    }
-  }, [query, tabCounts]);
 
   const scroll = (dir: "left" | "right") => {
     tabsRef.current?.scrollBy({
       left: dir === "left" ? -120 : 120,
       behavior: "smooth",
     });
-  };
-
-  const setActiveTabAndScroll = (id: string) => {
-    setActiveTab(id);
-    setTimeout(() => {
-      const activeBtn = tabsRef.current?.querySelector(`[data-tab="${id}"]`);
-      activeBtn?.scrollIntoView({
-        block: "nearest",
-        inline: "nearest",
-        behavior: "smooth",
-      });
-    }, 0);
   };
 
   const insertIntoBlock = (
@@ -260,7 +269,7 @@ export function FormattingLatex({
       );
     }
 
-    (globalThis as unknown as { umami?: any }).umami?.track(
+    (globalThis as unknown as { umami?: { track: (event: string) => void } }).umami?.track(
       "selected_formula_latex",
     );
     try {
@@ -274,35 +283,171 @@ export function FormattingLatex({
   };
 
   useEffect(() => {
-    const editor = editorRef.current;
-    if (!editor) return;
+    const handleOpenSingle = () => {
+      openCommand("single");
+    };
+    const handleOpenDouble = () => {
+      openCommand("double");
+    };
+    window.addEventListener("editor:open-latex-single", handleOpenSingle);
+    window.addEventListener("editor:open-latex-double", handleOpenDouble);
+    return () => {
+      window.removeEventListener("editor:open-latex-single", handleOpenSingle);
+      window.removeEventListener("editor:open-latex-double", handleOpenDouble);
+    };
+  }, []);
 
-    const disposable = editor.onKeyDown((e) => {
-      const isKeyG = e.browserEvent.key.toLowerCase() === "g" || e.code === "KeyG";
-      const isKeyH = e.browserEvent.key.toLowerCase() === "h" || e.code === "KeyH";
-      if (
-        (e.ctrlKey || e.metaKey) &&
-        e.shiftKey &&
-        isKeyG &&
-        isFocused
-      ) {
-        e.preventDefault();
-        e.stopPropagation();
-        openCommand("single");
-      }
-      if (
-        (e.ctrlKey || e.metaKey) &&
-        e.shiftKey &&
-        isKeyH &&
-        isFocused
-      ) {
-        e.preventDefault();
-        e.stopPropagation();
-        openCommand("double");
-      }
-    });
-    return () => disposable.dispose();
-  }, [isFocused, editorRef.current]);
+  const dialog = (
+    <CommandDialog
+      open={open}
+      onOpenChange={(v) => {
+        setOpen(v);
+        if (!v) {
+          setQuery("");
+          setActiveTab("formule");
+          setTimeout(() => editorRef.current?.focus(), 0);
+        }
+      }}
+    >
+      <Command
+        shouldFilter={false}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && activeData.length === 0) {
+            e.preventDefault();
+            handleFormulaSelect("");
+          }
+          if (e.key === "Tab") {
+            e.preventDefault();
+            e.stopPropagation();
+            const currentIndex = tabs.findIndex((t) => t.id === activeTab);
+            const nextIndex = e.shiftKey
+              ? (currentIndex - 1 + tabs.length) % tabs.length
+              : (currentIndex + 1) % tabs.length;
+            setActiveTabAndScroll(tabs[nextIndex].id);
+          }
+        }}
+      >
+        <CommandInput
+          placeholder="Cerca formula o simbolo..."
+          onValueChange={(val) => {
+            setQuery(val);
+            if (val) {
+              const q = val.toLowerCase();
+              const counts = Object.fromEntries(
+                tabs.map((t) => [
+                  t.id,
+                  t.data.filter((f) => f.label.toLowerCase().includes(q)).length,
+                ]),
+              );
+              const firstTabWithResults = tabs.find((t) => counts[t.id] > 0);
+              if (firstTabWithResults) {
+                setActiveTabAndScroll(firstTabWithResults.id);
+              }
+            }
+          }}
+        />
+
+        {/* Tab bar */}
+        <div className="tab-latex flex items-center">
+          <button
+            onClick={() => scroll("left")}
+            className="shrink-0 p-1 text-muted-foreground hover:text-foreground"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+
+          <div
+            ref={tabsRef}
+            className="flex overflow-x-auto scrollbar-none flex-1"
+          >
+            {tabs.map((t) => (
+              <button
+                key={t.id}
+                data-tab={t.id}
+                tabIndex={-1}
+                onClick={() => setActiveTabAndScroll(t.id)}
+                className={`px-3 py-1.5 text-sm whitespace-nowrap flex items-center gap-1.5 transition-colors
+                                      ${activeTab === t.id
+                    ? "border-b-2 border-primary font-medium"
+                    : "text-muted-foreground hover:text-foreground"
+                  }`}
+              >
+                {t.label}
+                {query && (
+                  <span
+                    className={`text-xs rounded-full px-1.5 py-0.5 
+                                          ${tabCounts[t.id] > 0
+                        ? "bg-primary/15 text-primary"
+                        : "bg-muted text-muted-foreground"
+                      }`}
+                  >
+                    {tabCounts[t.id]}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+
+          <button
+            onClick={() => scroll("right")}
+            className="shrink-0 p-1 text-muted-foreground hover:text-foreground"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+
+        <CommandList>
+          <CommandEmpty>
+            <div className="flex flex-col items-center gap-4 py-4 text-center">
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">
+                  Nessun risultato trovato
+                </p>
+                <p className="text-xs text-muted-foreground/80">
+                  Prova a cercare una formula o un simbolo
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 text-xs text-muted-foreground/70">
+                <span className="h-px w-8 bg-border" /> oppure <span className="h-px w-8 bg-border" />
+              </div>
+              <Button
+                onClick={() => handleFormulaSelect("")}
+                variant="outline"
+              >
+                {pendingKind === "single" ? (
+                  <Radical size={14} />
+                ) : (
+                  <SquareRadical size={14} />
+                )}
+                Inserisci vuota
+              </Button>
+            </div>
+          </CommandEmpty>
+          <CommandGroup>
+            {activeData.map((f) => (
+              <CommandItem
+                key={f.value}
+                value={f.value}
+                onSelect={() => handleFormulaSelect(f.snippet)}
+                className="flex items-center justify-between gap-2"
+              >
+                <span>{f.label}</span>
+                <span
+                  className="text-sm opacity-80"
+                  dangerouslySetInnerHTML={f.rendered}
+                />
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        </CommandList>
+      </Command>
+    </CommandDialog>
+  );
+
+  if (onlyDialog) {
+    return dialog;
+  }
 
   return (
     <>
@@ -379,136 +524,7 @@ export function FormattingLatex({
         </TooltipProvider>
       )}
 
-      <CommandDialog
-        open={open}
-        onOpenChange={(v) => {
-          setOpen(v);
-          if (!v) {
-            setQuery("");
-            setActiveTab("formule");
-            setTimeout(() => editorRef.current?.focus(), 0);
-          }
-        }}
-      >
-        <Command
-          shouldFilter={false}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && activeData.length === 0) {
-              e.preventDefault();
-              handleFormulaSelect("");
-            }
-            if (e.key === "Tab") {
-              e.preventDefault();
-              e.stopPropagation();
-              const currentIndex = tabs.findIndex((t) => t.id === activeTab);
-              const nextIndex = e.shiftKey
-                ? (currentIndex - 1 + tabs.length) % tabs.length
-                : (currentIndex + 1) % tabs.length;
-              setActiveTabAndScroll(tabs[nextIndex].id);
-            }
-          }}
-        >
-          <CommandInput
-            placeholder="Cerca formula o simbolo..."
-            onValueChange={setQuery}
-          />
-
-          {/* Tab bar */}
-          <div className="tab-latex flex items-center">
-            <button
-              onClick={() => scroll("left")}
-              className="shrink-0 p-1 text-muted-foreground hover:text-foreground"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-
-            <div
-              ref={tabsRef}
-              className="flex overflow-x-auto scrollbar-none flex-1"
-            >
-              {tabs.map((t) => (
-                <button
-                  key={t.id}
-                  data-tab={t.id}
-                  tabIndex={-1}
-                  onClick={() => setActiveTabAndScroll(t.id)}
-                  className={`px-3 py-1.5 text-sm whitespace-nowrap flex items-center gap-1.5 transition-colors
-                                        ${activeTab === t.id
-                      ? "border-b-2 border-primary font-medium"
-                      : "text-muted-foreground hover:text-foreground"
-                    }`}
-                >
-                  {t.label}
-                  {query && (
-                    <span
-                      className={`text-xs rounded-full px-1.5 py-0.5 
-                                            ${tabCounts[t.id] > 0
-                          ? "bg-primary/15 text-primary"
-                          : "bg-muted text-muted-foreground"
-                        }`}
-                    >
-                      {tabCounts[t.id]}
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-
-            <button
-              onClick={() => scroll("right")}
-              className="shrink-0 p-1 text-muted-foreground hover:text-foreground"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-
-          <CommandList>
-            <CommandEmpty>
-              <div className="flex flex-col items-center gap-4 py-4 text-center">
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">
-                    Nessun risultato trovato
-                  </p>
-                  <p className="text-xs text-muted-foreground/80">
-                    Prova a cercare una formula o un simbolo
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2 text-xs text-muted-foreground/70">
-                  <span className="h-px w-8 bg-border" /> oppure <span className="h-px w-8 bg-border" />
-                </div>
-                <Button
-                  onClick={() => handleFormulaSelect("")}
-                  variant="outline"
-                >
-                  {pendingKind === "single" ? (
-                    <Radical size={14} />
-                  ) : (
-                    <SquareRadical size={14} />
-                  )}
-                  Inserisci vuota
-                </Button>
-              </div>
-            </CommandEmpty>
-            <CommandGroup>
-              {activeData.map((f) => (
-                <CommandItem
-                  key={f.value}
-                  value={f.value}
-                  onSelect={() => handleFormulaSelect(f.snippet)}
-                  className="flex items-center justify-between gap-2"
-                >
-                  <span>{f.label}</span>
-                  <span
-                    className="text-sm opacity-80"
-                    dangerouslySetInnerHTML={f.rendered}
-                  />
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </CommandDialog>
+      {dialog}
       <Separator orientation="vertical" />
     </>
   );

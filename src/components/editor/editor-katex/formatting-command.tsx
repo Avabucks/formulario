@@ -24,7 +24,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/src/components/ui/tooltip";
-import { ChevronRight, SquareTerminal } from "lucide-react";
+import { ChevronRight, SquareTerminal, Radical, SquareRadical } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 
 import { FormattingBold } from "./tools/formatting-bold";
@@ -36,6 +36,7 @@ import { FormattingItalic } from "./tools/formatting-italic";
 import { FormattingOrderedList } from "./tools/formatting-ordered";
 import { FormattingQuote } from "./tools/formatting-quote";
 import { FormattingUnorderedList } from "./tools/formatting-unordered";
+import { FormattingLatex } from "./tools/formatting-latex";
 import { useEffect, useState, useRef } from "react";
 
 export function FormattingCommand({
@@ -197,12 +198,57 @@ export function FormattingCommand({
                   </CommandShortcut>
                 </CommandItem>
               </CommandGroup>
+
+              {/* Categoria Formule LaTeX */}
+              <CommandGroup heading="Formule LaTeX">
+                <CommandItem
+                  onSelect={() => {
+                    shouldPreventCloseFocus.current = true;
+                    handleSelect();
+                    window.dispatchEvent(new CustomEvent("editor:open-latex-single"));
+                  }}
+                  className="flex items-center gap-2 cursor-pointer"
+                >
+                  <Radical size={14} />
+                  <span>Formula inline</span>
+                  <CommandShortcut className="ml-auto">
+                    <KbdGroup>
+                      <Kbd>Ctrl</Kbd>
+                      <span>+</span>
+                      <Kbd>Shift</Kbd>
+                      <span>+</span>
+                      <Kbd>G</Kbd>
+                    </KbdGroup>
+                  </CommandShortcut>
+                </CommandItem>
+                <CommandItem
+                  onSelect={() => {
+                    shouldPreventCloseFocus.current = true;
+                    handleSelect();
+                    window.dispatchEvent(new CustomEvent("editor:open-latex-double"));
+                  }}
+                  className="flex items-center gap-2 cursor-pointer"
+                >
+                  <SquareRadical size={14} />
+                  <span>Formula in blocco</span>
+                  <CommandShortcut className="ml-auto">
+                    <KbdGroup>
+                      <Kbd>Ctrl</Kbd>
+                      <span>+</span>
+                      <Kbd>Shift</Kbd>
+                      <span>+</span>
+                      <Kbd>H</Kbd>
+                    </KbdGroup>
+                  </CommandShortcut>
+                </CommandItem>
+              </CommandGroup>
             </CommandList>
           </Command>
         </DialogContent>
       </Dialog>
 
       <FormattingCodeBlock editorRef={editorRef} />
+      <FormattingLatex editorRef={editorRef} onlyDialog />
     </>
   );
 }

@@ -32,6 +32,10 @@ const ACTIONS_SHIFT: Record<string, ToggleFn> = {
   KeyJ: toggleCodeInline,
   u: () => window.dispatchEvent(new CustomEvent("editor:open-code-block")),
   KeyU: () => window.dispatchEvent(new CustomEvent("editor:open-code-block")),
+  g: () => window.dispatchEvent(new CustomEvent("editor:open-latex-single")),
+  KeyG: () => window.dispatchEvent(new CustomEvent("editor:open-latex-single")),
+  h: () => window.dispatchEvent(new CustomEvent("editor:open-latex-double")),
+  KeyH: () => window.dispatchEvent(new CustomEvent("editor:open-latex-double")),
 };
 
 function getHeadingLevel(key: string, code: string): number | null {
