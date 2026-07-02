@@ -3,12 +3,20 @@
 import { Button } from "@/src/components/ui/button";
 import {
   Command,
-  CommandDialog,
   CommandEmpty,
   CommandGroup,
   CommandInput,
+  CommandItem,
   CommandList,
+  CommandShortcut,
 } from "@/src/components/ui/command";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/src/components/ui/dialog";
 import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
 import {
   Tooltip,
@@ -16,7 +24,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/src/components/ui/tooltip";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, SquareTerminal } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 
 import { FormattingBold } from "./tools/formatting-bold";
@@ -28,7 +36,7 @@ import { FormattingItalic } from "./tools/formatting-italic";
 import { FormattingOrderedList } from "./tools/formatting-ordered";
 import { FormattingQuote } from "./tools/formatting-quote";
 import { FormattingUnorderedList } from "./tools/formatting-unordered";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 export function FormattingCommand({
   _selection,
@@ -38,6 +46,7 @@ export function FormattingCommand({
   editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
 }>) {
   const [activeDialog, setActiveDialog] = useState<boolean>(false);
+  const shouldPreventCloseFocus = useRef(false);
 
   useEffect(() => {
     const editor = editorRef.current;
@@ -86,84 +95,114 @@ export function FormattingCommand({
         </Tooltip>
       </TooltipProvider>
 
-      <CommandDialog
+      <Dialog
         open={activeDialog}
         onOpenChange={setActiveDialog}
       >
-        <Command>
-          <CommandInput placeholder="Cerca un comando..." />
-          <CommandList>
-            <CommandEmpty>Nessun risultato.</CommandEmpty>
+        <DialogContent
+          className="rounded-xl! top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden p-0 max-w-[calc(100%-2rem)] sm:max-w-sm"
+          showCloseButton={false}
+          onCloseAutoFocus={(e) => {
+            if (shouldPreventCloseFocus.current) {
+              e.preventDefault();
+              shouldPreventCloseFocus.current = false;
+            }
+          }}
+        >
+          <DialogHeader className="sr-only">
+            <DialogTitle>Tavolozza comandi</DialogTitle>
+            <DialogDescription>Cerca un comando di formattazione o inserimento</DialogDescription>
+          </DialogHeader>
+          <Command>
+            <CommandInput placeholder="Cerca un comando..." />
+            <CommandList>
+              <CommandEmpty>Nessun risultato.</CommandEmpty>
 
-            {/* Categoria Testo */}
-            <CommandGroup heading="Formattazione Testo">
-              <FormattingBold
-                _selection={_selection}
-                editorRef={editorRef}
-                onSelect={handleSelect}
-              />
-              <FormattingItalic
-                _selection={_selection}
-                editorRef={editorRef}
-                onSelect={handleSelect}
-              />
-              <FormattingQuote
-                _selection={_selection}
-                editorRef={editorRef}
-                onSelect={handleSelect}
-              />
-            </CommandGroup>
+              {/* Categoria Testo */}
+              <CommandGroup heading="Formattazione Testo">
+                <FormattingBold
+                  _selection={_selection}
+                  editorRef={editorRef}
+                  onSelect={handleSelect}
+                />
+                <FormattingItalic
+                  _selection={_selection}
+                  editorRef={editorRef}
+                  onSelect={handleSelect}
+                />
+                <FormattingQuote
+                  _selection={_selection}
+                  editorRef={editorRef}
+                  onSelect={handleSelect}
+                />
+              </CommandGroup>
 
-            {/* Categoria Intestazioni */}
-            <CommandGroup heading="Intestazioni">
-              <FormattingHeaders
-                _selection={_selection}
-                editorRef={editorRef}
-                onSelect={handleSelect}
-              />
-            </CommandGroup>
+              {/* Categoria Intestazioni */}
+              <CommandGroup heading="Intestazioni">
+                <FormattingHeaders
+                  _selection={_selection}
+                  editorRef={editorRef}
+                  onSelect={handleSelect}
+                />
+              </CommandGroup>
 
-            {/* Categoria Elenchi */}
-            <CommandGroup heading="Elenchi">
-              <FormattingUnorderedList
-                _selection={_selection}
-                editorRef={editorRef}
-                onSelect={handleSelect}
-              />
-              <FormattingOrderedList
-                _selection={_selection}
-                editorRef={editorRef}
-                onSelect={handleSelect}
-              />
-            </CommandGroup>
+              {/* Categoria Elenchi */}
+              <CommandGroup heading="Elenchi">
+                <FormattingUnorderedList
+                  _selection={_selection}
+                  editorRef={editorRef}
+                  onSelect={handleSelect}
+                />
+                <FormattingOrderedList
+                  _selection={_selection}
+                  editorRef={editorRef}
+                  onSelect={handleSelect}
+                />
+              </CommandGroup>
 
-            {/* Categoria Inserisci */}
-            <CommandGroup heading="Inserisci">
-              <FormattingDivider
-                _selection={_selection}
-                editorRef={editorRef}
-                onSelect={handleSelect}
-              />
-            </CommandGroup>
+              {/* Categoria Inserisci */}
+              <CommandGroup heading="Inserisci">
+                <FormattingDivider
+                  _selection={_selection}
+                  editorRef={editorRef}
+                  onSelect={handleSelect}
+                />
+              </CommandGroup>
 
-            {/* Categoria Codice */}
-            <CommandGroup heading="Codice">
-              <FormattingCodeInline
-                _selection={_selection}
-                editorRef={editorRef}
-                onSelect={handleSelect}
-              />
-              <FormattingCodeBlock
-                editorRef={editorRef}
-                onSelect={handleSelect}
-              />
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </CommandDialog>
+              {/* Categoria Codice */}
+              <CommandGroup heading="Codice">
+                <FormattingCodeInline
+                  _selection={_selection}
+                  editorRef={editorRef}
+                  onSelect={handleSelect}
+                />
+                <CommandItem
+                  onSelect={() => {
+                    shouldPreventCloseFocus.current = true;
+                    handleSelect();
+                    window.dispatchEvent(new CustomEvent("editor:open-code-block"));
+                  }}
+                  className="flex items-center gap-2 cursor-pointer"
+                >
+                  <SquareTerminal size={14} />
+                  <span>Codice in blocco</span>
+                  <CommandShortcut className="ml-auto">
+                    <KbdGroup>
+                      <Kbd>Ctrl</Kbd>
+                      <span>+</span>
+                      <Kbd>Shift</Kbd>
+                      <span>+</span>
+                      <Kbd>U</Kbd>
+                    </KbdGroup>
+                  </CommandShortcut>
+                </CommandItem>
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </DialogContent>
+      </Dialog>
 
-      <FormattingCodeBlock editorRef={editorRef} onlyDialog />
-
+      <FormattingCodeBlock editorRef={editorRef} />
     </>
   );
 }

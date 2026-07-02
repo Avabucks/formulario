@@ -344,7 +344,7 @@ export function EditorPage({
                   className="h-8 gap-1.5 select-none cursor-pointer"
                 >
                   <Sparkles size={14} />
-                  <span className="hidden md:flex -mr-1.25">Chiedi all'</span> AI
+                  <span className="hidden md:flex -mr-1.25">Chiedi all&apos;</span> AI
                 </Button>
               </TooltipTrigger>
               <TooltipContent className="pr-1.5">

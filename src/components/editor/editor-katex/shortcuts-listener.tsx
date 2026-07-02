@@ -10,8 +10,6 @@ import { toggleOrderedList } from "./tools/formatting-ordered";
 import { toggleUnorderedList } from "./tools/formatting-unordered";
 import { toggleDivider } from "./tools/formatting-divider";
 import { toggleCodeInline } from "./tools/formatting-code-inline";
-import { triggerOpenCodeBlock } from "./tools/formatting-code-block";
-
 type ToggleFn = (editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>) => void;
 
 const ACTIONS_NO_SHIFT: Record<string, ToggleFn> = {
@@ -32,8 +30,8 @@ const ACTIONS_SHIFT: Record<string, ToggleFn> = {
   Digit9: toggleDivider,
   j: toggleCodeInline,
   KeyJ: toggleCodeInline,
-  u: () => triggerOpenCodeBlock(),
-  KeyU: () => triggerOpenCodeBlock(),
+  u: () => window.dispatchEvent(new CustomEvent("editor:open-code-block")),
+  KeyU: () => window.dispatchEvent(new CustomEvent("editor:open-code-block")),
 };
 
 function getHeadingLevel(key: string, code: string): number | null {

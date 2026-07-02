@@ -9,15 +9,13 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-  CommandShortcut,
 } from "@/src/components/ui/command";
-import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
 import languages from "@/src/data/languages.json";
 import {
   getIsActiveCode,
   handleBlockToggle
 } from "@/src/lib/editor/formatting-utils";
-import { Code, X, SquareTerminal } from "lucide-react";
+import { Code, X } from "lucide-react";
 import type { editor } from "monaco-editor";
 import { useEffect, useState } from "react";
 
@@ -26,39 +24,21 @@ const CLOSE_MARKER = "```";
 
 const LANGUAGES = languages.toSorted((a, b) => a.label.localeCompare(b.label));
 
-let openCallback: (() => void) | null = null;
-
-export const triggerOpenCodeBlock = () => {
-  openCallback?.();
-};
-
-export const toggleCodeBlock = (
-  editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
-) => {
-  const blockState = getIsActiveCode(editorRef);
-  handleBlockToggle(editorRef, blockState, OPEN_MARKER, CLOSE_MARKER);
-};
-
 export function FormattingCodeBlock({
   editorRef,
-  onSelect,
-  onlyDialog = false,
 }: Readonly<{
   editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
-  onSelect?: () => void;
-  onlyDialog?: boolean;
 }>) {
   const [open, setOpen] = useState(false);
   const [blockState, setBlockState] = useState<{ language: string | null } | null>(null);
 
   useEffect(() => {
-    if (onlyDialog) {
-      openCallback = () => setOpen(true);
-      return () => {
-        openCallback = null;
-      };
-    }
-  }, [onlyDialog]);
+    const handleOpen = () => setOpen(true);
+    window.addEventListener("editor:open-code-block", handleOpen);
+    return () => {
+      window.removeEventListener("editor:open-code-block", handleOpen);
+    };
+  }, []);
 
   useEffect(() => {
     if (open) {
@@ -90,14 +70,7 @@ export function FormattingCodeBlock({
     handleBlockToggle(editorRef, blockState, OPEN_MARKER, CLOSE_MARKER);
   };
 
-  const handleOpenBlock = () => {
-    onSelect?.();
-    setTimeout(() => {
-      triggerOpenCodeBlock();
-    }, 150);
-  };
-
-  const dialog = (
+  return (
     <CommandDialog
       open={open}
       onOpenChange={(v) => {
@@ -143,29 +116,6 @@ export function FormattingCodeBlock({
         </CommandList>
       </Command>
     </CommandDialog>
-  );
-
-  if (onlyDialog) {
-    return dialog;
-  }
-
-  return (
-    <CommandItem
-      onSelect={handleOpenBlock}
-      className="flex items-center gap-2 cursor-pointer"
-    >
-      <SquareTerminal size={14} />
-      <span>Codice in blocco</span>
-      <CommandShortcut className="ml-auto">
-        <KbdGroup>
-          <Kbd>Ctrl</Kbd>
-          <span>+</span>
-          <Kbd>Shift</Kbd>
-          <span>+</span>
-          <Kbd>U</Kbd>
-        </KbdGroup>
-      </CommandShortcut>
-    </CommandItem>
   );
 }
 
