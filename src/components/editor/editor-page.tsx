@@ -27,7 +27,6 @@ import { EditorAI } from "./editor-katex/editor-ai";
 import { EditorInput, SyncStatus } from "./editor-katex/editor-input";
 import { EditorPreview } from "./editor-katex/editor-preview";
 import { FormattingCodeBlock } from "./editor-katex/tools/formatting-code-block";
-import { FormattingCodeInline } from "./editor-katex/tools/formatting-code-inline";
 import { FormattingCommand } from "./editor-katex/formatting-command";
 import { FormattingLatex } from "./editor-katex/tools/formatting-latex";
 import { FormattingTable } from "./editor-katex/tools/formatting-table";
@@ -309,11 +308,6 @@ export function EditorPage({
 
               <div className="w-px h-4 bg-border mx-1 shrink-0" />
 
-              <FormattingCodeInline
-                _selection={selection}
-                editorRef={editorRef}
-                isFocused={isFocused}
-              />
               <FormattingCodeBlock
                 _selection={selection}
                 editorRef={editorRef}

@@ -1,13 +1,7 @@
 "use client";
 
+import { CommandItem, CommandShortcut } from "@/src/components/ui/command";
 import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
-import { Toggle } from "@/src/components/ui/toggle";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/src/components/ui/tooltip";
 import {
   getCodeInlineRegex,
   getIsActiveWord,
@@ -15,72 +9,51 @@ import {
 } from "@/src/lib/editor/formatting-utils";
 import { Terminal } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
-import { useEffect } from "react";
+
+export const toggleCodeInline = (
+  editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
+) => {
+  const isActive = getIsActiveWord(editorRef, getCodeInlineRegex);
+  handleWordToggle(
+    editorRef,
+    isActive,
+    getCodeInlineRegex,
+    (text) => `\`${text}$0\``,
+    (match) => match[1],
+    (matchIndex, match) => matchIndex + match[1].length,
+  );
+};
 
 export function FormattingCodeInline({
-  _selection,
   editorRef,
-  isFocused,
+  onSelect,
 }: Readonly<{
   _selection: Selection | null;
   editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
-  isFocused: boolean;
+  onSelect?: () => void;
 }>) {
-  const isActive = getIsActiveWord(editorRef, getCodeInlineRegex);
-
-  const handleToggle = () =>
-    handleWordToggle(
-      editorRef,
-      isActive,
-      getCodeInlineRegex,
-      (text) => `\`${text}$0\``,
-      (match) => match[1],
-      (matchIndex, match) => matchIndex + match[1].length,
-    );
-
-  useEffect(() => {
-    const editor = editorRef.current;
-    if (!editor) return;
-
-    const disposable = editor.onKeyDown((e) => {
-      const isKeyJ = e.browserEvent.key.toLowerCase() === "j" || e.code === "KeyJ";
-      if ((e.ctrlKey || e.metaKey) && isKeyJ && isFocused) {
-        e.preventDefault();
-        e.stopPropagation();
-        handleToggle();
-      }
-    });
-    return () => disposable.dispose();
-  }, [isFocused, editorRef.current]);
+  const handleToggle = () => {
+    toggleCodeInline(editorRef);
+    onSelect?.();
+    setTimeout(() => editorRef.current?.focus(), 0);
+  };
 
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Toggle
-            variant="outline"
-            onPressedChange={handleToggle}
-            onMouseDown={(e) => e.preventDefault()}
-            aria-label="Codice inline"
-            pressed={isActive && isFocused}
-            disabled={!isFocused}
-          >
-            <Terminal size={16} />
-          </Toggle>
-        </TooltipTrigger>
-        <TooltipContent className="pr-1.5">
-          <div className="flex items-center gap-2">
-            Codice inline
-            <KbdGroup className="hidden md:flex">
-              <Kbd>Ctrl</Kbd>
-              <span>+</span>
-              <Kbd>Shift</Kbd>
-              <span>+</span>
-              <Kbd>J</Kbd>
-            </KbdGroup>
-          </div>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <CommandItem
+      onSelect={handleToggle}
+      className="flex items-center gap-2 cursor-pointer"
+    >
+      <Terminal size={14} />
+      <span>Codice inline</span>
+      <CommandShortcut className="ml-auto">
+        <KbdGroup>
+          <Kbd>Ctrl</Kbd>
+          <span>+</span>
+          <Kbd>Shift</Kbd>
+          <span>+</span>
+          <Kbd>J</Kbd>
+        </KbdGroup>
+      </CommandShortcut>
+    </CommandItem>
   );
 }

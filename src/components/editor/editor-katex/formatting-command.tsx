@@ -20,6 +20,7 @@ import { ChevronRight } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 
 import { FormattingBold } from "./tools/formatting-bold";
+import { FormattingCodeInline } from "./tools/formatting-code-inline";
 import { FormattingDivider } from "./tools/formatting-divider";
 import { FormattingHeaders } from "./tools/formatting-headers";
 import { FormattingItalic } from "./tools/formatting-italic";
@@ -103,19 +104,16 @@ export function FormattingCommand({
               <FormattingBold
                 _selection={_selection}
                 editorRef={editorRef}
-                isFocused={isFocused}
                 onSelect={handleSelect}
               />
               <FormattingItalic
                 _selection={_selection}
                 editorRef={editorRef}
-                isFocused={isFocused}
                 onSelect={handleSelect}
               />
               <FormattingQuote
                 _selection={_selection}
                 editorRef={editorRef}
-                isFocused={isFocused}
                 onSelect={handleSelect}
               />
             </CommandGroup>
@@ -125,7 +123,6 @@ export function FormattingCommand({
               <FormattingHeaders
                 _selection={_selection}
                 editorRef={editorRef}
-                isFocused={isFocused}
                 onSelect={handleSelect}
               />
             </CommandGroup>
@@ -135,13 +132,11 @@ export function FormattingCommand({
               <FormattingUnorderedList
                 _selection={_selection}
                 editorRef={editorRef}
-                isFocused={isFocused}
                 onSelect={handleSelect}
               />
               <FormattingOrderedList
                 _selection={_selection}
                 editorRef={editorRef}
-                isFocused={isFocused}
                 onSelect={handleSelect}
               />
             </CommandGroup>
@@ -151,7 +146,15 @@ export function FormattingCommand({
               <FormattingDivider
                 _selection={_selection}
                 editorRef={editorRef}
-                isFocused={isFocused}
+                onSelect={handleSelect}
+              />
+            </CommandGroup>
+
+            {/* Categoria Codice */}
+            <CommandGroup heading="Codice">
+              <FormattingCodeInline
+                _selection={_selection}
+                editorRef={editorRef}
                 onSelect={handleSelect}
               />
             </CommandGroup>
