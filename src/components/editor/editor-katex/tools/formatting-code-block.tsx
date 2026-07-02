@@ -26,6 +26,12 @@ const CLOSE_MARKER = "```";
 
 const LANGUAGES = languages.toSorted((a, b) => a.label.localeCompare(b.label));
 
+let openCallback: (() => void) | null = null;
+
+export const triggerOpenCodeBlock = () => {
+  openCallback?.();
+};
+
 export const toggleCodeBlock = (
   editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
 ) => {
@@ -36,12 +42,23 @@ export const toggleCodeBlock = (
 export function FormattingCodeBlock({
   editorRef,
   onSelect,
+  onlyDialog = false,
 }: Readonly<{
   editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
   onSelect?: () => void;
+  onlyDialog?: boolean;
 }>) {
   const [open, setOpen] = useState(false);
   const [blockState, setBlockState] = useState<{ language: string | null } | null>(null);
+
+  useEffect(() => {
+    if (onlyDialog) {
+      openCallback = () => setOpen(true);
+      return () => {
+        openCallback = null;
+      };
+    }
+  }, [onlyDialog]);
 
   useEffect(() => {
     if (open) {
@@ -74,77 +91,84 @@ export function FormattingCodeBlock({
   };
 
   const handleOpenBlock = () => {
-    setOpen(true);
     onSelect?.();
+    setTimeout(() => {
+      triggerOpenCodeBlock();
+    }, 150);
   };
 
-  return (
-    <>
-      <CommandItem
-        onSelect={handleOpenBlock}
-        className="flex items-center gap-2 cursor-pointer"
-      >
-        <SquareTerminal size={14} />
-        <span>Codice in blocco</span>
-        <CommandShortcut className="ml-auto">
-          <KbdGroup>
-            <Kbd>Ctrl</Kbd>
-            <span>+</span>
-            <Kbd>Shift</Kbd>
-            <span>+</span>
-            <Kbd>U</Kbd>
-          </KbdGroup>
-        </CommandShortcut>
-      </CommandItem>
-
-      <CommandDialog
-        open={open}
-        onOpenChange={(v) => {
-          setOpen(v);
-          if (!v) setTimeout(() => editorRef.current?.focus(), 0);
-        }}
-      >
-        <Command>
-          <CommandInput placeholder="Cerca linguaggio..." />
-          <CommandList>
-            <CommandEmpty>Nessun risultato.</CommandEmpty>
-            <CommandGroup>
-              <CommandItem onSelect={() => handleSelect(null)}>
-                <Code size={14} />
-                <span>Senza linguaggio</span>
+  const dialog = (
+    <CommandDialog
+      open={open}
+      onOpenChange={(v) => {
+        setOpen(v);
+        if (!v) setTimeout(() => editorRef.current?.focus(), 0);
+      }}
+    >
+      <Command>
+        <CommandInput placeholder="Cerca linguaggio..." />
+        <CommandList>
+          <CommandEmpty>Nessun risultato.</CommandEmpty>
+          <CommandGroup>
+            <CommandItem onSelect={() => handleSelect(null)}>
+              <Code size={14} />
+              <span>Senza linguaggio</span>
+            </CommandItem>
+            {isActive && (
+              <CommandItem
+                onSelect={handleRemove}
+                className="text-destructive"
+              >
+                <X size={14} />
+                <span>Rimuovi blocco</span>
               </CommandItem>
-              {isActive && (
-                <CommandItem
-                  onSelect={handleRemove}
-                  className="text-destructive"
-                >
-                  <X size={14} />
-                  <span>Rimuovi blocco</span>
-                </CommandItem>
-              )}
-            </CommandGroup>
-            <CommandSeparator />
-            <CommandGroup>
-              {LANGUAGES.map((lang) => (
-                <CommandItem
-                  key={lang.value}
-                  value={lang.value}
-                  onSelect={() => handleSelect(lang.value)}
-                  className="text-sm"
-                >
-                  {blockState?.language === lang.value && (
-                    <span className="relative inline-flex size-2 rounded-full bg-primary"></span>
-                  )}
-                  {lang.label}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </CommandDialog>
-    </>
+            )}
+          </CommandGroup>
+          <CommandSeparator />
+          <CommandGroup>
+            {LANGUAGES.map((lang) => (
+              <CommandItem
+                key={lang.value}
+                value={lang.value}
+                onSelect={() => handleSelect(lang.value)}
+                className="text-sm"
+              >
+                {blockState?.language === lang.value && (
+                  <span className="relative inline-flex size-2 rounded-full bg-primary"></span>
+                )}
+                {lang.label}
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        </CommandList>
+      </Command>
+    </CommandDialog>
+  );
+
+  if (onlyDialog) {
+    return dialog;
+  }
+
+  return (
+    <CommandItem
+      onSelect={handleOpenBlock}
+      className="flex items-center gap-2 cursor-pointer"
+    >
+      <SquareTerminal size={14} />
+      <span>Codice in blocco</span>
+      <CommandShortcut className="ml-auto">
+        <KbdGroup>
+          <Kbd>Ctrl</Kbd>
+          <span>+</span>
+          <Kbd>Shift</Kbd>
+          <span>+</span>
+          <Kbd>U</Kbd>
+        </KbdGroup>
+      </CommandShortcut>
+    </CommandItem>
   );
 }
+
 
 
 

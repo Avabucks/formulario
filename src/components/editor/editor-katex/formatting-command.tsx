@@ -165,6 +165,11 @@ export function FormattingCommand({
           </CommandList>
         </Command>
       </CommandDialog>
+
+      <FormattingCodeBlock editorRef={editorRef} onlyDialog />
+
     </>
   );
 }
+
+

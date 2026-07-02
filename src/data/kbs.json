@@ -9,7 +9,8 @@
         { "label": "Genera con AI", "keys": ["Alt", "A"] },
         { "label": "Visualizzazione Editor", "keys": ["Alt", "1"] },
         { "label": "Visualizzazione Dividi", "keys": ["Alt", "2"] },
-        { "label": "Visualizzazione Anteprima", "keys": ["Alt", "3"] }
+        { "label": "Visualizzazione Anteprima", "keys": ["Alt", "3"] },
+        { "label": "Tavolozza comandi", "keys": ["Ctrl", "Space"] }
       ]
     },
     {
@@ -37,7 +38,6 @@
     {
       "title": "Editor",
       "shortcuts": [
-        { "label": "Tavolozza comandi", "keys": ["Ctrl", "Space"] },
         { "label": "Salva", "keys": ["Ctrl", "S"] },
         { "label": "Annulla", "keys": ["Ctrl", "Z"] },
         { "label": "Ripristina", "keys": ["Ctrl", "Y"] },
