@@ -1,17 +1,15 @@
 "use client";
 
 import { useIsMobile } from "@/src/hooks/useIsMobile";
+import { getOrderedListRegex, getUnorderedListRegex } from "@/src/lib/editor/formatting-utils";
 import { Monaco } from "@monaco-editor/react";
 import {
-  ArrowRightLeft,
   Columns2,
   Eye,
-  EyeClosed,
   PenLine,
-  PenOff,
   Redo2,
   Sparkles,
-  Undo2,
+  Undo2
 } from "lucide-react";
 import type { Selection } from "monaco-editor";
 import { useTheme } from "next-themes";
@@ -20,17 +18,15 @@ import { FormularioSettings } from "../home/formulario-settings";
 import { TakeFormulario } from "../home/take-formulario";
 import { Button } from "../ui/button";
 import { Kbd, KbdGroup, useIsMac } from "../ui/kbd";
-import { Separator } from "../ui/separator";
 import { Spinner } from "../ui/spinner";
-import { Toggle } from "../ui/toggle";
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
-import { motion } from "framer-motion";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
+import { EditorAI } from "./editor-katex/editor-ai";
 import { EditorInput, SyncStatus } from "./editor-katex/editor-input";
 import { EditorPreview } from "./editor-katex/editor-preview";
 import { FormattingBold } from "./editor-katex/tools/formatting-bold";
@@ -44,7 +40,6 @@ import { FormattingOrderedList } from "./editor-katex/tools/formatting-ordered";
 import { FormattingQuote } from "./editor-katex/tools/formatting-quote";
 import { FormattingTable } from "./editor-katex/tools/formatting-table";
 import { FormattingUnorderedList } from "./editor-katex/tools/formatting-unordered";
-import { EditorAI } from "./editor-katex/editor-ai";
 
 const darkRules = [
   { token: "math.display", foreground: "4EC9B0" },
@@ -179,6 +174,11 @@ export function EditorPage({
     editor.onDidFocusEditorWidget(() => {
       setIsFocused(true);
     });
+
+    editor.onKeyDown((e: any) => {
+      handleListEnter(editor, monaco, e);
+    });
+
 
     const updateButtons = () => {
       const model = editor.getModel();
@@ -328,7 +328,7 @@ export function EditorPage({
   );
 
   const toolbar = (
-    <div className="flex w-full border-b bg-background/95 backdrop-blur-xs min-h-[60px] items-center justify-between px-4 py-2 gap-4 overflow-x-auto select-none">
+    <div className="flex w-full border-b bg-background/95 backdrop-blur-xs min-h-15 items-center justify-between px-4 py-2 gap-4 overflow-x-auto select-none">
       {/* Left: History & Formatting Tray */}
       <div className="flex flex-1 items-center gap-3 min-w-0">
         {/* History Capsule */}
@@ -505,9 +505,9 @@ export function EditorPage({
             </Tooltip>
           </TooltipProvider>
         )}
-        <div className="h-6 w-[1px] bg-border" />
+        <div className="h-6 w-px bg-border" />
         {viewTabs}
-        <div className="h-6 w-[1px] bg-border" />
+        <div className="h-6 w-px bg-border" />
         <FormularioSettings formularioId={formularioId} />
       </div>
     </div>
@@ -544,7 +544,7 @@ export function EditorPage({
           {editable ? (
             toolbar
           ) : (
-            <div className="flex w-full border-b bg-background/95 backdrop-blur-xs min-h-[60px] items-center justify-between px-4 py-2 gap-4 overflow-x-auto select-none">
+            <div className="flex w-full border-b bg-background/95 backdrop-blur-xs min-h-15 items-center justify-between px-4 py-2 gap-4 overflow-x-auto select-none">
               {/* Left: TakeFormulario */}
               <div className="flex items-center gap-3 shrink-0">
                 <TakeFormulario formularioId={formularioId} />
@@ -565,62 +565,158 @@ export function EditorPage({
       )}
 
 
-        <div className="flex flex-1 min-h-0 w-full relative overflow-hidden">
-          {/* Main Area: Editor and/or Preview */}
-          <div className="flex-1 h-full flex relative min-w-0">
-            {/* Left panel (Editor) */}
-            <div
-              className="h-full flex flex-col min-w-0"
-              style={{
-                display: switchView === "preview" ? "none" : "flex",
-                width: (!isMobile && switchView === "divided") ? `${resizableSize}%` : "100%",
-              }}
-            >
-              {input}
-            </div>
-
-            {/* Divider */}
-            {!isMobile && switchView === "divided" && (
-              <div
-                className="w-1 bg-border/50 hover:bg-muted-foreground/30 hover:w-1.5 transition-all cursor-col-resize h-full select-none"
-                onMouseDown={handleMouseDown}
-              />
-            )}
-
-            {/* Right panel (Preview) */}
-            <div
-              className="h-full flex flex-col min-w-0"
-              style={{
-                display: (switchView === "preview" || (!isMobile && switchView === "divided")) ? "flex" : "none",
-                width: (!isMobile && switchView === "divided") ? `${100 - resizableSize}%` : "100%",
-              }}
-            >
-              {preview}
-            </div>
-
-            {editable && !loading && (
-              <SyncStatus error={saveError} loading={saveLoading} />
-            )}
+      <div className="flex flex-1 min-h-0 w-full relative overflow-hidden">
+        {/* Main Area: Editor and/or Preview */}
+        <div className="flex-1 h-full flex relative min-w-0">
+          {/* Left panel (Editor) */}
+          <div
+            className="h-full flex flex-col min-w-0"
+            style={{
+              display: switchView === "preview" ? "none" : "flex",
+              width: (!isMobile && switchView === "divided") ? `${resizableSize}%` : "100%",
+            }}
+          >
+            {input}
           </div>
 
-          {/* AI Chat Sidebar */}
-          {editable && (
-            <div className={`h-full border-l bg-background flex flex-col z-20 shrink-0 transition-all duration-300 shadow-lg ${
-              isMobile 
-                ? "absolute inset-0 w-full" 
-                : isAiExpanded 
-                  ? "w-[650px]" 
-                  : "w-[350px]"
-            } ${showAI ? "" : "hidden"}`}>
-              <EditorAI 
-                editorRef={editorRef} 
-                onClose={() => setShowAI(false)} 
-                isExpanded={isAiExpanded}
-                onToggleExpand={() => setIsAiExpanded(!isAiExpanded)}
-              />
-            </div>
+          {/* Divider */}
+          {!isMobile && switchView === "divided" && (
+            <div
+              className="w-1 bg-border/50 hover:bg-muted-foreground/30 hover:w-1.5 transition-all cursor-col-resize h-full select-none"
+              onMouseDown={handleMouseDown}
+            />
+          )}
+
+          {/* Right panel (Preview) */}
+          <div
+            className="h-full flex flex-col min-w-0"
+            style={{
+              display: (switchView === "preview" || (!isMobile && switchView === "divided")) ? "flex" : "none",
+              width: (!isMobile && switchView === "divided") ? `${100 - resizableSize}%` : "100%",
+            }}
+          >
+            {preview}
+          </div>
+
+          {editable && !loading && (
+            <SyncStatus error={saveError} loading={saveLoading} />
           )}
         </div>
+
+        {/* AI Chat Sidebar */}
+        {editable && (
+          <div className={`h-full border-l bg-background flex flex-col z-20 shrink-0 transition-all duration-300 shadow-lg ${isMobile
+              ? "absolute inset-0 w-full"
+              : isAiExpanded
+                ? "w-162.5"
+                : "w-87.5"
+            } ${showAI ? "" : "hidden"}`}>
+            <EditorAI
+              editorRef={editorRef}
+              onClose={() => setShowAI(false)}
+              isExpanded={isAiExpanded}
+              onToggleExpand={() => setIsAiExpanded(!isAiExpanded)}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
+
+function handleUnorderedList(
+  editor: any,
+  monaco: any,
+  position: any,
+  lineContent: string,
+  textBeforeCursor: string
+): boolean {
+  const match = new RegExp(getUnorderedListRegex()).exec(textBeforeCursor);
+  if (!match) return false;
+
+  const marker = match[0];
+  const isEmpty = textBeforeCursor === marker;
+  const text = isEmpty ? (new RegExp(/^\s*/).exec(marker)?.[0] || "") : ("\n" + marker);
+  const range = isEmpty
+    ? new monaco.Range(position.lineNumber, 1, position.lineNumber, lineContent.length + 1)
+    : new monaco.Range(position.lineNumber, position.column, position.lineNumber, position.column);
+
+  editor.executeEdits("list-autocomplete", [
+    {
+      range,
+      text,
+      forceMoveMarkers: true,
+    },
+  ]);
+
+  return true;
+}
+
+function handleOrderedList(
+  editor: any,
+  monaco: any,
+  position: any,
+  lineContent: string,
+  textBeforeCursor: string
+): boolean {
+  const match = new RegExp(getOrderedListRegex()).exec(textBeforeCursor);
+  if (!match) return false;
+
+  const marker = match[0];
+  const isEmpty = textBeforeCursor === marker;
+
+  let text = "";
+  let range;
+
+  if (isEmpty) {
+    text = new RegExp(/^\s*/).exec(marker)?.[0] || "";
+    range = new monaco.Range(position.lineNumber, 1, position.lineNumber, lineContent.length + 1);
+  } else {
+    const numMatch = new RegExp(/\d+/).exec(marker);
+    const nextNum = numMatch ? Number.parseInt(numMatch[0], 10) + 1 : 1;
+    const nextMarker = marker.replace(/\d+/, nextNum.toString());
+    text = "\n" + nextMarker;
+    range = new monaco.Range(position.lineNumber, position.column, position.lineNumber, position.column);
+  }
+
+  editor.executeEdits("list-autocomplete", [
+    {
+      range,
+      text,
+      forceMoveMarkers: true,
+    },
+  ]);
+
+  return true;
+}
+
+function handleListEnter(editor: any, monaco: any, e: any): boolean {
+  if (e.keyCode !== monaco.KeyCode.Enter) return false;
+
+  const selection = editor.getSelection();
+  if (!selection?.isEmpty()) return false;
+
+  const position = editor.getPosition();
+  if (!position) return false;
+
+  const model = editor.getModel();
+  if (!model) return false;
+
+  const lineContent = model.getLineContent(position.lineNumber);
+  const textBeforeCursor = lineContent.substring(0, position.column - 1);
+
+  if (handleUnorderedList(editor, monaco, position, lineContent, textBeforeCursor)) {
+    e.preventDefault();
+    e.stopPropagation();
+    return true;
+  }
+
+  if (handleOrderedList(editor, monaco, position, lineContent, textBeforeCursor)) {
+    e.preventDefault();
+    e.stopPropagation();
+    return true;
+  }
+
+  return false;
+}
+
