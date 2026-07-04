@@ -29,6 +29,7 @@ import { EditorAI } from "./editor-katex/editor-ai";
 import { EditorInput, SyncStatus } from "./editor-katex/editor-input";
 import { EditorPreview } from "./editor-katex/editor-preview";
 import { FormattingCommand } from "./editor-katex/formatting-command";
+import { ContextualToolbar } from "./editor-katex/contextual-toolbar";
 import { ShortcutsListener } from "./editor-katex/shortcuts-listener";
 
 const MIN_RESIZABLE_SIZE = 20;
@@ -320,10 +321,16 @@ export function EditorPage({
         <div className="h-6 w-px bg-border mx-1 shrink-0" />
 
         {switchView !== "preview" && (
-          <FormattingCommand
-            _selection={selection}
-            editorRef={editorRef}
-          />
+          <>
+            <FormattingCommand
+              _selection={selection}
+              editorRef={editorRef}
+            />
+            <ContextualToolbar
+              selection={selection}
+              editorRef={editorRef}
+            />
+          </>
         )}
 
         {titleComponent()}
