@@ -249,21 +249,21 @@ export function EditorPage({
   const toolbar = (
     <div className="flex w-full border-b bg-background/95 backdrop-blur-xs min-h-15 items-center justify-between px-4 py-2 gap-4 overflow-x-auto select-none">
       {/* Left: History & Formatting Tray */}
-      <div className="flex flex-1 items-center gap-3 min-w-0">
+      <div className="flex flex-1 items-center gap-2 min-w-0">
         {/* History Capsule */}
-        <div className="flex items-center gap-0.5 bg-muted/30 p-0.5 rounded-lg border border-border/40 shadow-xs shrink-0">
+        <div className="flex items-center gap-1 shrink-0">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   ref={undoBtnRef}
-                  variant="ghost"
+                  variant="outline"
                   size="icon"
                   onClick={handleUndo}
                   onMouseDown={(e) => e.preventDefault()}
-                  className="size-7 rounded-mdtext-foreground"
+                  className="text-foreground"
                 >
-                  <Undo2 size={15} />
+                  <Undo2 className="size-4" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent className="pr-1.5">
@@ -284,13 +284,13 @@ export function EditorPage({
               <TooltipTrigger asChild>
                 <Button
                   ref={redoBtnRef}
-                  variant="ghost"
+                  variant="outline"
                   size="icon"
                   onClick={handleRedo}
                   onMouseDown={(e) => e.preventDefault()}
-                  className="size-7 rounded-mdtext-foreground"
+                  className="text-foreground"
                 >
-                  <Redo2 size={15} />
+                  <Redo2 className="size-4" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent className="pr-1.5">
@@ -317,7 +317,9 @@ export function EditorPage({
           </TooltipProvider>
         </div>
 
-        <div className="h-6 w-px bg-border mx-1 shrink-0" />
+        <div className="h-6 w-px bg-border shrink-0" />
+
+
 
         {switchView !== "preview" && (
           <FormattingCommand

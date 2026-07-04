@@ -40,12 +40,15 @@ import {
   Bold,
   Check,
   ChevronDown,
+  ChevronRight,
   Heading,
   Indent,
   Italic,
   List,
   ListOrdered,
   Outdent,
+  Pencil,
+  PenTool,
   Plus,
   PlusCircle,
   Quote,
@@ -200,7 +203,7 @@ export function ContextualToolbar({
     editor.focus();
   };
 
-  // Select and change header level or toggle it off if already active
+  // Select and change header level or toggle off if already active
   const handleHeaderSelect = (level: number) => {
     const editor = editorRef.current;
     if (!editor) return;
@@ -227,18 +230,25 @@ export function ContextualToolbar({
   if (!activeState) return null;
 
   return (
-    <div className="hidden md:flex items-center">
+    <div className="hidden md:flex items-center gap-2">
       {/* CASE 1: LATEX FORMULA */}
       {activeState.type === "latex" && (
         <>
-          <div className="h-4 w-px bg-border/60 mx-1 shrink-0" />
+          <div className="flex items-center text-muted-foreground gap-1 px-2 py-1 select-none pr-0">
+            <Radical className="size-4 text-muted-foreground/80" />
+            <span className="text-xs text-muted-foreground/80 font-medium font-sans capitalize">
+              Formula {activeState.data.kind === "double" ? "blocco" : "inline"}
+            </span>
+            <ChevronRight className="size-4 text-muted-foreground/30 mx-0.5 shrink-0" />
+          </div>
+
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
-                  size="sm"
-                  className="text-foreground"
+                  size="default"
+                  className="text-foreground gap-1.5"
                   onClick={() => {
                     const event = new CustomEvent(
                       activeState.data.kind === "double"
@@ -248,11 +258,11 @@ export function ContextualToolbar({
                     window.dispatchEvent(event);
                   }}
                 >
-                  <PlusCircle className="size-3.5 text-primary" />
-                  <span>Aggiungi alla formula</span>
+                  <PenTool className="size-4 text-primary" />
+                  <span>Componi formula</span>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Aggiungi simbolo o formula KaTeX</TooltipContent>
+              <TooltipContent>Componi la formula (inserisci simboli, frazioni o funzioni KaTeX)</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </>
@@ -261,25 +271,25 @@ export function ContextualToolbar({
       {/* CASE 2: CODE BLOCK */}
       {activeState.type === "code" && (
         <>
-          <div className="h-4 w-px bg-border/60 mx-1 shrink-0" />
-          <div className="flex items-center text-muted-foreground gap-1.5 px-2 py-1 select-none">
-            <SquareCode className="size-3.5 text-muted-foreground/80" />
-            <span className="text-xs text-muted-foreground font-medium">
+          <div className="flex items-center text-muted-foreground gap-1 px-2 py-1 select-none pr-0">
+            <SquareCode className="size-4 text-muted-foreground/80" />
+            <span className="text-xs text-muted-foreground/80 font-medium font-sans">
               Blocco codice
             </span>
+            <ChevronRight className="size-4 text-muted-foreground/30 mx-0.5 shrink-0" />
           </div>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                size="sm"
+                size="default"
                 className="text-foreground"
               >
                 <span className="font-semibold capitalize">
                   {languages.find((l) => l.value === activeState.data.language)?.label || "Senza linguaggio"}
                 </span>
-                <ChevronDown className="size-3.5 text-muted-foreground/80" />
+                <ChevronDown className="size-4 text-muted-foreground/80" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-48 max-h-[300px] overflow-y-auto">
@@ -299,7 +309,7 @@ export function ContextualToolbar({
               >
                 <div className="flex items-center w-full justify-between">
                   <span>Senza linguaggio</span>
-                  {activeState.data.language === null && <Check className="size-14 text-primary shrink-0" />}
+                  {activeState.data.language === null && <Check className="size-4 text-primary shrink-0" />}
                 </div>
               </DropdownMenuItem>
 
@@ -323,7 +333,7 @@ export function ContextualToolbar({
                 >
                   <div className="flex items-center w-full justify-between">
                     <span>{lang.label}</span>
-                    {activeState.data.language === lang.value && <Check className="size-14 text-primary shrink-0" />}
+                    {activeState.data.language === lang.value && <Check className="size-4 text-primary shrink-0" />}
                   </div>
                 </DropdownMenuItem>
               ))}
@@ -354,23 +364,23 @@ export function ContextualToolbar({
       {/* CASE 3: HEADER BLOCK */}
       {activeState.type === "header" && (
         <>
-          <div className="h-4 w-px bg-border/60 mx-1 shrink-0" />
-          <div className="flex items-center text-muted-foreground gap-1.5 px-2 py-1 select-none">
-            <Heading className="size-3.5 text-muted-foreground/80" />
-            <span className="text-xs text-muted-foreground font-medium">
+          <div className="flex items-center text-muted-foreground gap-1 px-2 py-1 select-none pr-0">
+            <Heading className="size-4 text-muted-foreground/80" />
+            <span className="text-xs text-muted-foreground/80 font-medium font-sans">
               Intestazione
             </span>
+            <ChevronRight className="size-4 text-muted-foreground/30 mx-0.5 shrink-0" />
           </div>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                size="sm"
+                size="default"
                 className="text-foreground"
               >
                 <span className="font-semibold">H{activeState.level}</span>
-                <ChevronDown className="size-3.5 text-muted-foreground/80" />
+                <ChevronDown className="size-4 text-muted-foreground/80" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-40">
@@ -384,7 +394,7 @@ export function ContextualToolbar({
                 >
                   <div className="flex items-center w-full justify-between">
                     <span>Titolo {l} (H{l})</span>
-                    {activeState.level === l && <Check size={14} className="text-primary shrink-0" />}
+                    {activeState.level === l && <Check className="size-4 text-primary shrink-0" />}
                   </div>
                 </DropdownMenuItem>
               ))}
@@ -407,21 +417,21 @@ export function ContextualToolbar({
       {/* CASE 4: WORD FORMATTING (BOLD, ITALIC, INLINE CODE) */}
       {activeState.type === "text" && (
         <>
-          <div className="h-4 w-px bg-border/60 mx-1 shrink-0" />
-          <div className="flex items-center text-muted-foreground gap-1.5 px-2 py-1 select-none">
-            <Type className="size-3.5 text-muted-foreground/80" />
-            <span className="text-xs text-muted-foreground font-medium">
+          <div className="flex items-center text-muted-foreground gap-1 px-2 py-1 select-none pr-0">
+            <Type className="size-4 text-muted-foreground/80" />
+            <span className="text-xs text-muted-foreground/80 font-medium font-sans">
               Stile
             </span>
+            <ChevronRight className="size-4 text-muted-foreground/30 mx-0.5 shrink-0" />
           </div>
 
-          <div className="flex items-center gap-0.5">
+          <div className="flex items-center gap-1">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
-                    size="icon-sm"
+                    size="icon"
                     className={cn(
                       "text-foreground",
                       activeState.bold && "bg-muted"
@@ -431,7 +441,7 @@ export function ContextualToolbar({
                       setUpdateTrigger((prev) => prev + 1);
                     }}
                   >
-                    <Bold className="size-3.5" />
+                    <Bold className="size-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Grassetto</TooltipContent>
@@ -441,7 +451,7 @@ export function ContextualToolbar({
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
-                    size="icon-sm"
+                    size="icon"
                     className={cn(
                       "text-foreground",
                       activeState.italic && "bg-muted"
@@ -451,7 +461,7 @@ export function ContextualToolbar({
                       setUpdateTrigger((prev) => prev + 1);
                     }}
                   >
-                    <Italic className="size-3.5" />
+                    <Italic className="size-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Corsivo</TooltipContent>
@@ -461,7 +471,7 @@ export function ContextualToolbar({
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
-                    size="icon-sm"
+                    size="icon"
                     className={cn(
                       "text-foreground",
                       activeState.quote && "bg-muted"
@@ -471,7 +481,7 @@ export function ContextualToolbar({
                       setUpdateTrigger((prev) => prev + 1);
                     }}
                   >
-                    <Quote className="size-3.5" />
+                    <Quote className="size-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Citazione</TooltipContent>
@@ -481,7 +491,7 @@ export function ContextualToolbar({
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
-                    size="icon-sm"
+                    size="icon"
                     className={cn(
                       "text-foreground",
                       activeState.inlineCode && "bg-muted"
@@ -491,7 +501,7 @@ export function ContextualToolbar({
                       setUpdateTrigger((prev) => prev + 1);
                     }}
                   >
-                    <Terminal className="size-3.5" />
+                    <Terminal className="size-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Codice inline</TooltipContent>
@@ -505,21 +515,21 @@ export function ContextualToolbar({
       {activeState.type === "list" && (
         <>
           {/* Style first */}
-          <div className="h-4 w-px bg-border/60 mx-1 shrink-0" />
-          <div className="flex items-center text-muted-foreground gap-1.5 px-2 py-1 select-none">
-            <Type className="size-3.5 text-muted-foreground/80" />
-            <span className="text-xs text-muted-foreground font-medium">
+          <div className="flex items-center text-muted-foreground gap-1 px-2 py-1 select-none pr-0">
+            <Type className="size-4 text-muted-foreground/80" />
+            <span className="text-xs text-muted-foreground/80 font-medium font-sans">
               Stile
             </span>
+            <ChevronRight className="size-4 text-muted-foreground/30 mx-0.5 shrink-0" />
           </div>
 
-          <div className="flex items-center gap-0.5">
+          <div className="flex items-center gap-1">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
-                    size="icon-sm"
+                    size="icon"
                     className={cn(
                       "text-foreground",
                       activeState.bold && "bg-muted"
@@ -529,7 +539,7 @@ export function ContextualToolbar({
                       setUpdateTrigger((prev) => prev + 1);
                     }}
                   >
-                    <Bold className="size-3.5" />
+                    <Bold className="size-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Grassetto</TooltipContent>
@@ -539,7 +549,7 @@ export function ContextualToolbar({
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
-                    size="icon-sm"
+                    size="icon"
                     className={cn(
                       "text-foreground",
                       activeState.italic && "bg-muted"
@@ -549,7 +559,7 @@ export function ContextualToolbar({
                       setUpdateTrigger((prev) => prev + 1);
                     }}
                   >
-                    <Italic className="size-3.5" />
+                    <Italic className="size-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Corsivo</TooltipContent>
@@ -559,7 +569,7 @@ export function ContextualToolbar({
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
-                    size="icon-sm"
+                    size="icon"
                     className={cn(
                       "text-foreground",
                       activeState.quote && "bg-muted"
@@ -569,7 +579,7 @@ export function ContextualToolbar({
                       setUpdateTrigger((prev) => prev + 1);
                     }}
                   >
-                    <Quote className="size-3.5" />
+                    <Quote className="size-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Citazione</TooltipContent>
@@ -579,7 +589,7 @@ export function ContextualToolbar({
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
-                    size="icon-sm"
+                    size="icon"
                     className={cn(
                       "text-foreground",
                       activeState.inlineCode && "bg-muted"
@@ -589,7 +599,7 @@ export function ContextualToolbar({
                       setUpdateTrigger((prev) => prev + 1);
                     }}
                   >
-                    <Terminal className="size-3.5" />
+                    <Terminal className="size-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Codice inline</TooltipContent>
@@ -598,47 +608,50 @@ export function ContextualToolbar({
           </div>
 
           {/* List second */}
-          <div className="h-4 w-px bg-border/60 mx-1 shrink-0" />
-          <div className="flex items-center text-muted-foreground gap-1.5 px-2 py-1 select-none">
+          <div className="h-4 w-px bg-border/60 shrink-0" />
+          <div className="flex items-center text-muted-foreground gap-1 px-2 py-1 select-none pr-0">
             {activeState.kind === "unordered" ? (
-              <List className="size-3.5 text-muted-foreground/80" />
+              <List className="size-4 text-muted-foreground/80" />
             ) : (
-              <ListOrdered className="size-3.5 text-muted-foreground/80" />
+              <ListOrdered className="size-4 text-muted-foreground/80" />
             )}
-            <span className="text-xs text-muted-foreground font-medium">
-              {activeState.kind === "unordered" ? "Elenco puntato" : "Elenco numerato"}
+            <span className="text-xs text-muted-foreground/80 font-medium font-sans">
+              {activeState.kind === "unordered" ? "Elenco" : "Elenco"}
             </span>
+            <ChevronRight className="size-4 text-muted-foreground/30 mx-0.5 shrink-0" />
           </div>
 
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  className="text-foreground"
-                  onClick={outdentList}
-                >
-                  <Outdent className="size-3.5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Riduci rientro (Sposta a sinistra)</TooltipContent>
-            </Tooltip>
+          <div className="flex items-center gap-1">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-foreground"
+                    onClick={outdentList}
+                  >
+                    <Outdent className="size-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Riduci rientro (Sposta a sinistra)</TooltipContent>
+              </Tooltip>
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  className="text-foreground"
-                  onClick={indentList}
-                >
-                  <Indent className="size-3.5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Aumenta rientro (Sposta a destra)</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-foreground"
+                    onClick={indentList}
+                  >
+                    <Indent className="size-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Aumenta rientro (Sposta a destra)</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
         </>
       )}
     </div>
