@@ -2,8 +2,8 @@
 
 import { useIsMobile } from "@/src/hooks/useIsMobile";
 import clsx from "clsx";
-import { Columns2, Eye, PenLine, Redo2, Sparkles, Undo2 } from "lucide-react";
-import type { Selection } from "monaco-editor";
+import { Columns2, Eye, Maximize2, Minimize2, PenLine, Redo2, Sparkles, Undo2 } from "lucide-react";
+import type { editor, Selection } from "monaco-editor";
 import { useEffect, useRef, useState } from "react";
 import { FormularioSettings } from "../home/formulario-settings";
 import { TakeFormulario } from "../home/take-formulario";
@@ -53,8 +53,9 @@ export function EditorPage({
   const [resizableSize, setResizableSize] = useState<number>(40);
   const [isFocused, setIsFocused] = useState(false);
   const [selection, setSelection] = useState<Selection | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
 
-  const editorRef = useRef<any>(null);
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const isMac = useIsMac();
 
   const undoBtnRef = useRef<HTMLButtonElement>(null);
@@ -126,8 +127,8 @@ export function EditorPage({
         foto_profilo: data.foto_profilo,
       });
       setLoading(false);
-    } catch (error: any) {
-      console.error(error.message);
+    } catch (error) {
+      console.error(error instanceof Error ? error.message : String(error));
     }
   };
 
@@ -184,6 +185,23 @@ export function EditorPage({
       const isA = e.key.toLowerCase() === "a" || e.code === "KeyA";
       const hasMeta = e.ctrlKey || e.metaKey;
 
+      if (e.key === "Escape" && isFullscreen) {
+        setIsFullscreen(false);
+        return;
+      }
+      if (e.key.toLowerCase() === "f" && !e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey) {
+        const activeEl = document.activeElement;
+        const isTyping = activeEl && (
+          activeEl.tagName === "INPUT" ||
+          activeEl.tagName === "TEXTAREA" ||
+          activeEl.getAttribute("contenteditable") === "true"
+        );
+        if (!isFocused && !isTyping) {
+          e.preventDefault();
+          setIsFullscreen((prev) => !prev);
+          return;
+        }
+      }
       if (isZ && hasMeta && !e.shiftKey) {
         e.preventDefault();
         handleUndo();
@@ -205,7 +223,7 @@ export function EditorPage({
     };
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [handleUndo, handleRedo, editable, isMobile]);
+  }, [handleUndo, handleRedo, editable, isMobile, isFullscreen, isFocused]);
 
   const titleComponent = () => {
     if (switchView === "preview" || !editable)
@@ -235,7 +253,7 @@ export function EditorPage({
   const viewTabs = (
     <Tabs
       value={switchView}
-      onValueChange={(val) => setSwitchView(val as any)}
+      onValueChange={(val) => setSwitchView(val as "preview" | "divided" | "edit")}
       className="gap-0 select-none shrink-0"
     >
       <TabsList variant="line" className="h-8 p-0 bg-transparent gap-0">
@@ -381,6 +399,29 @@ export function EditorPage({
         <div className="h-6 w-px bg-border" />
         {viewTabs}
         <div className="h-6 w-px bg-border" />
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setIsFullscreen((prev) => !prev)}
+                className="size-8 text-foreground shrink-0 cursor-pointer"
+              >
+                {isFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="pr-1.5">
+              <div className="flex items-center gap-2">
+                {isFullscreen ? "Esci da schermo intero" : "Schermo intero"}
+                <KbdGroup>
+                  <Kbd>F</Kbd>
+                </KbdGroup>
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        <div className="h-6 w-px bg-border" />
         <FormularioSettings formularioId={formularioId} />
       </div>
     </div>
@@ -431,6 +472,29 @@ export function EditorPage({
         <div className="flex items-center gap-3 shrink-0">
           {viewTabs}
           <div className="h-6 w-px bg-border" />
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setIsFullscreen((prev) => !prev)}
+                  className="size-8 text-foreground shrink-0 cursor-pointer"
+                >
+                  {isFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="pr-1.5">
+                <div className="flex items-center gap-2">
+                  {isFullscreen ? "Esci da schermo intero" : "Schermo intero"}
+                  <KbdGroup>
+                    <Kbd>F</Kbd>
+                  </KbdGroup>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <div className="h-6 w-px bg-border" />
           <FormularioSettings formularioId={formularioId} />
         </div>
       </div>
@@ -438,7 +502,14 @@ export function EditorPage({
   };
 
   return (
-    <div className="flex flex-1 flex-col min-h-0 border rounded-lg overflow-hidden">
+    <div
+      className={clsx(
+        "flex flex-1 flex-col min-h-0 overflow-hidden",
+        isFullscreen
+          ? "fixed inset-0 z-50 bg-background w-screen h-screen rounded-none border-none"
+          : "border rounded-lg"
+      )}
+    >
       {loading ? (
         <div className="flex h-full items-center justify-center">
           <Spinner />

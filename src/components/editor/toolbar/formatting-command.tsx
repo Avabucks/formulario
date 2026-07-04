@@ -92,7 +92,7 @@ export function FormattingCommand({
                 aria-label="Apri tavolozza comandi"
               >
                 <ChevronRight className="size-4 text-primary" />
-                <span>Esegui</span>
+                <span className="hidden md:flex">Esegui</span>
               </Button>
             </TooltipTrigger>
             <TooltipContent className="pr-1.5">
