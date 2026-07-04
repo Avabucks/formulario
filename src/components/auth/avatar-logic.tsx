@@ -10,9 +10,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from "@/src/components/ui/dropdown-menu";
 import { auth } from "@/src/lib/firebase";
 import { signOut } from "firebase/auth";
@@ -22,15 +21,14 @@ import {
   Coffee,
   Keyboard,
   LogOutIcon,
-  Settings,
-  Users,
+  Users
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { KbShortcuts } from "../navigation/kb-shortcuts";
-import { NewAccountPopup } from "../home/new-account-popup";
 import { DiscordDialog, DiscordIcon } from "../home/discord-widget";
+import { NewAccountPopup } from "../home/new-account-popup";
+import { KbShortcuts } from "../navigation/kb-shortcuts";
 
 export function AvatarLogic() {
   const router = useRouter();
@@ -112,7 +110,7 @@ export function AvatarLogic() {
           <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={() => setOpenDiscord(true)}>
             <DiscordIcon className="size-4" />
-            Entra su Disocord
+            Entra su Discord
           </DropdownMenuItem>
           <Link
             href="https://ko-fi.com/formulabase"
