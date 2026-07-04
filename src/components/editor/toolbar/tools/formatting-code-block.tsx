@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/src/components/ui/button";
 import {
   Command,
   CommandDialog,
@@ -10,12 +11,19 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/src/components/ui/command";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/src/components/ui/dropdown-menu";
 import languages from "@/src/data/languages.json";
 import {
   getIsActiveCode,
   handleBlockToggle
 } from "@/src/lib/editor/formatting-utils";
-import { Code, X } from "lucide-react";
+import { Code, X, Check, ChevronDown, ChevronRight, SquareCode } from "lucide-react";
 import type { editor } from "monaco-editor";
 import { useEffect, useState } from "react";
 
@@ -116,6 +124,108 @@ export function FormattingCodeBlock({
         </CommandList>
       </Command>
     </CommandDialog>
+  );
+}
+
+export function FormattingCodeBlockContext({
+  activeData,
+  editorRef,
+  setUpdateTrigger,
+}: Readonly<{
+  activeData: NonNullable<ReturnType<typeof getIsActiveCode>>;
+  editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
+  setUpdateTrigger: React.Dispatch<React.SetStateAction<number>>;
+}>) {
+  return (
+    <>
+      <div className="flex items-center text-muted-foreground gap-1.5 pl-0 pr-0 py-1 select-none">
+        <SquareCode className="size-4 text-muted-foreground" />
+        <span className="text-xs text-muted-foreground font-medium font-sans">
+          Blocco codice
+        </span>
+        <ChevronRight className="size-4 text-muted-foreground/30 mx-0.5 shrink-0" />
+      </div>
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="default"
+            className="text-foreground"
+          >
+            <span className="font-semibold capitalize">
+              {languages.find((l) => l.value === activeData.language)?.label || "Senza linguaggio"}
+            </span>
+            <ChevronDown className="size-4 text-muted-foreground" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className="w-48 max-h-75 overflow-y-auto">
+          <DropdownMenuItem
+            className="cursor-pointer text-xs"
+            onClick={() => {
+              handleBlockToggle(
+                editorRef,
+                activeData,
+                "```",
+                "```",
+                null
+              );
+              setUpdateTrigger((prev) => prev + 1);
+              setTimeout(() => editorRef.current?.focus(), 50);
+            }}
+          >
+            <div className="flex items-center w-full justify-between">
+              <span>Senza linguaggio</span>
+              {activeData.language === null && <Check className="size-4 text-primary shrink-0" />}
+            </div>
+          </DropdownMenuItem>
+
+          <DropdownMenuSeparator />
+
+          {LANGUAGES.map((lang) => (
+            <DropdownMenuItem
+              key={lang.value}
+              className="cursor-pointer text-xs"
+              onClick={() => {
+                handleBlockToggle(
+                  editorRef,
+                  activeData,
+                  "```",
+                  "```",
+                  lang.value
+                );
+                setUpdateTrigger((prev) => prev + 1);
+                setTimeout(() => editorRef.current?.focus(), 50);
+              }}
+            >
+              <div className="flex items-center w-full justify-between">
+                <span>{lang.label}</span>
+                {activeData.language === lang.value && <Check className="size-4 text-primary shrink-0" />}
+              </div>
+            </DropdownMenuItem>
+          ))}
+
+          <DropdownMenuSeparator />
+
+          <DropdownMenuItem
+            variant="destructive"
+            className="cursor-pointer text-xs"
+            onClick={() => {
+              handleBlockToggle(
+                editorRef,
+                activeData,
+                "```",
+                "```"
+              );
+              setUpdateTrigger((prev) => prev + 1);
+              setTimeout(() => editorRef.current?.focus(), 50);
+            }}
+          >
+            Rimuovi Blocco Codice
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </>
   );
 }
 

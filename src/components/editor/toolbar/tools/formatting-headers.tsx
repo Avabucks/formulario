@@ -1,6 +1,14 @@
 "use client";
 
+import { Button } from "@/src/components/ui/button";
 import { CommandItem, CommandShortcut } from "@/src/components/ui/command";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/src/components/ui/dropdown-menu";
 import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
 import {
   getH1Regex,
@@ -19,6 +27,10 @@ import {
   Heading4,
   Heading5,
   Heading6,
+  Heading,
+  ChevronDown,
+  ChevronRight,
+  Check,
 } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 
@@ -167,6 +179,92 @@ export function FormattingHeaders({
         prefix="######"
         onToggle={onToggle}
       />
+    </>
+  );
+}
+
+export function FormattingHeadersContext({
+  activeLevel,
+  editorRef,
+  setUpdateTrigger,
+}: Readonly<{
+  activeLevel: number;
+  editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
+  setUpdateTrigger: React.Dispatch<React.SetStateAction<number>>;
+}>) {
+  const handleHeaderSelect = (level: number) => {
+    const editor = editorRef.current;
+    if (!editor) return;
+    const model = editor.getModel();
+    if (!model) return;
+    const selection = editor.getSelection();
+    if (!selection) return;
+
+    const currentRegex = [getH1Regex, getH2Regex, getH3Regex, getH4Regex, getH5Regex, getH6Regex][level - 1];
+    const isCurrentLevelActive = getIsActiveList(editorRef, currentRegex);
+    const prefix = "#".repeat(level);
+
+    handleListToggle(
+      editorRef,
+      isCurrentLevelActive,
+      currentRegex,
+      (line) => `${prefix} ${line.replace(/^#{1,6}\s/, "")}`,
+      (line) => line.replace(new RegExp(String.raw`^${prefix}\s`), "")
+    );
+    setUpdateTrigger((prev) => prev + 1);
+    setTimeout(() => editor.focus(), 50);
+  };
+
+  return (
+    <>
+      <div className="flex items-center text-muted-foreground gap-1.5 pl-0 pr-0 py-1 select-none">
+        <Heading className="size-4 text-muted-foreground" />
+        <span className="text-xs text-muted-foreground font-medium font-sans">
+          Intestazione
+        </span>
+        <ChevronRight className="size-4 text-muted-foreground/30 mx-0.5 shrink-0" />
+      </div>
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="default"
+            className="text-foreground"
+          >
+            <span className="font-semibold">H{activeLevel}</span>
+            <ChevronDown className="size-4 text-muted-foreground" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className="w-40">
+          {[1, 2, 3, 4, 5, 6].map((l) => (
+            <DropdownMenuItem
+              key={l}
+              className="cursor-pointer text-xs"
+              onClick={() => {
+                handleHeaderSelect(l);
+              }}
+            >
+              <div className="flex items-center w-full justify-between">
+                <span>Titolo {l} (H{l})</span>
+                {activeLevel === l && <Check className="size-4 text-primary shrink-0" />}
+              </div>
+            </DropdownMenuItem>
+          ))}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            variant="destructive"
+            className="cursor-pointer text-xs"
+            onClick={() => {
+              if (activeLevel) {
+                handleHeaderSelect(activeLevel);
+              }
+            }}
+          >
+            Rimuovi Intestazione
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </>
   );
 }

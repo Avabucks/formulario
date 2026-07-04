@@ -32,6 +32,7 @@ import {
   ChevronRight,
   Radical,
   SquareRadical,
+  PenTool,
 } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -526,6 +527,48 @@ export function FormattingLatex({
 
       {dialog}
       <Separator orientation="vertical" />
+    </>
+  );
+}
+
+export function FormattingLatexContext({
+  activeData,
+}: Readonly<{
+  activeData: NonNullable<ReturnType<typeof getIsActiveLatex>>;
+}>) {
+  return (
+    <>
+      <div className="flex items-center text-muted-foreground gap-1.5 pl-0 pr-0 py-1 select-none">
+        <Radical className="size-4 text-muted-foreground" />
+        <span className="text-xs text-muted-foreground font-medium font-sans capitalize">
+          Formula {activeData.kind === "double" ? "blocco" : "inline"}
+        </span>
+        <ChevronRight className="size-4 text-muted-foreground/30 mx-0.5 shrink-0" />
+      </div>
+
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="default"
+              className="text-foreground gap-1.5 overf"
+              onClick={() => {
+                const event = new CustomEvent(
+                  activeData.kind === "double"
+                    ? "editor:open-latex-double"
+                    : "editor:open-latex-single"
+                );
+                globalThis.dispatchEvent(event);
+              }}
+            >
+              <PenTool className="size-4 text-primary" />
+              <span>Componi formula</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Componi la formula (inserisci simboli, frazioni o funzioni KaTeX)</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     </>
   );
 }

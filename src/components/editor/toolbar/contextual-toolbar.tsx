@@ -1,20 +1,8 @@
 "use client";
 
-import { Button } from "@/src/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/src/components/ui/dropdown-menu";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/src/components/ui/tooltip";
-import languages from "@/src/data/languages.json";
+/* eslint-disable react-hooks/refs */
+
+import { TooltipProvider } from "@/src/components/ui/tooltip";
 import {
   getBoldRegex,
   getCodeInlineRegex,
@@ -32,34 +20,18 @@ import {
   getOrderedListRegex,
   getQuoteRegex,
   getUnorderedListRegex,
-  handleBlockToggle,
-  handleListToggle,
 } from "@/src/lib/editor/formatting-utils";
-import { cn } from "@/src/lib/utils";
-import {
-  Bold,
-  Check,
-  ChevronDown,
-  ChevronRight,
-  Heading,
-  Indent,
-  Italic,
-  List,
-  ListOrdered,
-  Outdent,
-  PenTool,
-  Quote,
-  Radical,
-  SquareCode,
-  Terminal,
-  Type
-} from "lucide-react";
+import { ChevronRight, Type } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useMemo, useState } from "react";
-import { toggleBold } from "./tools/formatting-bold";
-import { toggleCodeInline } from "./tools/formatting-code-inline";
-import { toggleItalic } from "./tools/formatting-italic";
-import { toggleQuote } from "./tools/formatting-quote";
+import { FormattingLatexContext } from "./tools/formatting-latex";
+import { FormattingCodeBlockContext } from "./tools/formatting-code-block";
+import { FormattingHeadersContext } from "./tools/formatting-headers";
+import { FormattingBoldContext } from "./tools/formatting-bold";
+import { FormattingItalicContext } from "./tools/formatting-italic";
+import { FormattingQuoteContext } from "./tools/formatting-quote";
+import { FormattingCodeInlineContext } from "./tools/formatting-code-inline";
+import { FormattingListContext } from "./tools/formatting-unordered";
 
 interface ContextualToolbarProps {
   selection: Selection | null;
@@ -81,6 +53,7 @@ export function ContextualToolbar({
 
   // 1. Detect active formatting using existing logic
   const activeState = useMemo<ActiveState | null>(() => {
+    void updateTrigger;
     if (!selection || !editorRef.current) return null;
 
     // A. Check LaTeX
@@ -133,281 +106,31 @@ export function ContextualToolbar({
     };
   }, [selection, editorRef, updateTrigger]);
 
-  // Indent list items in selection by 2 spaces
-  const indentList = () => {
-    const editor = editorRef.current;
-    if (!editor) return;
-    const model = editor.getModel();
-    if (!model) return;
-    const selection = editor.getSelection();
-    if (!selection) return;
-
-    const edits = [];
-    for (let l = selection.startLineNumber; l <= selection.endLineNumber; l++) {
-      edits.push({
-        range: {
-          startLineNumber: l,
-          startColumn: 1,
-          endLineNumber: l,
-          endColumn: 1,
-        },
-        text: "  ",
-      });
-    }
-
-    model.pushEditOperations([], edits, () => null);
-    setUpdateTrigger((prev) => prev + 1);
-    editor.focus();
-  };
-
-  // Outdent list items in selection (remove up to 2 spaces)
-  const outdentList = () => {
-    const editor = editorRef.current;
-    if (!editor) return;
-    const model = editor.getModel();
-    if (!model) return;
-    const selection = editor.getSelection();
-    if (!selection) return;
-
-    const edits = [];
-    for (let l = selection.startLineNumber; l <= selection.endLineNumber; l++) {
-      const content = model.getLineContent(l);
-      let spacesToRemove = 0;
-      if (content.startsWith("  ")) {
-        spacesToRemove = 2;
-      } else if (content.startsWith(" ")) {
-        spacesToRemove = 1;
-      } else if (content.startsWith("\t")) {
-        spacesToRemove = 1;
-      }
-
-      if (spacesToRemove > 0) {
-        edits.push({
-          range: {
-            startLineNumber: l,
-            startColumn: 1,
-            endLineNumber: l,
-            endColumn: spacesToRemove + 1,
-          },
-          text: "",
-        });
-      }
-    }
-
-    model.pushEditOperations([], edits, () => null);
-    setUpdateTrigger((prev) => prev + 1);
-    editor.focus();
-  };
-
-  // Select and change header level or toggle off if already active
-  const handleHeaderSelect = (level: number) => {
-    const editor = editorRef.current;
-    if (!editor) return;
-    const model = editor.getModel();
-    if (!model) return;
-    const selection = editor.getSelection();
-    if (!selection) return;
-
-    const currentRegex = [getH1Regex, getH2Regex, getH3Regex, getH4Regex, getH5Regex, getH6Regex][level - 1];
-    const isCurrentLevelActive = getIsActiveList(editorRef, currentRegex);
-    const prefix = "#".repeat(level);
-
-    handleListToggle(
-      editorRef,
-      isCurrentLevelActive,
-      currentRegex,
-      (line) => `${prefix} ${line.replace(/^#{1,6}\s/, "")}`,
-      (line) => line.replace(new RegExp(String.raw`^${prefix}\s`), "")
-    );
-    setUpdateTrigger((prev) => prev + 1);
-    setTimeout(() => editor.focus(), 50);
-  };
-
   if (!activeState) return null;
 
   return (
     <div className="hidden md:flex items-center overflow-x-auto overflow-y-hidden max-w-full min-w-0">
       {/* CASE 1: LATEX FORMULA */}
       {activeState.type === "latex" && (
-        <>
-          <div className="flex items-center text-muted-foreground gap-1.5 pl-0 pr-0 py-1 select-none">
-            <Radical className="size-4 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground font-medium font-sans capitalize">
-              Formula {activeState.data.kind === "double" ? "blocco" : "inline"}
-            </span>
-            <ChevronRight className="size-4 text-muted-foreground/30 mx-0.5 shrink-0" />
-          </div>
-
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="default"
-                  className="text-foreground gap-1.5 overf"
-                  onClick={() => {
-                    const event = new CustomEvent(
-                      activeState.data.kind === "double"
-                        ? "editor:open-latex-double"
-                        : "editor:open-latex-single"
-                    );
-                    globalThis.dispatchEvent(event);
-                  }}
-                >
-                  <PenTool className="size-4 text-primary" />
-                  <span>Componi formula</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Componi la formula (inserisci simboli, frazioni o funzioni KaTeX)</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </>
+        <FormattingLatexContext activeData={activeState.data} />
       )}
 
       {/* CASE 2: CODE BLOCK */}
       {activeState.type === "code" && (
-        <>
-          <div className="flex items-center text-muted-foreground gap-1.5 pl-0 pr-0 py-1 select-none">
-            <SquareCode className="size-4 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground font-medium font-sans">
-              Blocco codice
-            </span>
-            <ChevronRight className="size-4 text-muted-foreground/30 mx-0.5 shrink-0" />
-          </div>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="default"
-                className="text-foreground"
-              >
-                <span className="font-semibold capitalize">
-                  {languages.find((l) => l.value === activeState.data.language)?.label || "Senza linguaggio"}
-                </span>
-                <ChevronDown className="size-4 text-muted-foreground" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-48 max-h-75 overflow-y-auto">
-              <DropdownMenuItem
-                className="cursor-pointer text-xs"
-                onClick={() => {
-                  handleBlockToggle(
-                    editorRef,
-                    activeState.data,
-                    "```",
-                    "```",
-                    null
-                  );
-                  setUpdateTrigger((prev) => prev + 1);
-                  setTimeout(() => editorRef.current?.focus(), 50);
-                }}
-              >
-                <div className="flex items-center w-full justify-between">
-                  <span>Senza linguaggio</span>
-                  {activeState.data.language === null && <Check className="size-4 text-primary shrink-0" />}
-                </div>
-              </DropdownMenuItem>
-
-              <DropdownMenuSeparator />
-
-              {languages.map((lang) => (
-                <DropdownMenuItem
-                  key={lang.value}
-                  className="cursor-pointer text-xs"
-                  onClick={() => {
-                    handleBlockToggle(
-                      editorRef,
-                      activeState.data,
-                      "```",
-                      "```",
-                      lang.value
-                    );
-                    setUpdateTrigger((prev) => prev + 1);
-                    setTimeout(() => editorRef.current?.focus(), 50);
-                  }}
-                >
-                  <div className="flex items-center w-full justify-between">
-                    <span>{lang.label}</span>
-                    {activeState.data.language === lang.value && <Check className="size-4 text-primary shrink-0" />}
-                  </div>
-                </DropdownMenuItem>
-              ))}
-
-              <DropdownMenuSeparator />
-
-              <DropdownMenuItem
-                variant="destructive"
-                className="cursor-pointer text-xs"
-                onClick={() => {
-                  handleBlockToggle(
-                    editorRef,
-                    activeState.data,
-                    "```",
-                    "```"
-                  );
-                  setUpdateTrigger((prev) => prev + 1);
-                  setTimeout(() => editorRef.current?.focus(), 50);
-                }}
-              >
-                Rimuovi Blocco Codice
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </>
+        <FormattingCodeBlockContext
+          activeData={activeState.data}
+          editorRef={editorRef}
+          setUpdateTrigger={setUpdateTrigger}
+        />
       )}
 
       {/* CASE 3: HEADER BLOCK */}
       {activeState.type === "header" && (
-        <>
-          <div className="flex items-center text-muted-foreground gap-1.5 pl-0 pr-0 py-1 select-none">
-            <Heading className="size-4 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground font-medium font-sans">
-              Intestazione
-            </span>
-            <ChevronRight className="size-4 text-muted-foreground/30 mx-0.5 shrink-0" />
-          </div>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="default"
-                className="text-foreground"
-              >
-                <span className="font-semibold">H{activeState.level}</span>
-                <ChevronDown className="size-4 text-muted-foreground" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-40">
-              {[1, 2, 3, 4, 5, 6].map((l) => (
-                <DropdownMenuItem
-                  key={l}
-                  className="cursor-pointer text-xs"
-                  onClick={() => {
-                    handleHeaderSelect(l);
-                  }}
-                >
-                  <div className="flex items-center w-full justify-between">
-                    <span>Titolo {l} (H{l})</span>
-                    {activeState.level === l && <Check className="size-4 text-primary shrink-0" />}
-                  </div>
-                </DropdownMenuItem>
-              ))}
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="cursor-pointer text-xs text-destructive focus:bg-destructive/10"
-                onClick={() => {
-                  if (activeState.level) {
-                    handleHeaderSelect(activeState.level);
-                  }
-                }}
-              >
-                Rimuovi Intestazione
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </>
+        <FormattingHeadersContext
+          activeLevel={activeState.level}
+          editorRef={editorRef}
+          setUpdateTrigger={setUpdateTrigger}
+        />
       )}
 
       {/* CASE 4: WORD FORMATTING (BOLD, ITALIC, INLINE CODE) */}
@@ -423,85 +146,26 @@ export function ContextualToolbar({
 
           <div className="flex items-center gap-1">
             <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className={cn(
-                      "text-foreground",
-                      activeState.bold && "bg-muted"
-                    )}
-                    onClick={() => {
-                      toggleBold(editorRef);
-                      setUpdateTrigger((prev) => prev + 1);
-                    }}
-                  >
-                    <Bold className="size-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Grassetto</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className={cn(
-                      "text-foreground",
-                      activeState.italic && "bg-muted"
-                    )}
-                    onClick={() => {
-                      toggleItalic(editorRef);
-                      setUpdateTrigger((prev) => prev + 1);
-                    }}
-                  >
-                    <Italic className="size-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Corsivo</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className={cn(
-                      "text-foreground",
-                      activeState.quote && "bg-muted"
-                    )}
-                    onClick={() => {
-                      toggleQuote(editorRef);
-                      setUpdateTrigger((prev) => prev + 1);
-                    }}
-                  >
-                    <Quote className="size-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Citazione</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className={cn(
-                      "text-foreground",
-                      activeState.inlineCode && "bg-muted"
-                    )}
-                    onClick={() => {
-                      toggleCodeInline(editorRef);
-                      setUpdateTrigger((prev) => prev + 1);
-                    }}
-                  >
-                    <Terminal className="size-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Codice inline</TooltipContent>
-              </Tooltip>
+              <FormattingBoldContext
+                isActive={activeState.bold}
+                editorRef={editorRef}
+                setUpdateTrigger={setUpdateTrigger}
+              />
+              <FormattingItalicContext
+                isActive={activeState.italic}
+                editorRef={editorRef}
+                setUpdateTrigger={setUpdateTrigger}
+              />
+              <FormattingQuoteContext
+                isActive={activeState.quote}
+                editorRef={editorRef}
+                setUpdateTrigger={setUpdateTrigger}
+              />
+              <FormattingCodeInlineContext
+                isActive={activeState.inlineCode}
+                editorRef={editorRef}
+                setUpdateTrigger={setUpdateTrigger}
+              />
             </TooltipProvider>
           </div>
         </>
@@ -521,133 +185,37 @@ export function ContextualToolbar({
 
           <div className="flex items-center gap-1">
             <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className={cn(
-                      "text-foreground",
-                      activeState.bold && "bg-muted"
-                    )}
-                    onClick={() => {
-                      toggleBold(editorRef);
-                      setUpdateTrigger((prev) => prev + 1);
-                    }}
-                  >
-                    <Bold className="size-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Grassetto</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className={cn(
-                      "text-foreground",
-                      activeState.italic && "bg-muted"
-                    )}
-                    onClick={() => {
-                      toggleItalic(editorRef);
-                      setUpdateTrigger((prev) => prev + 1);
-                    }}
-                  >
-                    <Italic className="size-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Corsivo</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className={cn(
-                      "text-foreground",
-                      activeState.quote && "bg-muted"
-                    )}
-                    onClick={() => {
-                      toggleQuote(editorRef);
-                      setUpdateTrigger((prev) => prev + 1);
-                    }}
-                  >
-                    <Quote className="size-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Citazione</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className={cn(
-                      "text-foreground",
-                      activeState.inlineCode && "bg-muted"
-                    )}
-                    onClick={() => {
-                      toggleCodeInline(editorRef);
-                      setUpdateTrigger((prev) => prev + 1);
-                    }}
-                  >
-                    <Terminal className="size-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Codice inline</TooltipContent>
-              </Tooltip>
+              <FormattingBoldContext
+                isActive={activeState.bold}
+                editorRef={editorRef}
+                setUpdateTrigger={setUpdateTrigger}
+              />
+              <FormattingItalicContext
+                isActive={activeState.italic}
+                editorRef={editorRef}
+                setUpdateTrigger={setUpdateTrigger}
+              />
+              <FormattingQuoteContext
+                isActive={activeState.quote}
+                editorRef={editorRef}
+                setUpdateTrigger={setUpdateTrigger}
+              />
+              <FormattingCodeInlineContext
+                isActive={activeState.inlineCode}
+                editorRef={editorRef}
+                setUpdateTrigger={setUpdateTrigger}
+              />
             </TooltipProvider>
           </div>
 
           {/* List second */}
-          <div className="h-5 w-px bg-border mx-2.5 shrink-0" />
-          <div className="flex items-center text-muted-foreground gap-1.5 pl-0 pr-0 py-1 select-none">
-            {activeState.kind === "unordered" ? (
-              <List className="size-4 text-muted-foreground" />
-            ) : (
-              <ListOrdered className="size-4 text-muted-foreground" />
-            )}
-            <span className="text-xs text-muted-foreground font-medium font-sans">
-              {activeState.kind === "unordered" ? "Elenco non ordinato" : "Elenco ordinato"}
-            </span>
-            <ChevronRight className="size-4 text-muted-foreground/30 mx-0.5 shrink-0" />
-          </div>
-
-          <div className="flex items-center gap-1">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-foreground"
-                    onClick={outdentList}
-                  >
-                    <Outdent className="size-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Riduci rientro (Sposta a sinistra)</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-foreground"
-                    onClick={indentList}
-                  >
-                    <Indent className="size-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Aumenta rientro (Sposta a destra)</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
+          <TooltipProvider>
+            <FormattingListContext
+              kind={activeState.kind}
+              editorRef={editorRef}
+              setUpdateTrigger={setUpdateTrigger}
+            />
+          </TooltipProvider>
         </>
       )}
     </div>
