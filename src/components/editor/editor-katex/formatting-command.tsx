@@ -72,7 +72,7 @@ export function FormattingCommand({
 
   return (
     <>
-      <div className="flex items-center gap-2 shrink-0 select-none">
+      <div className="flex items-center gap-4 min-w-0 select-none max-w-full">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>

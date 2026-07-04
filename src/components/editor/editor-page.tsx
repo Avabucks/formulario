@@ -249,7 +249,7 @@ export function EditorPage({
   const toolbar = (
     <div className="flex w-full border-b bg-background/95 backdrop-blur-xs min-h-15 items-center justify-between px-4 py-2 gap-4 overflow-x-auto select-none">
       {/* Left: History & Formatting Tray */}
-      <div className="flex flex-1 items-center gap-2 min-w-0">
+      <div className="flex flex-1 items-center gap-3 min-w-0">
         {/* History Capsule */}
         <div className="flex items-center gap-1 shrink-0">
           <TooltipProvider>

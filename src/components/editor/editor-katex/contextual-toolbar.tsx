@@ -230,11 +230,11 @@ export function ContextualToolbar({
   if (!activeState) return null;
 
   return (
-    <div className="hidden md:flex items-center gap-2">
+    <div className="hidden md:flex items-center overflow-x-auto overflow-y-hidden max-w-full min-w-0">
       {/* CASE 1: LATEX FORMULA */}
       {activeState.type === "latex" && (
         <>
-          <div className="flex items-center text-muted-foreground gap-1 px-2 py-1 select-none pr-0">
+          <div className="flex items-center text-muted-foreground gap-1.5 pl-0 pr-0 py-1 select-none">
             <Radical className="size-4 text-muted-foreground/80" />
             <span className="text-xs text-muted-foreground/80 font-medium font-sans capitalize">
               Formula {activeState.data.kind === "double" ? "blocco" : "inline"}
@@ -248,7 +248,7 @@ export function ContextualToolbar({
                 <Button
                   variant="ghost"
                   size="default"
-                  className="text-foreground gap-1.5"
+                  className="text-foreground gap-1.5 overf"
                   onClick={() => {
                     const event = new CustomEvent(
                       activeState.data.kind === "double"
@@ -271,7 +271,7 @@ export function ContextualToolbar({
       {/* CASE 2: CODE BLOCK */}
       {activeState.type === "code" && (
         <>
-          <div className="flex items-center text-muted-foreground gap-1 px-2 py-1 select-none pr-0">
+          <div className="flex items-center text-muted-foreground gap-1.5 pl-0 pr-0 py-1 select-none">
             <SquareCode className="size-4 text-muted-foreground/80" />
             <span className="text-xs text-muted-foreground/80 font-medium font-sans">
               Blocco codice
@@ -364,7 +364,7 @@ export function ContextualToolbar({
       {/* CASE 3: HEADER BLOCK */}
       {activeState.type === "header" && (
         <>
-          <div className="flex items-center text-muted-foreground gap-1 px-2 py-1 select-none pr-0">
+          <div className="flex items-center text-muted-foreground gap-1.5 pl-0 pr-0 py-1 select-none">
             <Heading className="size-4 text-muted-foreground/80" />
             <span className="text-xs text-muted-foreground/80 font-medium font-sans">
               Intestazione
@@ -417,7 +417,7 @@ export function ContextualToolbar({
       {/* CASE 4: WORD FORMATTING (BOLD, ITALIC, INLINE CODE) */}
       {activeState.type === "text" && (
         <>
-          <div className="flex items-center text-muted-foreground gap-1 px-2 py-1 select-none pr-0">
+          <div className="flex items-center text-muted-foreground gap-1.5 pl-0 pr-0 py-1 select-none">
             <Type className="size-4 text-muted-foreground/80" />
             <span className="text-xs text-muted-foreground/80 font-medium font-sans">
               Stile
@@ -515,7 +515,7 @@ export function ContextualToolbar({
       {activeState.type === "list" && (
         <>
           {/* Style first */}
-          <div className="flex items-center text-muted-foreground gap-1 px-2 py-1 select-none pr-0">
+          <div className="flex items-center text-muted-foreground gap-1.5 pl-0 pr-0 py-1 select-none">
             <Type className="size-4 text-muted-foreground/80" />
             <span className="text-xs text-muted-foreground/80 font-medium font-sans">
               Stile
@@ -608,8 +608,8 @@ export function ContextualToolbar({
           </div>
 
           {/* List second */}
-          <div className="h-4 w-px bg-border/60 shrink-0" />
-          <div className="flex items-center text-muted-foreground gap-1 px-2 py-1 select-none pr-0">
+          <div className="h-5 w-px bg-border mx-2 shrink-0" />
+          <div className="flex items-center text-muted-foreground gap-1.5 pl-0 pr-0 py-1 select-none">
             {activeState.kind === "unordered" ? (
               <List className="size-4 text-muted-foreground/80" />
             ) : (
