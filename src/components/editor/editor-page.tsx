@@ -9,6 +9,7 @@ import { FormularioSettings } from "../home/formulario-settings";
 import { TakeFormulario } from "../home/take-formulario";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
+import { Toggle } from "../ui/toggle";
 import { Kbd, KbdGroup, useIsMac } from "../ui/kbd";
 import { Spinner } from "../ui/spinner";
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
@@ -166,28 +167,29 @@ export function EditorPage({
   }, [editable, showAI]);
 
   useEffect(() => {
-    const handleViewShortcut = (e: KeyboardEvent) => {
+    const handleViewShortcut = (e: KeyboardEvent): boolean => {
       if (e.key === "1" || e.code === "Digit1") {
         e.preventDefault();
         setSwitchView("edit");
-      } else if ((e.key === "2" || e.code === "Digit2") && !isMobile) {
+        return true;
+      }
+      if ((e.key === "2" || e.code === "Digit2") && !isMobile) {
         e.preventDefault();
         setSwitchView("divided");
-      } else if (e.key === "3" || e.code === "Digit3") {
+        return true;
+      }
+      if (e.key === "3" || e.code === "Digit3") {
         e.preventDefault();
         setSwitchView("preview");
+        return true;
       }
+      return false;
     };
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const isZ = e.key.toLowerCase() === "z" || e.code === "KeyZ";
-      const isY = e.key.toLowerCase() === "y" || e.code === "KeyY";
-      const isA = e.key.toLowerCase() === "a" || e.code === "KeyA";
-      const hasMeta = e.ctrlKey || e.metaKey;
-
+    const handleFullscreenShortcut = (e: KeyboardEvent): boolean => {
       if (e.key === "Escape" && isFullscreen) {
         setIsFullscreen(false);
-        return;
+        return true;
       }
       if (e.key.toLowerCase() === "f" && !e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey) {
         const activeEl = document.activeElement;
@@ -199,28 +201,49 @@ export function EditorPage({
         if (!isFocused && !isTyping) {
           e.preventDefault();
           setIsFullscreen((prev) => !prev);
-          return;
+          return true;
         }
       }
+      return false;
+    };
+
+    const handleHistoryShortcut = (e: KeyboardEvent): boolean => {
+      const isZ = e.key.toLowerCase() === "z" || e.code === "KeyZ";
+      const isY = e.key.toLowerCase() === "y" || e.code === "KeyY";
+      const hasMeta = e.ctrlKey || e.metaKey;
+
       if (isZ && hasMeta && !e.shiftKey) {
         e.preventDefault();
         handleUndo();
-        return;
+        return true;
       }
       if ((isY && hasMeta && !e.shiftKey) || (isZ && hasMeta && e.shiftKey)) {
         e.preventDefault();
         handleRedo();
-        return;
+        return true;
       }
+      return false;
+    };
+
+    const handleViewAndAiShortcut = (e: KeyboardEvent): boolean => {
+      const isA = e.key.toLowerCase() === "a" || e.code === "KeyA";
       if (isA && e.altKey && editable) {
         e.preventDefault();
         setShowAI((prev) => !prev);
-        return;
+        return true;
       }
       if (e.altKey) {
-        handleViewShortcut(e);
+        return handleViewShortcut(e);
       }
+      return false;
     };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (handleFullscreenShortcut(e)) return;
+      if (handleHistoryShortcut(e)) return;
+      if (handleViewAndAiShortcut(e)) return;
+    };
+
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [handleUndo, handleRedo, editable, isMobile, isFullscreen, isFocused]);
@@ -237,13 +260,7 @@ export function EditorPage({
           </Avatar>
 
           <h1 className="text-sm font-medium text-foreground truncate">
-            {(() => {
-              const firstLine = markdownContent.split("\n", 1)[0]?.trim();
-
-              return firstLine?.startsWith("#")
-                ? firstLine.replace(/^#+\s*/, "")
-                : "Senza Titolo";
-            })()}
+            {getMarkdownTitle(markdownContent)}
           </h1>
         </div>
       );
@@ -402,14 +419,14 @@ export function EditorPage({
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
+              <Toggle
                 variant="outline"
-                size="icon"
-                onClick={() => setIsFullscreen((prev) => !prev)}
-                className="size-8 text-foreground shrink-0 cursor-pointer"
+                pressed={isFullscreen}
+                onPressedChange={setIsFullscreen}
+                className="size-8 text-foreground shrink-0 cursor-pointer p-0"
               >
                 {isFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
-              </Button>
+              </Toggle>
             </TooltipTrigger>
             <TooltipContent className="pr-1.5">
               <div className="flex items-center gap-2">
@@ -475,14 +492,14 @@ export function EditorPage({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button
+                <Toggle
                   variant="outline"
-                  size="icon"
-                  onClick={() => setIsFullscreen((prev) => !prev)}
-                  className="size-8 text-foreground shrink-0 cursor-pointer"
+                  pressed={isFullscreen}
+                  onPressedChange={setIsFullscreen}
+                  className="size-8 text-foreground shrink-0 cursor-pointer p-0"
                 >
                   {isFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
-                </Button>
+                </Toggle>
               </TooltipTrigger>
               <TooltipContent className="pr-1.5">
                 <div className="flex items-center gap-2">
@@ -519,83 +536,164 @@ export function EditorPage({
       )}
 
       <div className="flex flex-1 min-h-0 w-full relative overflow-hidden">
-        {/* Main Area: Editor and/or Preview */}
-        <div className="flex-1 h-full flex relative min-w-0">
-          {/* Left panel (Editor) */}
-          <div
-            className="h-full flex flex-col min-w-0"
-            style={{
-              display: switchView === "preview" ? "none" : "flex",
-              width:
-                !isMobile && switchView === "divided"
-                  ? `${resizableSize}%`
-                  : "100%",
-            }}
-          >
-            {input}
-          </div>
+        <EditorPanels
+          switchView={switchView}
+          isMobile={isMobile}
+          resizableSize={resizableSize}
+          handleMouseDown={handleMouseDown}
+          handleSliderKeyDown={handleSliderKeyDown}
+          input={input}
+          preview={preview}
+          editable={editable}
+          loading={loading}
+          saveError={saveError}
+          saveLoading={saveLoading}
+        />
 
-          {/* Divider */}
-          {!isMobile && switchView === "divided" && (
-            <div
-              className="w-1 bg-border/50 hover:bg-muted-foreground/30 hover:w-1.5 transition-all cursor-col-resize h-full select-none outline-none focus-visible:bg-primary/50"
-              onMouseDown={handleMouseDown}
-              onKeyDown={handleSliderKeyDown}
-              role="slider"
-              aria-valuenow={resizableSize}
-              aria-valuemin={MIN_RESIZABLE_SIZE}
-              aria-valuemax={MAX_RESIZABLE_SIZE}
-              tabIndex={0}
-            />
-          )}
-
-          {/* Right panel (Preview) */}
-          <div
-            className="h-full flex flex-col min-w-0"
-            style={{
-              display:
-                switchView === "preview" ||
-                (!isMobile && switchView === "divided")
-                  ? "flex"
-                  : "none",
-              width:
-                !isMobile && switchView === "divided"
-                  ? `${100 - resizableSize}%`
-                  : "100%",
-            }}
-          >
-            {preview}
-          </div>
-
-          {editable && !loading && (
-            <SyncStatus error={saveError} loading={saveLoading} />
-          )}
-        </div>
-
-        {/* AI Chat Sidebar */}
-        {editable && (
-          <div
-            className={clsx(
-              "h-full border-l bg-background flex flex-col z-20 shrink-0 transition-all duration-300 shadow-lg",
-              {
-                "absolute inset-0 w-full": isMobile,
-                "w-162.5": !isMobile && isAiExpanded,
-                "w-87.5": !isMobile && !isAiExpanded,
-                hidden: !showAI,
-              },
-            )}
-          >
-            <EditorAI
-              editorRef={editorRef}
-              onClose={() => setShowAI(false)}
-              isExpanded={isAiExpanded}
-              onToggleExpand={() => setIsAiExpanded(!isAiExpanded)}
-            />
-          </div>
-        )}
+        <EditorAISidebar
+          editable={editable}
+          isMobile={isMobile}
+          isAiExpanded={isAiExpanded}
+          showAI={showAI}
+          editorRef={editorRef}
+          setShowAI={setShowAI}
+          setIsAiExpanded={setIsAiExpanded}
+        />
       </div>
 
       <ShortcutsListener editorRef={editorRef} isFocused={isFocused} />
+    </div>
+  );
+}
+
+const getMarkdownTitle = (markdown: string): string => {
+  const firstLine = markdown.split("\n", 1)[0]?.trim();
+  return firstLine?.startsWith("#")
+    ? firstLine.replace(/^#+\s*/, "")
+    : "Senza Titolo";
+};
+
+interface EditorPanelsProps {
+  switchView: string;
+  isMobile: boolean;
+  resizableSize: number;
+  handleMouseDown: (e: React.MouseEvent) => void;
+  handleSliderKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => void;
+  input: React.ReactNode;
+  preview: React.ReactNode;
+  editable: boolean;
+  loading: boolean;
+  saveError: boolean;
+  saveLoading: boolean;
+}
+
+function EditorPanels({
+  switchView,
+  isMobile,
+  resizableSize,
+  handleMouseDown,
+  handleSliderKeyDown,
+  input,
+  preview,
+  editable,
+  loading,
+  saveError,
+  saveLoading,
+}: Readonly<EditorPanelsProps>) {
+  return (
+    <div className="flex-1 h-full flex relative min-w-0">
+      {/* Left panel (Editor) */}
+      <div
+        className="h-full flex flex-col min-w-0"
+        style={{
+          display: switchView === "preview" ? "none" : "flex",
+          width:
+            !isMobile && switchView === "divided"
+              ? `${resizableSize}%`
+              : "100%",
+        }}
+      >
+        {input}
+      </div>
+
+      {/* Divider */}
+      {!isMobile && switchView === "divided" && (
+        <div
+          className="w-1 bg-border/50 hover:bg-muted-foreground/30 hover:w-1.5 transition-all cursor-col-resize h-full select-none outline-none focus-visible:bg-primary/50"
+          onMouseDown={handleMouseDown}
+          onKeyDown={handleSliderKeyDown}
+          role="slider"
+          aria-valuenow={resizableSize}
+          aria-valuemin={MIN_RESIZABLE_SIZE}
+          aria-valuemax={MAX_RESIZABLE_SIZE}
+          tabIndex={0}
+        />
+      )}
+
+      {/* Right panel (Preview) */}
+      <div
+        className="h-full flex flex-col min-w-0"
+        style={{
+          display:
+            switchView === "preview" ||
+            (!isMobile && switchView === "divided")
+              ? "flex"
+              : "none",
+          width:
+            !isMobile && switchView === "divided"
+              ? `${100 - resizableSize}%`
+              : "100%",
+        }}
+      >
+        {preview}
+      </div>
+
+      {editable && !loading && (
+        <SyncStatus error={saveError} loading={saveLoading} />
+      )}
+    </div>
+  );
+}
+
+interface EditorAISidebarProps {
+  editable: boolean;
+  isMobile: boolean;
+  isAiExpanded: boolean;
+  showAI: boolean;
+  editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
+  setShowAI: (show: boolean) => void;
+  setIsAiExpanded: (expanded: boolean) => void;
+}
+
+function EditorAISidebar({
+  editable,
+  isMobile,
+  isAiExpanded,
+  showAI,
+  editorRef,
+  setShowAI,
+  setIsAiExpanded,
+}: Readonly<EditorAISidebarProps>) {
+  if (!editable) return null;
+
+  return (
+    <div
+      className={clsx(
+        "h-full border-l bg-background flex flex-col z-20 shrink-0 transition-all duration-300 shadow-lg",
+        {
+          "absolute inset-0 w-full": isMobile,
+          "w-162.5": !isMobile && isAiExpanded,
+          "w-87.5": !isMobile && !isAiExpanded,
+          hidden: !showAI,
+        }
+      )}
+    >
+      <EditorAI
+        editorRef={editorRef}
+        onClose={() => setShowAI(false)}
+        isExpanded={isAiExpanded}
+        onToggleExpand={() => setIsAiExpanded(!isAiExpanded)}
+      />
     </div>
   );
 }
