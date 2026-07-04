@@ -39,6 +39,7 @@ import { FormattingUnorderedList } from "./tools/formatting-unordered";
 import { FormattingLatex } from "./tools/formatting-latex";
 import { FormattingTable } from "./tools/formatting-table";
 import { useEffect, useState, useRef } from "react";
+import { ContextualToolbar } from "./contextual-toolbar";
 
 export function FormattingCommand({
   _selection,
@@ -71,31 +72,40 @@ export function FormattingCommand({
 
   return (
     <>
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="outline"
-              onClick={() => setActiveDialog(!activeDialog)}
-              onMouseDown={(e) => e.preventDefault()}
-              aria-label="Apri tavolozza comandi"
-            >
-              <ChevronRight size={16} />
-              Esegui<span className="hidden md:flex"> Comando</span>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent className="pr-1.5">
-            <div className="flex items-center gap-2">
-              Comandi
-              <KbdGroup className="hidden md:flex">
-                <Kbd>Ctrl</Kbd>
-                <span>+</span>
-                <Kbd>Space</Kbd>
-              </KbdGroup>
-            </div>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <div className="flex items-center gap-0.5 bg-muted/30 p-0.5 rounded-lg border border-border/40 shadow-xs shrink-0 select-none">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-foreground gap-1"
+                onClick={() => setActiveDialog(!activeDialog)}
+                onMouseDown={(e) => e.preventDefault()}
+                aria-label="Apri tavolozza comandi"
+              >
+                <ChevronRight className="size-3.5 text-primary" />
+                <span>Esegui</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="pr-1.5">
+              <div className="flex items-center gap-2">
+                Comandi
+                <KbdGroup className="hidden md:flex">
+                  <Kbd>Ctrl</Kbd>
+                  <span>+</span>
+                  <Kbd>Space</Kbd>
+                </KbdGroup>
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
+        <ContextualToolbar
+          selection={_selection}
+          editorRef={editorRef}
+        />
+      </div>
 
       <Dialog
         open={activeDialog}

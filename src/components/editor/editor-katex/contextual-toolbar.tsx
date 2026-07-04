@@ -47,11 +47,13 @@ import {
   ListOrdered,
   Outdent,
   Plus,
+  PlusCircle,
   Quote,
   Radical,
+  Sigma,
   SquareCode,
-  SquareRadical,
   Terminal,
+  Type,
 } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useMemo, useState } from "react";
@@ -69,7 +71,7 @@ type ActiveState =
   | { type: "latex"; data: NonNullable<ReturnType<typeof getIsActiveLatex>> }
   | { type: "code"; data: NonNullable<ReturnType<typeof getIsActiveCode>> }
   | { type: "header"; level: number }
-  | { type: "list"; kind: "ordered" | "unordered" }
+  | { type: "list"; kind: "ordered" | "unordered"; bold: boolean; italic: boolean; quote: boolean; inlineCode: boolean }
   | { type: "text"; bold: boolean; italic: boolean; quote: boolean; inlineCode: boolean };
 
 export function ContextualToolbar({
@@ -102,22 +104,19 @@ export function ContextualToolbar({
     if (getIsActiveList(editorRef, getH5Regex)) return { type: "header", level: 5 };
     if (getIsActiveList(editorRef, getH6Regex)) return { type: "header", level: 6 };
 
-    // D. Check Lists
-    const isUnordered = getIsActiveList(editorRef, getUnorderedListRegex);
-    const isOrdered = getIsActiveList(editorRef, getOrderedListRegex);
-    if (isUnordered || isOrdered) {
-      return { type: "list", kind: isUnordered ? ("unordered" as const) : ("ordered" as const) };
-    }
-
-    // E. Check Word/Line Formats (Bold, Italic, Quote, Inline Code)
+    // Common text styles (Bold, Italic, Quote, Inline Code) to be used as default and inside lists
     const isBold = getIsActiveWord(editorRef, getBoldRegex);
     const isItalic = getIsActiveWord(editorRef, getItalicRegex);
     const isQuote = getIsActiveList(editorRef, getQuoteRegex);
     const isInlineCode = getIsActiveWord(editorRef, getCodeInlineRegex);
 
-    if (isBold || isItalic || isQuote || isInlineCode) {
+    // D. Check Lists
+    const isUnordered = getIsActiveList(editorRef, getUnorderedListRegex);
+    const isOrdered = getIsActiveList(editorRef, getOrderedListRegex);
+    if (isUnordered || isOrdered) {
       return {
-        type: "text",
+        type: "list",
+        kind: isUnordered ? ("unordered" as const) : ("ordered" as const),
         bold: isBold,
         italic: isItalic,
         quote: isQuote,
@@ -125,7 +124,14 @@ export function ContextualToolbar({
       };
     }
 
-    return null;
+    // E. Default Text styles context
+    return {
+      type: "text",
+      bold: isBold,
+      italic: isItalic,
+      quote: isQuote,
+      inlineCode: isInlineCode,
+    };
   }, [selection, editorRef, updateTrigger]);
 
   // Indent list items in selection by 2 spaces
@@ -221,17 +227,18 @@ export function ContextualToolbar({
   if (!activeState) return null;
 
   return (
-    <>
+    <div className="hidden md:flex items-center">
       {/* CASE 1: LATEX FORMULA */}
       {activeState.type === "latex" && (
         <>
-          <div className="h-6 w-px bg-border mx-1 shrink-0" />
+          <div className="h-4 w-px bg-border/60 mx-1 shrink-0" />
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  variant="outline"
-                  className="h-8 gap-1.5 cursor-pointer rounded-lg bg-background border border-border/80 text-xs text-muted-foreground hover:text-foreground shadow-xs hover:bg-muted/50 transition-colors px-3"
+                  variant="ghost"
+                  size="sm"
+                  className="text-foreground"
                   onClick={() => {
                     const event = new CustomEvent(
                       activeState.data.kind === "double"
@@ -241,9 +248,8 @@ export function ContextualToolbar({
                     window.dispatchEvent(event);
                   }}
                 >
-                  <Radical size={14} className="text-foreground/80" />
+                  <PlusCircle className="size-3.5 text-primary" />
                   <span>Aggiungi alla formula</span>
-                  <Plus size={12} className="text-muted-foreground/60 ml-0.5" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Aggiungi simbolo o formula KaTeX</TooltipContent>
@@ -255,30 +261,27 @@ export function ContextualToolbar({
       {/* CASE 2: CODE BLOCK */}
       {activeState.type === "code" && (
         <>
-          <div className="h-6 w-px bg-border mx-1 shrink-0" />
-          <div className="flex items-center gap-0.5 bg-muted/30 p-0.5 rounded-lg border border-border/40 shadow-xs shrink-0">
-            <div className="flex items-center text-muted-foreground gap-1.5 px-2 py-1 select-none">
-              <SquareCode size={14} className="text-foreground/75" />
-              <span className="text-[12px] font-medium text-muted-foreground font-sans">
-                Blocco codice
-              </span>
-            </div>
+          <div className="h-4 w-px bg-border/60 mx-1 shrink-0" />
+          <div className="flex items-center text-muted-foreground gap-1.5 px-2 py-1 select-none">
+            <SquareCode className="size-3.5 text-muted-foreground/80" />
+            <span className="text-xs text-muted-foreground font-medium">
+              Blocco codice
+            </span>
+          </div>
 
-            <div className="h-4 w-px bg-border/60 mx-1 shrink-0" />
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 px-2.5 text-[12px] font-medium text-muted-foreground hover:text-foreground cursor-pointer rounded-md border border-transparent hover:border-border/40 hover:bg-muted/60 gap-1 transition-colors"
-                >
-                  <span className="font-semibold text-foreground capitalize">
-                    {languages.find((l) => l.value === activeState.data.language)?.label || "Senza linguaggio"}
-                  </span>
-                  <ChevronDown size={12} className="text-muted-foreground/60 ml-0.5" />
-                </Button>
-              </DropdownMenuTrigger>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-foreground"
+              >
+                <span className="font-semibold capitalize">
+                  {languages.find((l) => l.value === activeState.data.language)?.label || "Senza linguaggio"}
+                </span>
+                <ChevronDown className="size-3.5 text-muted-foreground/80" />
+              </Button>
+            </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-48 max-h-[300px] overflow-y-auto">
               <DropdownMenuItem
                 className="cursor-pointer text-xs"
@@ -296,7 +299,7 @@ export function ContextualToolbar({
               >
                 <div className="flex items-center w-full justify-between">
                   <span>Senza linguaggio</span>
-                  {activeState.data.language === null && <Check size={14} className="text-primary shrink-0" />}
+                  {activeState.data.language === null && <Check className="size-14 text-primary shrink-0" />}
                 </div>
               </DropdownMenuItem>
 
@@ -320,7 +323,7 @@ export function ContextualToolbar({
                 >
                   <div className="flex items-center w-full justify-between">
                     <span>{lang.label}</span>
-                    {activeState.data.language === lang.value && <Check size={14} className="text-primary shrink-0" />}
+                    {activeState.data.language === lang.value && <Check className="size-14 text-primary shrink-0" />}
                   </div>
                 </DropdownMenuItem>
               ))}
@@ -345,35 +348,31 @@ export function ContextualToolbar({
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          </div>
         </>
       )}
 
       {/* CASE 3: HEADER BLOCK */}
       {activeState.type === "header" && (
         <>
-          <div className="h-6 w-px bg-border mx-1 shrink-0" />
-          <div className="flex items-center gap-0.5 bg-muted/30 p-0.5 rounded-lg border border-border/40 shadow-xs shrink-0">
-            <div className="flex items-center text-muted-foreground gap-1.5 px-2 py-1 select-none">
-              <Heading size={14} className="text-foreground/75" />
-              <span className="text-[12px] font-medium text-muted-foreground font-sans">
-                Intestazione
-              </span>
-            </div>
+          <div className="h-4 w-px bg-border/60 mx-1 shrink-0" />
+          <div className="flex items-center text-muted-foreground gap-1.5 px-2 py-1 select-none">
+            <Heading className="size-3.5 text-muted-foreground/80" />
+            <span className="text-xs text-muted-foreground font-medium">
+              Intestazione
+            </span>
+          </div>
 
-            <div className="h-4 w-px bg-border/60 mx-1 shrink-0" />
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 px-2.5 text-[12px] font-medium text-muted-foreground hover:text-foreground cursor-pointer rounded-md border border-transparent hover:border-border/40 hover:bg-muted/60 gap-1 transition-colors"
-                >
-                  <span className="font-semibold text-foreground">H{activeState.level}</span>
-                  <ChevronDown size={12} className="text-muted-foreground/60 ml-0.5" />
-                </Button>
-              </DropdownMenuTrigger>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-foreground"
+              >
+                <span className="font-semibold">H{activeState.level}</span>
+                <ChevronDown className="size-3.5 text-muted-foreground/80" />
+              </Button>
+            </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-40">
               {[1, 2, 3, 4, 5, 6].map((l) => (
                 <DropdownMenuItem
@@ -402,31 +401,37 @@ export function ContextualToolbar({
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          </div>
         </>
       )}
 
       {/* CASE 4: WORD FORMATTING (BOLD, ITALIC, INLINE CODE) */}
       {activeState.type === "text" && (
         <>
-          <div className="h-6 w-px bg-border mx-1 shrink-0" />
-          <div className="flex items-center gap-0.5 bg-muted/30 p-0.5 rounded-lg border border-border/40 shadow-xs shrink-0">
+          <div className="h-4 w-px bg-border/60 mx-1 shrink-0" />
+          <div className="flex items-center text-muted-foreground gap-1.5 px-2 py-1 select-none">
+            <Type className="size-3.5 text-muted-foreground/80" />
+            <span className="text-xs text-muted-foreground font-medium">
+              Stile
+            </span>
+          </div>
+
+          <div className="flex items-center gap-0.5">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
-                    size="icon"
+                    size="icon-sm"
                     className={cn(
-                      "size-7 rounded-md text-muted-foreground hover:text-foreground cursor-pointer border border-transparent transition-colors",
-                      activeState.bold && "bg-muted text-foreground border-border/60"
+                      "text-foreground",
+                      activeState.bold && "bg-muted"
                     )}
                     onClick={() => {
                       toggleBold(editorRef);
                       setUpdateTrigger((prev) => prev + 1);
                     }}
                   >
-                    <Bold size={13} />
+                    <Bold className="size-3.5" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Grassetto</TooltipContent>
@@ -436,17 +441,17 @@ export function ContextualToolbar({
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
-                    size="icon"
+                    size="icon-sm"
                     className={cn(
-                      "size-7 rounded-md text-muted-foreground hover:text-foreground cursor-pointer border border-transparent transition-colors",
-                      activeState.italic && "bg-muted text-foreground border-border/60"
+                      "text-foreground",
+                      activeState.italic && "bg-muted"
                     )}
                     onClick={() => {
                       toggleItalic(editorRef);
                       setUpdateTrigger((prev) => prev + 1);
                     }}
                   >
-                    <Italic size={13} />
+                    <Italic className="size-3.5" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Corsivo</TooltipContent>
@@ -456,17 +461,17 @@ export function ContextualToolbar({
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
-                    size="icon"
+                    size="icon-sm"
                     className={cn(
-                      "size-7 rounded-md text-muted-foreground hover:text-foreground cursor-pointer border border-transparent transition-colors",
-                      activeState.quote && "bg-muted text-foreground border-border/60"
+                      "text-foreground",
+                      activeState.quote && "bg-muted"
                     )}
                     onClick={() => {
                       toggleQuote(editorRef);
                       setUpdateTrigger((prev) => prev + 1);
                     }}
                   >
-                    <Quote size={13} />
+                    <Quote className="size-3.5" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Citazione</TooltipContent>
@@ -476,17 +481,17 @@ export function ContextualToolbar({
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
-                    size="icon"
+                    size="icon-sm"
                     className={cn(
-                      "size-7 rounded-md text-muted-foreground hover:text-foreground cursor-pointer border border-transparent transition-colors",
-                      activeState.inlineCode && "bg-muted text-foreground border-border/60"
+                      "text-foreground",
+                      activeState.inlineCode && "bg-muted"
                     )}
                     onClick={() => {
                       toggleCodeInline(editorRef);
                       setUpdateTrigger((prev) => prev + 1);
                     }}
                   >
-                    <Terminal size={13} />
+                    <Terminal className="size-3.5" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Codice inline</TooltipContent>
@@ -499,53 +504,143 @@ export function ContextualToolbar({
       {/* CASE 5: LISTS (ORDERED OR UNORDERED) */}
       {activeState.type === "list" && (
         <>
-          <div className="h-6 w-px bg-border mx-1 shrink-0" />
-          <div className="flex items-center gap-0.5 bg-muted/30 p-0.5 rounded-lg border border-border/40 shadow-xs shrink-0">
-            <div className="flex items-center text-muted-foreground gap-1.5 px-2 py-1 select-none">
-              {activeState.kind === "unordered" ? (
-                <List size={14} className="text-foreground/75" />
-              ) : (
-                <ListOrdered size={14} className="text-foreground/75" />
-              )}
-              <span className="text-[12px] font-medium text-muted-foreground font-sans">
-                {activeState.kind === "unordered" ? "Elenco puntato" : "Elenco numerato"}
-              </span>
-            </div>
+          {/* Style first */}
+          <div className="h-4 w-px bg-border/60 mx-1 shrink-0" />
+          <div className="flex items-center text-muted-foreground gap-1.5 px-2 py-1 select-none">
+            <Type className="size-3.5 text-muted-foreground/80" />
+            <span className="text-xs text-muted-foreground font-medium">
+              Stile
+            </span>
+          </div>
 
-            <div className="h-4 w-px bg-border/60 mx-1 shrink-0" />
-
+          <div className="flex items-center gap-0.5">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
-                    size="icon"
-                    className="size-7 rounded-md text-foreground hover:bg-muted/80 cursor-pointer transition-colors"
-                    onClick={outdentList}
+                    size="icon-sm"
+                    className={cn(
+                      "text-foreground",
+                      activeState.bold && "bg-muted"
+                    )}
+                    onClick={() => {
+                      toggleBold(editorRef);
+                      setUpdateTrigger((prev) => prev + 1);
+                    }}
                   >
-                    <Outdent size={13} />
+                    <Bold className="size-3.5" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Riduci rientro (Sposta a sinistra)</TooltipContent>
+                <TooltipContent>Grassetto</TooltipContent>
               </Tooltip>
 
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
-                    size="icon"
-                    className="size-7 rounded-md text-foreground hover:bg-muted/80 cursor-pointer transition-colors"
-                    onClick={indentList}
+                    size="icon-sm"
+                    className={cn(
+                      "text-foreground",
+                      activeState.italic && "bg-muted"
+                    )}
+                    onClick={() => {
+                      toggleItalic(editorRef);
+                      setUpdateTrigger((prev) => prev + 1);
+                    }}
                   >
-                    <Indent size={13} />
+                    <Italic className="size-3.5" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Aumenta rientro (Sposta a destra)</TooltipContent>
+                <TooltipContent>Corsivo</TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    className={cn(
+                      "text-foreground",
+                      activeState.quote && "bg-muted"
+                    )}
+                    onClick={() => {
+                      toggleQuote(editorRef);
+                      setUpdateTrigger((prev) => prev + 1);
+                    }}
+                  >
+                    <Quote className="size-3.5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Citazione</TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    className={cn(
+                      "text-foreground",
+                      activeState.inlineCode && "bg-muted"
+                    )}
+                    onClick={() => {
+                      toggleCodeInline(editorRef);
+                      setUpdateTrigger((prev) => prev + 1);
+                    }}
+                  >
+                    <Terminal className="size-3.5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Codice inline</TooltipContent>
               </Tooltip>
             </TooltipProvider>
           </div>
+
+          {/* List second */}
+          <div className="h-4 w-px bg-border/60 mx-1 shrink-0" />
+          <div className="flex items-center text-muted-foreground gap-1.5 px-2 py-1 select-none">
+            {activeState.kind === "unordered" ? (
+              <List className="size-3.5 text-muted-foreground/80" />
+            ) : (
+              <ListOrdered className="size-3.5 text-muted-foreground/80" />
+            )}
+            <span className="text-xs text-muted-foreground font-medium">
+              {activeState.kind === "unordered" ? "Elenco puntato" : "Elenco numerato"}
+            </span>
+          </div>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  className="text-foreground"
+                  onClick={outdentList}
+                >
+                  <Outdent className="size-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Riduci rientro (Sposta a sinistra)</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  className="text-foreground"
+                  onClick={indentList}
+                >
+                  <Indent className="size-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Aumenta rientro (Sposta a destra)</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </>
       )}
-    </>
+    </div>
   );
 }
