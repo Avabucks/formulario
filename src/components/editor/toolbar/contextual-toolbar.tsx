@@ -47,23 +47,19 @@ import {
   List,
   ListOrdered,
   Outdent,
-  Pencil,
   PenTool,
-  Plus,
-  PlusCircle,
   Quote,
   Radical,
-  Sigma,
   SquareCode,
   Terminal,
-  Type,
+  Type
 } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useMemo, useState } from "react";
 import { toggleBold } from "./tools/formatting-bold";
-import { toggleQuote } from "./tools/formatting-quote";
-import { toggleItalic } from "./tools/formatting-italic";
 import { toggleCodeInline } from "./tools/formatting-code-inline";
+import { toggleItalic } from "./tools/formatting-italic";
+import { toggleQuote } from "./tools/formatting-quote";
 
 interface ContextualToolbarProps {
   selection: Selection | null;
@@ -235,8 +231,8 @@ export function ContextualToolbar({
       {activeState.type === "latex" && (
         <>
           <div className="flex items-center text-muted-foreground gap-1.5 pl-0 pr-0 py-1 select-none">
-            <Radical className="size-4 text-muted-foreground/80" />
-            <span className="text-xs text-muted-foreground/80 font-medium font-sans capitalize">
+            <Radical className="size-4 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground font-medium font-sans capitalize">
               Formula {activeState.data.kind === "double" ? "blocco" : "inline"}
             </span>
             <ChevronRight className="size-4 text-muted-foreground/30 mx-0.5 shrink-0" />
@@ -255,7 +251,7 @@ export function ContextualToolbar({
                         ? "editor:open-latex-double"
                         : "editor:open-latex-single"
                     );
-                    window.dispatchEvent(event);
+                    globalThis.dispatchEvent(event);
                   }}
                 >
                   <PenTool className="size-4 text-primary" />
@@ -272,8 +268,8 @@ export function ContextualToolbar({
       {activeState.type === "code" && (
         <>
           <div className="flex items-center text-muted-foreground gap-1.5 pl-0 pr-0 py-1 select-none">
-            <SquareCode className="size-4 text-muted-foreground/80" />
-            <span className="text-xs text-muted-foreground/80 font-medium font-sans">
+            <SquareCode className="size-4 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground font-medium font-sans">
               Blocco codice
             </span>
             <ChevronRight className="size-4 text-muted-foreground/30 mx-0.5 shrink-0" />
@@ -289,10 +285,10 @@ export function ContextualToolbar({
                 <span className="font-semibold capitalize">
                   {languages.find((l) => l.value === activeState.data.language)?.label || "Senza linguaggio"}
                 </span>
-                <ChevronDown className="size-4 text-muted-foreground/80" />
+                <ChevronDown className="size-4 text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-48 max-h-[300px] overflow-y-auto">
+            <DropdownMenuContent align="start" className="w-48 max-h-75 overflow-y-auto">
               <DropdownMenuItem
                 className="cursor-pointer text-xs"
                 onClick={() => {
@@ -365,8 +361,8 @@ export function ContextualToolbar({
       {activeState.type === "header" && (
         <>
           <div className="flex items-center text-muted-foreground gap-1.5 pl-0 pr-0 py-1 select-none">
-            <Heading className="size-4 text-muted-foreground/80" />
-            <span className="text-xs text-muted-foreground/80 font-medium font-sans">
+            <Heading className="size-4 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground font-medium font-sans">
               Intestazione
             </span>
             <ChevronRight className="size-4 text-muted-foreground/30 mx-0.5 shrink-0" />
@@ -380,7 +376,7 @@ export function ContextualToolbar({
                 className="text-foreground"
               >
                 <span className="font-semibold">H{activeState.level}</span>
-                <ChevronDown className="size-4 text-muted-foreground/80" />
+                <ChevronDown className="size-4 text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-40">
@@ -418,8 +414,8 @@ export function ContextualToolbar({
       {activeState.type === "text" && (
         <>
           <div className="flex items-center text-muted-foreground gap-1.5 pl-0 pr-0 py-1 select-none">
-            <Type className="size-4 text-muted-foreground/80" />
-            <span className="text-xs text-muted-foreground/80 font-medium font-sans">
+            <Type className="size-4 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground font-medium font-sans">
               Stile
             </span>
             <ChevronRight className="size-4 text-muted-foreground/30 mx-0.5 shrink-0" />
@@ -516,8 +512,8 @@ export function ContextualToolbar({
         <>
           {/* Style first */}
           <div className="flex items-center text-muted-foreground gap-1.5 pl-0 pr-0 py-1 select-none">
-            <Type className="size-4 text-muted-foreground/80" />
-            <span className="text-xs text-muted-foreground/80 font-medium font-sans">
+            <Type className="size-4 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground font-medium font-sans">
               Stile
             </span>
             <ChevronRight className="size-4 text-muted-foreground/30 mx-0.5 shrink-0" />
@@ -608,15 +604,15 @@ export function ContextualToolbar({
           </div>
 
           {/* List second */}
-          <div className="h-5 w-px bg-border mx-2 shrink-0" />
+          <div className="h-5 w-px bg-border mx-2.5 shrink-0" />
           <div className="flex items-center text-muted-foreground gap-1.5 pl-0 pr-0 py-1 select-none">
             {activeState.kind === "unordered" ? (
-              <List className="size-4 text-muted-foreground/80" />
+              <List className="size-4 text-muted-foreground" />
             ) : (
-              <ListOrdered className="size-4 text-muted-foreground/80" />
+              <ListOrdered className="size-4 text-muted-foreground" />
             )}
-            <span className="text-xs text-muted-foreground/80 font-medium font-sans">
-              {activeState.kind === "unordered" ? "Elenco" : "Elenco"}
+            <span className="text-xs text-muted-foreground font-medium font-sans">
+              {activeState.kind === "unordered" ? "Elenco non ordinato" : "Elenco ordinato"}
             </span>
             <ChevronRight className="size-4 text-muted-foreground/30 mx-0.5 shrink-0" />
           </div>

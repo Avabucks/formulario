@@ -289,11 +289,11 @@ export function FormattingLatex({
     const handleOpenDouble = () => {
       openCommand("double");
     };
-    window.addEventListener("editor:open-latex-single", handleOpenSingle);
-    window.addEventListener("editor:open-latex-double", handleOpenDouble);
+    globalThis.addEventListener("editor:open-latex-single", handleOpenSingle);
+    globalThis.addEventListener("editor:open-latex-double", handleOpenDouble);
     return () => {
-      window.removeEventListener("editor:open-latex-single", handleOpenSingle);
-      window.removeEventListener("editor:open-latex-double", handleOpenDouble);
+      globalThis.removeEventListener("editor:open-latex-single", handleOpenSingle);
+      globalThis.removeEventListener("editor:open-latex-double", handleOpenDouble);
     };
   }, []);
 

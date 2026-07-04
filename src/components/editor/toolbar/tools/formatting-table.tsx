@@ -105,9 +105,9 @@ export function FormattingTable({
     const handleOpen = () => {
       setOpen(true);
     };
-    window.addEventListener("editor:open-table", handleOpen);
+    globalThis.addEventListener("editor:open-table", handleOpen);
     return () => {
-      window.removeEventListener("editor:open-table", handleOpen);
+      globalThis.removeEventListener("editor:open-table", handleOpen);
     };
   }, []);
 
@@ -118,15 +118,13 @@ export function FormattingTable({
         setOpen(v);
         if (!v) setTimeout(() => editorRef.current?.focus(), 0);
       }}
-      className="max-w-[280px]"
+      className="max-w-70"
     >
-      <div
+      <form
         className="flex flex-col gap-4 p-4 outline-hidden"
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            insertTable(rows, cols, withHeader, align);
-          }
+        onSubmit={(e) => {
+          e.preventDefault();
+          insertTable(rows, cols, withHeader, align);
         }}
       >
         <p className="text-sm font-semibold">Inserisci tabella</p>
@@ -158,9 +156,8 @@ export function FormattingTable({
                         pressed={isSelected}
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={() => setAlign(item.value as TableAlignment)}
-                        className={`h-7 w-7 p-0 ${
-                          isSelected ? "bg-muted text-foreground" : ""
-                        }`}
+                        className={`h-7 w-7 p-0 ${isSelected ? "bg-muted text-foreground" : ""
+                          }`}
                       >
                         <Icon size={12} />
                       </Toggle>
@@ -196,7 +193,7 @@ export function FormattingTable({
         >
           Inserisci
         </Button>
-      </div>
+      </form>
     </CommandDialog>
   );
 

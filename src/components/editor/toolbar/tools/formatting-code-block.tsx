@@ -34,9 +34,9 @@ export function FormattingCodeBlock({
 
   useEffect(() => {
     const handleOpen = () => setOpen(true);
-    window.addEventListener("editor:open-code-block", handleOpen);
+    globalThis.addEventListener("editor:open-code-block", handleOpen);
     return () => {
-      window.removeEventListener("editor:open-code-block", handleOpen);
+      globalThis.removeEventListener("editor:open-code-block", handleOpen);
     };
   }, []);
 

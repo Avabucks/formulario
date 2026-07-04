@@ -14,7 +14,7 @@ import { Textarea } from "@/src/components/ui/textarea";
 import { loadAnalytics } from "@/src/lib/firebase";
 import { DiffEditor } from "@monaco-editor/react";
 import { logEvent } from "firebase/analytics";
-import { Check, Sparkles, X, ArrowUp, Trash2, User, Bot, Maximize2, Minimize2, GitCompare } from "lucide-react";
+import { ArrowUp, Bot, Check, GitCompare, Maximize2, Minimize2, Trash2, User, X } from "lucide-react";
 import type { editor } from "monaco-editor";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -125,7 +125,7 @@ export function EditorAI({
         return;
       }
 
-      (globalThis as unknown as { umami?: any }).umami?.track("generated_ai");
+      (globalThis as unknown as { umami?: { track: (name: string) => void } }).umami?.track("generated_ai");
       try {
         const analytics = await loadAnalytics();
         if (analytics) {
@@ -148,6 +148,7 @@ export function EditorAI({
         )
       );
     } catch (error) {
+      console.error("Errore di rete:", error instanceof Error ? error.message : String(error));
       setMessages((prev) =>
         prev.map((msg) =>
           msg.id === aiMessageId
@@ -206,6 +207,142 @@ export function EditorAI({
     ]);
   };
 
+  const renderSuggestionContent = (msg: Message) => {
+    if (!msg.applied && !msg.discarded) {
+      return (
+        <div className="flex flex-col gap-2">
+          <div className="border border-border rounded-lg overflow-hidden bg-background flex flex-col">
+            <div className="flex items-center justify-between px-3 py-1.5 bg-muted/40 border-b border-border text-[11px] text-muted-foreground font-medium select-none">
+              <span className="flex items-center gap-1">
+                <GitCompare size={11} className="text-muted-foreground" />
+                Anteprima differenze
+              </span>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-5 text-muted-foreground hover:text-foreground cursor-pointer"
+                    title="Confronto a schermo intero"
+                  >
+                    <Maximize2 size={11} />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[90vw] h-[90vh] flex flex-col">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2 text-base">
+                      <GitCompare size={16} className="text-foreground/80" />
+                      Confronto modifiche
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="flex-1 min-h-0 border rounded-lg overflow-hidden mt-2 bg-background">
+                    <DiffEditor
+                      height="100%"
+                      original={msg.originalContent ?? ""}
+                      modified={msg.suggestedContent ?? ""}
+                      language="markdown-math"
+                      theme="markdown-math-theme"
+                      options={{
+                        lineNumbers: "on",
+                        links: false,
+                        minimap: { enabled: true },
+                        automaticLayout: true,
+                        wordWrap: "on",
+                        quickSuggestions: false,
+                        readOnly: true,
+                      }}
+                    />
+                  </div>
+                  <DialogFooter className="gap-2 mt-4 shrink-0">
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="h-8 text-xs px-3 gap-1 cursor-pointer"
+                        onClick={() => handleDiscard(msg.id)}
+                      >
+                        <X size={13} />
+                        Scarta
+                      </Button>
+                    </DialogTrigger>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="default"
+                        size="sm"
+                        className="h-8 text-xs px-3 gap-1 cursor-pointer"
+                        onClick={() => handleAccept(msg.id, msg.suggestedContent ?? "")}
+                      >
+                        <Check size={13} />
+                        Applica modifiche
+                      </Button>
+                    </DialogTrigger>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+            <div className={`w-full min-w-0 transition-all duration-300 ${isExpanded ? "h-96" : "h-56"}`}>
+              <DiffEditor
+                height="100%"
+                original={msg.originalContent ?? ""}
+                modified={msg.suggestedContent ?? ""}
+                language="markdown-math"
+                theme="markdown-math-theme"
+                options={{
+                  lineNumbers: "off",
+                  links: false,
+                  minimap: { enabled: false },
+                  automaticLayout: true,
+                  wordWrap: "on",
+                  quickSuggestions: false,
+                  readOnly: true,
+                  scrollbar: {
+                    verticalScrollbarSize: 6,
+                    horizontalScrollbarSize: 6,
+                  }
+                }}
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 justify-end">
+            <Button
+              variant="destructive"
+              size="sm"
+              className="h-7 text-xs px-2.5 gap-1 cursor-pointer"
+              onClick={() => handleDiscard(msg.id)}
+            >
+              <X size={12} />
+              Scarta
+            </Button>
+            <Button
+              variant="default"
+              size="sm"
+              className="h-7 text-xs px-2.5 gap-1 cursor-pointer"
+              onClick={() => handleAccept(msg.id, msg.suggestedContent ?? "")}
+            >
+              <Check size={12} />
+              Applica modifiche
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
+    if (msg.applied) {
+      return (
+        <div className="inline-flex items-center gap-1.5 text-xs text-foreground bg-muted border border-border rounded-md py-1 px-2 w-fit">
+          <Check size={12} /> Modifiche applicate con successo.
+        </div>
+      );
+    }
+
+    return (
+      <div className="text-xs text-muted-foreground italic py-0.5">
+        Suggerimento scartato.
+      </div>
+    );
+  };
+
   return (
     <div className="flex flex-col h-full bg-background border-r border-border text-sm">
 
@@ -234,7 +371,7 @@ export function EditorAI({
               {isExpanded ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
             </Button>
           )}
-          <span className="font-semibold text-foreground">Genera con l'AI</span>
+          <span className="font-semibold text-foreground">{"Genera con l'AI"}</span>
         </div>
         {messages.length > 1 && (
           <Button
@@ -306,132 +443,7 @@ export function EditorAI({
               {/* AI Generation State: Suggestion with Diff Editor */}
               {msg.status === "success" && (
                 <div className="flex flex-col gap-2.5 mt-2 w-full max-w-full">
-                  {!msg.applied && !msg.discarded ? (
-                    <div className="flex flex-col gap-2">
-                      <div className="border border-border rounded-lg overflow-hidden bg-background flex flex-col">
-                        <div className="flex items-center justify-between px-3 py-1.5 bg-muted/40 border-b border-border text-[11px] text-muted-foreground font-medium select-none">
-                          <span className="flex items-center gap-1">
-                            <GitCompare size={11} className="text-muted-foreground" />
-                            Anteprima differenze
-                          </span>
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="size-5 text-muted-foreground hover:text-foreground cursor-pointer"
-                                title="Confronto a schermo intero"
-                              >
-                                <Maximize2 size={11} />
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="sm:max-w-[90vw] h-[90vh] flex flex-col">
-                              <DialogHeader>
-                                <DialogTitle className="flex items-center gap-2 text-base">
-                                  <GitCompare size={16} className="text-foreground/80" />
-                                  Confronto modifiche
-                                </DialogTitle>
-                              </DialogHeader>
-                              <div className="flex-1 min-h-0 border rounded-lg overflow-hidden mt-2 bg-background">
-                                <DiffEditor
-                                  height="100%"
-                                  original={msg.originalContent ?? ""}
-                                  modified={msg.suggestedContent ?? ""}
-                                  language="markdown-math"
-                                  theme="markdown-math-theme"
-                                  options={{
-                                    lineNumbers: "on",
-                                    links: false,
-                                    minimap: { enabled: true },
-                                    automaticLayout: true,
-                                    wordWrap: "on",
-                                    quickSuggestions: false,
-                                    readOnly: true,
-                                  }}
-                                />
-                              </div>
-                              <DialogFooter className="gap-2 mt-4 shrink-0">
-                                <DialogTrigger asChild>
-                                  <Button
-                                    variant="destructive"
-                                    size="sm"
-                                    className="h-8 text-xs px-3 gap-1 cursor-pointer"
-                                    onClick={() => handleDiscard(msg.id)}
-                                  >
-                                    <X size={13} />
-                                    Scarta
-                                  </Button>
-                                </DialogTrigger>
-                                <DialogTrigger asChild>
-                                  <Button
-                                    variant="default"
-                                    size="sm"
-                                    className="h-8 text-xs px-3 gap-1 cursor-pointer"
-                                    onClick={() => handleAccept(msg.id, msg.suggestedContent ?? "")}
-                                  >
-                                    <Check size={13} />
-                                    Applica modifiche
-                                  </Button>
-                                </DialogTrigger>
-                              </DialogFooter>
-                            </DialogContent>
-                          </Dialog>
-                        </div>
-                        <div className={`w-full min-w-0 transition-all duration-300 ${isExpanded ? "h-96" : "h-56"}`}>
-                          <DiffEditor
-                            height="100%"
-                            original={msg.originalContent ?? ""}
-                            modified={msg.suggestedContent ?? ""}
-                            language="markdown-math"
-                            theme="markdown-math-theme"
-                            options={{
-                              lineNumbers: "off",
-                              links: false,
-                              minimap: { enabled: false },
-                              automaticLayout: true,
-                              wordWrap: "on",
-                              quickSuggestions: false,
-                              readOnly: true,
-                              scrollbar: {
-                                verticalScrollbarSize: 6,
-                                horizontalScrollbarSize: 6,
-                                }
-                              }}
-                            />
-                          </div>
-                        </div>
-
-                      <div className="flex items-center gap-2 justify-end">
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          className="h-7 text-xs px-2.5 gap-1 cursor-pointer"
-                          onClick={() => handleDiscard(msg.id)}
-                        >
-                          <X size={12} />
-                          Scarta
-                        </Button>
-                        <Button
-                          variant="default"
-                          size="sm"
-                          className="h-7 text-xs px-2.5 gap-1 cursor-pointer"
-                          onClick={() => handleAccept(msg.id, msg.suggestedContent ?? "")}
-                        >
-                          <Check size={12} />
-                          Applica modifiche
-                        </Button>
-                      </div>
-
-                    </div>
-                  ) : msg.applied ? (
-                    <div className="inline-flex items-center gap-1.5 text-xs text-foreground bg-muted border border-border rounded-md py-1 px-2 w-fit">
-                      <Check size={12} /> Modifiche applicate con successo.
-                    </div>
-                  ) : (
-                    <div className="text-xs text-muted-foreground italic py-0.5">
-                      Suggerimento scartato.
-                    </div>
-                  )}
+                  {renderSuggestionContent(msg)}
                 </div>
               )}
 
@@ -474,7 +486,7 @@ export function EditorAI({
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             disabled={loading}
-            className="flex-1 min-h-[48px] max-h-28 resize-none px-2.5 py-1.5 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent text-sm placeholder:text-muted-foreground/60"
+            className="flex-1 min-h-12 max-h-28 resize-none px-2.5 py-1.5 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent text-sm placeholder:text-muted-foreground/60"
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
@@ -500,7 +512,7 @@ export function EditorAI({
           </div>
         </div>
         <p className="text-[10px] text-center text-muted-foreground/45 select-none">
-          L'AI può generare risposte imprecise. Verifica prima di applicare.
+          {"L'AI può generare risposte imprecise. Verifica prima di applicare."}
         </p>
       </div>
 
