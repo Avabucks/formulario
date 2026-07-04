@@ -33,19 +33,19 @@ import {
 } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 
-import { FormattingBold } from "../toolbar/tools/formatting-bold";
-import { FormattingCodeBlock } from "../toolbar/tools/formatting-code-block";
-import { FormattingCodeInline } from "../toolbar/tools/formatting-code-inline";
-import { FormattingDivider } from "../toolbar/tools/formatting-divider";
-import { FormattingHeaders } from "../toolbar/tools/formatting-headers";
-import { FormattingItalic } from "../toolbar/tools/formatting-italic";
-import { FormattingOrderedList } from "../toolbar/tools/formatting-ordered";
-import { FormattingQuote } from "../toolbar/tools/formatting-quote";
-import { FormattingUnorderedList } from "../toolbar/tools/formatting-unordered";
-import { FormattingLatex } from "../toolbar/tools/formatting-latex";
-import { FormattingTable } from "../toolbar/tools/formatting-table";
+import { FormattingBold } from "../tools/toolbar/formatting-bold";
+import { FormattingCodeBlock } from "../tools/toolbar/formatting-code-block";
+import { FormattingCodeInline } from "../tools/toolbar/formatting-code-inline";
+import { FormattingDivider } from "../tools/toolbar/formatting-divider";
+import { FormattingHeaders } from "../tools/toolbar/formatting-headers";
+import { FormattingItalic } from "../tools/toolbar/formatting-italic";
+import { FormattingOrderedList } from "../tools/toolbar/formatting-ordered";
+import { FormattingQuote } from "../tools/toolbar/formatting-quote";
+import { FormattingUnorderedList } from "../tools/toolbar/formatting-unordered";
+import { FormattingLatex } from "../tools/toolbar/formatting-latex";
+import { FormattingTable } from "../tools/toolbar/formatting-table";
 import { useEffect, useState, useRef } from "react";
-import { ContextualToolbar } from "../toolbar/contextual-toolbar";
+import { ContextualToolbar } from "../tools/contextual-toolbar";
 
 export function FormattingCommand({
   _selection,
@@ -186,7 +186,7 @@ export function FormattingCommand({
                   onSelect={() => {
                     shouldPreventCloseFocus.current = true;
                     handleSelect();
-                    window.dispatchEvent(new CustomEvent("editor:open-table"));
+                    globalThis.dispatchEvent(new CustomEvent("editor:open-table"));
                   }}
                   className="flex items-center gap-2 cursor-pointer"
                 >
@@ -213,7 +213,7 @@ export function FormattingCommand({
                   onSelect={() => {
                     shouldPreventCloseFocus.current = true;
                     handleSelect();
-                    window.dispatchEvent(
+                    globalThis.dispatchEvent(
                       new CustomEvent("editor:open-code-block"),
                     );
                   }}
@@ -239,7 +239,7 @@ export function FormattingCommand({
                   onSelect={() => {
                     shouldPreventCloseFocus.current = true;
                     handleSelect();
-                    window.dispatchEvent(
+                    globalThis.dispatchEvent(
                       new CustomEvent("editor:open-latex-single"),
                     );
                   }}
@@ -261,7 +261,7 @@ export function FormattingCommand({
                   onSelect={() => {
                     shouldPreventCloseFocus.current = true;
                     handleSelect();
-                    window.dispatchEvent(
+                    globalThis.dispatchEvent(
                       new CustomEvent("editor:open-latex-double"),
                     );
                   }}

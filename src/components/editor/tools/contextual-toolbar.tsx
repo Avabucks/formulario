@@ -1,7 +1,5 @@
 "use client";
 
-/* eslint-disable react-hooks/refs */
-
 import { TooltipProvider } from "@/src/components/ui/tooltip";
 import {
   getBoldRegex,
@@ -24,14 +22,14 @@ import {
 import { ChevronRight, Type } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useMemo, useState } from "react";
-import { FormattingLatexContext } from "./tools/formatting-latex";
-import { FormattingCodeBlockContext } from "./tools/formatting-code-block";
-import { FormattingHeadersContext } from "./tools/formatting-headers";
-import { FormattingBoldContext } from "./tools/formatting-bold";
-import { FormattingItalicContext } from "./tools/formatting-italic";
-import { FormattingQuoteContext } from "./tools/formatting-quote";
-import { FormattingCodeInlineContext } from "./tools/formatting-code-inline";
-import { FormattingListContext } from "./tools/formatting-unordered";
+import { FormattingLatexContext } from "./toolbar/formatting-latex";
+import { FormattingCodeBlockContext } from "./toolbar/formatting-code-block";
+import { FormattingHeadersContext } from "./toolbar/formatting-headers";
+import { FormattingBoldContext } from "./toolbar/formatting-bold";
+import { FormattingItalicContext } from "./toolbar/formatting-italic";
+import { FormattingQuoteContext } from "./toolbar/formatting-quote";
+import { FormattingCodeInlineContext } from "./toolbar/formatting-code-inline";
+import { FormattingListContext } from "./toolbar/formatting-unordered";
 
 interface ContextualToolbarProps {
   selection: Selection | null;
@@ -66,7 +64,6 @@ export function ContextualToolbar({
 
   // 1. Detect active formatting using existing logic
   const activeState = useMemo<ActiveState | null>(() => {
-    void updateTrigger;
     if (!selection || !editorRef.current) return null;
 
     // A. Check LaTeX

@@ -2,14 +2,14 @@
 
 import { useEffect } from "react";
 import type { editor } from "monaco-editor";
-import { toggleBold } from "../toolbar/tools/formatting-bold";
-import { toggleItalic } from "../toolbar/tools/formatting-italic";
-import { toggleQuote } from "../toolbar/tools/formatting-quote";
-import { toggleHeading } from "../toolbar/tools/formatting-headers";
-import { toggleOrderedList } from "../toolbar/tools/formatting-ordered";
-import { toggleUnorderedList } from "../toolbar/tools/formatting-unordered";
-import { toggleDivider } from "../toolbar/tools/formatting-divider";
-import { toggleCodeInline } from "../toolbar/tools/formatting-code-inline";
+import { toggleBold } from "../tools/toolbar/formatting-bold";
+import { toggleItalic } from "../tools/toolbar/formatting-italic";
+import { toggleQuote } from "../tools/toolbar/formatting-quote";
+import { toggleHeading } from "../tools/toolbar/formatting-headers";
+import { toggleOrderedList } from "../tools/toolbar/formatting-ordered";
+import { toggleUnorderedList } from "../tools/toolbar/formatting-unordered";
+import { toggleDivider } from "../tools/toolbar/formatting-divider";
+import { toggleCodeInline } from "../tools/toolbar/formatting-code-inline";
 type ToggleFn = (
   editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
 ) => void;
@@ -32,12 +32,12 @@ const ACTIONS_SHIFT: Record<string, ToggleFn> = {
   Digit9: toggleDivider,
   j: toggleCodeInline,
   KeyJ: toggleCodeInline,
-  u: () => window.dispatchEvent(new CustomEvent("editor:open-code-block")),
-  KeyU: () => window.dispatchEvent(new CustomEvent("editor:open-code-block")),
-  g: () => window.dispatchEvent(new CustomEvent("editor:open-latex-single")),
-  KeyG: () => window.dispatchEvent(new CustomEvent("editor:open-latex-single")),
-  h: () => window.dispatchEvent(new CustomEvent("editor:open-latex-double")),
-  KeyH: () => window.dispatchEvent(new CustomEvent("editor:open-latex-double")),
+  u: () => globalThis.dispatchEvent(new CustomEvent("editor:open-code-block")),
+  KeyU: () => globalThis.dispatchEvent(new CustomEvent("editor:open-code-block")),
+  g: () => globalThis.dispatchEvent(new CustomEvent("editor:open-latex-single")),
+  KeyG: () => globalThis.dispatchEvent(new CustomEvent("editor:open-latex-single")),
+  h: () => globalThis.dispatchEvent(new CustomEvent("editor:open-latex-double")),
+  KeyH: () => globalThis.dispatchEvent(new CustomEvent("editor:open-latex-double")),
 };
 
 function getHeadingLevel(key: string, code: string): number | null {
@@ -80,7 +80,7 @@ export function ShortcutsListener({
         if (isKeyT) {
           e.preventDefault();
           e.stopPropagation();
-          window.dispatchEvent(new CustomEvent("editor:open-table"));
+          globalThis.dispatchEvent(new CustomEvent("editor:open-table"));
         }
         return;
       }

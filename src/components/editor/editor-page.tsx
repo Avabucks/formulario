@@ -19,11 +19,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
-import { EditorAI } from "./ai/editor-ai";
+import { EditorAI } from "./chat/editor-ai";
 import { EditorPreview } from "./preview/editor-preview";
-import { FormattingCommand } from "./toolbar/formatting-command";
+import { FormattingCommand } from "./tools/formatting-command";
 import { EditorInput, SyncStatus } from "./input/editor-input";
-import { ShortcutsListener } from "./toolbar/shortcuts-listener";
+import { ShortcutsListener } from "./tools/shortcuts-listener";
 
 const MIN_RESIZABLE_SIZE = 20;
 const MAX_RESIZABLE_SIZE = 80;
