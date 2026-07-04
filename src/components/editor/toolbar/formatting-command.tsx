@@ -24,7 +24,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/src/components/ui/tooltip";
-import { ChevronRight, SquareTerminal, Radical, SquareRadical, Table } from "lucide-react";
+import {
+  ChevronRight,
+  SquareTerminal,
+  Radical,
+  SquareRadical,
+  Table,
+} from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 
 import { FormattingBold } from "../toolbar/tools/formatting-bold";
@@ -56,7 +62,8 @@ export function FormattingCommand({
     if (!editor) return;
 
     const disposable = editor.onKeyDown((e) => {
-      const isSpace = e.browserEvent.key === " " || e.browserEvent.code === "Space";
+      const isSpace =
+        e.browserEvent.key === " " || e.browserEvent.code === "Space";
       if ((e.ctrlKey || e.metaKey) && isSpace) {
         e.preventDefault();
         e.stopPropagation();
@@ -101,16 +108,10 @@ export function FormattingCommand({
           </Tooltip>
         </TooltipProvider>
 
-        <ContextualToolbar
-          selection={_selection}
-          editorRef={editorRef}
-        />
+        <ContextualToolbar selection={_selection} editorRef={editorRef} />
       </div>
 
-      <Dialog
-        open={activeDialog}
-        onOpenChange={setActiveDialog}
-      >
+      <Dialog open={activeDialog} onOpenChange={setActiveDialog}>
         <DialogContent
           className="rounded-xl! top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden p-0 max-w-[calc(100%-2rem)] sm:max-w-sm"
           showCloseButton={false}
@@ -123,7 +124,9 @@ export function FormattingCommand({
         >
           <DialogHeader className="sr-only">
             <DialogTitle>Tavolozza comandi</DialogTitle>
-            <DialogDescription>Cerca un comando di formattazione o inserimento</DialogDescription>
+            <DialogDescription>
+              Cerca un comando di formattazione o inserimento
+            </DialogDescription>
           </DialogHeader>
           <Command>
             <CommandInput placeholder="Cerca un comando..." />
@@ -210,7 +213,9 @@ export function FormattingCommand({
                   onSelect={() => {
                     shouldPreventCloseFocus.current = true;
                     handleSelect();
-                    window.dispatchEvent(new CustomEvent("editor:open-code-block"));
+                    window.dispatchEvent(
+                      new CustomEvent("editor:open-code-block"),
+                    );
                   }}
                   className="flex items-center gap-2 cursor-pointer"
                 >
@@ -234,7 +239,9 @@ export function FormattingCommand({
                   onSelect={() => {
                     shouldPreventCloseFocus.current = true;
                     handleSelect();
-                    window.dispatchEvent(new CustomEvent("editor:open-latex-single"));
+                    window.dispatchEvent(
+                      new CustomEvent("editor:open-latex-single"),
+                    );
                   }}
                   className="flex items-center gap-2 cursor-pointer"
                 >
@@ -254,7 +261,9 @@ export function FormattingCommand({
                   onSelect={() => {
                     shouldPreventCloseFocus.current = true;
                     handleSelect();
-                    window.dispatchEvent(new CustomEvent("editor:open-latex-double"));
+                    window.dispatchEvent(
+                      new CustomEvent("editor:open-latex-double"),
+                    );
                   }}
                   className="flex items-center gap-2 cursor-pointer"
                 >
@@ -282,5 +291,3 @@ export function FormattingCommand({
     </>
   );
 }
-
-

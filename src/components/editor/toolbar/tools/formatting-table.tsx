@@ -45,7 +45,7 @@ export function FormattingTable({
     rows: number,
     cols: number,
     withHeader: boolean,
-    alignment: TableAlignment
+    alignment: TableAlignment,
   ) => {
     let t = 1;
 
@@ -77,7 +77,7 @@ export function FormattingTable({
     targetRows: number,
     targetCols: number,
     useHeader: boolean,
-    targetAlign: TableAlignment
+    targetAlign: TableAlignment,
   ) => {
     const editor = editorRef.current;
     if (!editor) return;
@@ -156,8 +156,9 @@ export function FormattingTable({
                         pressed={isSelected}
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={() => setAlign(item.value as TableAlignment)}
-                        className={`h-7 w-7 p-0 ${isSelected ? "bg-muted text-foreground" : ""
-                          }`}
+                        className={`h-7 w-7 p-0 ${
+                          isSelected ? "bg-muted text-foreground" : ""
+                        }`}
                       >
                         <Icon size={12} />
                       </Toggle>

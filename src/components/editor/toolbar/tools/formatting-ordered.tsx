@@ -5,7 +5,7 @@ import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
 import {
   getIsActiveList,
   getOrderedListRegex,
-  handleListToggle
+  handleListToggle,
 } from "@/src/lib/editor/formatting-utils";
 import { ListOrdered } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";

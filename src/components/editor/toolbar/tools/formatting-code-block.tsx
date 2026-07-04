@@ -21,9 +21,16 @@ import {
 import languages from "@/src/data/languages.json";
 import {
   getIsActiveCode,
-  handleBlockToggle
+  handleBlockToggle,
 } from "@/src/lib/editor/formatting-utils";
-import { Code, X, Check, ChevronDown, ChevronRight, SquareCode } from "lucide-react";
+import {
+  Code,
+  X,
+  Check,
+  ChevronDown,
+  ChevronRight,
+  SquareCode,
+} from "lucide-react";
 import type { editor } from "monaco-editor";
 import { useEffect, useState } from "react";
 
@@ -38,7 +45,9 @@ export function FormattingCodeBlock({
   editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
 }>) {
   const [open, setOpen] = useState(false);
-  const [blockState, setBlockState] = useState<{ language: string | null } | null>(null);
+  const [blockState, setBlockState] = useState<{
+    language: string | null;
+  } | null>(null);
 
   useEffect(() => {
     const handleOpen = () => setOpen(true);
@@ -96,10 +105,7 @@ export function FormattingCodeBlock({
               <span>Senza linguaggio</span>
             </CommandItem>
             {isActive && (
-              <CommandItem
-                onSelect={handleRemove}
-                className="text-destructive"
-              >
+              <CommandItem onSelect={handleRemove} className="text-destructive">
                 <X size={14} />
                 <span>Rimuovi blocco</span>
               </CommandItem>
@@ -148,35 +154,31 @@ export function FormattingCodeBlockContext({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="default"
-            className="text-foreground"
-          >
+          <Button variant="ghost" size="default" className="text-foreground">
             <span className="font-semibold capitalize">
-              {languages.find((l) => l.value === activeData.language)?.label || "Senza linguaggio"}
+              {languages.find((l) => l.value === activeData.language)?.label ||
+                "Senza linguaggio"}
             </span>
             <ChevronDown className="size-4 text-muted-foreground" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-48 max-h-75 overflow-y-auto">
+        <DropdownMenuContent
+          align="start"
+          className="w-48 max-h-75 overflow-y-auto"
+        >
           <DropdownMenuItem
             className="cursor-pointer text-xs"
             onClick={() => {
-              handleBlockToggle(
-                editorRef,
-                activeData,
-                "```",
-                "```",
-                null
-              );
+              handleBlockToggle(editorRef, activeData, "```", "```", null);
               setUpdateTrigger((prev) => prev + 1);
               setTimeout(() => editorRef.current?.focus(), 50);
             }}
           >
             <div className="flex items-center w-full justify-between">
               <span>Senza linguaggio</span>
-              {activeData.language === null && <Check className="size-4 text-primary shrink-0" />}
+              {activeData.language === null && (
+                <Check className="size-4 text-primary shrink-0" />
+              )}
             </div>
           </DropdownMenuItem>
 
@@ -192,7 +194,7 @@ export function FormattingCodeBlockContext({
                   activeData,
                   "```",
                   "```",
-                  lang.value
+                  lang.value,
                 );
                 setUpdateTrigger((prev) => prev + 1);
                 setTimeout(() => editorRef.current?.focus(), 50);
@@ -200,7 +202,9 @@ export function FormattingCodeBlockContext({
             >
               <div className="flex items-center w-full justify-between">
                 <span>{lang.label}</span>
-                {activeData.language === lang.value && <Check className="size-4 text-primary shrink-0" />}
+                {activeData.language === lang.value && (
+                  <Check className="size-4 text-primary shrink-0" />
+                )}
               </div>
             </DropdownMenuItem>
           ))}
@@ -211,12 +215,7 @@ export function FormattingCodeBlockContext({
             variant="destructive"
             className="cursor-pointer text-xs"
             onClick={() => {
-              handleBlockToggle(
-                editorRef,
-                activeData,
-                "```",
-                "```"
-              );
+              handleBlockToggle(editorRef, activeData, "```", "```");
               setUpdateTrigger((prev) => prev + 1);
               setTimeout(() => editorRef.current?.focus(), 50);
             }}
@@ -228,8 +227,3 @@ export function FormattingCodeBlockContext({
     </>
   );
 }
-
-
-
-
-

@@ -10,7 +10,9 @@ import { toggleOrderedList } from "../toolbar/tools/formatting-ordered";
 import { toggleUnorderedList } from "../toolbar/tools/formatting-unordered";
 import { toggleDivider } from "../toolbar/tools/formatting-divider";
 import { toggleCodeInline } from "../toolbar/tools/formatting-code-inline";
-type ToggleFn = (editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>) => void;
+type ToggleFn = (
+  editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
+) => void;
 
 const ACTIONS_NO_SHIFT: Record<string, ToggleFn> = {
   b: toggleBold,
@@ -46,7 +48,7 @@ function getHeadingLevel(key: string, code: string): number | null {
 function getAction(
   key: string,
   code: string,
-  shiftKey: boolean
+  shiftKey: boolean,
 ): ToggleFn | null {
   if (shiftKey) {
     const headingLevel = getHeadingLevel(key, code);
@@ -73,7 +75,8 @@ export function ShortcutsListener({
       if (!isFocused) return;
 
       if (e.altKey) {
-        const isKeyT = e.browserEvent.key.toLowerCase() === "t" || e.code === "KeyT";
+        const isKeyT =
+          e.browserEvent.key.toLowerCase() === "t" || e.code === "KeyT";
         if (isKeyT) {
           e.preventDefault();
           e.stopPropagation();
@@ -87,8 +90,6 @@ export function ShortcutsListener({
 
       const key = e.browserEvent.key.toLowerCase();
       const code = e.code;
-
-
 
       const action = getAction(key, code, e.shiftKey);
       if (action) {

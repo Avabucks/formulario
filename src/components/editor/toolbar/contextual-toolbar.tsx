@@ -42,8 +42,21 @@ type ActiveState =
   | { type: "latex"; data: NonNullable<ReturnType<typeof getIsActiveLatex>> }
   | { type: "code"; data: NonNullable<ReturnType<typeof getIsActiveCode>> }
   | { type: "header"; level: number }
-  | { type: "list"; kind: "ordered" | "unordered"; bold: boolean; italic: boolean; quote: boolean; inlineCode: boolean }
-  | { type: "text"; bold: boolean; italic: boolean; quote: boolean; inlineCode: boolean };
+  | {
+      type: "list";
+      kind: "ordered" | "unordered";
+      bold: boolean;
+      italic: boolean;
+      quote: boolean;
+      inlineCode: boolean;
+    }
+  | {
+      type: "text";
+      bold: boolean;
+      italic: boolean;
+      quote: boolean;
+      inlineCode: boolean;
+    };
 
 export function ContextualToolbar({
   selection,
@@ -69,12 +82,18 @@ export function ContextualToolbar({
     }
 
     // C. Check Headers
-    if (getIsActiveList(editorRef, getH1Regex)) return { type: "header", level: 1 };
-    if (getIsActiveList(editorRef, getH2Regex)) return { type: "header", level: 2 };
-    if (getIsActiveList(editorRef, getH3Regex)) return { type: "header", level: 3 };
-    if (getIsActiveList(editorRef, getH4Regex)) return { type: "header", level: 4 };
-    if (getIsActiveList(editorRef, getH5Regex)) return { type: "header", level: 5 };
-    if (getIsActiveList(editorRef, getH6Regex)) return { type: "header", level: 6 };
+    if (getIsActiveList(editorRef, getH1Regex))
+      return { type: "header", level: 1 };
+    if (getIsActiveList(editorRef, getH2Regex))
+      return { type: "header", level: 2 };
+    if (getIsActiveList(editorRef, getH3Regex))
+      return { type: "header", level: 3 };
+    if (getIsActiveList(editorRef, getH4Regex))
+      return { type: "header", level: 4 };
+    if (getIsActiveList(editorRef, getH5Regex))
+      return { type: "header", level: 5 };
+    if (getIsActiveList(editorRef, getH6Regex))
+      return { type: "header", level: 6 };
 
     // Common text styles (Bold, Italic, Quote, Inline Code) to be used as default and inside lists
     const isBold = getIsActiveWord(editorRef, getBoldRegex);

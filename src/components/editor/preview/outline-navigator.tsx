@@ -131,7 +131,6 @@ export function OutlineNavigator({
           showNavigatorTemporarily();
         }}
       >
-
         {headings.map((heading) => (
           <button
             key={heading.id}

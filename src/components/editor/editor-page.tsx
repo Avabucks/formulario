@@ -2,14 +2,7 @@
 
 import { useIsMobile } from "@/src/hooks/useIsMobile";
 import clsx from "clsx";
-import {
-  Columns2,
-  Eye,
-  PenLine,
-  Redo2,
-  Sparkles,
-  Undo2
-} from "lucide-react";
+import { Columns2, Eye, PenLine, Redo2, Sparkles, Undo2 } from "lucide-react";
 import type { Selection } from "monaco-editor";
 import { useEffect, useRef, useState } from "react";
 import { FormularioSettings } from "../home/formulario-settings";
@@ -43,10 +36,15 @@ export function EditorPage({
 
   const [textAreaContent, setTextAreaContent] = useState<string>("");
   const [markdownContent, setMarkdownContent] = useState<string>("");
-  const [user, setUser] = useState<{ display_name: string; foto_profilo: string } | null>(null);
+  const [user, setUser] = useState<{
+    display_name: string;
+    foto_profilo: string;
+  } | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [edited, setEdited] = useState<boolean>(false);
-  const [switchView, setSwitchView] = useState<"preview" | "divided" | "edit">("preview");
+  const [switchView, setSwitchView] = useState<"preview" | "divided" | "edit">(
+    "preview",
+  );
   const [hasSetInitialView, setHasSetInitialView] = useState<boolean>(false);
   const [showAI, setShowAI] = useState<boolean>(false);
   const [isAiExpanded, setIsAiExpanded] = useState<boolean>(false);
@@ -73,7 +71,12 @@ export function EditorPage({
     const handleMouseMove = (moveEvent: MouseEvent) => {
       const deltaX = moveEvent.clientX - startX;
       const deltaPercent = (deltaX / containerWidth) * 100;
-      setResizableSize(Math.max(MIN_RESIZABLE_SIZE, Math.min(MAX_RESIZABLE_SIZE, startSize + deltaPercent)));
+      setResizableSize(
+        Math.max(
+          MIN_RESIZABLE_SIZE,
+          Math.min(MAX_RESIZABLE_SIZE, startSize + deltaPercent),
+        ),
+      );
     };
 
     const handleMouseUp = () => {
@@ -118,7 +121,10 @@ export function EditorPage({
       const data = await response.json();
       setTextAreaContent(data.content);
       setMarkdownContent(data.content);
-      setUser({ display_name: data.display_name, foto_profilo: data.foto_profilo });
+      setUser({
+        display_name: data.display_name,
+        foto_profilo: data.foto_profilo,
+      });
       setLoading(false);
     } catch (error: any) {
       console.error(error.message);
@@ -202,43 +208,57 @@ export function EditorPage({
   }, [handleUndo, handleRedo, editable, isMobile]);
 
   const titleComponent = () => {
-    if (switchView === "preview" || !editable) return (
-      <div className="hidden md:flex items-center gap-3 py-1 rounded-md bg-background/50">
-        <Avatar className="h-7 w-7">
-          <AvatarImage src={user?.foto_profilo} alt={user?.display_name} />
-          <AvatarFallback className="text-xs font-medium">
-            {user?.display_name?.charAt(0)?.toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
+    if (switchView === "preview" || !editable)
+      return (
+        <div className="hidden md:flex items-center gap-3 py-1 rounded-md bg-background/50">
+          <Avatar className="h-7 w-7">
+            <AvatarImage src={user?.foto_profilo} alt={user?.display_name} />
+            <AvatarFallback className="text-xs font-medium">
+              {user?.display_name?.charAt(0)?.toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
 
-        <h1 className="text-sm font-medium text-foreground truncate">
-          {(() => {
-            const firstLine = markdownContent.split("\n", 1)[0]?.trim();
+          <h1 className="text-sm font-medium text-foreground truncate">
+            {(() => {
+              const firstLine = markdownContent.split("\n", 1)[0]?.trim();
 
-            return firstLine?.startsWith("#")
-              ? firstLine.replace(/^#+\s*/, "")
-              : "Senza Titolo";
-          })()}
-        </h1>
-      </div>
-    )
+              return firstLine?.startsWith("#")
+                ? firstLine.replace(/^#+\s*/, "")
+                : "Senza Titolo";
+            })()}
+          </h1>
+        </div>
+      );
     return null;
-  }
+  };
 
   const viewTabs = (
-    <Tabs value={switchView} onValueChange={(val) => setSwitchView(val as any)} className="gap-0 select-none shrink-0">
+    <Tabs
+      value={switchView}
+      onValueChange={(val) => setSwitchView(val as any)}
+      className="gap-0 select-none shrink-0"
+    >
       <TabsList variant="line" className="h-8 p-0 bg-transparent gap-0">
-        <TabsTrigger value="edit" className="gap-1.5 px-3 py-1 text-xs font-semibold cursor-pointer">
+        <TabsTrigger
+          value="edit"
+          className="gap-1.5 px-3 py-1 text-xs font-semibold cursor-pointer"
+        >
           <PenLine size={13.5} />
           <span className="hidden sm:inline">Editor</span>
         </TabsTrigger>
         {!isMobile && (
-          <TabsTrigger value="divided" className="gap-1.5 px-3 py-1 text-xs font-semibold cursor-pointer">
+          <TabsTrigger
+            value="divided"
+            className="gap-1.5 px-3 py-1 text-xs font-semibold cursor-pointer"
+          >
             <Columns2 size={13.5} />
             <span className="hidden sm:inline">Dividi</span>
           </TabsTrigger>
         )}
-        <TabsTrigger value="preview" className="gap-1.5 px-3 py-1 text-xs font-semibold cursor-pointer">
+        <TabsTrigger
+          value="preview"
+          className="gap-1.5 px-3 py-1 text-xs font-semibold cursor-pointer"
+        >
           <Eye size={13.5} />
           <span className="hidden sm:inline">Anteprima</span>
         </TabsTrigger>
@@ -319,19 +339,12 @@ export function EditorPage({
 
         <div className="h-6 w-px bg-border shrink-0" />
 
-
-
         {switchView !== "preview" && (
-          <FormattingCommand
-            _selection={selection}
-            editorRef={editorRef}
-          />
+          <FormattingCommand _selection={selection} editorRef={editorRef} />
         )}
 
         {titleComponent()}
-
       </div>
-
 
       {/* Right: View Selector & Settings */}
       <div className="flex items-center gap-3 shrink-0">
@@ -346,7 +359,10 @@ export function EditorPage({
                   className="h-8 gap-1.5 select-none cursor-pointer"
                 >
                   <Sparkles size={14} />
-                  <span className="hidden md:flex -mr-1.25">Chiedi all&apos;</span> AI
+                  <span className="hidden md:flex -mr-1.25">
+                    Chiedi all&apos;
+                  </span>{" "}
+                  AI
                 </Button>
               </TooltipTrigger>
               <TooltipContent className="pr-1.5">
@@ -417,7 +433,6 @@ export function EditorPage({
           <div className="h-6 w-px bg-border" />
           <FormularioSettings formularioId={formularioId} />
         </div>
-
       </div>
     );
   };
@@ -440,7 +455,10 @@ export function EditorPage({
             className="h-full flex flex-col min-w-0"
             style={{
               display: switchView === "preview" ? "none" : "flex",
-              width: (!isMobile && switchView === "divided") ? `${resizableSize}%` : "100%",
+              width:
+                !isMobile && switchView === "divided"
+                  ? `${resizableSize}%`
+                  : "100%",
             }}
           >
             {input}
@@ -464,8 +482,15 @@ export function EditorPage({
           <div
             className="h-full flex flex-col min-w-0"
             style={{
-              display: (switchView === "preview" || (!isMobile && switchView === "divided")) ? "flex" : "none",
-              width: (!isMobile && switchView === "divided") ? `${100 - resizableSize}%` : "100%",
+              display:
+                switchView === "preview" ||
+                (!isMobile && switchView === "divided")
+                  ? "flex"
+                  : "none",
+              width:
+                !isMobile && switchView === "divided"
+                  ? `${100 - resizableSize}%`
+                  : "100%",
             }}
           >
             {preview}
@@ -486,7 +511,7 @@ export function EditorPage({
                 "w-162.5": !isMobile && isAiExpanded,
                 "w-87.5": !isMobile && !isAiExpanded,
                 hidden: !showAI,
-              }
+              },
             )}
           >
             <EditorAI
@@ -499,11 +524,7 @@ export function EditorPage({
         )}
       </div>
 
-      <ShortcutsListener
-        editorRef={editorRef}
-        isFocused={isFocused}
-      />
+      <ShortcutsListener editorRef={editorRef} isFocused={isFocused} />
     </div>
   );
 }
-

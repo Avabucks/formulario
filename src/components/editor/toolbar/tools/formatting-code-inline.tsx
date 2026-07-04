@@ -3,11 +3,15 @@
 import { Button } from "@/src/components/ui/button";
 import { CommandItem, CommandShortcut } from "@/src/components/ui/command";
 import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/src/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/src/components/ui/tooltip";
 import {
   getCodeInlineRegex,
   getIsActiveWord,
-  handleWordToggle
+  handleWordToggle,
 } from "@/src/lib/editor/formatting-utils";
 import { cn } from "@/src/lib/utils";
 import { Terminal } from "lucide-react";

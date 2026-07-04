@@ -14,7 +14,17 @@ import { Textarea } from "@/src/components/ui/textarea";
 import { loadAnalytics } from "@/src/lib/firebase";
 import { DiffEditor } from "@monaco-editor/react";
 import { logEvent } from "firebase/analytics";
-import { ArrowUp, Bot, Check, GitCompare, Maximize2, Minimize2, Trash2, User, X } from "lucide-react";
+import {
+  ArrowUp,
+  Bot,
+  Check,
+  GitCompare,
+  Maximize2,
+  Minimize2,
+  Trash2,
+  User,
+  X,
+} from "lucide-react";
 import type { editor } from "monaco-editor";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -91,11 +101,19 @@ export function EditorAI({
 
     const lastAiSuggestion = [...messages]
       .reverse()
-      .find((msg) => msg.sender === "ai" && msg.status === "success" && msg.suggestedContent);
+      .find(
+        (msg) =>
+          msg.sender === "ai" &&
+          msg.status === "success" &&
+          msg.suggestedContent,
+      );
 
-    const currentContext = (lastAiSuggestion && !lastAiSuggestion.applied && !lastAiSuggestion.discarded)
-      ? (lastAiSuggestion.suggestedContent ?? "")
-      : (editorRef.current?.getValue() ?? "");
+    const currentContext =
+      lastAiSuggestion &&
+      !lastAiSuggestion.applied &&
+      !lastAiSuggestion.discarded
+        ? (lastAiSuggestion.suggestedContent ?? "")
+        : (editorRef.current?.getValue() ?? "");
 
     try {
       const res = await fetch("/api/groq", {
@@ -115,17 +133,21 @@ export function EditorAI({
           prev.map((msg) =>
             msg.id === aiMessageId
               ? {
-                ...msg,
-                status: "error",
-                text: data.error ?? "Si è verificato un errore durante l'elaborazione.",
-              }
-              : msg
-          )
+                  ...msg,
+                  status: "error",
+                  text:
+                    data.error ??
+                    "Si è verificato un errore durante l'elaborazione.",
+                }
+              : msg,
+          ),
         );
         return;
       }
 
-      (globalThis as unknown as { umami?: { track: (name: string) => void } }).umami?.track("generated_ai");
+      (
+        globalThis as unknown as { umami?: { track: (name: string) => void } }
+      ).umami?.track("generated_ai");
       try {
         const analytics = await loadAnalytics();
         if (analytics) {
@@ -139,26 +161,29 @@ export function EditorAI({
         prev.map((msg) =>
           msg.id === aiMessageId
             ? {
-              ...msg,
-              status: "success",
-              originalContent: currentContext,
-              suggestedContent: data.text,
-            }
-            : msg
-        )
+                ...msg,
+                status: "success",
+                originalContent: currentContext,
+                suggestedContent: data.text,
+              }
+            : msg,
+        ),
       );
     } catch (error) {
-      console.error("Errore di rete:", error instanceof Error ? error.message : String(error));
+      console.error(
+        "Errore di rete:",
+        error instanceof Error ? error.message : String(error),
+      );
       setMessages((prev) =>
         prev.map((msg) =>
           msg.id === aiMessageId
             ? {
-              ...msg,
-              status: "error",
-              text: "Errore di rete. Controlla la tua connessione.",
-            }
-            : msg
-        )
+                ...msg,
+                status: "error",
+                text: "Errore di rete. Controlla la tua connessione.",
+              }
+            : msg,
+        ),
       );
     } finally {
       setLoading(false);
@@ -178,22 +203,22 @@ export function EditorAI({
       endColumn: model.getLineMaxColumn(model.getLineCount()),
     };
 
-    model.pushEditOperations([], [{ range, text: suggestedContent }], () => null);
+    model.pushEditOperations(
+      [],
+      [{ range, text: suggestedContent }],
+      () => null,
+    );
     editor.focus();
 
     setMessages((prev) =>
-      prev.map((msg) =>
-        msg.id === msgId ? { ...msg, applied: true } : msg
-      )
+      prev.map((msg) => (msg.id === msgId ? { ...msg, applied: true } : msg)),
     );
     toast.success("Modifiche inserite con successo!");
   };
 
   const handleDiscard = (msgId: string) => {
     setMessages((prev) =>
-      prev.map((msg) =>
-        msg.id === msgId ? { ...msg, discarded: true } : msg
-      )
+      prev.map((msg) => (msg.id === msgId ? { ...msg, discarded: true } : msg)),
     );
   };
 
@@ -270,7 +295,9 @@ export function EditorAI({
                         variant="default"
                         size="sm"
                         className="h-8 text-xs px-3 gap-1 cursor-pointer"
-                        onClick={() => handleAccept(msg.id, msg.suggestedContent ?? "")}
+                        onClick={() =>
+                          handleAccept(msg.id, msg.suggestedContent ?? "")
+                        }
                       >
                         <Check size={13} />
                         Applica modifiche
@@ -280,7 +307,9 @@ export function EditorAI({
                 </DialogContent>
               </Dialog>
             </div>
-            <div className={`w-full min-w-0 transition-all duration-300 ${isExpanded ? "h-96" : "h-56"}`}>
+            <div
+              className={`w-full min-w-0 transition-all duration-300 ${isExpanded ? "h-96" : "h-56"}`}
+            >
               <DiffEditor
                 height="100%"
                 original={msg.originalContent ?? ""}
@@ -298,7 +327,7 @@ export function EditorAI({
                   scrollbar: {
                     verticalScrollbarSize: 6,
                     horizontalScrollbarSize: 6,
-                  }
+                  },
                 }}
               />
             </div>
@@ -345,7 +374,6 @@ export function EditorAI({
 
   return (
     <div className="flex flex-col h-full bg-background border-r border-border text-sm">
-
       {/* Header (Shadcn style - strict monochrome) */}
       <div className="flex items-center justify-between p-3 border-b">
         <div className="flex items-center gap-2">
@@ -366,12 +394,16 @@ export function EditorAI({
               size="icon"
               onClick={onToggleExpand}
               className="size-7 text-muted-foreground hover:text-foreground hidden md:flex"
-              title={isExpanded ? "Riduci larghezza chat" : "Allarga larghezza chat"}
+              title={
+                isExpanded ? "Riduci larghezza chat" : "Allarga larghezza chat"
+              }
             >
               {isExpanded ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
             </Button>
           )}
-          <span className="font-semibold text-foreground">{"Genera con l'AI"}</span>
+          <span className="font-semibold text-foreground">
+            {"Genera con l'AI"}
+          </span>
         </div>
         {messages.length > 1 && (
           <Button
@@ -390,13 +422,14 @@ export function EditorAI({
       <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-6">
         {messages.map((msg) => (
           <div key={msg.id} className="flex gap-3 items-start">
-
             {/* Avatar / Icon */}
-            <div className={`size-7 rounded-md flex items-center justify-center shrink-0 text-xs font-semibold select-none border ${
-              msg.sender === "user" 
-                ? "bg-muted border-border text-muted-foreground" 
-                : "bg-primary border-primary text-primary-foreground"
-            }`}>
+            <div
+              className={`size-7 rounded-md flex items-center justify-center shrink-0 text-xs font-semibold select-none border ${
+                msg.sender === "user"
+                  ? "bg-muted border-border text-muted-foreground"
+                  : "bg-primary border-primary text-primary-foreground"
+              }`}
+            >
               {msg.sender === "user" ? (
                 <User size={13.5} className="text-muted-foreground" />
               ) : (
@@ -406,7 +439,6 @@ export function EditorAI({
 
             {/* Content box */}
             <div className="flex-1 flex flex-col gap-1 min-w-0">
-
               {/* Message Header */}
               <div className="flex items-center gap-1.5">
                 <span className="font-semibold text-xs text-foreground">
@@ -425,9 +457,18 @@ export function EditorAI({
               {msg.status === "loading" && (
                 <div className="flex items-center gap-2 py-1 text-xs text-muted-foreground select-none">
                   <div className="flex space-x-1 items-center h-2 mr-1">
-                    <div className="size-1 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <div className="size-1 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <div className="size-1 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                    <div
+                      className="size-1 bg-muted-foreground/60 rounded-full animate-bounce"
+                      style={{ animationDelay: "0ms" }}
+                    />
+                    <div
+                      className="size-1 bg-muted-foreground/60 rounded-full animate-bounce"
+                      style={{ animationDelay: "150ms" }}
+                    />
+                    <div
+                      className="size-1 bg-muted-foreground/60 rounded-full animate-bounce"
+                      style={{ animationDelay: "300ms" }}
+                    />
                   </div>
                   <span>{loadingText}</span>
                 </div>
@@ -446,7 +487,6 @@ export function EditorAI({
                   {renderSuggestionContent(msg)}
                 </div>
               )}
-
             </div>
           </div>
         ))}
@@ -459,21 +499,33 @@ export function EditorAI({
         <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5 select-none">
           <button
             type="button"
-            onClick={() => setPrompt("Formatta in LaTeX le formule presenti in questo argomento")}
+            onClick={() =>
+              setPrompt(
+                "Formatta in LaTeX le formule presenti in questo argomento",
+              )
+            }
             className="px-2.5 py-1 rounded-md border border-border bg-muted/40 text-[11px] text-muted-foreground hover:bg-muted hover:text-foreground transition-all shrink-0 font-medium cursor-pointer"
           >
             Formatta in LaTeX
           </button>
           <button
             type="button"
-            onClick={() => setPrompt("Correggi errori di battitura, grammatica e formattazione")}
+            onClick={() =>
+              setPrompt(
+                "Correggi errori di battitura, grammatica e formattazione",
+              )
+            }
             className="px-2.5 py-1 rounded-md border border-border bg-muted/40 text-[11px] text-muted-foreground hover:bg-muted hover:text-foreground transition-all shrink-0 font-medium cursor-pointer"
           >
             Correggi testo
           </button>
           <button
             type="button"
-            onClick={() => setPrompt("Aggiungi spiegazioni teoriche dettagliate ed esempi pratici")}
+            onClick={() =>
+              setPrompt(
+                "Aggiungi spiegazioni teoriche dettagliate ed esempi pratici",
+              )
+            }
             className="px-2.5 py-1 rounded-md border border-border bg-muted/40 text-[11px] text-muted-foreground hover:bg-muted hover:text-foreground transition-all shrink-0 font-medium cursor-pointer"
           >
             Espandi teoria
@@ -515,7 +567,6 @@ export function EditorAI({
           {"L'AI può generare risposte imprecise. Verifica prima di applicare."}
         </p>
       </div>
-
     </div>
   );
 }

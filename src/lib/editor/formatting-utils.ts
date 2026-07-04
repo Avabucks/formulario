@@ -80,10 +80,10 @@ export function getIsActiveWord(
       )
         return true;
     } else if (
-        startOffset >= match.index &&
-        endOffset <= match.index + match[0].length
-      )
-        return true;
+      startOffset >= match.index &&
+      endOffset <= match.index + match[0].length
+    )
+      return true;
   }
   return false;
 }
@@ -235,7 +235,10 @@ interface CodeBlock {
   language: string | null;
 }
 
-function findCodeBlocks(model: editor.ITextModel, maxLine: number): CodeBlock[] {
+function findCodeBlocks(
+  model: editor.ITextModel,
+  maxLine: number,
+): CodeBlock[] {
   const blocks: CodeBlock[] = [];
   let startLine: number | null = null;
   let language: string | null = null;
@@ -315,7 +318,8 @@ function wrapInBlock(
     () => null,
   );
 
-  const newEndLine = selection.startLineNumber + selectedText.split("\n").length;
+  const newEndLine =
+    selection.startLineNumber + selectedText.split("\n").length;
   const newEndCol = closeMarker.length + 1;
   editor.setSelection({
     startLineNumber: newEndLine,
@@ -335,7 +339,8 @@ function findOpenLine(
     const lineContent = model.getLineContent(l).trim();
     if (
       lineContent === openMarker ||
-      (lineContent.startsWith(openMarker) && lineContent.length > openMarker.length)
+      (lineContent.startsWith(openMarker) &&
+        lineContent.length > openMarker.length)
     ) {
       return l;
     }
@@ -397,7 +402,10 @@ function unwrapBlock(
         startLineNumber: closeLine,
         startColumn: 1,
         endLineNumber: closeLine < totalLines ? closeLine + 1 : closeLine,
-        endColumn: closeLine < totalLines ? 1 : model.getLineContent(closeLine).length + 1,
+        endColumn:
+          closeLine < totalLines
+            ? 1
+            : model.getLineContent(closeLine).length + 1,
       },
       text: "",
     },

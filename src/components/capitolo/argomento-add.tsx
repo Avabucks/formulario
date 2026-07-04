@@ -28,7 +28,11 @@ export function ArgomentoAdd({ capitolo }: Readonly<{ capitolo: Capitolo }>) {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === "a" && (e.metaKey || e.ctrlKey) && e.shiftKey) {
+      if (
+        e.key.toLowerCase() === "a" &&
+        (e.metaKey || e.ctrlKey) &&
+        e.shiftKey
+      ) {
         e.preventDefault();
         e.stopPropagation();
         if (hasSubmitted.current) return;

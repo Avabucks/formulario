@@ -2,7 +2,8 @@ import { MetadataRoute } from "next";
 import { pool } from "@/src/lib/db";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://formulario-five.vercel.app";
+  const baseUrl =
+    process.env.NEXT_PUBLIC_APP_URL || "https://formulario-five.vercel.app";
 
   // Static routes
   const staticPages = [
@@ -44,7 +45,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       `SELECT beautiful_id, data_creazione 
        FROM formulari 
        WHERE visibility = 2 
-       ORDER BY data_creazione DESC`
+       ORDER BY data_creazione DESC`,
     );
 
     const formulariUrls = formulari.map((f) => ({
@@ -59,7 +60,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       `SELECT c.beautiful_id 
        FROM capitoli c
        JOIN formulari f ON c.formulario = f.beautiful_id
-       WHERE f.visibility = 2`
+       WHERE f.visibility = 2`,
     );
 
     const capitoliUrls = capitoli.map((c) => ({

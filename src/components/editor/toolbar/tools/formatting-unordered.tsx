@@ -3,11 +3,15 @@
 import { Button } from "@/src/components/ui/button";
 import { CommandItem, CommandShortcut } from "@/src/components/ui/command";
 import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/src/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/src/components/ui/tooltip";
 import {
   getIsActiveList,
   getUnorderedListRegex,
-  handleListToggle
+  handleListToggle,
 } from "@/src/lib/editor/formatting-utils";
 import { List, ListOrdered, Outdent, Indent, ChevronRight } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";

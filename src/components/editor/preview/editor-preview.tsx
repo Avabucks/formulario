@@ -36,8 +36,6 @@ const SCROLL_OFFSET = 48;
 const HEADING_SCROLL_NUDGE_PX = 6;
 const NAVIGATOR_HIDE_DELAY_MS = 700;
 
-
-
 function extractMarkdownHeadings(markdown: string) {
   const headings: Array<{ level: number; title: string }> = [];
   let inCodeBlock = false;
@@ -61,8 +59,6 @@ function extractMarkdownHeadings(markdown: string) {
 
   return headings;
 }
-
-
 
 export const EditorPreview = memo(function EditorPreview({
   markdownContent,
@@ -203,7 +199,9 @@ export const EditorPreview = memo(function EditorPreview({
       }
 
       // After the smooth scroll should have finished (800ms), check if we have scrolled away
-      const headingClick = headings.find((h) => h.id === clickedHeadingRef.current);
+      const headingClick = headings.find(
+        (h) => h.id === clickedHeadingRef.current,
+      );
       if (headingClick) {
         const containerTop = container.getBoundingClientRect().top;
         const headingTop = headingClick.element.getBoundingClientRect().top;
@@ -215,7 +213,10 @@ export const EditorPreview = memo(function EditorPreview({
           HEADING_SCROLL_NUDGE_PX;
 
         const maxScrollTop = container.scrollHeight - container.clientHeight;
-        const expectedScrollTop = Math.max(0, Math.min(maxScrollTop, targetScrollTop));
+        const expectedScrollTop = Math.max(
+          0,
+          Math.min(maxScrollTop, targetScrollTop),
+        );
 
         // If the scroll position is still close to the expected scroll target, keep it active
         if (Math.abs(container.scrollTop - expectedScrollTop) <= 10) {
@@ -302,44 +303,42 @@ export const EditorPreview = memo(function EditorPreview({
     };
   }, [headings, showNavigatorTemporarily, updateActiveHeading, isMobile]);
 
+  const handleHeadingClick = useCallback(
+    (heading: PreviewHeading) => {
+      const container = containerRef.current;
+      if (!container) return;
 
+      clickedHeadingRef.current = heading.id;
+      clickTimeRef.current = Date.now();
+      setActiveHeadingId(heading.id);
 
-  const handleHeadingClick = useCallback((heading: PreviewHeading) => {
-    const container = containerRef.current;
-    if (!container) return;
+      const isFirst = headings.length > 0 && heading.id === headings[0].id;
+      if (isFirst) {
+        container.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+        return;
+      }
 
-    clickedHeadingRef.current = heading.id;
-    clickTimeRef.current = Date.now();
-    setActiveHeadingId(heading.id);
+      const containerTop = container.getBoundingClientRect().top;
+      const headingTop = heading.element.getBoundingClientRect().top;
+      const nextScrollTop =
+        container.scrollTop +
+        headingTop -
+        containerTop -
+        SCROLL_OFFSET +
+        HEADING_SCROLL_NUDGE_PX;
 
-    const isFirst = headings.length > 0 && heading.id === headings[0].id;
-    if (isFirst) {
       container.scrollTo({
-        top: 0,
+        top: Math.max(0, nextScrollTop),
         behavior: "smooth",
       });
-      return;
-    }
-
-    const containerTop = container.getBoundingClientRect().top;
-    const headingTop = heading.element.getBoundingClientRect().top;
-    const nextScrollTop =
-      container.scrollTop +
-      headingTop -
-      containerTop -
-      SCROLL_OFFSET +
-      HEADING_SCROLL_NUDGE_PX;
-
-    container.scrollTo({
-      top: Math.max(0, nextScrollTop),
-      behavior: "smooth",
-    });
-  }, [headings]);
+    },
+    [headings],
+  );
   const previewMarkdown = () => (
-    <div
-      ref={contentRef}
-      className="editor p-4 md:p-9 leading-loose relative"
-    >
+    <div ref={contentRef} className="editor p-4 md:p-9 leading-loose relative">
       <ReactMarkdown
         remarkPlugins={remarkPlugins}
         rehypePlugins={rehypePlugins}
@@ -348,7 +347,7 @@ export const EditorPreview = memo(function EditorPreview({
         {processedContent}
       </ReactMarkdown>
     </div>
-  )
+  );
 
   const desktopView = () => (
     <div className="flex flex-col flex-1 h-full w-full min-w-0 overflow-hidden relative">
@@ -515,17 +514,13 @@ export const EditorPreview = memo(function EditorPreview({
               />
             </pattern>
           </defs>
-          <rect
-            width="100%"
-            height="100%"
-            fill={`url(#${patternId})`}
-          />
+          <rect width="100%" height="100%" fill={`url(#${patternId})`} />
         </svg>
 
         {previewMarkdown()}
       </div>
     </div>
-  )
+  );
 
   return (
     <div className="flex flex-col flex-1 h-full w-full min-w-0 overflow-hidden relative">

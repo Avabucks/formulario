@@ -5,7 +5,10 @@ import type { editor, Selection } from "monaco-editor";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useRef, useState } from "react";
-import { getOrderedListRegex, getUnorderedListRegex } from "@/src/lib/editor/formatting-utils";
+import {
+  getOrderedListRegex,
+  getUnorderedListRegex,
+} from "@/src/lib/editor/formatting-utils";
 import { NavigationBlocker } from "../../navigation/navigation-blocker";
 import { Spinner } from "../../ui/spinner";
 
@@ -36,17 +39,29 @@ function handleUnorderedList(
   monaco: Monaco,
   position: any,
   lineContent: string,
-  textBeforeCursor: string
+  textBeforeCursor: string,
 ): boolean {
   const match = new RegExp(getUnorderedListRegex()).exec(textBeforeCursor);
   if (!match) return false;
 
   const marker = match[0];
   const isEmpty = textBeforeCursor === marker;
-  const text = isEmpty ? (new RegExp(/^\s*/).exec(marker)?.[0] || "") : ("\n" + marker);
+  const text = isEmpty
+    ? new RegExp(/^\s*/).exec(marker)?.[0] || ""
+    : "\n" + marker;
   const range = isEmpty
-    ? new monaco.Range(position.lineNumber, 1, position.lineNumber, lineContent.length + 1)
-    : new monaco.Range(position.lineNumber, position.column, position.lineNumber, position.column);
+    ? new monaco.Range(
+        position.lineNumber,
+        1,
+        position.lineNumber,
+        lineContent.length + 1,
+      )
+    : new monaco.Range(
+        position.lineNumber,
+        position.column,
+        position.lineNumber,
+        position.column,
+      );
 
   editor.executeEdits("list-autocomplete", [
     {
@@ -64,7 +79,7 @@ function handleOrderedList(
   monaco: Monaco,
   position: any,
   lineContent: string,
-  textBeforeCursor: string
+  textBeforeCursor: string,
 ): boolean {
   const match = new RegExp(getOrderedListRegex()).exec(textBeforeCursor);
   if (!match) return false;
@@ -77,13 +92,23 @@ function handleOrderedList(
 
   if (isEmpty) {
     text = new RegExp(/^\s*/).exec(marker)?.[0] || "";
-    range = new monaco.Range(position.lineNumber, 1, position.lineNumber, lineContent.length + 1);
+    range = new monaco.Range(
+      position.lineNumber,
+      1,
+      position.lineNumber,
+      lineContent.length + 1,
+    );
   } else {
     const numMatch = new RegExp(/\d+/).exec(marker);
     const nextNum = numMatch ? Number.parseInt(numMatch[0], 10) + 1 : 1;
     const nextMarker = marker.replace(/\d+/, nextNum.toString());
     text = "\n" + nextMarker;
-    range = new monaco.Range(position.lineNumber, position.column, position.lineNumber, position.column);
+    range = new monaco.Range(
+      position.lineNumber,
+      position.column,
+      position.lineNumber,
+      position.column,
+    );
   }
 
   editor.executeEdits("list-autocomplete", [
@@ -97,7 +122,11 @@ function handleOrderedList(
   return true;
 }
 
-function handleListEnter(editor: editor.IStandaloneCodeEditor, monaco: Monaco, e: any): boolean {
+function handleListEnter(
+  editor: editor.IStandaloneCodeEditor,
+  monaco: Monaco,
+  e: any,
+): boolean {
   if (e.keyCode !== monaco.KeyCode.Enter) return false;
 
   const selection = editor.getSelection();
@@ -112,13 +141,17 @@ function handleListEnter(editor: editor.IStandaloneCodeEditor, monaco: Monaco, e
   const lineContent = model.getLineContent(position.lineNumber);
   const textBeforeCursor = lineContent.substring(0, position.column - 1);
 
-  if (handleUnorderedList(editor, monaco, position, lineContent, textBeforeCursor)) {
+  if (
+    handleUnorderedList(editor, monaco, position, lineContent, textBeforeCursor)
+  ) {
     e.preventDefault();
     e.stopPropagation();
     return true;
   }
 
-  if (handleOrderedList(editor, monaco, position, lineContent, textBeforeCursor)) {
+  if (
+    handleOrderedList(editor, monaco, position, lineContent, textBeforeCursor)
+  ) {
     e.preventDefault();
     e.stopPropagation();
     return true;
@@ -242,7 +275,10 @@ export function EditorInput({
     setSelection(sel);
   };
 
-  const handleEditorDidMount = (editor: editor.IStandaloneCodeEditor, monaco: Monaco) => {
+  const handleEditorDidMount = (
+    editor: editor.IStandaloneCodeEditor,
+    monaco: Monaco,
+  ) => {
     editorRef.current = editor;
     monacoRef.current = monaco;
 

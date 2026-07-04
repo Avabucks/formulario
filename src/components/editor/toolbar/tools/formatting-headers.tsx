@@ -18,7 +18,7 @@ import {
   getH5Regex,
   getH6Regex,
   getIsActiveList,
-  handleListToggle
+  handleListToggle,
 } from "@/src/lib/editor/formatting-utils";
 import {
   Heading1,
@@ -38,7 +38,14 @@ export const toggleHeading = (
   editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>,
   level: number,
 ) => {
-  const getRegex = [getH1Regex, getH2Regex, getH3Regex, getH4Regex, getH5Regex, getH6Regex][level - 1];
+  const getRegex = [
+    getH1Regex,
+    getH2Regex,
+    getH3Regex,
+    getH4Regex,
+    getH5Regex,
+    getH6Regex,
+  ][level - 1];
   const prefix = "#".repeat(level);
 
   const anyActive =
@@ -200,7 +207,14 @@ export function FormattingHeadersContext({
     const selection = editor.getSelection();
     if (!selection) return;
 
-    const currentRegex = [getH1Regex, getH2Regex, getH3Regex, getH4Regex, getH5Regex, getH6Regex][level - 1];
+    const currentRegex = [
+      getH1Regex,
+      getH2Regex,
+      getH3Regex,
+      getH4Regex,
+      getH5Regex,
+      getH6Regex,
+    ][level - 1];
     const isCurrentLevelActive = getIsActiveList(editorRef, currentRegex);
     const prefix = "#".repeat(level);
 
@@ -209,7 +223,7 @@ export function FormattingHeadersContext({
       isCurrentLevelActive,
       currentRegex,
       (line) => `${prefix} ${line.replace(/^#{1,6}\s/, "")}`,
-      (line) => line.replace(new RegExp(String.raw`^${prefix}\s`), "")
+      (line) => line.replace(new RegExp(String.raw`^${prefix}\s`), ""),
     );
     setUpdateTrigger((prev) => prev + 1);
     setTimeout(() => editor.focus(), 50);
@@ -227,11 +241,7 @@ export function FormattingHeadersContext({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="default"
-            className="text-foreground"
-          >
+          <Button variant="ghost" size="default" className="text-foreground">
             <span className="font-semibold">H{activeLevel}</span>
             <ChevronDown className="size-4 text-muted-foreground" />
           </Button>
@@ -246,8 +256,12 @@ export function FormattingHeadersContext({
               }}
             >
               <div className="flex items-center w-full justify-between">
-                <span>Titolo {l} (H{l})</span>
-                {activeLevel === l && <Check className="size-4 text-primary shrink-0" />}
+                <span>
+                  Titolo {l} (H{l})
+                </span>
+                {activeLevel === l && (
+                  <Check className="size-4 text-primary shrink-0" />
+                )}
               </div>
             </DropdownMenuItem>
           ))}

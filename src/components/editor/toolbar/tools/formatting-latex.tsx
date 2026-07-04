@@ -20,9 +20,7 @@ import {
   TooltipTrigger,
 } from "@/src/components/ui/tooltip";
 import formulasData from "@/src/data/formulas.json";
-import {
-  getIsActiveLatex
-} from "@/src/lib/editor/formatting-utils";
+import { getIsActiveLatex } from "@/src/lib/editor/formatting-utils";
 import { loadAnalytics } from "@/src/lib/firebase";
 import { logEvent } from "firebase/analytics";
 import katex from "katex";
@@ -58,7 +56,9 @@ export function FormattingLatex({
   const [open, setOpen] = useState(false);
   const [pendingKind, setPendingKind] = useState<"single" | "double">("double");
 
-  const [inlineState, setInlineState] = useState<{ kind: "single" | "double" | "block" | null } | null>(null);
+  const [inlineState, setInlineState] = useState<{
+    kind: "single" | "double" | "block" | null;
+  } | null>(null);
 
   useEffect(() => {
     if (open) {
@@ -149,7 +149,6 @@ export function FormattingLatex({
       ]),
     );
   }, [query, tabs]);
-
 
   const scroll = (dir: "left" | "right") => {
     tabsRef.current?.scrollBy({
@@ -270,9 +269,9 @@ export function FormattingLatex({
       );
     }
 
-    (globalThis as unknown as { umami?: { track: (event: string) => void } }).umami?.track(
-      "selected_formula_latex",
-    );
+    (
+      globalThis as unknown as { umami?: { track: (event: string) => void } }
+    ).umami?.track("selected_formula_latex");
     try {
       const analytics = await loadAnalytics();
       if (analytics) {
@@ -293,8 +292,14 @@ export function FormattingLatex({
     globalThis.addEventListener("editor:open-latex-single", handleOpenSingle);
     globalThis.addEventListener("editor:open-latex-double", handleOpenDouble);
     return () => {
-      globalThis.removeEventListener("editor:open-latex-single", handleOpenSingle);
-      globalThis.removeEventListener("editor:open-latex-double", handleOpenDouble);
+      globalThis.removeEventListener(
+        "editor:open-latex-single",
+        handleOpenSingle,
+      );
+      globalThis.removeEventListener(
+        "editor:open-latex-double",
+        handleOpenDouble,
+      );
     };
   }, []);
 
@@ -337,7 +342,8 @@ export function FormattingLatex({
               const counts = Object.fromEntries(
                 tabs.map((t) => [
                   t.id,
-                  t.data.filter((f) => f.label.toLowerCase().includes(q)).length,
+                  t.data.filter((f) => f.label.toLowerCase().includes(q))
+                    .length,
                 ]),
               );
               const firstTabWithResults = tabs.find((t) => counts[t.id] > 0);
@@ -368,19 +374,21 @@ export function FormattingLatex({
                 tabIndex={-1}
                 onClick={() => setActiveTabAndScroll(t.id)}
                 className={`px-3 py-1.5 text-sm whitespace-nowrap flex items-center gap-1.5 transition-colors
-                                      ${activeTab === t.id
-                    ? "border-b-2 border-primary font-medium"
-                    : "text-muted-foreground hover:text-foreground"
-                  }`}
+                                      ${
+                                        activeTab === t.id
+                                          ? "border-b-2 border-primary font-medium"
+                                          : "text-muted-foreground hover:text-foreground"
+                                      }`}
               >
                 {t.label}
                 {query && (
                   <span
                     className={`text-xs rounded-full px-1.5 py-0.5 
-                                          ${tabCounts[t.id] > 0
-                        ? "bg-primary/15 text-primary"
-                        : "bg-muted text-muted-foreground"
-                      }`}
+                                          ${
+                                            tabCounts[t.id] > 0
+                                              ? "bg-primary/15 text-primary"
+                                              : "bg-muted text-muted-foreground"
+                                          }`}
                   >
                     {tabCounts[t.id]}
                   </span>
@@ -410,12 +418,10 @@ export function FormattingLatex({
               </div>
 
               <div className="flex items-center gap-2 text-xs text-muted-foreground/70">
-                <span className="h-px w-8 bg-border" /> oppure <span className="h-px w-8 bg-border" />
+                <span className="h-px w-8 bg-border" /> oppure{" "}
+                <span className="h-px w-8 bg-border" />
               </div>
-              <Button
-                onClick={() => handleFormulaSelect("")}
-                variant="outline"
-              >
+              <Button onClick={() => handleFormulaSelect("")} variant="outline">
                 {pendingKind === "single" ? (
                   <Radical size={14} />
                 ) : (
@@ -557,7 +563,7 @@ export function FormattingLatexContext({
                 const event = new CustomEvent(
                   activeData.kind === "double"
                     ? "editor:open-latex-double"
-                    : "editor:open-latex-single"
+                    : "editor:open-latex-single",
                 );
                 globalThis.dispatchEvent(event);
               }}
@@ -566,7 +572,9 @@ export function FormattingLatexContext({
               <span>Componi formula</span>
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Componi la formula (inserisci simboli, frazioni o funzioni KaTeX)</TooltipContent>
+          <TooltipContent>
+            Componi la formula (inserisci simboli, frazioni o funzioni KaTeX)
+          </TooltipContent>
         </Tooltip>
       </TooltipProvider>
     </>

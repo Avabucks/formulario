@@ -15,7 +15,9 @@ export const toggleDivider = (
   const editor = editorRef.current;
   if (!editor) return false;
 
-  const controller = editor.getContribution("snippetController2") as unknown as SnippetController | undefined;
+  const controller = editor.getContribution("snippetController2") as unknown as
+    | SnippetController
+    | undefined;
   if (!controller) return false;
 
   const position = editor.getPosition();

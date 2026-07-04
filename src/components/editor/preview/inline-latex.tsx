@@ -9,11 +9,15 @@ import remarkMath from "remark-math";
 const remarkPlugins = [remarkMath, remarkGfm];
 const rehypePlugins = [rehypeKatex];
 
-function InlineLatexParagraph({ children }: Readonly<{ children?: React.ReactNode }>) {
+function InlineLatexParagraph({
+  children,
+}: Readonly<{ children?: React.ReactNode }>) {
   return <>{children}</>;
 }
 
-function InlineLatexCode({ children }: Readonly<{ children?: React.ReactNode }>) {
+function InlineLatexCode({
+  children,
+}: Readonly<{ children?: React.ReactNode }>) {
   return (
     <code className="rounded bg-foreground/8 px-1 py-0.5 font-mono text-[85%]">
       {children}
