@@ -19,9 +19,9 @@ import rehypeKatex from "rehype-katex";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
-import { markdownComponents } from "./markdown-components";
 import { useIsMobile } from "@/src/hooks/useIsMobile";
 import { OutlineNavigator, type PreviewHeading } from "./outline-navigator";
+import { markdownComponents } from "./markdown-components";
 
 const remarkPlugins = [remarkMath, remarkBreaks, remarkGfm];
 const rehypePlugins = [rehypeKatex];

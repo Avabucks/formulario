@@ -27,19 +27,19 @@ import {
 import { ChevronRight, SquareTerminal, Radical, SquareRadical, Table } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 
-import { FormattingBold } from "./tools/formatting-bold";
-import { FormattingCodeBlock } from "./tools/formatting-code-block";
-import { FormattingCodeInline } from "./tools/formatting-code-inline";
-import { FormattingDivider } from "./tools/formatting-divider";
-import { FormattingHeaders } from "./tools/formatting-headers";
-import { FormattingItalic } from "./tools/formatting-italic";
-import { FormattingOrderedList } from "./tools/formatting-ordered";
-import { FormattingQuote } from "./tools/formatting-quote";
-import { FormattingUnorderedList } from "./tools/formatting-unordered";
-import { FormattingLatex } from "./tools/formatting-latex";
-import { FormattingTable } from "./tools/formatting-table";
+import { FormattingBold } from "../toolbar/tools/formatting-bold";
+import { FormattingCodeBlock } from "../toolbar/tools/formatting-code-block";
+import { FormattingCodeInline } from "../toolbar/tools/formatting-code-inline";
+import { FormattingDivider } from "../toolbar/tools/formatting-divider";
+import { FormattingHeaders } from "../toolbar/tools/formatting-headers";
+import { FormattingItalic } from "../toolbar/tools/formatting-italic";
+import { FormattingOrderedList } from "../toolbar/tools/formatting-ordered";
+import { FormattingQuote } from "../toolbar/tools/formatting-quote";
+import { FormattingUnorderedList } from "../toolbar/tools/formatting-unordered";
+import { FormattingLatex } from "../toolbar/tools/formatting-latex";
+import { FormattingTable } from "../toolbar/tools/formatting-table";
 import { useEffect, useState, useRef } from "react";
-import { ContextualToolbar } from "./contextual-toolbar";
+import { ContextualToolbar } from "../toolbar/contextual-toolbar";
 
 export function FormattingCommand({
   _selection,

@@ -1,5 +1,5 @@
 "use client";
-import { InlineLatex } from "@/src/components/editor/editor-katex/inline-latex";
+import { InlineLatex } from "@/src/components/editor/preview/inline-latex";
 import { Button } from "@/src/components/ui/button";
 import {
   Command,

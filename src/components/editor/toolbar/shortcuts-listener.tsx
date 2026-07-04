@@ -2,14 +2,14 @@
 
 import { useEffect } from "react";
 import type { editor } from "monaco-editor";
-import { toggleBold } from "./tools/formatting-bold";
-import { toggleItalic } from "./tools/formatting-italic";
-import { toggleQuote } from "./tools/formatting-quote";
-import { toggleHeading } from "./tools/formatting-headers";
-import { toggleOrderedList } from "./tools/formatting-ordered";
-import { toggleUnorderedList } from "./tools/formatting-unordered";
-import { toggleDivider } from "./tools/formatting-divider";
-import { toggleCodeInline } from "./tools/formatting-code-inline";
+import { toggleBold } from "../toolbar/tools/formatting-bold";
+import { toggleItalic } from "../toolbar/tools/formatting-italic";
+import { toggleQuote } from "../toolbar/tools/formatting-quote";
+import { toggleHeading } from "../toolbar/tools/formatting-headers";
+import { toggleOrderedList } from "../toolbar/tools/formatting-ordered";
+import { toggleUnorderedList } from "../toolbar/tools/formatting-unordered";
+import { toggleDivider } from "../toolbar/tools/formatting-divider";
+import { toggleCodeInline } from "../toolbar/tools/formatting-code-inline";
 type ToggleFn = (editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>) => void;
 
 const ACTIONS_NO_SHIFT: Record<string, ToggleFn> = {

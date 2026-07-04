@@ -25,11 +25,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
-import { EditorAI } from "./editor-katex/editor-ai";
-import { EditorInput, SyncStatus } from "./editor-katex/editor-input";
-import { EditorPreview } from "./editor-katex/editor-preview";
-import { FormattingCommand } from "./editor-katex/formatting-command";
-import { ShortcutsListener } from "./editor-katex/shortcuts-listener";
+import { EditorAI } from "./ai/editor-ai";
+import { EditorPreview } from "./preview/editor-preview";
+import { FormattingCommand } from "./toolbar/formatting-command";
+import { EditorInput, SyncStatus } from "./input/editor-input";
+import { ShortcutsListener } from "./toolbar/shortcuts-listener";
 
 const MIN_RESIZABLE_SIZE = 20;
 const MAX_RESIZABLE_SIZE = 80;
