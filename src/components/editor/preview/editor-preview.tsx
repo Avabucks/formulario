@@ -353,10 +353,7 @@ export const EditorPreview = memo(function EditorPreview({
     <div className="flex flex-col flex-1 h-full w-full min-w-0 overflow-hidden relative">
       <div
         ref={containerRef}
-        className="group/container flex-1 overflow-auto"
-        style={{
-          backgroundColor: "hsl(var(--sidebar-background, var(--secondary)))",
-        }}
+        className="group/container flex-1 overflow-auto bg-card/40"
       >
         <div className="py-10" style={{ minWidth: A4_WIDTH_PX * scale }}>
           <div

@@ -119,7 +119,7 @@ export function OutlineNavigator({
 
       {/* Dash Outline Minimap */}
       <nav
-        className="absolute right-5  bg-background top-1/2 -translate-y-1/2 z-10 flex flex-col items-end gap-1.5 transition-all duration-300 group/outline max-h-[70vh] overflow-y-auto scrollbar-none"
+        className="absolute right-5 top-1/2 -translate-y-1/2 z-10 flex flex-col items-end gap-1.5 transition-all duration-300 group/outline max-h-[70vh] overflow-y-auto scrollbar-none"
         style={{ scrollbarWidth: "none" }}
         onMouseEnter={() => {
           navigatorHoverRef.current = true;
