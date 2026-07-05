@@ -155,7 +155,8 @@ export function handleWordToggle(
       }
     }
   }
-  const text = wrap(trimmedText);
+  const escapedText = trimmedText.replace(/[\$\\]/g, (m) => "\\" + m);
+  const text = wrap(escapedText);
   controller.insert(text);
   setTimeout(() => editor.focus(), 0);
 }
