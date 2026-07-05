@@ -21,7 +21,7 @@ const SYSTEM_INSTRUCTION =
   "2. Non includere alcuna introduzione, conclusione o commento (come 'Certamente', 'Ecco il documento modificato:', ecc.). Il testo generato deve essere pronto all'uso e sostituire integralmente il documento precedente.\n" +
   "3. NON racchiudere il testo generato in tag XML o delimitatori di alcun tipo (come <documento>, ecc.). Restituisci esclusivamente il testo pulito del documento.\n" +
   "4. Se non viene fornito alcun documento da modificare, genera da zero il formulario richiesto seguendo le stesse regole.\n" +
-  "5. Usa Markdown (per le liste usa il trattino '-' e non l'asterisco '*') e LaTeX ($ per formule inline, $$ per formule display), organizzando i contenuti con opportuni headings (es. #, ##, ###).";
+  String.raw`5. Usa Markdown (per le liste usa il trattino '-' e non l'asterisco '*') e LaTeX ($ per formule inline, $$ per formule display, non usare \[), organizzando i contenuti con opportuni headings (es. #, ##, ###).`;
 
 type Message = {
   role: "user" | "assistant";

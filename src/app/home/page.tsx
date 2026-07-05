@@ -288,7 +288,6 @@ export default async function Home() {
           </TabsContent>
         </Tabs>
       </div>
-
     </>
   );
 }

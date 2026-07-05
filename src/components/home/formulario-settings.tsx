@@ -76,7 +76,11 @@ export function FormularioSettings({
       });
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === "i" && (e.metaKey || e.ctrlKey) && e.shiftKey) {
+      if (
+        e.key.toLowerCase() === "i" &&
+        (e.metaKey || e.ctrlKey) &&
+        e.shiftKey
+      ) {
         e.preventDefault();
         setOpen((prev) => !prev);
       }

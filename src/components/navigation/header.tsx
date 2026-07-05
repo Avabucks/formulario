@@ -8,8 +8,6 @@ import { AvatarLogic } from "../auth/avatar-logic";
 import { LandingMenu } from "./landing-menu";
 import { SearchLogic } from "./search-logic";
 
-
-
 export async function Header() {
   const session = await getIronSession<SessionData>(
     await cookies(),
@@ -47,4 +45,3 @@ export async function Header() {
     </div>
   );
 }
-

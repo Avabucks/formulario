@@ -7,7 +7,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/src/components/ui/dropdown-menu";
-import { InlineLatex } from "@/src/components/editor/editor-katex/inline-latex";
+import { InlineLatex } from "@/src/components/editor/preview/inline-latex";
 import {
   Item,
   ItemActions,

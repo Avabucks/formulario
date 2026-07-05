@@ -68,8 +68,6 @@ export async function PUT(request: Request) {
       [id],
     );
 
-
-
     revalidatePath("/home");
     return NextResponse.json({ success: true });
   } catch (error: any) {
