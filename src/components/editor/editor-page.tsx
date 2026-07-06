@@ -273,10 +273,10 @@ export function EditorPage({
       onValueChange={(val) => setSwitchView(val as "preview" | "divided" | "edit")}
       className="gap-0 select-none shrink-0"
     >
-      <TabsList variant="line" className="h-8 p-0 bg-transparent gap-0">
+      <TabsList variant="line" className="h-7 md:h-8 p-0 bg-transparent gap-0">
         <TabsTrigger
           value="edit"
-          className="gap-1.5 px-3 py-1 text-xs font-semibold cursor-pointer"
+          className="gap-1 md:gap-1.5 px-2 md:px-3 py-0.5 md:py-1 text-xs font-semibold cursor-pointer"
         >
           <PenLine size={13.5} />
           <span className="hidden sm:inline">Editor</span>
@@ -292,7 +292,7 @@ export function EditorPage({
         )}
         <TabsTrigger
           value="preview"
-          className="gap-1.5 px-3 py-1 text-xs font-semibold cursor-pointer"
+          className="gap-1 md:gap-1.5 px-2 md:px-3 py-0.5 md:py-1 text-xs font-semibold cursor-pointer"
         >
           <Eye size={13.5} />
           <span className="hidden sm:inline">Anteprima</span>
@@ -300,11 +300,10 @@ export function EditorPage({
       </TabsList>
     </Tabs>
   );
-
   const toolbar = (
-    <div className="flex w-full border-b bg-background/95 backdrop-blur-xs min-h-15 items-center justify-between px-4 py-2 gap-4 overflow-x-auto select-none">
+    <div className="flex w-full border-b bg-background/95 backdrop-blur-xs min-h-14 md:min-h-15 items-center justify-between px-2.5 md:px-4 py-1.5 md:py-2 gap-2 md:gap-4 overflow-x-auto scrollbar-none select-none">
       {/* Left: History & Formatting Tray */}
-      <div className="flex flex-1 items-center gap-3 min-w-0">
+      <div className="flex flex-1 items-center gap-1.5 md:gap-3 min-w-0">
         {/* History Capsule */}
         <div className="flex items-center gap-1 shrink-0">
           <TooltipProvider>
@@ -313,12 +312,11 @@ export function EditorPage({
                 <Button
                   ref={undoBtnRef}
                   variant="outline"
-                  size="icon"
                   onClick={handleUndo}
                   onMouseDown={(e) => e.preventDefault()}
-                  className="text-foreground"
+                  className="h-7 w-7 md:h-8 md:w-8 text-foreground flex items-center justify-center p-0 shrink-0"
                 >
-                  <Undo2 className="size-4" />
+                  <Undo2 className="size-3.5 md:size-4" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent className="pr-1.5">
@@ -340,12 +338,11 @@ export function EditorPage({
                 <Button
                   ref={redoBtnRef}
                   variant="outline"
-                  size="icon"
                   onClick={handleRedo}
                   onMouseDown={(e) => e.preventDefault()}
-                  className="text-foreground"
+                  className="h-7 w-7 md:h-8 md:w-8 text-foreground flex items-center justify-center p-0 shrink-0"
                 >
-                  <Redo2 className="size-4" />
+                  <Redo2 className="size-3.5 md:size-4" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent className="pr-1.5">
@@ -372,28 +369,27 @@ export function EditorPage({
           </TooltipProvider>
         </div>
 
-        <div className="h-6 w-px bg-border shrink-0" />
+        <div className="h-6 w-px bg-border shrink-0 hidden sm:block" />
 
-        {switchView !== "preview" && (
+        <div className={clsx(switchView === "preview" && "hidden")}>
           <FormattingCommand _selection={selection} editorRef={editorRef} />
-        )}
+        </div>
 
         {titleComponent()}
       </div>
 
       {/* Right: View Selector & Settings */}
-      <div className="flex items-center gap-3 shrink-0">
+      <div className="flex items-center gap-1.5 md:gap-3 shrink-0">
         {editable && (
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   variant={showAI ? "default" : "outline"}
-                  size="sm"
                   onClick={() => setShowAI(!showAI)}
-                  className="h-8 gap-1.5 select-none cursor-pointer"
+                  className="h-7 md:h-8 gap-1 md:gap-1.5 px-2 md:px-2.5 text-[0.8rem] md:text-sm select-none cursor-pointer"
                 >
-                  <Sparkles size={14} />
+                  <Sparkles className="size-3.5 md:size-4" />
                   <span className="hidden md:flex -mr-1.25">
                     Chiedi all&apos;
                   </span>{" "}
@@ -413,9 +409,9 @@ export function EditorPage({
             </Tooltip>
           </TooltipProvider>
         )}
-        <div className="h-6 w-px bg-border" />
+        <div className="h-6 w-px bg-border hidden sm:block" />
         {viewTabs}
-        <div className="h-6 w-px bg-border" />
+        <div className="h-6 w-px bg-border hidden sm:block" />
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -423,9 +419,13 @@ export function EditorPage({
                 variant="outline"
                 pressed={isFullscreen}
                 onPressedChange={setIsFullscreen}
-                className="size-8 text-foreground shrink-0 cursor-pointer p-0"
+                className="h-7 w-7 md:h-8 md:w-8 text-foreground shrink-0 cursor-pointer p-0 flex items-center justify-center"
               >
-                {isFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
+                {isFullscreen ? (
+                  <Minimize2 className="size-3.5 md:size-4" />
+                ) : (
+                  <Maximize2 className="size-3.5 md:size-4" />
+                )}
               </Toggle>
             </TooltipTrigger>
             <TooltipContent className="pr-1.5">
@@ -438,11 +438,12 @@ export function EditorPage({
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-        <div className="h-6 w-px bg-border" />
+        <div className="h-6 w-px bg-border hidden sm:block" />
         <FormularioSettings formularioId={formularioId} />
       </div>
     </div>
   );
+
   const preview = !loading && (
     <EditorPreview markdownContent={markdownContent ?? ""} />
   );
@@ -474,11 +475,11 @@ export function EditorPage({
     }
 
     return (
-      <div className="flex w-full border-b bg-background/95 backdrop-blur-xs min-h-15 items-center justify-between px-4 py-2 gap-4 overflow-x-auto select-none">
+      <div className="flex w-full border-b bg-background/95 backdrop-blur-xs min-h-14 md:min-h-15 items-center justify-between px-2.5 md:px-4 py-1.5 md:py-2 gap-2 md:gap-4 overflow-x-auto scrollbar-none select-none">
         {/* Left: TakeFormulario */}
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-1.5 md:gap-3 shrink-0">
           <TakeFormulario formularioId={formularioId} />
-          <div className="h-6 w-px bg-border" />
+          <div className="h-6 w-px bg-border hidden sm:block" />
           {titleComponent()}
         </div>
 
@@ -486,9 +487,9 @@ export function EditorPage({
         <div className="flex-1" />
 
         {/* Right: View Selector & Settings */}
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-1.5 md:gap-3 shrink-0">
           {viewTabs}
-          <div className="h-6 w-px bg-border" />
+          <div className="h-6 w-px bg-border hidden sm:block" />
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -496,9 +497,9 @@ export function EditorPage({
                   variant="outline"
                   pressed={isFullscreen}
                   onPressedChange={setIsFullscreen}
-                  className="size-8 text-foreground shrink-0 cursor-pointer p-0"
+                  className="size-7 md:size-8 text-foreground shrink-0 cursor-pointer p-0"
                 >
-                  {isFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
+                  {isFullscreen ? <Minimize2 size={isMobile ? 14 : 15} /> : <Maximize2 size={isMobile ? 14 : 15} />}
                 </Toggle>
               </TooltipTrigger>
               <TooltipContent className="pr-1.5">
@@ -511,7 +512,7 @@ export function EditorPage({
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          <div className="h-6 w-px bg-border" />
+          <div className="h-6 w-px bg-border hidden sm:block" />
           <FormularioSettings formularioId={formularioId} />
         </div>
       </div>

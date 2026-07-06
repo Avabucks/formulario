@@ -79,19 +79,18 @@ export function FormattingCommand({
 
   return (
     <>
-      <div className="flex items-center gap-4 min-w-0 select-none max-w-full">
+      <div className="flex items-center gap-2 md:gap-4 min-w-0 select-none max-w-full">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
                 variant="outline"
-                size="default"
-                className="text-foreground gap-1"
+                className="h-7 md:h-8 text-foreground gap-1 px-2.5 md:px-2.5 text-[0.8rem] md:text-sm"
                 onClick={() => setActiveDialog(!activeDialog)}
                 onMouseDown={(e) => e.preventDefault()}
                 aria-label="Apri tavolozza comandi"
               >
-                <ChevronRight className="size-4 text-primary" />
+                <ChevronRight className="size-3.5 md:size-4 text-primary" />
                 <span className="hidden md:flex">Esegui</span>
               </Button>
             </TooltipTrigger>

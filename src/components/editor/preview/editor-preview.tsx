@@ -489,8 +489,8 @@ export const EditorPreview = memo(function EditorPreview({
   );
 
   const mobileView = () => (
-    <div className="flex-1 w-full overflow-y-auto" ref={containerRef}>
-      <div className="relative w-full min-h-full bg-background">
+    <div className="flex-1 w-full overflow-auto" ref={containerRef}>
+      <div className="relative min-w-full w-fit min-h-full bg-background">
         <svg
           className="absolute inset-0 h-full w-full opacity-[0.08] pointer-events-none"
           xmlns="http://www.w3.org/2000/svg"

@@ -166,8 +166,8 @@ export function FormularioSettings({
           <Tooltip>
             <TooltipTrigger asChild>
               <DialogTrigger asChild>
-                <Button variant="outline" size="icon" className="relative">
-                  <Settings size={16} />
+                <Button variant="outline" className="size-7 md:size-8 relative p-0 flex items-center justify-center shrink-0">
+                  <Settings className="size-3.5 md:size-4" />
                   {edited && (
                     <span className="absolute -top-0.5 -right-0.5 flex size-2">
                       <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>

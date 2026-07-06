@@ -177,8 +177,8 @@ export function DiscordDialog({
         </div>
 
         {/* Footer del popup corretto (stile slide tutorial) */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-border bg-muted/50 gap-3">
-          <div>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between px-6 py-4 border-t border-border bg-muted/50 gap-3">
+          <div className="order-2 sm:order-1 flex justify-end sm:justify-start w-full sm:w-auto">
             {showDisableOption && disableAutomaticPopup && (
               <button
                 onClick={disableAutomaticPopup}
@@ -188,7 +188,7 @@ export function DiscordDialog({
               </button>
             )}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="order-1 sm:order-2 flex items-center justify-end gap-2 w-full sm:w-auto">
             <DialogClose asChild>
               <Button variant="ghost" size="sm">
                 Chiudi
