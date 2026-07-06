@@ -31,6 +31,8 @@ import {
   Radical,
   SquareRadical,
   PenTool,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -80,6 +82,7 @@ export function FormattingLatex({
 
   const [query, setQuery] = useState("");
   const [activeTab, setActiveTab] = useState("formule");
+  const [showAll, setShowAll] = useState(false);
 
   const renderLatex = (latex: string): { __html: string } => {
     return {
@@ -107,10 +110,14 @@ export function FormattingLatex({
     const tab = tabs.find((t) => t.id === activeTab);
     if (!tab) return [];
     const q = query.toLowerCase();
-    return q
-      ? tab.data.filter((f) => f.label.toLowerCase().includes(q))
-      : tab.data.slice(0, MAX_VISIBLE);
-  }, [query, activeTab]);
+    if (q) {
+      return tab.data.filter((f) => f.label.toLowerCase().includes(q));
+    }
+    if (showAll) {
+      return tab.data;
+    }
+    return tab.data.slice(0, MAX_VISIBLE);
+  }, [query, activeTab, showAll, tabs]);
 
   function resolveActiveKind(): "block" | "single" | "double" | null {
     if (inlineState?.kind === "double") return "double";
@@ -228,6 +235,7 @@ export function FormattingLatex({
   const handleFormulaSelect = async (snippet: string) => {
     setOpen(false);
     setQuery("");
+    setShowAll(false);
     setActiveTab("formule");
 
     const model = editorRef.current?.getModel();
@@ -310,6 +318,7 @@ export function FormattingLatex({
         setOpen(v);
         if (!v) {
           setQuery("");
+          setShowAll(false);
           setActiveTab("formule");
           setTimeout(() => editorRef.current?.focus(), 0);
         }
@@ -407,29 +416,59 @@ export function FormattingLatex({
 
         <CommandList>
           <CommandEmpty>
-            <div className="flex flex-col items-center gap-4 py-4 text-center">
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">
-                  Nessun risultato trovato
-                </p>
-                <p className="text-xs text-muted-foreground/80">
-                  Prova a cercare una formula o un simbolo
-                </p>
-              </div>
+            {query ? (
+              <div className="flex flex-col items-center gap-4 py-4 text-center">
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">
+                    Nessun risultato trovato per &ldquo;{query}&rdquo;
+                  </p>
+                  <p className="text-xs text-muted-foreground/80">
+                    Prova a cercare un altro termine o sfoglia l'elenco completo.
+                  </p>
+                </div>
 
-              <div className="flex items-center gap-2 text-xs text-muted-foreground/70">
-                <span className="h-px w-8 bg-border" /> oppure{" "}
-                <span className="h-px w-8 bg-border" />
+                <div className="flex items-center gap-2 mt-2">
+                  <Button onClick={() => setShowAll(true)} variant="outline" className="gap-2">
+                    <Eye className="h-4 w-4" />
+                    Mostra tutte
+                  </Button>
+                  <Button onClick={() => handleFormulaSelect("")} variant="outline" className="gap-2">
+                    {pendingKind === "single" ? (
+                      <Radical size={14} />
+                    ) : (
+                      <SquareRadical size={14} />
+                    )}
+                    Inserisci vuota
+                  </Button>
+                </div>
               </div>
-              <Button onClick={() => handleFormulaSelect("")} variant="outline">
-                {pendingKind === "single" ? (
-                  <Radical size={14} />
-                ) : (
-                  <SquareRadical size={14} />
-                )}
-                Inserisci vuota
-              </Button>
-            </div>
+            ) : (
+              <div className="flex flex-col items-center gap-4 py-4 text-center">
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground font-medium">
+                    Scegli una formula
+                  </p>
+                  <p className="text-xs text-muted-foreground/80">
+                    Cerca una formula o sfoglia l'elenco completo di questa categoria.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 mt-2">
+                  <Button onClick={() => setShowAll(true)} variant="default" className="gap-2">
+                    <Eye className="h-4 w-4" />
+                    Visualizza tutte
+                  </Button>
+                  <Button onClick={() => handleFormulaSelect("")} variant="outline" className="gap-2">
+                    {pendingKind === "single" ? (
+                      <Radical size={14} />
+                    ) : (
+                      <SquareRadical size={14} />
+                    )}
+                    Inserisci vuota
+                  </Button>
+                </div>
+              </div>
+            )}
           </CommandEmpty>
           <CommandGroup>
             {activeData.map((f) => (
@@ -448,6 +487,20 @@ export function FormattingLatex({
             ))}
           </CommandGroup>
         </CommandList>
+        {showAll && !query && (
+          <div className="flex items-center justify-between px-3 py-1.5 border-t bg-muted/20 text-xs text-muted-foreground">
+            <span>Stai visualizzando tutte le formule</span>
+            <Button
+              variant="ghost"
+              size="xs"
+              className="h-6 text-xs gap-1 text-muted-foreground hover:text-foreground hover:bg-muted"
+              onClick={() => setShowAll(false)}
+            >
+              <EyeOff className="h-3 w-3" />
+              Nascondi
+            </Button>
+          </div>
+        )}
       </Command>
     </CommandDialog>
   );
