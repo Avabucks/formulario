@@ -2,9 +2,10 @@
 
 import { useIsMobile } from "@/src/hooks/useIsMobile";
 import clsx from "clsx";
-import { Columns2, Eye, Maximize2, Minimize2, PenLine, Redo2, Sparkles, Undo2 } from "lucide-react";
+import { Columns2, Eye, Maximize2, Minimize2, PenLine, Redo2, Sparkles, Undo2, PanelLeftClose, Home } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { FormularioSettings } from "../home/formulario-settings";
 import { TakeFormulario } from "../home/take-formulario";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -24,6 +25,7 @@ import { EditorPreview } from "./preview/editor-preview";
 import { FormattingCommand } from "./tools/formatting-command";
 import { EditorInput, SyncStatus } from "./input/editor-input";
 import { ShortcutsListener } from "./tools/shortcuts-listener";
+import { EditorSidebar } from "./sidebar/editor-sidebar";
 
 const MIN_RESIZABLE_SIZE = 20;
 const MAX_RESIZABLE_SIZE = 80;
@@ -32,9 +34,17 @@ export function EditorPage({
   argomentoId,
   editable,
   formularioId,
-}: Readonly<{ argomentoId: string; editable: boolean; formularioId: string }>) {
+  tree,
+}: Readonly<{
+  argomentoId: string;
+  editable: boolean;
+  formularioId: string;
+  tree: any[];
+}>) {
   const isMobile = useIsMobile();
+  const router = useRouter();
 
+  const [showSidebar, setShowSidebar] = useState<boolean>(true);
   const [textAreaContent, setTextAreaContent] = useState<string>("");
   const [markdownContent, setMarkdownContent] = useState<string>("");
   const [user, setUser] = useState<{
@@ -54,7 +64,6 @@ export function EditorPage({
   const [resizableSize, setResizableSize] = useState<number>(40);
   const [isFocused, setIsFocused] = useState(false);
   const [selection, setSelection] = useState<Selection | null>(null);
-  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
 
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const isMac = useIsMac();
@@ -134,8 +143,9 @@ export function EditorPage({
   };
 
   useEffect(() => {
+    setLoading(true);
     fetchContent();
-  }, []);
+  }, [argomentoId]);
 
   useEffect(() => {
     if (edited) {
@@ -186,27 +196,6 @@ export function EditorPage({
       return false;
     };
 
-    const handleFullscreenShortcut = (e: KeyboardEvent): boolean => {
-      if (e.key === "Escape" && isFullscreen) {
-        setIsFullscreen(false);
-        return true;
-      }
-      if (e.key.toLowerCase() === "f" && !e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey) {
-        const activeEl = document.activeElement;
-        const isTyping = activeEl && (
-          activeEl.tagName === "INPUT" ||
-          activeEl.tagName === "TEXTAREA" ||
-          activeEl.getAttribute("contenteditable") === "true"
-        );
-        if (!isFocused && !isTyping) {
-          e.preventDefault();
-          setIsFullscreen((prev) => !prev);
-          return true;
-        }
-      }
-      return false;
-    };
-
     const handleHistoryShortcut = (e: KeyboardEvent): boolean => {
       const isZ = e.key.toLowerCase() === "z" || e.code === "KeyZ";
       const isY = e.key.toLowerCase() === "y" || e.code === "KeyY";
@@ -239,14 +228,13 @@ export function EditorPage({
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (handleFullscreenShortcut(e)) return;
       if (handleHistoryShortcut(e)) return;
       if (handleViewAndAiShortcut(e)) return;
     };
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [handleUndo, handleRedo, editable, isMobile, isFullscreen, isFocused]);
+  }, [handleUndo, handleRedo, editable, isMobile, isFocused]);
 
   const titleComponent = () => {
     if (switchView === "preview" || !editable)
@@ -304,6 +292,43 @@ export function EditorPage({
     <div className="flex w-full border-b bg-background/95 backdrop-blur-xs min-h-14 md:min-h-15 items-center justify-between px-2.5 md:px-4 py-1.5 md:py-2 gap-2 md:gap-4 overflow-x-auto scrollbar-none select-none">
       {/* Left: History & Formatting Tray */}
       <div className="flex flex-1 items-center gap-1.5 md:gap-3 min-w-0">
+        {/* Home Button */}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                onClick={() => router.push("/home")}
+                className="h-7 w-7 md:h-8 md:w-8 text-foreground flex items-center justify-center p-0 shrink-0 cursor-pointer"
+              >
+                <Home className="size-3.5 md:size-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              Torna alla home
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
+        {/* Sidebar Toggle */}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                onClick={() => setShowSidebar((prev) => !prev)}
+                className="h-7 w-7 md:h-8 md:w-8 text-foreground flex items-center justify-center p-0 shrink-0 cursor-pointer"
+              >
+                <PanelLeftClose className={clsx("size-3.5 md:size-4 transition-transform", !showSidebar && "rotate-180")} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              {showSidebar ? "Nascondi barra laterale" : "Mostra barra laterale"}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
+        <div className="h-6 w-px bg-border shrink-0" />
         {/* History Capsule */}
         <div className="flex items-center gap-1 shrink-0">
           <TooltipProvider>
@@ -411,33 +436,7 @@ export function EditorPage({
         )}
         <div className="h-6 w-px bg-border hidden sm:block" />
         {viewTabs}
-        <div className="h-6 w-px bg-border hidden sm:block" />
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Toggle
-                variant="outline"
-                pressed={isFullscreen}
-                onPressedChange={setIsFullscreen}
-                className="h-7 w-7 md:h-8 md:w-8 text-foreground shrink-0 cursor-pointer p-0 flex items-center justify-center"
-              >
-                {isFullscreen ? (
-                  <Minimize2 className="size-3.5 md:size-4" />
-                ) : (
-                  <Maximize2 className="size-3.5 md:size-4" />
-                )}
-              </Toggle>
-            </TooltipTrigger>
-            <TooltipContent className="pr-1.5">
-              <div className="flex items-center gap-2">
-                {isFullscreen ? "Esci da schermo intero" : "Schermo intero"}
-                <KbdGroup>
-                  <Kbd>F</Kbd>
-                </KbdGroup>
-              </div>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+
         <div className="h-6 w-px bg-border hidden sm:block" />
         <FormularioSettings formularioId={formularioId} />
       </div>
@@ -449,6 +448,7 @@ export function EditorPage({
   );
   const editor = (
     <EditorInput
+      key={argomentoId}
       argomentoId={argomentoId}
       textAreaContent={textAreaContent ?? ""}
       setTextAreaContent={setTextAreaContent}
@@ -478,6 +478,44 @@ export function EditorPage({
       <div className="flex w-full border-b bg-background/95 backdrop-blur-xs min-h-14 md:min-h-15 items-center justify-between px-2.5 md:px-4 py-1.5 md:py-2 gap-2 md:gap-4 overflow-x-auto scrollbar-none select-none">
         {/* Left: TakeFormulario */}
         <div className="flex items-center gap-1.5 md:gap-3 shrink-0">
+          {/* Home Button */}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  onClick={() => router.push("/home")}
+                  className="h-7 w-7 md:h-8 md:w-8 text-foreground flex items-center justify-center p-0 shrink-0 cursor-pointer"
+                >
+                  <Home className="size-3.5 md:size-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                Torna alla home
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          {/* Sidebar Toggle */}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowSidebar((prev) => !prev)}
+                  className="h-7 w-7 md:h-8 md:w-8 text-foreground flex items-center justify-center p-0 shrink-0 cursor-pointer"
+                >
+                  <PanelLeftClose className={clsx("size-3.5 md:size-4 transition-transform", !showSidebar && "rotate-180")} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {showSidebar ? "Nascondi barra laterale" : "Mostra barra laterale"}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <div className="h-6 w-px bg-border shrink-0" />
+
           <TakeFormulario formularioId={formularioId} />
           <div className="h-6 w-px bg-border hidden sm:block" />
           {titleComponent()}
@@ -489,29 +527,7 @@ export function EditorPage({
         {/* Right: View Selector & Settings */}
         <div className="flex items-center gap-1.5 md:gap-3 shrink-0">
           {viewTabs}
-          <div className="h-6 w-px bg-border hidden sm:block" />
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Toggle
-                  variant="outline"
-                  pressed={isFullscreen}
-                  onPressedChange={setIsFullscreen}
-                  className="size-7 md:size-8 text-foreground shrink-0 cursor-pointer p-0"
-                >
-                  {isFullscreen ? <Minimize2 size={isMobile ? 14 : 15} /> : <Maximize2 size={isMobile ? 14 : 15} />}
-                </Toggle>
-              </TooltipTrigger>
-              <TooltipContent className="pr-1.5">
-                <div className="flex items-center gap-2">
-                  {isFullscreen ? "Esci da schermo intero" : "Schermo intero"}
-                  <KbdGroup>
-                    <Kbd>F</Kbd>
-                  </KbdGroup>
-                </div>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+
           <div className="h-6 w-px bg-border hidden sm:block" />
           <FormularioSettings formularioId={formularioId} />
         </div>
@@ -520,14 +536,7 @@ export function EditorPage({
   };
 
   return (
-    <div
-      className={clsx(
-        "flex flex-1 flex-col min-h-0 overflow-hidden",
-        isFullscreen
-          ? "fixed inset-0 z-50 bg-background w-screen h-screen rounded-none border-none"
-          : "border rounded-lg"
-      )}
-    >
+    <div className="flex flex-1 flex-col min-h-0 overflow-hidden bg-background">
       {loading ? (
         <div className="flex h-full items-center justify-center">
           <Spinner />
@@ -537,6 +546,16 @@ export function EditorPage({
       )}
 
       <div className="flex flex-1 min-h-0 w-full relative overflow-hidden">
+        <EditorSidebar
+          tree={tree}
+          argomentoId={argomentoId}
+          editable={editable}
+          formularioId={formularioId}
+          showSidebar={showSidebar}
+          setShowSidebar={setShowSidebar}
+          onSelectArgomento={(argId) => router.push(`/editor/${argId}`)}
+        />
+
         <EditorPanels
           switchView={switchView}
           isMobile={isMobile}

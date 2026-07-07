@@ -133,19 +133,6 @@ export default async function Argomento({
     }
   }
 
-  const breadcrumbs = [
-    { label: "Home", href: "/" },
-    {
-      label: argomento.formularioTitolo,
-      href: `/formulario/${argomento.formularioId}`,
-    },
-    {
-      label: argomento.capitoloTitolo,
-      href: `/capitolo/${argomento.capitoloId}`,
-    },
-    { label: argomento.titolo, href: `/editor/${argomento}` },
-  ];
-
     // Fetch tree data (capitoli and argomenti of the formulario)
   const { rows: treeRows } = await pool.query(
     `SELECT 
@@ -195,20 +182,30 @@ export default async function Argomento({
   }
 
   const tree = Object.values(capitoliMap).sort((a, b) => a.sortOrder - b.sortOrder);
+  const firstArgId = tree[0]?.argomenti[0]?.id || argomento.id;
+
+  const breadcrumbs = [
+    { label: "Home", href: "/" },
+    {
+      label: argomento.formularioTitolo,
+      href: `/editor/${firstArgId}`,
+    },
+    {
+      label: argomento.capitoloTitolo,
+    },
+    { label: argomento.titolo, href: `/editor/${argomento.id}` },
+  ];
 
   return (
-    <div className="flex flex-col h-screen">
-      <Header />
-      <div className="flex flex-1 flex-col gap-4 w-full px-2 md:px-6 pt-16 pb-5 overflow-hidden">
-        <BreadcrumbLogic items={breadcrumbs} />
-        <Suspense fallback={<Skeleton className="h-full w-full" />}>
-          <EditorPage
-            argomentoId={argomento.id}
-            editable={argomento.editable}
-            formularioId={argomento.formularioId}
-          />
-        </Suspense>
-      </div>
+    <div className="flex flex-col h-screen w-screen overflow-hidden bg-background">
+      <Suspense fallback={<Skeleton className="h-full w-full" />}>
+        <EditorPage
+          argomentoId={argomento.id}
+          editable={argomento.editable}
+          formularioId={argomento.formularioId}
+          tree={tree}
+        />
+      </Suspense>
     </div>
   );
 }

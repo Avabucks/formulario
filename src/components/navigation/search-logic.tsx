@@ -27,13 +27,14 @@ import { Spinner } from "../ui/spinner";
 const STORAGE_KEY = "search-history";
 const MAX_HISTORY = 8;
 
-type Formulario = { id: string; titolo: string };
+type Formulario = { id: string; titolo: string; firstArgomentoId?: string };
 type Capitolo = {
   id: string;
   titolo: string;
   formularioId: string;
   formularioTitolo?: string;
   sortOrder: number;
+  firstArgomentoId?: string;
 };
 type Argomento = {
   id: string;
@@ -234,7 +235,7 @@ export function SearchLogic() {
                   <CommandItem
                     value={`f-${f.id}`}
                     key={f.id}
-                    onSelect={() => handleNavigate(`/formulario/${f.id}`)}
+                    onSelect={() => handleNavigate(f.firstArgomentoId ? `/editor/${f.firstArgomentoId}` : `/home`)}
                   >
                     <Book />
                     <span>{f.titolo}</span>
@@ -248,7 +249,13 @@ export function SearchLogic() {
                   <CommandItem
                     value={`c-${c.id}`}
                     key={c.id}
-                    onSelect={() => handleNavigate(`/capitolo/${c.id}`)}
+                    onSelect={() =>
+                      handleNavigate(
+                        c.firstArgomentoId
+                          ? `/editor/${c.firstArgomentoId}`
+                          : `/formulario/${c.formularioId}`,
+                      )
+                    }
                   >
                     <Bookmark />
                     <div className="flex flex-col justify-center w-full">

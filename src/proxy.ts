@@ -5,7 +5,6 @@ import { sessionOptions, SessionData } from "@/src/lib/session";
 const protectedRoutes = [
   "/home",
   "/formulario",
-  "/capitolo",
   "/editor",
   "/settings",
 ];
@@ -46,10 +45,8 @@ export const config = {
     "/",
     "/home",
     "/formulario",
-    "/capitolo",
     "/editor",
     "/formulario/:path*",
-    "/capitolo/:path*",
     "/editor/:path*",
     "/login",
     "/admin",

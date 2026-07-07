@@ -42,8 +42,6 @@ export function FormularioSettings({
   const [edited, setEdited] = useState(false);
   const [activeSection, setActiveSection] = useState<SettingsSection>();
 
-  const shareUrl = `${process.env.NEXT_PUBLIC_APP_URL}/formulario/${formularioId}`;
-
   useEffect(() => {
     let ignore = false;
 
@@ -144,7 +142,10 @@ export function FormularioSettings({
                 />
               )}
               {activeSection === "qr" && formulario.visibility !== 0 && (
-                <ShareSection link={shareUrl} title={formulario.titolo} />
+                <ShareSection
+                  link={`${process.env.NEXT_PUBLIC_APP_URL}/editor/${formulario.firstArgomentoId || ""}`}
+                  title={formulario.titolo}
+                />
               )}
             </div>
           </ScrollArea>

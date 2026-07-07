@@ -57,22 +57,23 @@ export async function GET() {
       priority: 0.8,
     }));
 
-    // Dynamic public capitoli belonging to public formulari
-    const { rows: capitoli } = await pool.query(
-      `SELECT c.beautiful_id 
-       FROM capitoli c
+    // Dynamic public argomenti belonging to public formulari
+    const { rows: argomenti } = await pool.query(
+      `SELECT a.beautiful_id 
+       FROM argomenti a
+       JOIN capitoli c ON a.capitolo = c.beautiful_id
        JOIN formulari f ON c.formulario = f.beautiful_id
        WHERE f.visibility = 2`,
     );
 
-    const capitoliUrls = capitoli.map((c) => ({
-      url: `${baseUrl}/capitolo/${c.beautiful_id}`,
+    const argomentiUrls = argomenti.map((a) => ({
+      url: `${baseUrl}/editor/${a.beautiful_id}`,
       lastModified: new Date().toISOString(),
       changeFrequency: "weekly",
       priority: 0.7,
     }));
 
-    pages = [...pages, ...formulariUrls, ...capitoliUrls];
+    pages = [...pages, ...formulariUrls, ...argomentiUrls];
   } catch (error) {
     console.error("Error generating sitemap:", error);
   }

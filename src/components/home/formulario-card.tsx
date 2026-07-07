@@ -24,6 +24,7 @@ import { Separator } from "../ui/separator";
 import { StarFormulario } from "./star-formulario";
 import { formatNumber } from "@/src/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { pool } from "@/src/lib/db";
 
 type Formulario = {
   id: string;
@@ -45,6 +46,18 @@ export async function FormularioCard({
     await cookies(),
     sessionOptions,
   );
+
+  // Fetch the first argument ID for this formulario
+  const { rows: firstArgRow } = await pool.query(
+    `SELECT A.beautiful_id AS "id"
+     FROM argomenti A
+     JOIN capitoli C ON A.capitolo = C.beautiful_id
+     WHERE C.formulario = $1
+     ORDER BY C.sort_order ASC, A.sort_order ASC
+     LIMIT 1`,
+    [formulario.id],
+  );
+  const firstArgId = firstArgRow[0]?.id;
 
   return (
     <Card className="w-full">
@@ -111,7 +124,7 @@ export async function FormularioCard({
       </CardContent>
       <CardFooter>
         <div className="flex flex-1 items-center gap-2">
-          <Link href={`/formulario/${formulario.id}`} className="flex-1 w-full">
+          <Link href={firstArgId ? `/editor/${firstArgId}` : `/home`} className="flex-1 w-full">
             <Button variant="outline" className="w-full">
               <BookOpen size={16} />
               Apri il formulario
