@@ -1,9 +1,6 @@
 "use client";
 
-<<<<<<< HEAD
-=======
 import { usePathname, useRouter } from "next/navigation";
->>>>>>> 19ab209e1d1e04e50f47d16839945dfeb3b8c189
 import { Button } from "../ui/button";
 
 export function LandingMenu() {
@@ -37,24 +34,7 @@ export function LandingMenu() {
       <Button
         variant="ghost"
         className="cursor-pointer"
-<<<<<<< HEAD
-        onClick={() =>
-          document
-            .getElementById("pricing")
-            ?.scrollIntoView({ behavior: "smooth" })
-        }
-      >
-        Pricing
-      </Button>
-      <Button
-        variant="ghost"
-        className="cursor-pointer"
-        onClick={() =>
-          document.getElementById("faq")?.scrollIntoView({ behavior: "smooth" })
-        }
-=======
         onClick={() => handleScroll("faq")}
->>>>>>> 19ab209e1d1e04e50f47d16839945dfeb3b8c189
       >
         FAQ
       </Button>
