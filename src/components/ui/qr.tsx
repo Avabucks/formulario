@@ -120,10 +120,7 @@ export function Qr({ link, title }: Readonly<{ link: string; title: string }>) {
 
       {/* QR */}
       <div className="flex flex-col items-center gap-4">
-        <div
-          ref={svgRef}
-          className="p-4 bg-white rounded-2xl shadow-sm border"
-        >
+        <div ref={svgRef} className="p-4 bg-white rounded-2xl shadow-sm border">
           <SvgQrCode
             text={link}
             options={{

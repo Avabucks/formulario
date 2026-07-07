@@ -34,12 +34,6 @@ export function SettingsSidebar({
             onClick={() => setActiveSection("edit")}
           />
         )}
-        <SettingsSidebarButton
-          active={activeSection === "structure"}
-          icon={<ListTree size={15} />}
-          label="Struttura"
-          onClick={() => setActiveSection("structure")}
-        />
         {visibility !== 0 && (
           <SettingsSidebarButton
             active={activeSection === "qr"}

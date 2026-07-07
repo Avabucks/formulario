@@ -1,3 +1,5 @@
+"use client";
+
 import { CopyPlus } from "lucide-react";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
@@ -32,9 +34,13 @@ export function TakeFormulario({
   }
 
   return (
-    <Button onClick={handleTake}>
-      <CopyPlus size={16} />
-      Aggiungi ai miei formulari
+    <Button
+      onClick={handleTake}
+      className="h-7 md:h-8 px-2 md:px-2.5 text-[0.8rem] md:text-sm gap-1 md:gap-1.5"
+    >
+      <CopyPlus className="size-3.5 md:size-4" />
+      <span className="hidden sm:inline">Aggiungi ai miei formulari</span>
+      <span className="inline sm:hidden">Aggiungi</span>
     </Button>
   );
 }

@@ -231,6 +231,12 @@
           "label": "Simile o uguale",
           "preview": "\\simeq ",
           "snippet": "\\simeq $1"
+        },
+        {
+          "value": "grado",
+          "label": "Grado (cerchio)",
+          "preview": "^{\\circ}",
+          "snippet": "^{\\circ}$1"
         }
       ]
     },

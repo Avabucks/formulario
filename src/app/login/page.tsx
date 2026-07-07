@@ -6,8 +6,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: `Login - ${packageJson.displayName}`,
-  description: `Crea, organizza e condividi i tuoi formulari e cheat sheet con ${packageJson.displayName}. Usa l'editor avanzato e l'assistente AI per generare formule e appunti in pochi secondi.`,
+  title: `Accedi - ${packageJson.displayName}`,
+  description: `Accedi a ${packageJson.displayName} per creare, organizzare e gestire i tuoi formulari personali e cheat sheet scientifici.`,
+  alternates: {
+    canonical: "/login",
+  },
 };
 
 export default function LoginPage() {
