@@ -39,14 +39,18 @@ export function CapitoloAdd({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "A" && (e.metaKey || e.ctrlKey) && e.shiftKey) {
+      if (
+        e.key.toLowerCase() === "a" &&
+        (e.metaKey || e.ctrlKey) &&
+        e.shiftKey
+      ) {
         e.preventDefault();
         setOpen((prev) => !prev);
       }
     };
 
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown, true);
+    return () => document.removeEventListener("keydown", handleKeyDown, true);
   }, [open]);
 
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {

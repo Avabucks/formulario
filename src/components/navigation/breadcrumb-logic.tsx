@@ -6,7 +6,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/src/components/ui/breadcrumb";
-import { InlineLatex } from "@/src/components/editor/editor-katex/inline-latex";
+import { InlineLatex } from "@/src/components/editor/preview/inline-latex";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { Fragment } from "react";

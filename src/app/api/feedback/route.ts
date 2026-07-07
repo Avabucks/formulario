@@ -2,6 +2,7 @@ import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -14,6 +15,15 @@ export async function POST(request: Request) {
 
   if (!uid)
     return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
+
+  // check if user exists
+  const { rows: users } = await pool.query(
+    `SELECT id FROM users WHERE uid = $1`,
+    [uid],
+  );
+  if (users.length === 0) {
+    redirect("/api/auth/logout");
+  }
 
   const { rating, testo } = await request.json();
 

@@ -1,0 +1,635 @@
+"use client";
+
+import { Button } from "@/src/components/ui/button";
+import {
+  Command,
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/src/components/ui/command";
+import { Kbd, KbdGroup } from "@/src/components/ui/kbd";
+import { Separator } from "@/src/components/ui/separator";
+import { Toggle } from "@/src/components/ui/toggle";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/src/components/ui/tooltip";
+import formulasData from "@/src/data/formulas.json";
+import { getIsActiveLatex } from "@/src/lib/editor/formatting-utils";
+import { loadAnalytics } from "@/src/lib/firebase";
+import { logEvent } from "firebase/analytics";
+import katex from "katex";
+import "katex/dist/katex.min.css";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Radical,
+  SquareRadical,
+  PenTool,
+  Eye,
+  EyeOff,
+} from "lucide-react";
+import type { editor, Selection } from "monaco-editor";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
+
+type SnippetController = {
+  insert: (snippet: string) => void;
+};
+
+const BLOCK_MARKER = "$$";
+
+const FORMULA_FIRST_USE_KEY = "formula_first_use_shown";
+
+export function FormattingLatex({
+  editorRef,
+  isFocused = false,
+  onlyDialog = false,
+}: Readonly<{
+  editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
+  isFocused?: boolean;
+  onlyDialog?: boolean;
+}>) {
+  const [open, setOpen] = useState(false);
+  const [pendingKind, setPendingKind] = useState<"single" | "double">("double");
+
+  const [inlineState, setInlineState] = useState<{
+    kind: "single" | "double" | "block" | null;
+  } | null>(null);
+
+  useEffect(() => {
+    if (open) {
+      setInlineState(getIsActiveLatex(editorRef));
+      return;
+    }
+
+    const editor = editorRef.current;
+    if (!editor) return;
+
+    const disposable = editor.onDidChangeCursorSelection(() => {
+      setInlineState(getIsActiveLatex(editorRef));
+    });
+
+    setInlineState(getIsActiveLatex(editorRef));
+
+    return () => disposable.dispose();
+  }, [open, editorRef]);
+
+  const [query, setQuery] = useState("");
+  const [activeTab, setActiveTab] = useState("formule");
+  const [showAll, setShowAll] = useState(false);
+
+  const renderLatex = (latex: string): { __html: string } => {
+    return {
+      __html: katex.renderToString(latex, {
+        throwOnError: false,
+      }),
+    };
+  };
+
+  const MAX_VISIBLE = 0;
+
+  const tabs = useMemo(
+    () =>
+      formulasData.sections.map((section) => ({
+        id: section.id,
+        label: section.label,
+        data: [...section.items]
+          .sort((a, b) => a.label.localeCompare(b.label))
+          .map((f) => ({ ...f, rendered: renderLatex(f.preview) })),
+      })),
+    [],
+  );
+
+  const activeData = useMemo(() => {
+    const tab = tabs.find((t) => t.id === activeTab);
+    if (!tab) return [];
+    const q = query.toLowerCase();
+    if (q) {
+      return tab.data.filter((f) => f.label.toLowerCase().includes(q));
+    }
+    if (showAll) {
+      return tab.data;
+    }
+    return tab.data.slice(0, MAX_VISIBLE);
+  }, [query, activeTab, showAll, tabs]);
+
+  function resolveActiveKind(): "block" | "single" | "double" | null {
+    if (inlineState?.kind === "double") return "double";
+    if (inlineState?.kind === "single") return "single";
+    return null;
+  }
+  const activeKind = resolveActiveKind();
+
+  const openCommand = (kind: "single" | "double") => {
+    setPendingKind(kind);
+    setOpen(true);
+  };
+
+  const tabsRef = useRef<HTMLDivElement>(null);
+
+  const setActiveTabAndScroll = (id: string) => {
+    setActiveTab(id);
+    setTimeout(() => {
+      const activeBtn = tabsRef.current?.querySelector(`[data-tab="${id}"]`);
+      activeBtn?.scrollIntoView({
+        block: "nearest",
+        inline: "nearest",
+        behavior: "smooth",
+      });
+    }, 0);
+  };
+
+  const tabCounts = useMemo(() => {
+    const q = query.toLowerCase();
+    return Object.fromEntries(
+      tabs.map((t) => [
+        t.id,
+        q
+          ? t.data.filter((f) => f.label.toLowerCase().includes(q)).length
+          : t.data.length,
+      ]),
+    );
+  }, [query, tabs]);
+
+  const scroll = (dir: "left" | "right") => {
+    tabsRef.current?.scrollBy({
+      left: dir === "left" ? -120 : 120,
+      behavior: "smooth",
+    });
+  };
+
+  const insertIntoBlock = (
+    model: editor.ITextModel,
+    sel: Selection,
+    snippet: string,
+  ) => {
+    const totalLines = model.getLineCount();
+    let openLine = -1;
+    for (let l = sel.startLineNumber; l >= 1; l--) {
+      if (model.getLineContent(l).trim() === BLOCK_MARKER) {
+        openLine = l;
+        break;
+      }
+    }
+    let closeLine = -1;
+    for (let l = sel.endLineNumber; l <= totalLines; l++) {
+      if (model.getLineContent(l).trim() === BLOCK_MARKER) {
+        closeLine = l;
+        break;
+      }
+    }
+    if (openLine === -1 || closeLine === -1) return;
+
+    const onOpenLine = sel.startLineNumber === openLine;
+    const onCloseLine = sel.startLineNumber === closeLine;
+
+    const controller = editorRef.current?.getContribution(
+      "snippetController2",
+    ) as SnippetController | undefined;
+    const text = onOpenLine || onCloseLine ? `${snippet}$0\n` : `${snippet}$0`;
+    controller?.insert(text);
+    setTimeout(() => {
+      editorRef.current?.focus();
+    }, 0);
+  };
+
+  const insertInline = (snippet: string) => {
+    const controller = editorRef.current?.getContribution(
+      "snippetController2",
+    ) as SnippetController | undefined;
+    controller?.insert(`${snippet}$0`);
+    setTimeout(() => {
+      editorRef.current?.focus();
+    }, 0);
+  };
+
+  const insertNew = (snippet: string, kind: "single" | "double") => {
+    const isEmpty = snippet === "";
+    const controller = editorRef.current?.getContribution(
+      "snippetController2",
+    ) as SnippetController | undefined;
+
+    if (kind === "single") {
+      const text = isEmpty ? "$$0$" : `$${snippet}$0$`;
+      controller?.insert(text);
+      setTimeout(() => {
+        editorRef.current?.focus();
+      }, 0);
+    } else {
+      const text = isEmpty
+        ? `${BLOCK_MARKER}\n$0\n${BLOCK_MARKER}`
+        : `${BLOCK_MARKER}\n${snippet}$0\n${BLOCK_MARKER}`;
+      controller?.insert(text);
+      setTimeout(() => {
+        editorRef.current?.focus();
+      }, 0);
+    }
+  };
+
+  const handleFormulaSelect = async (snippet: string) => {
+    setOpen(false);
+    setQuery("");
+    setShowAll(false);
+    setActiveTab("formule");
+
+    const model = editorRef.current?.getModel();
+    const sel = editorRef.current?.getSelection();
+    if (!model || !sel) return;
+
+    if (activeKind === "block") {
+      insertIntoBlock(model, sel, snippet);
+    } else if (activeKind === "single" || activeKind === "double") {
+      insertInline(snippet);
+    } else {
+      insertNew(snippet, pendingKind);
+    }
+
+    if (!localStorage.getItem(FORMULA_FIRST_USE_KEY)) {
+      const toastId = toast(
+        <span className="leading-6 flex flex-col md:flex-row gap-2 md:text-nowrap md:flex-nowrap">
+          <span>
+            Usa <Kbd>Tab</Kbd> per spostarti tra i campi della formula e{" "}
+            <Kbd>Shift</Kbd> + <Kbd>Tab</Kbd> per tornare indietro.
+          </span>
+          <button
+            className="text-xs text-muted-foreground underline text-left w-fit cursor-pointer"
+            onClick={() => {
+              localStorage.setItem(FORMULA_FIRST_USE_KEY, "true");
+              toast.dismiss(toastId);
+            }}
+          >
+            Non mostrare più
+          </button>
+        </span>,
+        {
+          position: "bottom-center",
+          duration: 5000,
+          classNames: {
+            toast: "md:!min-w-fit md:!left-1/2 md:!-translate-x-1/2",
+          },
+        },
+      );
+    }
+
+    (
+      globalThis as unknown as { umami?: { track: (event: string) => void } }
+    ).umami?.track("selected_formula_latex");
+    try {
+      const analytics = await loadAnalytics();
+      if (analytics) {
+        logEvent(analytics, "selected_formula_latex");
+      }
+    } catch (error) {
+      console.error("Errore nel tracciamento dell'evento:", error);
+    }
+  };
+
+  useEffect(() => {
+    const handleOpenSingle = () => {
+      openCommand("single");
+    };
+    const handleOpenDouble = () => {
+      openCommand("double");
+    };
+    globalThis.addEventListener("editor:open-latex-single", handleOpenSingle);
+    globalThis.addEventListener("editor:open-latex-double", handleOpenDouble);
+    return () => {
+      globalThis.removeEventListener(
+        "editor:open-latex-single",
+        handleOpenSingle,
+      );
+      globalThis.removeEventListener(
+        "editor:open-latex-double",
+        handleOpenDouble,
+      );
+    };
+  }, []);
+
+  const dialog = (
+    <CommandDialog
+      open={open}
+      onOpenChange={(v) => {
+        setOpen(v);
+        if (!v) {
+          setQuery("");
+          setShowAll(false);
+          setActiveTab("formule");
+          setTimeout(() => editorRef.current?.focus(), 0);
+        }
+      }}
+    >
+      <Command
+        shouldFilter={false}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && activeData.length === 0) {
+            e.preventDefault();
+            handleFormulaSelect("");
+          }
+          if (e.key === "Tab") {
+            e.preventDefault();
+            e.stopPropagation();
+            const currentIndex = tabs.findIndex((t) => t.id === activeTab);
+            const nextIndex = e.shiftKey
+              ? (currentIndex - 1 + tabs.length) % tabs.length
+              : (currentIndex + 1) % tabs.length;
+            setActiveTabAndScroll(tabs[nextIndex].id);
+          }
+        }}
+      >
+        <CommandInput
+          placeholder="Cerca formula o simbolo..."
+          onValueChange={(val) => {
+            setQuery(val);
+            if (val) {
+              const q = val.toLowerCase();
+              const counts = Object.fromEntries(
+                tabs.map((t) => [
+                  t.id,
+                  t.data.filter((f) => f.label.toLowerCase().includes(q))
+                    .length,
+                ]),
+              );
+              const firstTabWithResults = tabs.find((t) => counts[t.id] > 0);
+              if (firstTabWithResults) {
+                setActiveTabAndScroll(firstTabWithResults.id);
+              }
+            }
+          }}
+        />
+
+        {/* Tab bar */}
+        <div className="tab-latex flex items-center">
+          <button
+            onClick={() => scroll("left")}
+            className="shrink-0 p-1 text-muted-foreground hover:text-foreground"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+
+          <div
+            ref={tabsRef}
+            className="flex overflow-x-auto scrollbar-none flex-1"
+          >
+            {tabs.map((t) => (
+              <button
+                key={t.id}
+                data-tab={t.id}
+                tabIndex={-1}
+                onClick={() => setActiveTabAndScroll(t.id)}
+                className={`px-3 py-1.5 text-sm whitespace-nowrap flex items-center gap-1.5 transition-colors
+                                      ${
+                                        activeTab === t.id
+                                          ? "border-b-2 border-primary font-medium"
+                                          : "text-muted-foreground hover:text-foreground"
+                                      }`}
+              >
+                {t.label}
+                {query && (
+                  <span
+                    className={`text-xs rounded-full px-1.5 py-0.5 
+                                          ${
+                                            tabCounts[t.id] > 0
+                                              ? "bg-primary/15 text-primary"
+                                              : "bg-muted text-muted-foreground"
+                                          }`}
+                  >
+                    {tabCounts[t.id]}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+
+          <button
+            onClick={() => scroll("right")}
+            className="shrink-0 p-1 text-muted-foreground hover:text-foreground"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+
+        <CommandList>
+          <CommandEmpty>
+            {query ? (
+              <div className="flex flex-col items-center gap-4 py-4 text-center">
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">
+                    Nessun risultato trovato per &ldquo;{query}&rdquo;
+                  </p>
+                  <p className="text-xs text-muted-foreground/80">
+                    Prova a cercare un altro termine o sfoglia l'elenco completo.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 mt-2">
+                  <Button onClick={() => setShowAll(true)} variant="outline" className="gap-2">
+                    <Eye className="h-4 w-4" />
+                    Mostra tutte
+                  </Button>
+                  <Button onClick={() => handleFormulaSelect("")} variant="outline" className="gap-2">
+                    {pendingKind === "single" ? (
+                      <Radical size={14} />
+                    ) : (
+                      <SquareRadical size={14} />
+                    )}
+                    Inserisci vuota
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center gap-4 py-4 text-center">
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground font-medium">
+                    Scegli una formula
+                  </p>
+                  <p className="text-xs text-muted-foreground/80">
+                    Cerca una formula o sfoglia l'elenco completo di questa categoria.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 mt-2">
+                  <Button onClick={() => setShowAll(true)} variant="default" className="gap-2">
+                    <Eye className="h-4 w-4" />
+                    Visualizza tutte
+                  </Button>
+                  <Button onClick={() => handleFormulaSelect("")} variant="outline" className="gap-2">
+                    {pendingKind === "single" ? (
+                      <Radical size={14} />
+                    ) : (
+                      <SquareRadical size={14} />
+                    )}
+                    Inserisci vuota
+                  </Button>
+                </div>
+              </div>
+            )}
+          </CommandEmpty>
+          <CommandGroup>
+            {activeData.map((f) => (
+              <CommandItem
+                key={f.value}
+                value={f.value}
+                onSelect={() => handleFormulaSelect(f.snippet)}
+                className="flex items-center justify-between gap-2"
+              >
+                <span>{f.label}</span>
+                <span
+                  className="text-sm opacity-80"
+                  dangerouslySetInnerHTML={f.rendered}
+                />
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        </CommandList>
+        {showAll && !query && (
+          <div className="flex items-center justify-between px-3 py-1.5 border-t bg-muted/20 text-xs text-muted-foreground">
+            <span>Stai visualizzando tutte le formule</span>
+            <Button
+              variant="ghost"
+              size="xs"
+              className="h-6 text-xs gap-1 text-muted-foreground hover:text-foreground hover:bg-muted"
+              onClick={() => setShowAll(false)}
+            >
+              <EyeOff className="h-3 w-3" />
+              Nascondi
+            </Button>
+          </div>
+        )}
+      </Command>
+    </CommandDialog>
+  );
+
+  if (onlyDialog) {
+    return dialog;
+  }
+
+  return (
+    <>
+      {/* Toggle $ — nascosto se block o double attivi */}
+      {(!isFocused || (activeKind !== "block" && activeKind !== "double")) && (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Toggle
+                variant="outline"
+                onMouseDown={(e) => e.preventDefault()}
+                aria-label="Formula inline"
+                pressed={activeKind === "single" && isFocused}
+                disabled={!isFocused}
+                onClick={() => openCommand("single")}
+              >
+                <Radical size={16} />
+                {activeKind == "single" && isFocused && (
+                  <span>Aggiungi alla formula</span>
+                )}
+              </Toggle>
+            </TooltipTrigger>
+            <TooltipContent className="pr-1.5">
+              <div className="flex items-center gap-2">
+                Formula inline
+                <KbdGroup className="hidden md:flex">
+                  <Kbd>Ctrl</Kbd>
+                  <span>+</span>
+                  <Kbd>Shift</Kbd>
+                  <span>+</span>
+                  <Kbd>G</Kbd>
+                </KbdGroup>
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
+
+      {/* Toggle $$ — nascosto se single attivo */}
+      {(!isFocused || activeKind !== "single") && (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Toggle
+                variant="outline"
+                onMouseDown={(e) => e.preventDefault()}
+                aria-label="Formula in blocco"
+                pressed={
+                  (activeKind === "block" || activeKind === "double") &&
+                  isFocused
+                }
+                disabled={!isFocused}
+                onClick={() => openCommand("double")}
+              >
+                <SquareRadical size={16} />
+                {activeKind == "double" && isFocused && (
+                  <span>Aggiungi alla formula</span>
+                )}
+              </Toggle>
+            </TooltipTrigger>
+            <TooltipContent className="pr-1.5">
+              <div className="flex items-center gap-2">
+                Formula in blocco
+                <KbdGroup className="hidden md:flex">
+                  <Kbd>Ctrl</Kbd>
+                  <span>+</span>
+                  <Kbd>Shift</Kbd>
+                  <span>+</span>
+                  <Kbd>H</Kbd>
+                </KbdGroup>
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
+
+      {dialog}
+      <Separator orientation="vertical" />
+    </>
+  );
+}
+
+export function FormattingLatexContext({
+  activeData,
+}: Readonly<{
+  activeData: NonNullable<ReturnType<typeof getIsActiveLatex>>;
+}>) {
+  return (
+    <>
+      <div className="flex items-center text-muted-foreground gap-1.5 pl-0 pr-0 py-1 select-none">
+        <Radical className="size-4 text-muted-foreground" />
+        <span className="text-xs text-muted-foreground font-medium font-sans capitalize">
+          Formula {activeData.kind === "double" ? "blocco" : "inline"}
+        </span>
+        <ChevronRight className="size-4 text-muted-foreground/30 mx-0.5 shrink-0" />
+      </div>
+
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="default"
+              className="text-foreground gap-1.5 overf"
+              onClick={() => {
+                const event = new CustomEvent(
+                  activeData.kind === "double"
+                    ? "editor:open-latex-double"
+                    : "editor:open-latex-single",
+                );
+                globalThis.dispatchEvent(event);
+              }}
+            >
+              <PenTool className="size-4 text-primary" />
+              <span>Componi formula</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            Componi la formula (inserisci simboli, frazioni o funzioni KaTeX)
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    </>
+  );
+}

@@ -34,6 +34,20 @@ export async function PUT(request: Request) {
     );
 
   try {
+    // Recupera la visibilità precedente per evitare notifiche duplicate ad ogni modifica
+    const { rows: currentFormulari } = await pool.query(
+      `SELECT visibility FROM formulari WHERE beautiful_id = $1 AND owner_uid = $2`,
+      [id, uid],
+    );
+
+    if (currentFormulari.length === 0)
+      return NextResponse.json(
+        { error: "Formulario non trovato o non autorizzato" },
+        { status: 404 },
+      );
+
+    const oldVisibility = currentFormulari[0].visibility;
+
     const result = await pool.query(
       `UPDATE formulari 
              SET titolo = $1, descrizione = $2, visibility = $3

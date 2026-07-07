@@ -11,7 +11,10 @@ import { pool } from "@/src/lib/db";
 
 export const metadata: Metadata = {
   title: `Termini e condizioni - ${packageJson.displayName}`,
-  description: `Crea, organizza e condividi i tuoi formulari e cheat sheet con ${packageJson.displayName}. Usa l'editor avanzato e l'assistente AI per generare formule e appunti in pochi secondi.`,
+  description: `Termini di servizio e condizioni d'uso della piattaforma ${packageJson.displayName}.`,
+  alternates: {
+    canonical: "/terms",
+  },
 };
 
 export default async function TermsPage() {

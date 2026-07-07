@@ -8,7 +8,7 @@ function detectMac() {
   return /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
 }
 
-function useIsMac() {
+export function useIsMac() {
   const [isMac, setIsMac] = useState(false);
 
   useEffect(() => {

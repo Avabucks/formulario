@@ -14,10 +14,14 @@ if (!apiKey) {
 const groq = new Groq({ apiKey });
 
 const SYSTEM_INSTRUCTION =
-  "Agisci come un assistente accademico esperto in formulari universitari. " +
-  "Usa Markdown (usa per le liste il trattino - non l'asterisco) e LaTeX ($ per inline, $$ per display), " +
-  "suddividendo bene i paragrafi con gli headings. Rispondi in modo conciso. " +
-  "Niente introduzioni come 'Certamente' o 'Ecco la risposta', devi generare un testo ready to use.";
+  "Agisci come un assistente accademico esperto in formulari universitari.\n" +
+  "Il tuo compito principale è modificare, correggere o arricchire il documento fornito in base alle istruzioni dell'utente.\n" +
+  "IMPORTANTE:\n" +
+  "1. Non limitarti a spiegare le modifiche o a rispondere alla domanda: devi restituire l'INTERO documento modificato, incorporando i cambiamenti richiesti e preservando il resto del testo esistente.\n" +
+  "2. Non includere alcuna introduzione, conclusione o commento (come 'Certamente', 'Ecco il documento modificato:', ecc.). Il testo generato deve essere pronto all'uso e sostituire integralmente il documento precedente.\n" +
+  "3. NON racchiudere il testo generato in tag XML o delimitatori di alcun tipo (come <documento>, ecc.). Restituisci esclusivamente il testo pulito del documento.\n" +
+  "4. Se non viene fornito alcun documento da modificare, genera da zero il formulario richiesto seguendo le stesse regole.\n" +
+  String.raw`5. Usa Markdown (per le liste usa il trattino '-' e non l'asterisco '*') e LaTeX ($ per formule inline, $$ per formule display, non usare \[), organizzando i contenuti con opportuni headings (es. #, ##, ###).`;
 
 type Message = {
   role: "user" | "assistant";
@@ -40,7 +44,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { prompt, context } = await req.json();
+    const { prompt, context, messages } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
       return NextResponse.json(
@@ -49,17 +53,39 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const apiMessages: any[] = [
+      { role: "system", content: SYSTEM_INSTRUCTION },
+    ];
+
+    if (messages && Array.isArray(messages)) {
+      for (const msg of messages) {
+        if (msg.status === "loading" || msg.status === "error") {
+          continue;
+        }
+
+        if (msg.sender === "user") {
+          if (msg.text?.trim()) {
+            apiMessages.push({ role: "user", content: msg.text.trim() });
+          }
+        } else if (msg.sender === "ai") {
+          const content = msg.suggestedContent ?? msg.text;
+          if (content?.trim()) {
+            apiMessages.push({ role: "assistant", content: content.trim() });
+          }
+        }
+      }
+    }
+
     const userMessage = context?.trim()
-      ? `<documento>\n${context}\n</documento>\n\nDomanda: ${prompt}`
+      ? `Documento:\n${context}\n\nRichiesta di modifica: ${prompt}`
       : prompt;
 
+    apiMessages.push({ role: "user", content: userMessage });
+
     const completion = await groq.chat.completions.create({
-      model: "llama-3.1-8b-instant",
+      model: "openai/gpt-oss-120b",
       temperature: 0.5,
-      messages: [
-        { role: "system", content: SYSTEM_INSTRUCTION },
-        { role: "user", content: userMessage },
-      ],
+      messages: apiMessages,
     });
 
     const usage = completion.usage;

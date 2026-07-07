@@ -5,20 +5,25 @@
       "shortcuts": [
         { "label": "Cerca nei tuoi formulari", "keys": ["Ctrl", "K"] },
         { "label": "Impostazioni formulario", "keys": ["Ctrl", "Shift", "I"] },
-        { "label": "Aggiungi nuovo", "keys": ["Ctrl", "Shift", "A"] }
+        { "label": "Aggiungi nuovo", "keys": ["Ctrl", "Shift", "A"] },
+        { "label": "Genera con AI", "keys": ["Alt", "A"] },
+        { "label": "Visualizzazione Editor", "keys": ["Alt", "1"] },
+        { "label": "Visualizzazione Dividi", "keys": ["Alt", "2"] },
+        { "label": "Visualizzazione Anteprima", "keys": ["Alt", "3"] },
+        { "label": "Tavolozza comandi", "keys": ["Ctrl", "Space"] },
+        { "label": "Editor a schermo intero (Fullscreen)", "keys": ["F"] }
       ]
     },
     {
       "title": "Formattazione",
       "shortcuts": [
-        { "label": "Chiedi all'AI", "keys": ["Alt", "A"] },
         { "label": "Grassetto", "keys": ["Ctrl", "B"] },
         { "label": "Corsivo", "keys": ["Ctrl", "I"] },
         { "label": "Citazione", "keys": ["Ctrl", "Shift", "Q"] },
         { "label": "Lista ordinata", "keys": ["Ctrl", "Shift", "7"] },
         { "label": "Lista non ordinata", "keys": ["Ctrl", "Shift", "8"] },
         { "label": "Divisore", "keys": ["Ctrl", "Shift", "9"] },
-        { "label": "Tabella", "keys": ["Ctrl", "Shift", ";"] },
+        { "label": "Tabella", "keys": ["Alt", "T"] },
         { "label": "Codice inline", "keys": ["Ctrl", "Shift", "J"] },
         { "label": "Codice in blocco", "keys": ["Ctrl", "Shift", "U"] },
         { "label": "Formula inline", "keys": ["Ctrl", "Shift", "G"] },
