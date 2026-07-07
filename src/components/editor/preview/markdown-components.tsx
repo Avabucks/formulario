@@ -1,8 +1,8 @@
 "use client";
 
 import { Components } from "react-markdown";
-import { LinkComponent } from "./markdown-components/link";
-import { CodeBlock } from "./markdown-components/code";
+import { LinkComponent } from "../preview/markdown-components/link";
+import { CodeBlock } from "../preview/markdown-components/code";
 import {
   H1Component,
   H2Component,
@@ -10,12 +10,12 @@ import {
   H4Component,
   H5Component,
   H6Component,
-} from "./markdown-components/headings";
+} from "../preview/markdown-components/headings";
 import {
   UlComponent,
   OlComponent,
   LiComponent,
-} from "./markdown-components/lists";
+} from "../preview/markdown-components/lists";
 import {
   TableComponent,
   TheadComponent,
@@ -23,14 +23,14 @@ import {
   TrComponent,
   ThComponent,
   TdComponent,
-} from "./markdown-components/table";
-import { PComponent } from "./markdown-components/p";
-import { StrongComponent } from "./markdown-components/strong";
-import { EmComponent } from "./markdown-components/em";
-import { DelComponent } from "./markdown-components/del";
-import { HrComponent } from "./markdown-components/hr";
-import { BlockquoteComponent } from "./markdown-components/blockquote";
-import { ImgComponent } from "./markdown-components/img";
+} from "../preview/markdown-components/table";
+import { PComponent } from "../preview/markdown-components/p";
+import { StrongComponent } from "../preview/markdown-components/strong";
+import { EmComponent } from "../preview/markdown-components/em";
+import { DelComponent } from "../preview/markdown-components/del";
+import { HrComponent } from "../preview/markdown-components/hr";
+import { BlockquoteComponent } from "../preview/markdown-components/blockquote";
+import { ImgComponent } from "../preview/markdown-components/img";
 
 export const markdownComponents: Components = {
   h1: H1Component,

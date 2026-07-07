@@ -37,7 +37,7 @@ export const LinkComponent = ({ href, children }: any) => {
     e.preventDefault();
     if (!href) return;
     if (isMail) {
-      window.location.href = href;
+      globalThis.location.href = href;
       return;
     }
     if (isInternal) {

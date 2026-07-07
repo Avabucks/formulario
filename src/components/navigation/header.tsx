@@ -1,7 +1,7 @@
 import { Button } from "@/src/components/ui/button";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { getIronSession } from "iron-session";
-import { ArrowRight, Coffee, Pi } from "lucide-react";
+import { ArrowRight, Pi } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { AvatarLogic } from "../auth/avatar-logic";
@@ -27,25 +27,7 @@ export async function Header() {
           <Link href="/community/page/1">Community</Link>
         </Button>
       </div>
-      <div className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2">
-        <Button
-          asChild
-          variant="ghost"
-          className="gap-1.5 bg-brand-purple/10 px-2 text-brand-purple shadow-none hover:bg-brand-purple/20 focus-visible:border-brand-purple/40 focus-visible:ring-brand-purple/20 md:px-3"
-        >
-          <Link
-            href="https://ko-fi.com/formulabase"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Supporta FormulaBase su Ko-fi"
-          >
-            <Coffee className="h-4 w-4" />
-            <span>
-              Supporta<span className="hidden md:inline"> il progetto</span>
-            </span>
-          </Link>
-        </Button>
-      </div>
+
       <div className="flex items-center gap-2">
         {session.uid && <SearchLogic />}
         <div className="h-6 border-l"></div>

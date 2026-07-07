@@ -14,10 +14,6 @@ export async function GET(
   );
   const uid = session.uid;
 
-  // Controllo autenticazione
-  if (!uid)
-    return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
-
   const { argomentoId } = await params;
 
   try {
@@ -26,13 +22,16 @@ export async function GET(
                 a.beautiful_id AS id, 
                 a.content, 
                 a.sort_order,
-                a.capitolo AS "capitoloId"
+                a.capitolo AS "capitoloId",
+                u.display_name,
+                u.foto_profilo
              FROM argomenti a
              JOIN capitoli c ON a.capitolo = c.beautiful_id
              JOIN formulari f ON c.formulario = f.beautiful_id
+             JOIN users u ON f.author_uid = u.uid
              WHERE a.beautiful_id = $1 
                AND (f.owner_uid = $2 OR f.visibility > 0)`,
-      [argomentoId, uid],
+      [argomentoId, uid || null],
     );
 
     if (rowCount === 0) {

@@ -58,9 +58,12 @@ export default function ForumlarioAdd({
     setLikedAi(true);
     localStorage.setItem("like_ai_generating", "true");
 
-    toast.success("Grazie! Abbiamo registrato il tuo interesse per la generazione con AI. ❤️", {
-      position: "bottom-center",
-    });
+    toast.success(
+      "Grazie! Abbiamo registrato il tuo interesse per la generazione con AI. ❤️",
+      {
+        position: "bottom-center",
+      },
+    );
 
     try {
       const analytics = await loadAnalytics();
@@ -75,14 +78,19 @@ export default function ForumlarioAdd({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "A" && (e.metaKey || e.ctrlKey) && e.shiftKey && allowKey) {
+      if (
+        e.key.toLowerCase() === "a" &&
+        (e.metaKey || e.ctrlKey) &&
+        e.shiftKey &&
+        allowKey
+      ) {
         e.preventDefault();
         setOpen((prev) => !prev);
       }
     };
 
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown, true);
+    return () => document.removeEventListener("keydown", handleKeyDown, true);
   }, [open, allowKey]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -253,7 +261,13 @@ export default function ForumlarioAdd({
                       <Plus size={18} />
                     </div>
                     <div className="flex flex-col text-left">
+<<<<<<< HEAD
                       <span className="font-semibold text-sm">Parti da vuoto</span>
+=======
+                      <span className="font-semibold text-sm">
+                        Parti da vuoto
+                      </span>
+>>>>>>> 19ab209e1d1e04e50f47d16839945dfeb3b8c189
                       <span className="text-xs text-muted-foreground/80">
                         Inizia con un formulario vuoto e aggiungi formule a mano
                       </span>
@@ -261,7 +275,13 @@ export default function ForumlarioAdd({
                   </div>
                   <div
                     className={`flex items-center justify-center w-5 h-5 rounded-full border-2 transition-colors duration-200 ${
+<<<<<<< HEAD
                       template === "empty" ? "border-brand-purple" : "border-muted-foreground/30"
+=======
+                      template === "empty"
+                        ? "border-brand-purple"
+                        : "border-muted-foreground/30"
+>>>>>>> 19ab209e1d1e04e50f47d16839945dfeb3b8c189
                     }`}
                   >
                     {template === "empty" && (
@@ -270,7 +290,16 @@ export default function ForumlarioAdd({
                   </div>
                 </div>
 
+<<<<<<< HEAD
                 <AiTemplateCardActive isSelected={template === "ai"} onSelect={() => setTemplate("ai")} />
+=======
+                <AiTemplateCardFeedback
+                  likedAi={likedAi}
+                  onLike={handleLikeAi}
+                />
+                {/* Quando implementerai la feature, usa questa riga al posto di quella sopra: */}
+                {/* <AiTemplateCardActive isSelected={template === "ai"} onSelect={() => setTemplate("ai")} /> */}
+>>>>>>> 19ab209e1d1e04e50f47d16839945dfeb3b8c189
               </div>
             </Field>
 
@@ -365,7 +394,10 @@ export default function ForumlarioAdd({
     </Dialog>
   );
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 19ab209e1d1e04e50f47d16839945dfeb3b8c189
 export function AiTemplateCardFeedback({
   likedAi,
   onLike,
@@ -376,9 +408,12 @@ export function AiTemplateCardFeedback({
   return (
     <div
       onClick={() => {
-        toast.info("La generazione automatica con AI sarà disponibile a breve!", {
-          position: "bottom-center",
-        });
+        toast.info(
+          "La generazione automatica con AI sarà disponibile a breve!",
+          {
+            position: "bottom-center",
+          },
+        );
       }}
       className="flex gap-2 items-center justify-between p-3.5 rounded-xl border border-dashed border-border bg-muted/10 dark:bg-muted/5 transition-all duration-200 cursor-default"
     >
@@ -388,7 +423,9 @@ export function AiTemplateCardFeedback({
         </div>
         <div className="flex flex-col text-left">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-sm text-muted-foreground/80">Genera con AI</span>
+            <span className="font-semibold text-sm text-muted-foreground/80">
+              Genera con AI
+            </span>
             <span className="inline-flex items-center rounded-full bg-brand-purple/10 px-2 py-0.5 text-[10px] font-semibold text-brand-purple border border-brand-purple/30 uppercase tracking-wider">
               Premium
             </span>
@@ -410,7 +447,9 @@ export function AiTemplateCardFeedback({
           disabled={likedAi}
         >
           <Heart size={13} className={likedAi ? "fill-current" : ""} />
-          <span className="text-nowrap">{likedAi ? "Votato" : "Ti piace?"}</span>
+          <span className="text-nowrap">
+            {likedAi ? "Votato" : "Ti piace?"}
+          </span>
         </button>
       </div>
     </div>
@@ -434,7 +473,13 @@ export function AiTemplateCardActive({
       <div className="flex items-center gap-3">
         <div
           className={`flex items-center justify-center p-2 rounded-lg transition-colors duration-200 ${
+<<<<<<< HEAD
             isSelected ? "bg-brand-purple/20 text-brand-purple" : "bg-muted text-muted-foreground"
+=======
+            isSelected
+              ? "bg-brand-purple/20 text-brand-purple"
+              : "bg-muted text-muted-foreground"
+>>>>>>> 19ab209e1d1e04e50f47d16839945dfeb3b8c189
           }`}
         >
           <Sparkles size={18} />
@@ -456,7 +501,13 @@ export function AiTemplateCardActive({
           isSelected ? "border-brand-purple" : "border-muted-foreground/30"
         }`}
       >
+<<<<<<< HEAD
         {isSelected && <div className="w-2.5 h-2.5 rounded-full bg-brand-purple" />}
+=======
+        {isSelected && (
+          <div className="w-2.5 h-2.5 rounded-full bg-brand-purple" />
+        )}
+>>>>>>> 19ab209e1d1e04e50f47d16839945dfeb3b8c189
       </div>
     </div>
   );

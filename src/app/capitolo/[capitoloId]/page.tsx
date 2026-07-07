@@ -57,12 +57,20 @@ export async function generateMetadata({
     openGraph: {
       title: `${capitolo.titolo} - ${packageJson.displayName}`,
       description: capitolo.descrizione,
-      images: ["/social.png"],
+      images: [
+        {
+          url: "/social.png",
+          width: 1200,
+          height: 630,
+          alt: `${capitolo.titolo} - ${packageJson.displayName}`,
+        },
+      ],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title: `${capitolo.titolo} - ${packageJson.displayName}`,
       description: capitolo.descrizione,
+      images: ["/social.png"],
     },
   };
 }
@@ -80,35 +88,41 @@ export default async function Capitolo({
   );
   const uid = session.uid;
 
-  // check if user exists
-  const { rows: users } = await pool.query(
-    `SELECT id FROM users WHERE uid = $1`,
-    [uid],
-  );
-  if (users.length === 0) {
-    redirect("/api/auth/logout");
-  }
-
   // Check if user has access to the capitolo (owner or public)
   const { rows: capitoloRows, rowCount } = await pool.query(
     `SELECT C.beautiful_id AS "id", COALESCE(C.titolo, 'Senza titolo') AS "titolo", C.formulario,
-            F.titolo AS "formularioTitolo", F.owner_uid as "ownerUid", U_A.display_name AS "nomeAutore", F.beautiful_id AS "formularioId"
+            F.titolo AS "formularioTitolo", F.descrizione AS "formularioDescrizione", F.visibility, F.owner_uid as "ownerUid", U_A.display_name AS "nomeAutore", F.beautiful_id AS "formularioId"
             FROM capitoli C
             JOIN formulari F ON F.beautiful_id = C.formulario
             LEFT JOIN users U_A ON F.author_uid = U_A.uid
             WHERE C.beautiful_id = $1
             AND (F.owner_uid = $2 OR F.visibility > 0)`,
-    [capitoloId, uid],
+    [capitoloId, uid || null],
   );
 
   if (rowCount === 0) {
-    redirect("/home");
+    if (uid) {
+      redirect("/home");
+    } else {
+      redirect("/login");
+    }
   }
 
   const capitolo = {
     ...capitoloRows[0],
-    editable: capitoloRows[0].ownerUid === uid,
+    editable: uid ? capitoloRows[0].ownerUid === uid : false,
   };
+
+  // check if logged in user exists in db
+  if (uid) {
+    const { rows: users } = await pool.query(
+      `SELECT id FROM users WHERE uid = $1`,
+      [uid],
+    );
+    if (users.length === 0) {
+      redirect("/api/auth/logout");
+    }
+  }
 
   const breadcrumbs = [
     { label: "Home", href: "/" },
@@ -164,8 +178,37 @@ export default async function Capitolo({
     </div>
   );
 
+  const showSchema = capitolo.visibility === 2;
+  const jsonLd = showSchema
+    ? {
+        "@context": "https://schema.org",
+        "@type": "CreativeWork",
+        name: `${capitolo.titolo} - ${capitolo.formularioTitolo}`,
+        description:
+          capitolo.formularioDescrizione ||
+          `Capitolo "${capitolo.titolo}" del formulario "${capitolo.formularioTitolo}".`,
+        author: {
+          "@type": "Person",
+          name: capitolo.nomeAutore || "FormulaBase User",
+        },
+        publisher: {
+          "@type": "Organization",
+          name: "FormulaBase",
+          url:
+            process.env.NEXT_PUBLIC_APP_URL ||
+            "https://formulario-five.vercel.app",
+        },
+      }
+    : null;
+
   return (
     <>
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
       <Header />
       <div className="flex flex-col gap-4 w-full px-2 md:px-6 pt-16 pb-5">
         <BreadcrumbLogic items={breadcrumbs} />

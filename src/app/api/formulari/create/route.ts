@@ -19,7 +19,7 @@ export async function POST(request: Request) {
 
   // check if user exists
   const { rows: users } = await pool.query(
-    `SELECT id FROM users WHERE uid = $1`,
+    `SELECT id, display_name as "displayName" FROM users WHERE uid = $1`,
     [uid],
   );
   if (users.length === 0) {
