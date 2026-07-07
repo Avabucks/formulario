@@ -19,16 +19,16 @@ const wordVariants = {
 const titleWords: { text: string; muted: boolean }[] = [
   { text: "Le", muted: false },
   { text: "tue", muted: false },
-  { text: "formule.", muted: false },
-  { text: "Sempre", muted: true },
+  { text: "formule", muted: false },
+  { text: "sempre", muted: true },
   { text: "a", muted: true },
   { text: "portata", muted: true },
   { text: "di", muted: true },
-  { text: "mano.", muted: true },
+  { text: "mano", muted: true },
 ];
 
 const subWords =
-  "La piattaforma completa per creare, organizzare e condividere formulari scientifici. Scrivi in LaTeX, genera con l'AI, dividi per capitoli, condividi via QR o link.".split(
+  "La piattaforma completa per creare, organizzare e condividere formulari scientifici: scrivi in LaTeX, genera con l'AI, dividi per capitoli, condividi via QR o link.".split(
     " ",
   );
 

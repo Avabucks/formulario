@@ -1,203 +1,230 @@
 # FormulaBase
 
-FormulaBase è una web app per creare, organizzare e condividere formulari scientifici e cheat sheet. Permette di scrivere contenuti in Markdown e LaTeX, dividerli in capitoli e argomenti, salvarli nel proprio spazio personale, condividerli tramite link o QR code e usare assistenti AI per generare o migliorare appunti.
+FormulaBase è una web app avanzata per creare, organizzare e condividere formulari scientifici e cheat sheet. Permette di scrivere contenuti complessi in Markdown e LaTeX, organizzarli in capitoli e argomenti, salvarli nel proprio spazio personale, condividerli tramite link pubblici o codici QR e utilizzare assistenti AI di ultima generazione per generare o migliorare formule ed appunti.
 
 ## Funzionalità principali
 
-- Autenticazione Google tramite Firebase
-- Sessioni server-side con `iron-session`
-- Database PostgreSQL per utenti, formulari, capitoli, argomenti e preferiti
-- Editor Markdown/LaTeX con Monaco Editor
-- Anteprima KaTeX e strumenti di formattazione
-- Generazione contenuti tramite Gemini e Groq
-- Formulari privati, condivisi o pubblici nella community
-- Sistema di preferiti, visualizzazioni, ricerca e duplicazione formulari
-- Condivisione tramite link e QR code
-- Tema chiaro/scuro con UI basata su Radix UI e shadcn/ui
+- **Autenticazione Sicura**: Accesso tramite Google Authentication e Google One Tap integrato con Firebase Auth.
+- **Sessioni Server-Side**: Gestione delle sessioni sicura e performante lato server tramite `iron-session`.
+- **Editor Avanzato a 3 Pannelli**:
+  - **Navigatore Struttura (Outline)**: Un menu ad albero laterale che mostra l'indice dell'argomento e permette di navigare istantaneamente tra le sezioni.
+  - **Monaco Editor**: Editor di codice integrato con evidenziazione della sintassi per Markdown e LaTeX.
+  - **Anteprima KaTeX/Markdown**: Rendering in tempo reale delle formule matematiche e del layout Markdown.
+- **Assistente AI Chat Integrato**: Chat AI accessibile direttamente dall'editor (supportata da Gemini e Groq) che legge il contesto dell'argomento per generare formule, spiegazioni o riassunti.
+- **Condivisione & Community**:
+  - Pubblicazione dei formulari nella sezione **Community** con filtri e ricerca globale.
+  - Condivisione immediata tramite link condivisibili o codici QR dinamici generati in-app.
+  - Possibilità di duplicare (clonare) formulari altrui per personalizzarli.
+  - Sistema di preferiti e contatore di visualizzazioni.
+- **Dashboard di Amministrazione**: Pannello `/admin` dedicato per il monitoraggio degli utenti attivi, la creazione di formulari, l'analisi della distribuzione delle risorse e la lettura dei feedback degli utenti.
+- **Aesthetics & UX**: Design premium scuro/chiaro moderno basato su Tailwind CSS 4, Radix UI e framer-motion per micro-animazioni fluide.
+- **Ottimizzazione SEO**: Sitemap e robots dinamici, metadati semantici ottimizzati per ciascuna pagina pubblica.
+
+---
 
 ## Stack tecnologico
 
-- Next.js 16 (App Router)
-- React 19
-- TypeScript
-- Tailwind CSS 4
-- PostgreSQL (`pg`)
-- Firebase Auth + Firebase Admin
-- Monaco Editor
-- KaTeX, React Markdown e Mermaid
-- Gemini API e Groq API
+- **Framework**: Next.js 16 (App Router)
+- **Libreria Core**: React 19 (con React 19.2.3)
+- **Linguaggio**: TypeScript
+- **Styling**: Tailwind CSS 4, PostCSS, framer-motion (animazioni)
+- **Database**: PostgreSQL (con estensione `pg_trgm` per la ricerca fuzzy)
+- **Autenticazione**: Firebase Client Auth + Firebase Admin SDK
+- **Editor di testo**: Monaco Editor (`@monaco-editor/react`)
+- **Rendering scientifico & diagrammi**: KaTeX (`react-katex`, `rehype-katex`), React Markdown e Mermaid.js
+- **Motori AI**: Google Gemini API (`@google/generative-ai`) e Groq API (`groq-sdk`)
+- **Analytics**: Umami Analytics integrato
 
-## Requisiti
+---
 
-Prima di iniziare assicurati di avere:
+## Setup Locale
 
-- Node.js 20 o superiore
-- npm
-- Un database PostgreSQL
-- Un progetto Firebase con autenticazione Google abilitata
-- Una chiave API Gemini e/o Groq per le funzionalità AI
+### Requisiti
 
-## Setup locale
+Prima di iniziare, assicurati di avere installato:
 
-Installa le dipendenze:
+- **Node.js 20** o superiore
+- **npm** o un package manager equivalente
+- Un database **PostgreSQL** attivo
+
+### 1. Installazione dipendenze
+
+Clona la repository ed installa i pacchetti necessari:
 
 ```bash
 npm install
 ```
 
-Crea il file delle variabili ambiente:
+### 2. Configurazione Variabili Ambiente
+
+Crea il tuo file `.env.local` partendo dal modello di esempio:
 
 ```bash
 cp .env.example .env.local
 ```
 
-Su PowerShell:
+_(Su Windows PowerShell)_:
 
 ```powershell
 Copy-Item .env.example .env.local
 ```
 
-Compila `.env.local` con le tue credenziali.
+Compila il file `.env.local` configurando le chiavi per Firebase, il database PostgreSQL, Gemini/Groq e Umami.
 
-Inizializza il database:
+### 3. Inizializzazione Database
+
+Esegui lo script SQL fornito per generare le tabelle:
 
 ```bash
 psql "$DATABASE_URL" -f sql/create_tables.sql
 ```
 
-Avvia il server di sviluppo:
+> [!IMPORTANT]
+> **Dashboard di Amministrazione (`/admin`)**:
+> Lo schema SQL di base non include di default privilegi di amministrazione per gli utenti. Per abilitare l'accesso alla dashboard admin, aggiungi la colonna `is_admin` alla tabella `users`:
+>
+> ```sql
+> ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT FALSE;
+> ```
+>
+> Dopodiché, imposta a `TRUE` il flag per il tuo specifico `uid` utente (assegnato da Firebase):
+>
+> ```sql
+> UPDATE users SET is_admin = TRUE WHERE uid = 'IL_TUO_UID_FIREBASE';
+> ```
+
+### 4. Avvio in Sviluppo
+
+Avvia il server locale di sviluppo:
 
 ```bash
 npm run dev
 ```
 
-L'app sarà disponibile su:
+L'applicazione sarà disponibile all'indirizzo:
+[http://localhost:3000](http://localhost:3000)
 
-```text
-http://localhost:3000
-```
+---
 
-## Variabili ambiente
+## Variabili Ambiente
 
-| Variabile                                  | Descrizione                                              |
-| ------------------------------------------ | -------------------------------------------------------- |
-| `DATABASE_URL`                             | URL di connessione PostgreSQL                            |
-| `NEXT_PUBLIC_FIREBASE_API_KEY`             | API key Firebase client                                  |
-| `NEXT_PUBLIC_GOOGLE_CLIENT_ID`             | Client ID OAuth Google usato anche per Google One Tap    |
-| `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`         | Auth domain Firebase                                     |
-| `NEXT_PUBLIC_FIREBASE_PROJECT_ID`          | ID del progetto Firebase                                 |
-| `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`      | Storage bucket Firebase                                  |
-| `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | Sender ID Firebase                                       |
-| `NEXT_PUBLIC_FIREBASE_APP_ID`              | Firebase App ID                                          |
-| `NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID`      | Firebase Measurement ID                                  |
-| `FIREBASE_PRIVATE_KEY`                     | Chiave privata del service account Firebase Admin        |
-| `FIREBASE_CLIENT_EMAIL`                    | Email del service account Firebase Admin                 |
-| `SESSION_SECRET`                           | Segreto usato da `iron-session`                          |
-| `NEXT_PUBLIC_APP_URL`                      | URL pubblico dell'app                                    |
-| `NEXT_PUBLIC_FORMULARIO_BENVENUTO_ID`      | ID del formulario di benvenuto assegnato ai nuovi utenti |
-| `GEMINI_API_KEY`                           | API key Gemini                                           |
-| `GROQ_API_KEY`                             | API key Groq                                             |
-| `NEXT_PUBLIC_UMAMI_APP_ID`                 | ID sito Umami per analytics                              |
+| Variabile                                  | Descrizione                                                           |
+| :----------------------------------------- | :-------------------------------------------------------------------- |
+| `DATABASE_URL`                             | Stringa di connessione a PostgreSQL                                   |
+| `NEXT_PUBLIC_FIREBASE_API_KEY`             | Chiave API Firebase Client                                            |
+| `NEXT_PUBLIC_GOOGLE_CLIENT_ID`             | Client ID OAuth Google per il login ed il Google One Tap              |
+| `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`         | Dominio di autenticazione Firebase                                    |
+| `NEXT_PUBLIC_FIREBASE_PROJECT_ID`          | ID progetto Firebase                                                  |
+| `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`      | Bucket di storage Firebase                                            |
+| `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | ID mittente messaggi Firebase                                         |
+| `NEXT_PUBLIC_FIREBASE_APP_ID`              | App ID Firebase Client                                                |
+| `NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID`      | ID di misurazione Analytics Firebase                                  |
+| `FIREBASE_PRIVATE_KEY`                     | Chiave privata del Service Account Firebase Admin                     |
+| `FIREBASE_CLIENT_EMAIL`                    | Email del Service Account Firebase Admin                              |
+| `SESSION_SECRET`                           | Chiave segreta di crittografia per `iron-session` (min. 32 caratteri) |
+| `NEXT_PUBLIC_APP_URL`                      | URL pubblico dell'applicazione (es. per canonical URL/condivisione)   |
+| `NEXT_PUBLIC_FORMULARIO_BENVENUTO_ID`      | `beautiful_id` del formulario predefinito clonato per i nuovi utenti  |
+| `GEMINI_API_KEY`                           | API Key per l'accesso ai modelli Google Gemini                        |
+| `GROQ_API_KEY`                             | API Key per l'accesso ai modelli di inferenza Groq                    |
+| `NEXT_PUBLIC_UMAMI_APP_ID`                 | ID del sito configurato per il tracciamento Umami Analytics           |
 
-> Nota: il codice usa `NEXT_PUBLIC_FORMULARIO_BENVENUTO_ID`. Se trovi `FORMULARIO_BENVENUTO_ID` nel file `.env.example`, rinominala aggiungendo il prefisso `NEXT_PUBLIC_`.
+---
 
-## Script disponibili
+## Scorciatoie da Tastiera (Keyboard Shortcuts)
 
-### Avvio sviluppo
+L'applicazione dispone di scorciatoie da tastiera integrate per velocizzare la navigazione e la formattazione scientifica all'interno dell'editor.
 
-```bash
-npm run dev
-```
+<details>
+<summary><b>Visualizza elenco scorciatoie</b></summary>
 
-Avvia Next.js in modalità sviluppo.
+### Navigazione & Applicazione
 
-### Build produzione
+- **Cerca nei formulari**: `Ctrl + K`
+- **Impostazioni Formulario**: `Ctrl + Shift + I`
+- **Aggiungi nuovo capitolo/argomento**: `Ctrl + Shift + A`
+- **Genera con AI**: `Alt + A`
+- **Visualizzazione Editor**: `Alt + 1`
+- **Visualizzazione Dividi (Split)**: `Alt + 2`
+- **Visualizzazione Anteprima**: `Alt + 3`
 
-```bash
-npm run build
-```
+### Formattazione Contenuto
 
-Genera la build di produzione.
+- **Grassetto**: `Ctrl + B`
+- **Corsivo**: `Ctrl + I`
+- **Citazione (Quote)**: `Ctrl + Shift + Q`
+- **Lista ordinata**: `Ctrl + Shift + 7`
+- **Lista non ordinata**: `Ctrl + Shift + 8`
+- **Divisore**: `Ctrl + Shift + 9`
+- **Tabella**: `Alt + T`
+- **Codice inline**: `Ctrl + Shift + J`
+- **Codice in blocco**: `Ctrl + Shift + U`
+- **Formula inline**: `Ctrl + Shift + G`
+- **Formula in blocco**: `Ctrl + Shift + H`
+- **Titoli (da H1 a H6)**: `Ctrl + Shift + [1-6]`
 
-### Avvio produzione
+### Comandi Editor (Monaco)
 
-```bash
-npm run start
-```
+- **Salva**: `Ctrl + S`
+- **Annulla / Ripristina**: `Ctrl + Z` / `Ctrl + Y`
+- **Seleziona prossima occorrenza**: `Ctrl + D`
+- **Seleziona tutte le occorrenze**: `Ctrl + Shift + L`
+- **Inserisci cursore multiplo**: `Alt + Click`
+- **Sposta riga su/giù**: `Alt + ↑` / `Alt + ↓`
+- **Duplica riga**: `Shift + Alt + ↓`
+- **Elimina riga**: `Ctrl + Shift + K`
 
-Avvia la build di produzione.
+</details>
 
-### Lint
+---
 
-```bash
-npm run lint
-```
-
-Esegue ESLint.
-
-### Controllo formattazione
-
-```bash
-npm run format:check
-```
-
-Controlla la formattazione con Prettier.
-
-### Formattazione automatica
-
-```bash
-npm run format:fix
-```
-
-Formatta automaticamente il progetto con Prettier.
-
-## Struttura del progetto
+## Struttura del Progetto
 
 ```text
 src/
-  app/                 Route, pagine e API Next.js
-  components/          Componenti UI e componenti di dominio
-  data/                Dati statici e configurazioni
-  hooks/               Hook React condivisi
-  lib/                 Configurazioni DB, Firebase, sessioni e utility
-  styles/              Stili globali ed editor
+  ├── app/             # Pagine, rotte, API Next.js e logica di routing (robots.ts, sitemap.ts)
+  ├── components/      # Componenti UI riutilizzabili e moduli di dominio (editor, auth, home)
+  ├── data/            # Configurazione statica e costanti (es. kbs.json per shortcut)
+  ├── hooks/           # Custom hooks di React (es. useIsMobile, useFilters)
+  ├── lib/             # Utility, inizializzazione DB (pg), Firebase SDK e iron-session
+  ├── proxy.ts         # Logica e matcher per la protezione delle rotte ed i reindirizzamenti
+  └── styles/          # Fogli di stile CSS globali, KaTeX ed editor personalizzati
 
-public/                Asset statici, icone, manifest e video tutorial
-sql/                   Script SQL per inizializzare il database
+public/                # Asset statici (loghi, manifest.json, immagini e icone)
+sql/                   # Script di creazione delle tabelle del database PostgreSQL
 ```
 
-## Database
+---
 
-Lo schema iniziale si trova in:
+## Struttura del Database
 
-```text
-sql/create_tables.sql
-```
+Il database PostgreSQL utilizza le seguenti tabelle configurate in `sql/create_tables.sql`:
 
-Lo script crea le seguenti tabelle:
+- `users`: Informazioni sul profilo degli utenti registrati (UID Firebase, nome, email, foto profilo).
+- `formulari`: Testata del formulario (titolo, descrizione, visibilità privata/pubblica/condivisa, contatore visualizzazioni, owner).
+- `capitoli`: Sezioni intermedie collegate a un formulario con ordine di ordinamento personalizzato.
+- `argomenti`: Le pagine effettive contenenti il testo scritto in Markdown/LaTeX.
+- `preferiti`: Relazione molti-a-molti che traccia i formulari salvati dagli utenti nella dashboard.
+- `feedback`: Valutazioni da 1 a 5 stelle e recensioni fornite dagli utenti per il monitoraggio della qualità.
 
-- `users` → utenti autenticati tramite Firebase
-- `formulari` → formulari creati o duplicati dagli utenti
-- `capitoli` → sezioni ordinate dei formulari
-- `argomenti` → contenuti Markdown/LaTeX associati ai capitoli
-- `preferiti` → relazione tra utenti e formulari salvati
+Viene inoltre abilitata l'estensione `pg_trgm` per supportare ricerche testuali con corrispondenze parziali e similarità di stringhe.
 
-Viene inoltre abilitata l'estensione PostgreSQL `pg_trgm`, utilizzata per migliorare le ricerche testuali.
+---
 
-## Flusso principale
+## Flusso Logico di Funzionamento
 
-1. L'utente accede con Google
-2. Il backend verifica l'ID token tramite Firebase Admin
-3. L'utente viene creato o aggiornato nel database PostgreSQL
-4. I formulari vengono gestiti tramite:
-   - `/home`
-   - `/formulario/[formularioId]`
-   - `/capitolo/[capitoloId]`
-   - `/editor/[argomentoId]`
+1. **Accesso utente**: L'utente si autentica con Google Auth (Client). L'ID Token viene trasmesso via POST a `/api/auth/login`.
+2. **Verifica sessione**: Il backend verifica il token con Firebase Admin SDK e crea una sessione cifrata server-side salvata tramite `iron-session`. Se l'utente non è censito nel DB locale, viene registrato automaticamente nella tabella `users`.
+3. **Controllo Accessi**: La logica definita in `src/proxy.ts` protegge le rotte riservate (come `/home`, `/editor`, `/settings`, `/admin`) reindirizzando gli utenti non autenticati al login.
+4. **Scrittura e Modifica**: Dall'editor `/editor/[argomentoId]`, l'utente può scrivere note con formattazione istantanea KaTeX. Può chiedere supporto all'AI Chat, che recupera il contenuto corrente per ottimizzare il prompt. I dati vengono salvati automaticamente su PostgreSQL.
+5. **Condivisione**: L'utente può cambiare la visibilità del formulario. Se impostato su pubblico, questo apparirà nella scheda `/community` e i motori di ricerca lo indicizzeranno grazie alla sitemap dinamica (`/sitemap.ts`).
 
-5. Le API in `src/app/api` gestiscono:
-   - salvataggio contenuti
-   - struttura formulari
-   - preferiti
-   - visibilità
-   - richieste AI
+---
+
+## Script disponibili
+
+- `npm run dev`: Avvia il server di sviluppo locale.
+- `npm run build`: Esegue la compilazione del progetto per l'ambiente di produzione.
+- `npm run start`: Avvia l'applicazione Next.js già compilata in produzione.
+- `npm run lint`: Esegue i controlli statici del codice con ESLint.
+- `npm run format:check`: Controlla lo stile del codice usando Prettier.
+- `npm run format:fix`: Applica automaticamente le correzioni di formattazione di Prettier in tutto il progetto.

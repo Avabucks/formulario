@@ -1,5 +1,5 @@
 "use client";
-import { InlineLatex } from "@/src/components/editor/editor-katex/inline-latex";
+import { InlineLatex } from "@/src/components/editor/preview/inline-latex";
 import { Button } from "@/src/components/ui/button";
 import {
   Command,
@@ -85,13 +85,13 @@ export function SearchLogic() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+      if (e.key.toLowerCase() === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         setOpen((prev) => !prev);
       }
     };
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown, true);
+    return () => document.removeEventListener("keydown", handleKeyDown, true);
   }, []);
 
   useEffect(() => {

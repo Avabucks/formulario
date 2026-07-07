@@ -77,16 +77,20 @@ export function FormularioSettings({
       });
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "I" && (e.metaKey || e.ctrlKey) && e.shiftKey) {
+      if (
+        e.key.toLowerCase() === "i" &&
+        (e.metaKey || e.ctrlKey) &&
+        e.shiftKey
+      ) {
         e.preventDefault();
         setOpen((prev) => !prev);
       }
     };
 
-    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown, true);
     return () => {
       ignore = true;
-      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("keydown", handleKeyDown, true);
     };
   }, [formularioId]);
 
@@ -169,8 +173,8 @@ export function FormularioSettings({
           <Tooltip>
             <TooltipTrigger asChild>
               <DialogTrigger asChild>
-                <Button variant="outline" size="icon" className="relative">
-                  <Settings size={16} />
+                <Button variant="outline" className="size-7 md:size-8 relative p-0 flex items-center justify-center shrink-0">
+                  <Settings className="size-3.5 md:size-4" />
                   {edited && (
                     <span className="absolute -top-0.5 -right-0.5 flex size-2">
                       <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
