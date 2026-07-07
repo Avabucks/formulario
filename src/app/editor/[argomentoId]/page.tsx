@@ -146,6 +146,56 @@ export default async function Argomento({
     { label: argomento.titolo, href: `/editor/${argomento}` },
   ];
 
+    // Fetch tree data (capitoli and argomenti of the formulario)
+  const { rows: treeRows } = await pool.query(
+    `SELECT 
+        C.beautiful_id AS "capitoloId",
+        COALESCE(C.titolo, 'Senza titolo') AS "capitoloTitolo",
+        C.sort_order AS "capitoloSortOrder",
+        A.beautiful_id AS "argomentoId",
+        A.content AS "argomentoContent",
+        A.sort_order AS "argomentoSortOrder"
+     FROM capitoli C
+     LEFT JOIN argomenti A ON A.capitolo = C.beautiful_id
+     WHERE C.formulario = $1
+     ORDER BY C.sort_order ASC, A.sort_order ASC`,
+    [argomento.formularioId],
+  );
+
+  const capitoliMap: Record<
+    string,
+    {
+      id: string;
+      titolo: string;
+      sortOrder: number;
+      argomenti: { id: string; titolo: string; sortOrder: number }[];
+    }
+  > = {};
+
+  for (const row of treeRows) {
+    if (!capitoliMap[row.capitoloId]) {
+      capitoliMap[row.capitoloId] = {
+        id: row.capitoloId,
+        titolo: row.capitoloTitolo,
+        sortOrder: row.capitoloSortOrder,
+        argomenti: [],
+      };
+    }
+    if (row.argomentoId) {
+      const firstLine = row.argomentoContent?.split("\n")[0] ?? "";
+      const argomentoTitolo = firstLine.startsWith("#")
+        ? firstLine.replace(/^#+\s*/, "")
+        : "Senza titolo";
+      capitoliMap[row.capitoloId].argomenti.push({
+        id: row.argomentoId,
+        titolo: argomentoTitolo,
+        sortOrder: row.argomentoSortOrder,
+      });
+    }
+  }
+
+  const tree = Object.values(capitoliMap).sort((a, b) => a.sortOrder - b.sortOrder);
+
   return (
     <div className="flex flex-col h-screen">
       <Header />
