@@ -1,28 +1,9 @@
 "use client";
 
 import { useIsMobile } from "@/src/hooks/useIsMobile";
-<<<<<<< HEAD
-import { Monaco } from "@monaco-editor/react";
-import {
-  ArrowRightLeft,
-  Eye,
-  EyeClosed,
-  PenOff,
-  Redo2,
-  Undo2,
-  Download,
-  FileJson,
-  FileText,
-  FileCode,
-  Printer,
-} from "lucide-react";
-import type { Selection } from "monaco-editor";
-import { useTheme } from "next-themes";
-=======
 import clsx from "clsx";
 import { Columns2, Eye, Maximize2, Minimize2, PenLine, Redo2, Sparkles, Undo2 } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
->>>>>>> 19ab209e1d1e04e50f47d16839945dfeb3b8c189
 import { useEffect, useRef, useState } from "react";
 import { FormularioSettings } from "../home/formulario-settings";
 import { TakeFormulario } from "../home/take-formulario";
@@ -38,30 +19,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
-<<<<<<< HEAD
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-import { Exporter } from "@/src/lib/export-utils";
-import slugify from "slugify";
-import { EditorInput } from "./editor-katex/editor-input";
-import { EditorPreview } from "./editor-katex/editor-preview";
-import { FormattingBold } from "./editor-katex/tools/formatting-bold";
-import { FormattingCodeBlock } from "./editor-katex/tools/formatting-code-block";
-import { FormattingCodeInline } from "./editor-katex/tools/formatting-code-inline";
-import { FormattingDivider } from "./editor-katex/tools/formatting-divider";
-import { FormattingHeaders } from "./editor-katex/tools/formatting-headers";
-import { FormattingItalic } from "./editor-katex/tools/formatting-italic";
-import { FormattingLatex } from "./editor-katex/tools/formatting-latex";
-import { FormattingOrderedList } from "./editor-katex/tools/formatting-ordered";
-import { FormattingQuote } from "./editor-katex/tools/formatting-quote";
-import { FormattingTable } from "./editor-katex/tools/formatting-table";
-import { FormattingUnorderedList } from "./editor-katex/tools/formatting-unordered";
-import { AskAIButton } from "./editor-katex/tools/ask-ai";
-=======
 import { EditorAI } from "./chat/editor-ai";
 import { EditorPreview } from "./preview/editor-preview";
 import { FormattingCommand } from "./tools/formatting-command";
@@ -70,7 +27,6 @@ import { ShortcutsListener } from "./tools/shortcuts-listener";
 
 const MIN_RESIZABLE_SIZE = 20;
 const MAX_RESIZABLE_SIZE = 80;
->>>>>>> 19ab209e1d1e04e50f47d16839945dfeb3b8c189
 
 export function EditorPage({
   argomentoId,
@@ -100,90 +56,8 @@ export function EditorPage({
   const [selection, setSelection] = useState<Selection | null>(null);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
 
-<<<<<<< HEAD
-  const ExportNoteButton = () => {
-    const handleExportMarkdown = () => {
-      const firstLine = textAreaContent?.split("\n")[0] ?? "";
-      const rawTitle = firstLine.startsWith("#") ? firstLine.replace(/^#+\s*/, "") : "Senza titolo";
-      const cleanFilename = slugify(rawTitle, { lower: true, strict: true }) || "nota";
-      Exporter.markdown.exportNote({
-        id: argomentoId,
-        title: rawTitle,
-        content: textAreaContent
-      }, cleanFilename);
-    };
-
-    const handleExportJson = () => {
-      const firstLine = textAreaContent?.split("\n")[0] ?? "";
-      const rawTitle = firstLine.startsWith("#") ? firstLine.replace(/^#+\s*/, "") : "Senza titolo";
-      const cleanFilename = slugify(rawTitle, { lower: true, strict: true }) || "nota";
-      Exporter.json.exportNote({
-        id: argomentoId,
-        title: rawTitle,
-        content: textAreaContent
-      }, cleanFilename);
-    };
-
-    const handleExportLatex = () => {
-      const firstLine = textAreaContent?.split("\n")[0] ?? "";
-      const rawTitle = firstLine.startsWith("#") ? firstLine.replace(/^#+\s*/, "") : "Senza titolo";
-      const cleanFilename = slugify(rawTitle, { lower: true, strict: true }) || "nota";
-      Exporter.latex.exportNote({
-        id: argomentoId,
-        title: rawTitle,
-        content: textAreaContent
-      }, cleanFilename);
-    };
-
-    const handleExportPdf = () => {
-      window.open(`/export/argomento/${argomentoId}`, "_blank");
-    };
-
-    return (
-      <DropdownMenu>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon" className="relative">
-                  <Download size={16} />
-                </Button>
-              </DropdownMenuTrigger>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Esporta nota</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuItem onClick={handleExportPdf} className="flex gap-2 items-center cursor-pointer">
-            <Printer className="h-4 w-4" />
-            <span>Esporta come PDF</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleExportMarkdown} className="flex gap-2 items-center cursor-pointer">
-            <FileText className="h-4 w-4" />
-            <span>Esporta come Markdown (.md)</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleExportLatex} className="flex gap-2 items-center cursor-pointer">
-            <FileCode className="h-4 w-4" />
-            <span>Esporta come LaTeX (.tex)</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleExportJson} className="flex gap-2 items-center cursor-pointer">
-            <FileJson className="h-4 w-4" />
-            <span>Esporta come JSON (.json)</span>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    );
-  };
-
-  const editorRef = useRef<any>(null);
-  const monacoRef = useRef<Monaco | null>(null);
-  const [monacoReady, setMonacoReady] = useState(false);
-=======
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const isMac = useIsMac();
->>>>>>> 19ab209e1d1e04e50f47d16839945dfeb3b8c189
 
   const undoBtnRef = useRef<HTMLButtonElement>(null);
   const redoBtnRef = useRef<HTMLButtonElement>(null);
@@ -564,129 +438,7 @@ export function EditorPage({
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-<<<<<<< HEAD
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                ref={redoBtnRef}
-                variant="outline"
-                size="icon"
-                onClick={handleRedo}
-                onMouseDown={(e) => e.preventDefault()}
-              >
-                <Redo2 size={16} />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent className="pr-1.5">
-              <div className="flex items-center gap-2">
-                Ripristina
-                <KbdGroup className="hidden md:flex">
-                  <Kbd>Ctrl</Kbd>
-                  <span>+</span>
-                  <Kbd>Y</Kbd>
-                </KbdGroup>
-              </div>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
-
-      <div className="flex flex-1 items-center">
-        <div className="flex flex-1 items-center gap-3 h-full px-3">
-          <FormattingHeaders
-            _selection={selection}
-            editorRef={editorRef}
-            isFocused={isFocused}
-          />
-          <FormattingBold
-            _selection={selection}
-            editorRef={editorRef}
-            isFocused={isFocused}
-          />
-          <FormattingItalic
-            _selection={selection}
-            editorRef={editorRef}
-            isFocused={isFocused}
-          />
-          <FormattingQuote
-            _selection={selection}
-            editorRef={editorRef}
-            isFocused={isFocused}
-          />
-
-          <FormattingOrderedList
-            _selection={selection}
-            editorRef={editorRef}
-            isFocused={isFocused}
-          />
-          <FormattingUnorderedList
-            _selection={selection}
-            editorRef={editorRef}
-            isFocused={isFocused}
-          />
-
-          <FormattingTable
-            _selection={selection}
-            editorRef={editorRef}
-            isFocused={isFocused}
-          />
-          <FormattingDivider
-            _selection={selection}
-            editorRef={editorRef}
-            isFocused={isFocused}
-          />
-
-          <FormattingCodeInline
-            _selection={selection}
-            editorRef={editorRef}
-            isFocused={isFocused}
-          />
-          <FormattingCodeBlock
-            _selection={selection}
-            editorRef={editorRef}
-            isFocused={isFocused}
-          />
-
-          <FormattingLatex
-            _selection={selection}
-            editorRef={editorRef}
-            isFocused={isFocused}
-          />
-        </div>
-
-        <div className="flex items-center gap-3 px-3 h-full">
-          <AskAIButton editorRef={editorRef} />
-        </div>
-      </div>
-
-      {/* Mobile */}
-      <div className="flex md:hidden border-l items-center px-3 gap-3">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => setSwitchView((prev) => !prev)}
-        >
-          <ArrowRightLeft size={16} />
-        </Button>
-      </div>
-
-      {/* Desktop */}
-      <div className="hidden md:flex border-l items-center px-3 gap-3">
-        <Toggle
-          variant="outline"
-          pressed={switchView}
-          onClick={() => setSwitchView((prev) => !prev)}
-        >
-          {switchView ? <Eye size={16} /> : <EyeClosed size={16} />}
-        </Toggle>
-      </div>
-
-      <div className="flex border-l items-center px-3 gap-2">
-        <ExportNoteButton />
-=======
         <div className="h-6 w-px bg-border hidden sm:block" />
->>>>>>> 19ab209e1d1e04e50f47d16839945dfeb3b8c189
         <FormularioSettings formularioId={formularioId} />
       </div>
     </div>
@@ -781,50 +533,7 @@ export function EditorPage({
           <Spinner />
         </div>
       ) : (
-<<<<<<< HEAD
-        <>
-          {editable ? (
-            toolbar
-          ) : (
-            <div className="flex w-full border-b min-h-15 justify-between items-center">
-              <div className="flex flex-1 items-center gap-2 px-4 text-sm text-muted-foreground">
-                <PenOff size={16} />
-                <TakeFormulario formularioId={formularioId} />
-                <span className="hidden md:flex">per modifcare</span>
-              </div>
-
-              {/* Mobile */}
-              <div className="flex md:hidden border-l items-center px-3 gap-3 h-full">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setSwitchView((prev) => !prev)}
-                >
-                  <ArrowRightLeft size={16} />
-                </Button>
-              </div>
-
-              {/* Desktop */}
-              <div className="hidden md:flex border-l items-center px-3 gap-3 h-full">
-                <Toggle
-                  variant="outline"
-                  pressed={switchView}
-                  onClick={() => setSwitchView((prev) => !prev)}
-                >
-                  {switchView ? <Eye size={16} /> : <EyeClosed size={16} />}
-                </Toggle>
-              </div>
-
-              <div className="flex border-l items-center px-3 gap-2 h-full">
-                <ExportNoteButton />
-                <FormularioSettings formularioId={formularioId} />
-              </div>
-            </div>
-          )}
-        </>
-=======
         editorHeader()
->>>>>>> 19ab209e1d1e04e50f47d16839945dfeb3b8c189
       )}
 
       <div className="flex flex-1 min-h-0 w-full relative overflow-hidden">

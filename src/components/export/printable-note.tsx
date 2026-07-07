@@ -8,8 +8,8 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import { ArrowLeft, Printer } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
-import { markdownComponents } from "@/src/components/editor/editor-katex/markdown-components";
 import "katex/dist/katex.min.css";
+import { markdownComponents } from "../editor/preview/markdown-components";
 
 const remarkPlugins = [remarkMath, remarkBreaks, remarkGfm];
 const rehypePlugins = [rehypeKatex];
