@@ -261,13 +261,9 @@ export default function ForumlarioAdd({
                       <Plus size={18} />
                     </div>
                     <div className="flex flex-col text-left">
-<<<<<<< HEAD
-                      <span className="font-semibold text-sm">Parti da vuoto</span>
-=======
                       <span className="font-semibold text-sm">
                         Parti da vuoto
                       </span>
->>>>>>> 19ab209e1d1e04e50f47d16839945dfeb3b8c189
                       <span className="text-xs text-muted-foreground/80">
                         Inizia con un formulario vuoto e aggiungi formule a mano
                       </span>
@@ -275,13 +271,9 @@ export default function ForumlarioAdd({
                   </div>
                   <div
                     className={`flex items-center justify-center w-5 h-5 rounded-full border-2 transition-colors duration-200 ${
-<<<<<<< HEAD
-                      template === "empty" ? "border-brand-purple" : "border-muted-foreground/30"
-=======
                       template === "empty"
                         ? "border-brand-purple"
                         : "border-muted-foreground/30"
->>>>>>> 19ab209e1d1e04e50f47d16839945dfeb3b8c189
                     }`}
                   >
                     {template === "empty" && (
@@ -290,16 +282,12 @@ export default function ForumlarioAdd({
                   </div>
                 </div>
 
-<<<<<<< HEAD
-                <AiTemplateCardActive isSelected={template === "ai"} onSelect={() => setTemplate("ai")} />
-=======
                 <AiTemplateCardFeedback
                   likedAi={likedAi}
                   onLike={handleLikeAi}
                 />
                 {/* Quando implementerai la feature, usa questa riga al posto di quella sopra: */}
                 {/* <AiTemplateCardActive isSelected={template === "ai"} onSelect={() => setTemplate("ai")} /> */}
->>>>>>> 19ab209e1d1e04e50f47d16839945dfeb3b8c189
               </div>
             </Field>
 
@@ -394,10 +382,6 @@ export default function ForumlarioAdd({
     </Dialog>
   );
 }
-<<<<<<< HEAD
-
-=======
->>>>>>> 19ab209e1d1e04e50f47d16839945dfeb3b8c189
 export function AiTemplateCardFeedback({
   likedAi,
   onLike,
@@ -473,13 +457,9 @@ export function AiTemplateCardActive({
       <div className="flex items-center gap-3">
         <div
           className={`flex items-center justify-center p-2 rounded-lg transition-colors duration-200 ${
-<<<<<<< HEAD
-            isSelected ? "bg-brand-purple/20 text-brand-purple" : "bg-muted text-muted-foreground"
-=======
             isSelected
               ? "bg-brand-purple/20 text-brand-purple"
               : "bg-muted text-muted-foreground"
->>>>>>> 19ab209e1d1e04e50f47d16839945dfeb3b8c189
           }`}
         >
           <Sparkles size={18} />
@@ -501,13 +481,9 @@ export function AiTemplateCardActive({
           isSelected ? "border-brand-purple" : "border-muted-foreground/30"
         }`}
       >
-<<<<<<< HEAD
-        {isSelected && <div className="w-2.5 h-2.5 rounded-full bg-brand-purple" />}
-=======
         {isSelected && (
           <div className="w-2.5 h-2.5 rounded-full bg-brand-purple" />
         )}
->>>>>>> 19ab209e1d1e04e50f47d16839945dfeb3b8c189
       </div>
     </div>
   );
