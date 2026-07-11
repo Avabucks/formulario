@@ -185,7 +185,9 @@ export function FormattingCommand({
                   onSelect={() => {
                     shouldPreventCloseFocus.current = true;
                     handleSelect();
-                    globalThis.dispatchEvent(new CustomEvent("editor:open-table"));
+                    globalThis.dispatchEvent(
+                      new CustomEvent("editor:open-table"),
+                    );
                   }}
                   className="flex items-center gap-2 cursor-pointer"
                 >

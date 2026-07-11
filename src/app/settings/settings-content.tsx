@@ -215,14 +215,14 @@ export async function SettingsContent({
                     icon={Handshake}
                     title="Termini e condizioni"
                     description="Regole di utilizzo, contenuti utente e cancellazione account."
-                    meta="Aggiornati ad Aprile 2026"
+                    meta="Aggiornati a Luglio 2026"
                   />
                   <LegalLink
                     href="/privacy"
                     icon={Cookie}
                     title="Privacy Policy"
                     description="Dati raccolti, finalita del trattamento e uso dei servizi AI."
-                    meta="Aggiornata a Febbraio 2026"
+                    meta="Aggiornata a Luglio 2026"
                   />
                 </div>
               </SettingsSection>

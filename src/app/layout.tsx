@@ -2,14 +2,12 @@ import packageJson from "@/package.json";
 import { Toaster } from "@/src/components/ui/sonner";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Script from "next/script";
 import NextTopLoader from "nextjs-toploader";
-import { UmamiTracker } from "../components/analytics/umami-tracker";
 import { ThemeProvider } from "../components/theme/theme-provider";
 import "../styles/editor.css";
 import "../styles/globals.css";
-import AnalyticsLoader from "../components/analytics/google-analytics";
 import DiscordWidget from "../components/home/discord-widget";
+import { CookieConsent } from "../components/legal/cookie-consent";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -111,13 +109,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="it" suppressHydrationWarning>
-      <head>
-        <Script
-          src="https://cloud.umami.is/script.js"
-          data-website-id={process.env.NEXT_PUBLIC_UMAMI_APP_ID}
-          strategy="afterInteractive"
-        />
-      </head>
+      <head />
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col h-screen overflow-y-auto`}
       >
@@ -135,8 +127,7 @@ export default function RootLayout({
           <main className="flex flex-1 flex-col">{children}</main>
           <DiscordWidget />
           <Toaster />
-          <UmamiTracker />
-          <AnalyticsLoader />
+          <CookieConsent />
         </ThemeProvider>
       </body>
     </html>

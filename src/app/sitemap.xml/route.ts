@@ -52,7 +52,9 @@ export async function GET() {
 
     const formulariUrls = formulari.map((f) => ({
       url: `${baseUrl}/formulario/${f.beautiful_id}`,
-      lastModified: f.data_creazione ? new Date(f.data_creazione).toISOString() : new Date().toISOString(),
+      lastModified: f.data_creazione
+        ? new Date(f.data_creazione).toISOString()
+        : new Date().toISOString(),
       changeFrequency: "weekly",
       priority: 0.8,
     }));
@@ -87,7 +89,7 @@ export async function GET() {
     <lastmod>${page.lastModified}</lastmod>
     <changefreq>${page.changeFrequency}</changefreq>
     <priority>${page.priority.toFixed(1)}</priority>
-  </url>`
+  </url>`,
     )
     .join("")}
 </urlset>`;
