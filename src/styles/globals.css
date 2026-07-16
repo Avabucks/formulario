@@ -83,6 +83,7 @@
   --sidebar-ring: oklch(0.708 0 0);
   --editor-title: oklch(0% 0 0);
   --brand-purple: oklch(0.402 0.203 303.491);
+  --brand-purple-highlight: oklch(0.402 0.203 303.491 / 0.2);
 }
 
 .dark {
@@ -119,6 +120,7 @@
   --sidebar-ring: oklch(0.556 0 0);
   --editor-title: oklch(100% 0.00011 271.152);
   --brand-purple: oklch(0.793 0.129 301.554);
+  --brand-purple-highlight: oklch(0.793 0.129 301.554 / 0.25);
 }
 
 @layer base {

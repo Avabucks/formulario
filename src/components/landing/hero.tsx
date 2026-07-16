@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { AnimatedGridPattern } from "@/src/components/ui/animated-grid-pattern";
 import { cn } from "@/src/lib/utils";
+import { Highlighter } from "../ui/highlighter";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -19,18 +20,13 @@ const wordVariants = {
 };
 
 const titleWords: { text: string; muted: boolean }[] = [
-  { text: "Le", muted: false },
-  { text: "tue", muted: false },
-  { text: "formule", muted: false },
-  { text: "sempre", muted: true },
-  { text: "a", muted: true },
-  { text: "portata", muted: true },
-  { text: "di", muted: true },
-  { text: "mano", muted: true },
+  { text: "Crea", muted: false },
+  { text: "formulari scientifici", muted: false },
+  { text: "in pochi secondi", muted: false },
 ];
 
 const subWords =
-  "La piattaforma completa per creare, organizzare e condividere formulari scientifici: scrivi in LaTeX, genera con l'AI, dividi per capitoli, condividi via QR o link.".split(
+  "Scrivi in LaTeX, usa l'AI per generare formule all'istante, organizza lo studio in capitoli e condividi i tuoi schemi tramite QR o link.".split(
     " ",
   );
 
@@ -59,18 +55,51 @@ export function Hero() {
       <div className="relative z-10 mx-auto max-w-4xl text-center">
         {/* Titolo — parola per parola */}
         <h1 className="text-balance text-5xl font-bold leading-tight tracking-tight text-foreground md:text-7xl">
-          {titleWords.map((word, i) => (
-            <motion.span
-              key={i}
-              custom={TITLE_START + i * TITLE_STEP}
-              variants={wordVariants}
-              initial="hidden"
-              animate="visible"
-              className={`inline-block mr-[0.3em] last:mr-0 ${word.muted ? "text-muted-foreground" : ""}`}
-            >
-              {word.text}
-            </motion.span>
-          ))}
+          {titleWords.map((word, i) => {
+            const isHighlighted = word.text === "formulari scientifici";
+            const span = (
+              <motion.span
+                key={i}
+                custom={TITLE_START + i * TITLE_STEP}
+                variants={wordVariants}
+                initial="hidden"
+                animate="visible"
+                className={`inline-block mr-[0.3em] last:mr-0 ${word.muted ? "text-muted-foreground" : ""}`}
+              >
+                {word.text}
+              </motion.span>
+            );
+
+            if (isHighlighted) {
+              const innerSpan = (
+                <motion.span
+                  key={i}
+                  custom={TITLE_START + i * TITLE_STEP}
+                  variants={wordVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className={`inline-block ${word.muted ? "text-muted-foreground" : ""}`}
+                >
+                  {word.text}
+                </motion.span>
+              );
+
+              return (
+                <span key={i} className="inline-block mr-[0.3em] last:mr-0">
+                  <Highlighter
+                    action="highlight"
+                    color="var(--brand-purple-highlight)"
+                    delay={750}
+                    animationDuration={600}
+                  >
+                    {innerSpan}
+                  </Highlighter>
+                </span>
+              );
+            }
+
+            return span;
+          })}
         </h1>
 
         {/* Sottotitolo — parola per parola */}
@@ -117,30 +146,7 @@ export function Hero() {
           </Button>
         </motion.div>
 
-        {/* Badge features */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, ease, delay: AFTER_SUB + 0.15 }}
-          className="mt-16 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-xs text-muted-foreground"
-        >
-          <span>Gratuito per iniziare</span>
-          <span
-            className="hidden h-4 w-px bg-border sm:block"
-            aria-hidden="true"
-          />
-          <span>Generazione formule con AI</span>
-          <span
-            className="hidden h-4 w-px bg-border sm:block"
-            aria-hidden="true"
-          />
-          <span>Supporto LaTeX completo</span>
-          <span
-            className="hidden h-4 w-px bg-border sm:block"
-            aria-hidden="true"
-          />
-          <span>Condivisione via QR code</span>
-        </motion.div>
+
       </div>
     </section>
   );
