@@ -1,30 +1,23 @@
+"use client";
+
+import { AnimatedGridPattern } from "@/src/components/ui/animated-grid-pattern";
+import { cn } from "@/src/lib/utils";
+
 export function CtaCommunity() {
   return (
     <section className="relative overflow-hidden bg-accent-foreground/1 border rounded-xl">
       <div className="absolute inset-0 dark:bg-card/10 bg-foreground/2" />
-      <svg
-        className="absolute inset-0 h-full w-full opacity-[0.10]"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <defs>
-          <pattern
-            id="cross"
-            width="40"
-            height="40"
-            patternUnits="userSpaceOnUse"
-          >
-            <path
-              d="M16 0v40M0 16h40"
-              stroke="currentColor"
-              strokeWidth="0.5"
-              fill="none"
-            />
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#cross)" />
-      </svg>
+      <AnimatedGridPattern
+        numSquares={20}
+        maxOpacity={0.3}
+        duration={3}
+        repeatDelay={1}
+        className={cn(
+          "inset-y-0 h-full w-full opacity-20",
+        )}
+      />
 
-      <div className="relative mx-auto flex min-h-[40vh] max-w-7xl flex-col items-center justify-center px-6 py-16 text-center">
+      <div className="relative z-10 mx-auto flex min-h-[40vh] max-w-7xl flex-col items-center justify-center px-6 py-16 text-center">
         {/* Title */}
         <h1 className="mb-6 max-w-3xl text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl">
           <span className="text-balance">
