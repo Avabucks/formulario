@@ -4,6 +4,8 @@ import { Button } from "@/src/components/ui/button";
 import { ArrowRight, ScanEye } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { AnimatedGridPattern } from "@/src/components/ui/animated-grid-pattern";
+import { cn } from "@/src/lib/utils";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -42,27 +44,17 @@ export function Hero() {
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden px-6">
       <div className="absolute inset-0 bg-background" />
-      <svg
-        className="absolute inset-0 h-full w-full opacity-[0.10]"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <defs>
-          <pattern
-            id="cross"
-            width="50"
-            height="50"
-            patternUnits="userSpaceOnUse"
-          >
-            <path
-              d="M16 0v50M0 16h50"
-              stroke="currentColor"
-              strokeWidth="0.5"
-              fill="none"
-            />
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#cross)" />
-      </svg>
+      <AnimatedGridPattern
+        numSquares={30}
+        maxOpacity={0.2}
+        duration={3}
+        repeatDelay={1}
+        className={cn(
+          "mask-[radial-gradient(350px_circle_at_center,white,transparent)]",
+          "md:mask-[radial-gradient(900px_circle_at_center,white,transparent)]",
+          "inset-y-0 h-full w-full opacity-40",
+        )}
+      />
 
       <div className="relative z-10 mx-auto max-w-4xl text-center">
         {/* Titolo — parola per parola */}
