@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { ArrowLeft, Home } from "lucide-react"
-import { Button } from "@/src/components/ui/button"
+import Link from "next/link";
+import { ArrowLeft, Home } from "lucide-react";
+import { Button } from "@/src/components/ui/button";
 
 export default function NotFound() {
   return (
@@ -28,9 +28,34 @@ export default function NotFound() {
             fill="none"
           >
             {/* Easel Stand Legs */}
-            <line x1="65" y1="144" x2="50" y2="185" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            <line x1="155" y1="144" x2="170" y2="185" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            <line x1="110" y1="144" x2="110" y2="180" stroke="currentColor" strokeWidth="1" strokeLinecap="round" className="opacity-40" />
+            <line
+              x1="65"
+              y1="144"
+              x2="50"
+              y2="185"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            <line
+              x1="155"
+              y1="144"
+              x2="170"
+              y2="185"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            <line
+              x1="110"
+              y1="144"
+              x2="110"
+              y2="180"
+              stroke="currentColor"
+              strokeWidth="1"
+              strokeLinecap="round"
+              className="opacity-40"
+            />
 
             {/* Whiteboard Frame */}
             <rect
@@ -68,7 +93,13 @@ export default function NotFound() {
             />
 
             {/* Hand-drawn "404" */}
-            <g stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" className="text-foreground">
+            <g
+              stroke="currentColor"
+              strokeWidth="3.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="text-foreground"
+            >
               {/* 4 */}
               <path d="M 62 55 L 62 82 L 84 82" />
               <path d="M 78 50 L 78 95" />
@@ -80,19 +111,26 @@ export default function NotFound() {
               <path d="M 137 55 L 137 82 L 159 82" />
               <path d="M 153 50 L 153 95" />
             </g>
-
           </svg>
         </div>
 
         <div className="flex flex-col items-center gap-3">
-          <h1 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">Pagina non trovata</h1>
+          <h1 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
+            Pagina non trovata
+          </h1>
           <p className="max-w-md text-pretty leading-relaxed text-muted-foreground">
-            Questa equazione non ha soluzione. La pagina che cercavi non esiste o è stata spostata.
+            Questa equazione non ha soluzione. La pagina che cercavi non esiste
+            o è stata spostata.
           </p>
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row mt-4">
-          <Button className="order-2 md:order-first" size="lg" variant="outline" onClick={() => window.history.back()}>
+          <Button
+            className="order-2 md:order-first"
+            size="lg"
+            variant="outline"
+            onClick={() => window.history.back()}
+          >
             <ArrowLeft className="size-4" />
             Pagina precedente
           </Button>
@@ -105,5 +143,5 @@ export default function NotFound() {
         </div>
       </div>
     </main>
-  )
+  );
 }

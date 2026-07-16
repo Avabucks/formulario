@@ -2,7 +2,16 @@
 
 import { useIsMobile } from "@/src/hooks/useIsMobile";
 import clsx from "clsx";
-import { Columns2, Eye, Maximize2, Minimize2, PenLine, Redo2, Sparkles, Undo2 } from "lucide-react";
+import {
+  Columns2,
+  Eye,
+  Maximize2,
+  Minimize2,
+  PenLine,
+  Redo2,
+  Sparkles,
+  Undo2,
+} from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useEffect, useRef, useState } from "react";
 import { FormularioSettings } from "../home/formulario-settings";
@@ -191,13 +200,19 @@ export function EditorPage({
         setIsFullscreen(false);
         return true;
       }
-      if (e.key.toLowerCase() === "f" && !e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey) {
+      if (
+        e.key.toLowerCase() === "f" &&
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !e.altKey &&
+        !e.shiftKey
+      ) {
         const activeEl = document.activeElement;
-        const isTyping = activeEl && (
-          activeEl.tagName === "INPUT" ||
-          activeEl.tagName === "TEXTAREA" ||
-          activeEl.getAttribute("contenteditable") === "true"
-        );
+        const isTyping =
+          activeEl &&
+          (activeEl.tagName === "INPUT" ||
+            activeEl.tagName === "TEXTAREA" ||
+            activeEl.getAttribute("contenteditable") === "true");
         if (!isFocused && !isTyping) {
           e.preventDefault();
           setIsFullscreen((prev) => !prev);
@@ -270,7 +285,9 @@ export function EditorPage({
   const viewTabs = (
     <Tabs
       value={switchView}
-      onValueChange={(val) => setSwitchView(val as "preview" | "divided" | "edit")}
+      onValueChange={(val) =>
+        setSwitchView(val as "preview" | "divided" | "edit")
+      }
       className="gap-0 select-none shrink-0"
     >
       <TabsList variant="line" className="h-7 md:h-8 p-0 bg-transparent gap-0">
@@ -499,7 +516,11 @@ export function EditorPage({
                   onPressedChange={setIsFullscreen}
                   className="size-7 md:size-8 text-foreground shrink-0 cursor-pointer p-0"
                 >
-                  {isFullscreen ? <Minimize2 size={isMobile ? 14 : 15} /> : <Maximize2 size={isMobile ? 14 : 15} />}
+                  {isFullscreen ? (
+                    <Minimize2 size={isMobile ? 14 : 15} />
+                  ) : (
+                    <Maximize2 size={isMobile ? 14 : 15} />
+                  )}
                 </Toggle>
               </TooltipTrigger>
               <TooltipContent className="pr-1.5">
@@ -525,7 +546,7 @@ export function EditorPage({
         "flex flex-1 flex-col min-h-0 overflow-hidden",
         isFullscreen
           ? "fixed inset-0 z-50 bg-background w-screen h-screen rounded-none border-none"
-          : "border rounded-lg"
+          : "border rounded-lg",
       )}
     >
       {loading ? (
@@ -636,8 +657,7 @@ function EditorPanels({
         className="h-full flex flex-col min-w-0"
         style={{
           display:
-            switchView === "preview" ||
-            (!isMobile && switchView === "divided")
+            switchView === "preview" || (!isMobile && switchView === "divided")
               ? "flex"
               : "none",
           width:
@@ -686,7 +706,7 @@ function EditorAISidebar({
           "w-162.5": !isMobile && isAiExpanded,
           "w-87.5": !isMobile && !isAiExpanded,
           hidden: !showAI,
-        }
+        },
       )}
     >
       <EditorAI

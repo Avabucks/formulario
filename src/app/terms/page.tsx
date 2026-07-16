@@ -35,7 +35,7 @@ export default async function TermsPage() {
         <div className="max-w-3xl mx-auto w-full py-8 flex flex-col gap-8">
           <div className="flex flex-col gap-2">
             <p className="text-xs text-muted-foreground uppercase tracking-widest">
-              Ultimo aggiornamento: Aprile 2026
+              Ultimo aggiornamento: Luglio 2026
             </p>
             <h1 className="text-3xl font-bold">Termini di Servizio</h1>
             <p className="text-muted-foreground">
@@ -56,71 +56,120 @@ export default async function TermsPage() {
             <p>
               {packageJson.displayName} è una piattaforma che consente agli
               utenti registrati di creare, organizzare e consultare formulari
-              strutturati in capitoli e argomenti. Il servizio è fornito così
-              com'è, senza garanzie di disponibilità continua.
+              strutturati in capitoli e argomenti. Gli utenti possono inoltre
+              condividere i propri formulari tramite link diretto o pubblicarli
+              nella Community pubblica della piattaforma. Il servizio è fornito
+              così com'è, senza garanzie di disponibilità continua.
             </p>
           </Section>
 
           <Section title="3. Registrazione e account">
             <p>
               Per utilizzare il servizio è necessario creare un account tramite
-              il provider di autenticazione supportato. L'utente è responsabile
-              della sicurezza del proprio account e delle attività svolte
-              attraverso di esso. In caso di accesso non autorizzato, è
-              necessario notificarcelo immediatamente.
+              il provider di autenticazione supportato (Google Account gestito
+              tramite Firebase Authentication). L'utente è responsabile della
+              sicurezza del proprio account e delle attività svolte attraverso
+              di esso. In caso di accesso non autorizzato, è necessario
+              notificarcelo immediatamente.
             </p>
           </Section>
 
-          <Section title="4. Contenuti dell'utente">
+          <Section title="4. Contenuti dell'utente e Condivisione">
             <p>
               L'utente è l'unico responsabile dei contenuti (formulari,
-              capitoli, argomenti) che carica o crea sulla piattaforma. È
-              vietato inserire contenuti:
+              capitoli, argomenti) che carica, crea o condivide sulla
+              piattaforma. Quando pubblichi un formulario nella Community o lo
+              condividi tramite link, questo diventa accessibile ad altri
+              soggetti. È vietato inserire o condividere contenuti:
             </p>
             <ul className="list-disc list-inside flex flex-col gap-1 mt-2 text-muted-foreground">
-              <li>Illegali o che violino diritti di terzi</li>
+              <li>
+                Illegali, protetti da copyright senza autorizzazione o che
+                violino diritti di terzi
+              </li>
               <li>Offensivi, diffamatori o discriminatori</li>
               <li>Contenenti malware o codice dannoso</li>
+              <li>
+                Contenenti dati personali o sensibili di terze persone senza
+                consenso
+              </li>
             </ul>
             <p className="mt-3">
-              Ci riserviamo il diritto di rimuovere contenuti che violino questi
-              termini.
+              Ci riserviamo il diritto di rimuovere, oscurare o modificare
+              qualsiasi contenuto che violi questi termini.
             </p>
           </Section>
 
-          <Section title="5. Proprietà intellettuale">
+          <Section title="5. Proprietà intellettuale e Licenze">
             <p>
               I contenuti creati dall'utente rimangono di sua proprietà.
-              Utilizzando il servizio, l'utente concede alla piattaforma una
-              licenza limitata, non esclusiva e non trasferibile per archiviare
-              ed erogare tali contenuti esclusivamente ai fini del servizio.
+              Utilizzando il servizio e impostando i formulari come privati,
+              l'utente concede alla piattaforma una licenza limitata, non
+              esclusiva e non trasferibile per archiviare ed erogare tali
+              contenuti esclusivamente al fine di fornirgli il servizio.
+            </p>
+            <p className="mt-2">
+              Se l'utente imposta un formulario come "Pubblico" nella Community
+              o lo condivide tramite link, concede alla piattaforma e a tutti
+              gli utenti della stessa una licenza gratuita, mondiale, non
+              esclusiva e irrevocabile (fino a quando il formulario non viene
+              rimosso o reso privato) per visualizzare, consultare ed aggiungere
+              ai preferiti tale contenuto.
             </p>
           </Section>
 
-          <Section title="6. Limitazione di responsabilità">
+          <Section title="6. Utilizzo dei Servizi AI">
+            <p>
+              La piattaforma mette a disposizione funzionalità di intelligenza
+              artificiale basate su servizi di terze parti (Groq e Google
+              Gemini) per supportare la creazione di formule e testi.
+            </p>
+            <ul className="list-disc list-inside flex flex-col gap-1 mt-2 text-muted-foreground">
+              <li>
+                L'utente è consapevole che i contenuti generati dall'AI
+                potrebbero contenere errori, inesattezze o formule non corrette.
+              </li>
+              <li>
+                L'utente è l'unico responsabile della verifica e della
+                correttezza delle formule generate prima di farne uso accademico
+                o professionale.
+              </li>
+              <li>
+                È vietato l'uso delle funzionalità AI per generare contenuti
+                abusivi, illegali o spam.
+              </li>
+            </ul>
+          </Section>
+
+          <Section title="7. Limitazione di responsabilità">
             <p>
               La piattaforma non è responsabile per perdita di dati,
-              interruzioni del servizio o danni derivanti dall'utilizzo o
-              dall'impossibilità di utilizzo del servizio. Il servizio è fornito
-              "così com'è" senza garanzie di alcun tipo.
+              interruzioni del servizio, malfunzionamenti o danni derivanti
+              dall'utilizzo o dall'impossibilità di utilizzare il servizio.
+              Inoltre, non garantiamo la correttezza scientifica o accademica
+              dei formulari presenti sulla piattaforma, siano essi creati dagli
+              utenti o generati/supportati dai sistemi di intelligenza
+              artificiale.
             </p>
           </Section>
 
-          <Section title="7. Cancellazione dell'account">
+          <Section title="8. Cancellazione dell'account">
             <p>
               L'utente può richiedere la cancellazione del proprio account in
-              qualsiasi momento. A seguito della cancellazione, tutti i dati
-              personali e i contenuti associati verranno eliminati entro 30
-              giorni, salvo obblighi di legge contrari.
+              qualsiasi momento tramite la sezione apposita nelle impostazioni.
+              A seguito della cancellazione, l'account dell'utente ed i relativi
+              formulari caricati o creati (compresi quelli condivisi o
+              pubblicati nella Community) verranno eliminati in modo definitivo
+              ed immediato dai database di produzione.
             </p>
-            <div>
+            <div className="mt-2">
               {session.uid && (
                 <DeleteAccount username={users[0]?.displayName} />
               )}
             </div>
           </Section>
 
-          <Section title="8. Modifiche ai termini">
+          <Section title="9. Modifiche ai termini">
             <p>
               Ci riserviamo il diritto di modificare i presenti termini in
               qualsiasi momento. Le modifiche saranno comunicate agli utenti e
@@ -130,7 +179,7 @@ export default async function TermsPage() {
             </p>
           </Section>
 
-          <Section title="9. Legge applicabile">
+          <Section title="10. Legge applicabile">
             <p>
               I presenti termini sono regolati dalla legge italiana. Per
               qualsiasi controversia è competente il foro del luogo di residenza
@@ -139,7 +188,7 @@ export default async function TermsPage() {
             </p>
           </Section>
 
-          <Section title="10. Contatti">
+          <Section title="11. Contatti">
             <p>
               Per qualsiasi domanda relativa ai presenti termini, puoi
               contattarci tramite mail.

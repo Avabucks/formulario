@@ -423,16 +423,25 @@ export function FormattingLatex({
                     Nessun risultato trovato per &ldquo;{query}&rdquo;
                   </p>
                   <p className="text-xs text-muted-foreground/80">
-                    Prova a cercare un altro termine o sfoglia l'elenco completo.
+                    Prova a cercare un altro termine o sfoglia l'elenco
+                    completo.
                   </p>
                 </div>
 
                 <div className="flex items-center gap-2 mt-2">
-                  <Button onClick={() => setShowAll(true)} variant="outline" className="gap-2">
+                  <Button
+                    onClick={() => setShowAll(true)}
+                    variant="outline"
+                    className="gap-2"
+                  >
                     <Eye className="h-4 w-4" />
                     Mostra tutte
                   </Button>
-                  <Button onClick={() => handleFormulaSelect("")} variant="outline" className="gap-2">
+                  <Button
+                    onClick={() => handleFormulaSelect("")}
+                    variant="outline"
+                    className="gap-2"
+                  >
                     {pendingKind === "single" ? (
                       <Radical size={14} />
                     ) : (
@@ -449,16 +458,25 @@ export function FormattingLatex({
                     Scegli una formula
                   </p>
                   <p className="text-xs text-muted-foreground/80">
-                    Cerca una formula o sfoglia l'elenco completo di questa categoria.
+                    Cerca una formula o sfoglia l'elenco completo di questa
+                    categoria.
                   </p>
                 </div>
 
                 <div className="flex items-center gap-2 mt-2">
-                  <Button onClick={() => setShowAll(true)} variant="default" className="gap-2">
+                  <Button
+                    onClick={() => setShowAll(true)}
+                    variant="default"
+                    className="gap-2"
+                  >
                     <Eye className="h-4 w-4" />
                     Visualizza tutte
                   </Button>
-                  <Button onClick={() => handleFormulaSelect("")} variant="outline" className="gap-2">
+                  <Button
+                    onClick={() => handleFormulaSelect("")}
+                    variant="outline"
+                    className="gap-2"
+                  >
                     {pendingKind === "single" ? (
                       <Radical size={14} />
                     ) : (
