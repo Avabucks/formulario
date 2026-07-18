@@ -52,12 +52,13 @@ export const metadata: Metadata = {
 export default async function Home({
   searchParams,
 }: Readonly<{
-  searchParams: Promise<{ tab?: string; view?: string; order?: string }>;
+  searchParams: Promise<{ tab?: string; view?: string; order?: string; q?: string }>;
 }>) {
-  const { tab, view, order } = await searchParams;
+  const { tab, view, order, q } = await searchParams;
   const activeTab = tab === "preferiti" ? "preferiti" : "formulari";
   const activeView = view === "list" ? "list" : "grid";
   const activeOrder = order || "modificato";
+  const searchQuery = q?.trim() ?? "";
 
   let orderByClause = "ORDER BY F.data_modifica DESC";
   if (activeOrder === "creato") {
@@ -84,6 +85,13 @@ export default async function Home({
     redirect("/api/auth/logout");
   }
 
+  const sqlParamsFormulari: (string | number)[] = [session.uid];
+  let searchFilterFormulari = "";
+  if (searchQuery) {
+    sqlParamsFormulari.push(`%${searchQuery}%`);
+    searchFilterFormulari = `AND (F.titolo ILIKE $2 OR F.descrizione ILIKE $2)`;
+  }
+
   const { rows: formulari } = await pool.query(
     `
         SELECT F.beautiful_id AS "id", titolo, owner_uid AS "ownerUid", COALESCE(U_A.display_name, 'Utente eliminato') AS "nomeAutore", U_A.foto_profilo AS "photoURL", F.data_creazione as "dataCreazione", descrizione, visibility, views,
@@ -91,11 +99,18 @@ export default async function Home({
             (SELECT COUNT(*) FROM preferiti P2 WHERE P2.formulario_id = F.beautiful_id) AS likes
         FROM formulari F
         LEFT JOIN users U_A ON F.author_uid = U_A.uid
-        WHERE owner_uid = $1
+        WHERE owner_uid = $1 ${searchFilterFormulari}
         ${orderByClause}
     `,
-    [session.uid],
+    sqlParamsFormulari,
   );
+
+  const sqlParamsPreferiti: (string | number)[] = [session.uid];
+  let searchFilterPreferiti = "";
+  if (searchQuery) {
+    sqlParamsPreferiti.push(`%${searchQuery}%`);
+    searchFilterPreferiti = `AND (F.titolo ILIKE $2 OR F.descrizione ILIKE $2)`;
+  }
 
   const { rows: preferiti } = await pool.query(
     `
@@ -105,10 +120,10 @@ export default async function Home({
         FROM formulari F
         JOIN users U_A ON F.author_uid = U_A.uid
         JOIN preferiti P ON P.formulario_id = F.beautiful_id
-        WHERE P.user_uid = $1 AND F.visibility > 0
+        WHERE P.user_uid = $1 AND F.visibility > 0 ${searchFilterPreferiti}
         ${orderByClause}
     `,
-    [session.uid],
+    sqlParamsPreferiti,
   );
 
   const totalFormulari = formulari.length;

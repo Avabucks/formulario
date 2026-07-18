@@ -18,7 +18,8 @@ export function CommunityFilters() {
   };
 
   return (
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex items-center justify-between w-full gap-3">
+      {/* Search Input expanding to fill space */}
       <div className="relative flex-1">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
@@ -28,15 +29,16 @@ export function CommunityFilters() {
             setSearchQuery(e.target.value);
             handleSearch(e.target.value);
           }}
-          className="pl-10"
+          className="pl-10 w-full h-9"
         />
       </div>
-      <div className="flex items-center gap-3">
-        <SortSelector
-          value={sortBy as SortOption}
-          onChange={handleSortChange}
-        />
-      </div>
+
+      {/* Sort Selector aligned next to search, auto-sized by text */}
+      <SortSelector
+        value={sortBy as SortOption}
+        onChange={handleSortChange}
+        className="h-9 px-3 w-auto shrink-0"
+      />
     </div>
   );
 }
