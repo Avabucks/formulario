@@ -12,7 +12,7 @@ import { cn } from "@/src/lib/utils";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { ArrowLeft, ArrowRight, FileVideo } from "lucide-react";
 import { useState } from "react";
-import ForumlarioAdd from "./formulario-add";
+import ForumlarioAdd from "../home/formulario-add";
 
 const STORAGE_KEY = "new-account-popup-closed";
 

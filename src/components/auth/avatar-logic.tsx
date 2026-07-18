@@ -30,8 +30,8 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { DiscordDialog } from "../home/discord-widget";
-import { NewAccountPopup } from "../home/new-account-popup";
+import { DiscordDialog } from "../shared/discord-widget";
+import { NewAccountPopup } from "../shared/new-account-popup";
 import { KbShortcuts } from "../navigation/kb-shortcuts";
 
 export function AvatarLogic() {

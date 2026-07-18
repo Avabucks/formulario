@@ -22,7 +22,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Separator } from "../ui/separator";
-import { StarFormulario } from "./star-formulario";
+import { StarFormulario } from "../shared/star-formulario";
 
 type Formulario = {
   id: string;

@@ -10,7 +10,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar";
 import { DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";
 import { Separator } from "../../ui/separator";
-import { StarFormulario } from "../star-formulario";
+import { StarFormulario } from "../../shared/star-formulario";
 import { Formulario } from "./types";
 
 export function SettingsHeader({

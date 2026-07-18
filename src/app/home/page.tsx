@@ -1,8 +1,8 @@
 import packageJson from "@/package.json";
 
 import ForumlarioAdd from "@/src/components/home/formulario-add";
-import { FormularioCard } from "@/src/components/home/formulario-card";
 import { FormularioCardHome } from "@/src/components/home/formulario-card-home";
+import { HomeTabs } from "@/src/components/home/home-tabs";
 import { Header } from "@/src/components/navigation/header";
 import { AnimatedGridPattern } from "@/src/components/ui/animated-grid-pattern";
 import {
@@ -10,7 +10,6 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/src/components/ui/avatar";
-import { Badge } from "@/src/components/ui/badge";
 import { Button } from "@/src/components/ui/button";
 import {
   Card,
@@ -28,24 +27,14 @@ import {
 } from "@/src/components/ui/empty";
 import { Separator } from "@/src/components/ui/separator";
 import { Skeleton } from "@/src/components/ui/skeleton";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/src/components/ui/tabs";
 import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
-import { cn, formatNumber } from "@/src/lib/utils";
+import { cn } from "@/src/lib/utils";
 import { getIronSession } from "iron-session";
 import {
   ArrowRight,
   BookOpen,
-  FileText,
-  Grid,
   Library,
-  List,
-  Star,
   StarOff,
   UsersRound,
 } from "lucide-react";
@@ -60,7 +49,27 @@ export const metadata: Metadata = {
   description: `Crea, organizza e condividi i tuoi formulari e cheat sheet con ${packageJson.displayName}. Usa l'editor avanzato e l'assistente AI per generare formule e appunti in pochi secondi.`,
 };
 
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: Readonly<{
+  searchParams: Promise<{ tab?: string; view?: string; order?: string }>;
+}>) {
+  const { tab, view, order } = await searchParams;
+  const activeTab = tab === "preferiti" ? "preferiti" : "formulari";
+  const activeView = view === "list" ? "list" : "grid";
+  const activeOrder = order || "modificato";
+
+  let orderByClause = "ORDER BY F.data_modifica DESC";
+  if (activeOrder === "creato") {
+    orderByClause = "ORDER BY F.data_creazione DESC";
+  } else if (activeOrder === "titolo") {
+    orderByClause = "ORDER BY F.titolo ASC";
+  } else if (activeOrder === "views") {
+    orderByClause = "ORDER BY F.views DESC";
+  } else if (activeOrder === "popolari") {
+    orderByClause = "ORDER BY (SELECT COUNT(*) FROM preferiti P2 WHERE P2.formulario_id = F.beautiful_id) DESC";
+  }
+
   const session = await getIronSession<SessionData>(
     await cookies(),
     sessionOptions,
@@ -83,7 +92,7 @@ export default async function Home() {
         FROM formulari F
         LEFT JOIN users U_A ON F.author_uid = U_A.uid
         WHERE owner_uid = $1
-        ORDER BY data_modifica DESC
+        ${orderByClause}
     `,
     [session.uid],
   );
@@ -97,7 +106,7 @@ export default async function Home() {
         JOIN users U_A ON F.author_uid = U_A.uid
         JOIN preferiti P ON P.formulario_id = F.beautiful_id
         WHERE P.user_uid = $1 AND F.visibility > 0
-        ORDER BY titolo
+        ${orderByClause}
     `,
     [session.uid],
   );
@@ -151,6 +160,54 @@ export default async function Home() {
       ))}
     </div>
   );
+
+  const renderFormulariContent = () => {
+    if (formulari.length === 0) {
+      return renderEmptyFormulari();
+    }
+
+    if (activeView === "grid") {
+      return (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[101rem]:grid-cols-5 gap-4 w-full">
+          {formulari.map((f) => (
+            <FormularioCardHome variant="grid" formulario={f} key={f.id} />
+          ))}
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex flex-col gap-3 w-full">
+        {formulari.map((f) => (
+          <FormularioCardHome variant="list" formulario={f} key={f.id} />
+        ))}
+      </div>
+    );
+  };
+
+  const renderPreferitiContent = () => {
+    if (preferiti.length === 0) {
+      return renderEmptyPreferiti();
+    }
+
+    if (activeView === "grid") {
+      return (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[101rem]:grid-cols-5 gap-4 w-full">
+          {preferiti.map((f) => (
+            <FormularioCardHome variant="grid" formulario={f} key={f.id} />
+          ))}
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex flex-col gap-3 w-full">
+        {preferiti.map((f) => (
+          <FormularioCardHome variant="list" formulario={f} key={f.id} />
+        ))}
+      </div>
+    );
+  };
 
   return (
     <>
@@ -219,84 +276,21 @@ export default async function Home() {
           </Card>
         </section>
         <Separator />
-        <Tabs defaultValue="formulari" className="w-full gap-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-                La tua raccolta
-              </h2>
+        <div className="w-full flex flex-col gap-4">
+          <HomeTabs
+            activeTab={activeTab}
+            activeView={activeView}
+            activeOrder={activeOrder}
+            totalFormulari={totalFormulari}
+            totalPreferiti={totalPreferiti}
+          />
+
+          <Suspense fallback={renderLoadingSkeleton()}>
+            <div className="flex flex-col gap-4 w-full mt-2">
+              {activeTab === "formulari" ? renderFormulariContent() : renderPreferitiContent()}
             </div>
-            <TabsList variant="line" className="w-full sm:w-fit">
-              <TabsTrigger value="formulari" className="gap-2 px-3">
-                <FileText className="h-4 w-4" />
-                Formulari
-                <Badge variant="secondary" className="ml-1 h-5 px-1.5">
-                  {formatNumber(totalFormulari)}
-                </Badge>
-              </TabsTrigger>
-              <TabsTrigger value="preferiti" className="gap-2 px-3">
-                <Star className="h-4 w-4" />
-                Preferiti
-                <Badge variant="secondary" className="ml-1 h-5 px-1.5">
-                  {formatNumber(totalPreferiti)}
-                </Badge>
-              </TabsTrigger>
-            </TabsList>
-          </div>
-
-          <TabsContent value="formulari" className="mt-0">
-            <Suspense fallback={renderLoadingSkeleton()}>
-              <div className="flex flex-col gap-4 w-full">
-                {formulari.length === 0 ? (
-                  renderEmptyFormulari()
-                ) : (
-                  <Tabs defaultValue="grid">
-                    <div className="hidden md:flex">
-                      <TabsList variant="line" className="w-full sm:w-fit">
-                        <TabsTrigger value="grid" className="gap-2 px-3">
-                          <Grid className="h-4 w-4" />
-                        </TabsTrigger>
-                        <TabsTrigger value="list" className="gap-2 px-3">
-                          <List className="h-4 w-4" />
-                        </TabsTrigger>
-                      </TabsList>
-                    </div>
-                    <TabsContent value="grid" className="mt-0">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[101rem]:grid-cols-5 gap-4 w-full">
-                        {formulari.map((f) => (
-                          <FormularioCardHome variant="grid" formulario={f} key={f.id} />
-                        ))}
-                      </div>
-                    </TabsContent>
-                    <TabsContent value="list" className="mt-0">
-                      <div className="flex flex-col gap-3 w-full">
-                        {formulari.map((f) => (
-                          <FormularioCardHome variant="list" formulario={f} key={f.id} />
-                        ))}
-                      </div>
-                    </TabsContent>
-                  </Tabs>
-                )}
-              </div>
-            </Suspense>
-          </TabsContent>
-
-          <TabsContent value="preferiti" className="mt-0">
-            <Suspense fallback={renderLoadingSkeleton()}>
-              <div className="flex flex-col gap-4 w-full">
-                {preferiti.length === 0 ? (
-                  renderEmptyPreferiti()
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[101rem]:grid-cols-5 gap-4 w-full">
-                    {preferiti.map((f) => (
-                      <FormularioCard formulario={f} key={f.id} />
-                    ))}
-                  </div>
-                )}
-              </div>
-            </Suspense>
-          </TabsContent>
-        </Tabs>
+          </Suspense>
+        </div>
       </div>
     </>
   );

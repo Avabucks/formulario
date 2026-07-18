@@ -1,17 +1,10 @@
 "use client";
-import { Clock, Search, Star, TrendingUp } from "lucide-react";
+
+import { Search } from "lucide-react";
 import { useDebouncedCallback } from "use-debounce";
-import { Button } from "../ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
 import { Input } from "../ui/input";
 import { useFilters } from "@/src/hooks/useFilters";
-
-type SortOption = "trending" | "recent" | "popular";
+import { SortSelector, SortOption } from "../shared/sort-selector";
 
 export function CommunityFilters() {
   const { sortBy, searchQuery, setSearchQuery, updateParams } = useFilters();
@@ -20,16 +13,8 @@ export function CommunityFilters() {
     updateParams({ q: value });
   }, 400);
 
-  const sortLabels: Record<
-    SortOption,
-    { label: string; icon: React.ReactNode }
-  > = {
-    trending: {
-      label: "In tendenza",
-      icon: <TrendingUp className="h-4 w-4" />,
-    },
-    recent: { label: "Recenti", icon: <Clock className="h-4 w-4" /> },
-    popular: { label: "Popolari", icon: <Star className="h-4 w-4" /> },
+  const handleSortChange = (value: SortOption) => {
+    updateParams({ sort: value });
   };
 
   return (
@@ -47,30 +32,10 @@ export function CommunityFilters() {
         />
       </div>
       <div className="flex items-center gap-3">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="gap-2">
-              {sortLabels[sortBy].icon}
-              {sortLabels[sortBy].label}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onClick={() => updateParams({ sort: "trending" })}
-            >
-              <TrendingUp className="mr-2 h-4 w-4" />
-              In tendenza
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => updateParams({ sort: "recent" })}>
-              <Clock className="mr-2 h-4 w-4" />
-              Recenti
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => updateParams({ sort: "popular" })}>
-              <Star className="mr-2 h-4 w-4" />
-              Popolari
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <SortSelector
+          value={sortBy as SortOption}
+          onChange={handleSortChange}
+        />
       </div>
     </div>
   );

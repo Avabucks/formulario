@@ -6,7 +6,7 @@ import NextTopLoader from "nextjs-toploader";
 import { ThemeProvider } from "../components/theme/theme-provider";
 import "../styles/editor.css";
 import "../styles/globals.css";
-import DiscordWidget from "../components/home/discord-widget";
+import DiscordWidget from "../components/shared/discord-widget";
 import { CookieConsent } from "../components/legal/cookie-consent";
 
 const geistSans = Geist({

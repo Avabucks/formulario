@@ -2,14 +2,14 @@
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useCallback, useState } from "react";
 
-type SortOption = "trending" | "recent" | "popular";
+type SortOption = "modificato" | "creato" | "titolo" | "views" | "popolari";
 
 export function useFilters() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const sortBy = (searchParams.get("sort") as SortOption) ?? "trending";
+  const sortBy = (searchParams.get("sort") as SortOption) ?? "modificato";
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") ?? "");
   const page = Number(searchParams.get("page") ?? 1);
 

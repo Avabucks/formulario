@@ -19,9 +19,11 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 
 const SORT_MAP = {
-  trending: "views DESC",
-  recent: "F.id DESC",
-  popular: "likes DESC",
+  modificato: "F.data_modifica DESC",
+  creato: "F.data_creazione DESC",
+  titolo: "F.titolo ASC",
+  views: "F.views DESC",
+  popolari: "likes DESC",
 };
 
 export const metadata: Metadata = {
@@ -47,10 +49,10 @@ export default async function Capitolo({
   );
 
   const currentPage = Math.max(1, Number.parseInt(pageParams.page ?? "1"));
-  const sort = (queryParams.sort ?? "trending") as keyof typeof SORT_MAP;
+  const sort = (queryParams.sort ?? "modificato") as keyof typeof SORT_MAP;
   const q = queryParams.q?.trim() ?? "";
 
-  const orderBy = SORT_MAP[sort] ?? SORT_MAP.trending;
+  const orderBy = SORT_MAP[sort] ?? SORT_MAP.modificato;
 
   const LIMIT = 60;
   const OFFSET = (currentPage - 1) * LIMIT;
