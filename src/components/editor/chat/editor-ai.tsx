@@ -532,7 +532,7 @@ export function EditorAI({
           </button>
         </div>
 
-        <div className="flex flex-col border border-input rounded-xl bg-background focus-within:ring-1 focus-within:ring-ring focus-within:border-ring transition-all p-1.5 shadow-xs relative">
+        <div className="flex flex-col border border-input rounded-xl bg-background focus-within:ring-1 focus-within:ring-ring focus-within:border-ring transition-all p-1.5 relative">
           <Textarea
             placeholder="Scrivi le modifiche che desideri apportare..."
             value={prompt}

@@ -72,7 +72,7 @@ export function OutlineNavigator({
     <>
       {/* Popover */}
       <nav
-        className={`absolute right-11 top-1/2 -translate-y-1/2 z-10 max-h-[70vh] w-52 overflow-hidden rounded-xl border border-border/40 bg-background shadow-lg transition duration-300 ${
+        className={`absolute right-11 top-1/2 -translate-y-1/2 z-10 max-h-[70vh] w-52 overflow-hidden rounded-xl border border-border/40 bg-background transition duration-300 ${
           navigatorVisible
             ? "pointer-events-auto opacity-100 translate-x-0"
             : "pointer-events-none opacity-0 translate-x-1.5"
@@ -100,7 +100,7 @@ export function OutlineNavigator({
               onClick={() => onHeadingClick(heading)}
               className={`relative flex min-h-7 w-full items-center rounded-md py-1 pr-2 text-left text-[11px] ${
                 activeHeadingId === heading.id
-                  ? "text-primary bg-primary/10 shadow-xs"
+                  ? "text-primary bg-primary/10"
                   : "text-muted-foreground hover:bg-muted/40 hover:text-foreground"
               }`}
               style={{ paddingLeft: 14 + (heading.level - 1) * 8 }}
@@ -138,7 +138,7 @@ export function OutlineNavigator({
             onClick={() => onHeadingClick(heading)}
             className={`z-10 h-0.5 rounded-full focus:outline-none ${
               activeHeadingId === heading.id
-                ? "bg-primary opacity-100 scale-y-150 shadow-[0_0_6px_hsl(var(--primary)/0.4)]"
+                ? "bg-primary opacity-100 scale-y-150"
                 : "bg-muted-foreground/30 group-hover/outline:bg-muted-foreground/50 hover:bg-primary/80! opacity-60 hover:opacity-100 hover:scale-y-150"
             }`}
             style={{

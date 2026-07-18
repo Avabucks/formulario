@@ -112,7 +112,7 @@ export default async function Home({
       <Header />
       <div className="mx-auto flex w-full flex-col gap-4 px-3 pb-8 mt-16 md:px-6">
         <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
-          <div className="relative overflow-hidden rounded-xl border bg-card p-6 shadow-sm md:p-8">
+          <div className="relative overflow-hidden rounded-xl border bg-card p-6 md:p-8">
             <AnimatedGridPattern
               numSquares={20}
               maxOpacity={0.3}
@@ -148,7 +148,7 @@ export default async function Home({
             </div>
           </div>
 
-          <Card className="shadow-sm">
+          <Card className="hidden md:flex">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Library className="h-5 w-5" />
