@@ -18,15 +18,19 @@ import { signOut } from "firebase/auth";
 import {
   BadgeInfo,
   Book,
-  Coffee,
+  Brush,
+  Cookie,
+  Handshake,
   Keyboard,
   LogOutIcon,
-  Users,
+  Shield,
+  User,
+  Users
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { DiscordDialog, DiscordIcon } from "../home/discord-widget";
+import { DiscordDialog } from "../home/discord-widget";
 import { NewAccountPopup } from "../home/new-account-popup";
 import { KbShortcuts } from "../navigation/kb-shortcuts";
 
@@ -68,37 +72,53 @@ export function AvatarLogic() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
+          <div className="flex items-center gap-2 p-1">
+            <Avatar size="default" className="mt-0.5">
+              {photoURL && <AvatarImage src={photoURL} alt="foto profilo" />}
+              <AvatarFallback>
+                {name?.substring(0, 1).toUpperCase() || "U"}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex items-center justify-between gap-2 w-full">
+              <span className="font-medium text-sm leading-none">{name}</span>
+              <Button size="icon" variant="outline" onClick={handleLogout}>
+                <LogOutIcon />
+              </Button>
+            </div>
+          </div>
+          <DropdownMenuSeparator />
           <Link href="/settings">
-            <DropdownMenuItem className="cursor-pointer">
-              <Avatar size="sm" className="mt-0.5">
-                {photoURL && <AvatarImage src={photoURL} alt="foto profilo" />}
-                <AvatarFallback>
-                  {name?.substring(0, 1).toUpperCase() || "U"}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex flex-col">
-                <span className="font-medium text-sm leading-none">{name}</span>
-                <span className="text-[11px] text-muted-foreground mt-0.5">
-                  Impostazioni profilo
-                </span>
-              </div>
+            <DropdownMenuItem>
+              <User />
+              Profilo
             </DropdownMenuItem>
           </Link>
-          <DropdownMenuSeparator />
+          <Link href="/settings/account">
+            <DropdownMenuItem>
+              <Shield />
+              Account
+            </DropdownMenuItem>
+          </Link>
           <Link href="/home">
             <DropdownMenuItem>
               <Book />
               Visualizza i tuoi formulari
             </DropdownMenuItem>
           </Link>
+          <Link href="/settings/preferences">
+            <DropdownMenuItem>
+              <Brush />
+              Preferenze
+            </DropdownMenuItem>
+          </Link>
+
+          <DropdownMenuSeparator />
           <Link href="/community/page/1">
             <DropdownMenuItem>
               <Users />
               Community
             </DropdownMenuItem>
           </Link>
-
-          <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={() => setOpenOBPopup(true)}>
             <BadgeInfo />
             Scopri come funziona
@@ -107,26 +127,20 @@ export function AvatarLogic() {
             <Keyboard />
             Scorciatoie da tastiera
           </DropdownMenuItem>
+
           <DropdownMenuSeparator />
-          <DropdownMenuItem onSelect={() => setOpenDiscord(true)}>
-            <DiscordIcon className="size-4" />
-            Entra su Discord
-          </DropdownMenuItem>
-          <Link
-            href="https://ko-fi.com/formulabase"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <Link href="/terms">
             <DropdownMenuItem>
-              <Coffee />
-              Supporta il progetto
+              <Handshake />
+              Termini e condizioni
             </DropdownMenuItem>
           </Link>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem variant="destructive" onClick={handleLogout}>
-            <LogOutIcon />
-            Sign Out
-          </DropdownMenuItem>
+          <Link href="/privacy">
+            <DropdownMenuItem>
+              <Cookie />
+              Privacy Policy
+            </DropdownMenuItem>
+          </Link>
         </DropdownMenuContent>
       </DropdownMenu>
       <NewAccountPopup setOpen={setOpenOBPopup} open={openOBPopup} />

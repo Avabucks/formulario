@@ -21,14 +21,14 @@ import { SessionData, sessionOptions } from "@/src/lib/session";
 import { getIronSession } from "iron-session";
 import {
   BookOpen,
+  Brush,
   ChevronRight,
   Cookie,
   Handshake,
   Mail,
-  Palette,
   Shield,
   Trash2,
-  User,
+  User
 } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -41,7 +41,7 @@ const settingsNav = [
     id: "preferences",
     href: "/settings/preferences",
     label: "Preferenze",
-    icon: Palette,
+    icon: Brush,
   },
   {
     id: "legal",

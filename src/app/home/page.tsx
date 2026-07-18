@@ -3,6 +3,7 @@ import packageJson from "@/package.json";
 import ForumlarioAdd from "@/src/components/home/formulario-add";
 import { FormularioCard } from "@/src/components/home/formulario-card";
 import { Header } from "@/src/components/navigation/header";
+import { AnimatedGridPattern } from "@/src/components/ui/animated-grid-pattern";
 import {
   Avatar,
   AvatarFallback,
@@ -34,7 +35,7 @@ import {
 } from "@/src/components/ui/tabs";
 import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
-import { formatNumber } from "@/src/lib/utils";
+import { cn, formatNumber } from "@/src/lib/utils";
 import { getIronSession } from "iron-session";
 import {
   ArrowRight,
@@ -157,27 +158,15 @@ export default async function Home() {
       <div className="mx-auto flex w-full flex-col gap-4 px-3 pb-8 mt-16 md:px-6">
         <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
           <div className="relative overflow-hidden rounded-xl border bg-card p-6 shadow-sm md:p-8">
-            <svg
-              className="absolute inset-0 h-full w-full opacity-[0.08]"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <defs>
-                <pattern
-                  id="home-grid"
-                  width="36"
-                  height="36"
-                  patternUnits="userSpaceOnUse"
-                >
-                  <path
-                    d="M36 0H0v36"
-                    stroke="currentColor"
-                    strokeWidth="0.5"
-                    fill="none"
-                  />
-                </pattern>
-              </defs>
-              <rect width="100%" height="100%" fill="url(#home-grid)" />
-            </svg>
+            <AnimatedGridPattern
+              numSquares={20}
+              maxOpacity={0.3}
+              duration={3}
+              repeatDelay={1}
+              className={cn(
+                "inset-y-0 h-full w-full opacity-20",
+              )}
+            />
             <div className="relative flex max-w-3xl flex-col gap-5">
               <div className="space-y-2">
                 <div className="flex items-center gap-3">

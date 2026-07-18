@@ -7,6 +7,7 @@ import {
   CardTitle,
 } from "@/src/components/ui/card";
 import { SessionData, sessionOptions } from "@/src/lib/session";
+import { formatNumber } from "@/src/lib/utils";
 import { getIronSession } from "iron-session";
 import {
   BookOpen,
@@ -15,15 +16,13 @@ import {
   GlobeIcon,
   LinkIcon,
   LockIcon,
-  Star,
-  UserRound,
+  Star
 } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Separator } from "../ui/separator";
 import { StarFormulario } from "./star-formulario";
-import { formatNumber } from "@/src/lib/utils";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 type Formulario = {
   id: string;

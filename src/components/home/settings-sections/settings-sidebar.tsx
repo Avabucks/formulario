@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/src/lib/utils";
-import { Download, Info, ListTree, Pencil, QrCode } from "lucide-react";
+import { Download, Info, Pencil, QrCode } from "lucide-react";
 import { SettingsSection } from "./types";
 
 export function SettingsSidebar({
