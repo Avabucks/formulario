@@ -217,7 +217,7 @@ export function HomeTabs({
         </div>
 
         {/* Search Input ONLY on Desktop (occupying remaining space between title and order button) */}
-        <div className="hidden lg:block flex-1 mx-4 relative">
+        <div className="hidden lg:block flex-1 relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Cerca nella tua raccolta..."
