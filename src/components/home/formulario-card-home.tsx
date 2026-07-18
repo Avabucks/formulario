@@ -1,7 +1,7 @@
+"use client";
+
 import { Card } from "@/src/components/ui/card";
-import { SessionData, sessionOptions } from "@/src/lib/session";
 import { cn, formatNumber } from "@/src/lib/utils";
-import { getIronSession } from "iron-session";
 import {
   BookOpen,
   Calendar,
@@ -11,7 +11,6 @@ import {
   LockIcon,
   Star
 } from "lucide-react";
-import { cookies } from "next/headers";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Separator } from "../ui/separator";
@@ -23,6 +22,7 @@ type Formulario = {
   nomeAutore?: string;
   photoURL?: string;
   dataCreazione?: string;
+  dataModifica?: string;
   descrizione?: string;
   visibility: 0 | 1 | 2;
   views: number;
@@ -30,15 +30,11 @@ type Formulario = {
   starred: boolean;
 };
 
-export async function FormularioCardHome({
+export function FormularioCardHome({
   formulario,
   variant = "grid",
-}: Readonly<{ formulario: Formulario; variant?: "grid" | "list" }>) {
-  const session = await getIronSession<SessionData>(
-    await cookies(),
-    sessionOptions,
-  );
-
+  userId,
+}: Readonly<{ formulario: Formulario; variant?: "grid" | "list"; userId?: string }>) {
   return (
     <Card className="relative w-full overflow-hidden hover:bg-accent/50 transition-colors duration-200 cursor-pointer py-3 gap-0">
       <Link href={`/formulario/${formulario.id}`} className="absolute inset-0 z-0" />
@@ -110,7 +106,7 @@ export async function FormularioCardHome({
           "pointer-events-auto shrink-0 relative z-20",
           variant === "grid" && "-mt-1"
         )}>
-          {session.uid && (
+          {userId && (
             <StarFormulario
               formularioId={formulario.id}
               isStarred={formulario.starred}

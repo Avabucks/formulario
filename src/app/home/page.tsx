@@ -1,7 +1,6 @@
 import packageJson from "@/package.json";
 
 import ForumlarioAdd from "@/src/components/home/formulario-add";
-import { FormularioCardHome } from "@/src/components/home/formulario-card-home";
 import { HomeTabs } from "@/src/components/home/home-tabs";
 import { Header } from "@/src/components/navigation/header";
 import { AnimatedGridPattern } from "@/src/components/ui/animated-grid-pattern";
@@ -17,32 +16,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/src/components/ui/card";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/src/components/ui/empty";
 import { Separator } from "@/src/components/ui/separator";
-import { Skeleton } from "@/src/components/ui/skeleton";
 import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { cn } from "@/src/lib/utils";
 import { getIronSession } from "iron-session";
 import {
   ArrowRight,
-  BookOpen,
   Library,
-  StarOff,
-  UsersRound,
 } from "lucide-react";
 import { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Suspense } from "react";
+import { SortOption } from "@/src/components/shared/sort-selector";
 
 export const metadata: Metadata = {
   title: `Home - ${packageJson.displayName}`,
@@ -52,24 +39,15 @@ export const metadata: Metadata = {
 export default async function Home({
   searchParams,
 }: Readonly<{
-  searchParams: Promise<{ tab?: string; view?: string; order?: string; q?: string }>;
+  searchParams: Promise<{ tab?: string; q?: string }>;
 }>) {
-  const { tab, view, order, q } = await searchParams;
+  const { tab, q } = await searchParams;
   const activeTab = tab === "preferiti" ? "preferiti" : "formulari";
-  const activeView = view === "list" ? "list" : "grid";
-  const activeOrder = order || "modificato";
   const searchQuery = q?.trim() ?? "";
 
-  let orderByClause = "ORDER BY F.data_modifica DESC";
-  if (activeOrder === "creato") {
-    orderByClause = "ORDER BY F.data_creazione DESC";
-  } else if (activeOrder === "titolo") {
-    orderByClause = "ORDER BY F.titolo ASC";
-  } else if (activeOrder === "views") {
-    orderByClause = "ORDER BY F.views DESC";
-  } else if (activeOrder === "popolari") {
-    orderByClause = "ORDER BY (SELECT COUNT(*) FROM preferiti P2 WHERE P2.formulario_id = F.beautiful_id) DESC";
-  }
+  const cookieStore = await cookies();
+  const initialView = cookieStore.get("home-view")?.value || "grid";
+  const initialOrder = (cookieStore.get("home-order")?.value || "modificato") as SortOption;
 
   const session = await getIronSession<SessionData>(
     await cookies(),
@@ -94,13 +72,13 @@ export default async function Home({
 
   const { rows: formulari } = await pool.query(
     `
-        SELECT F.beautiful_id AS "id", titolo, owner_uid AS "ownerUid", COALESCE(U_A.display_name, 'Utente eliminato') AS "nomeAutore", U_A.foto_profilo AS "photoURL", F.data_creazione as "dataCreazione", descrizione, visibility, views,
+        SELECT F.beautiful_id AS "id", titolo, owner_uid AS "ownerUid", COALESCE(U_A.display_name, 'Utente eliminato') AS "nomeAutore", U_A.foto_profilo AS "photoURL", F.data_creazione as "dataCreazione", F.data_modifica as "dataModifica", descrizione, visibility, views,
             EXISTS (SELECT 1 FROM preferiti P WHERE P.formulario_id = F.beautiful_id AND P.user_uid = $1) AS starred,
             (SELECT COUNT(*) FROM preferiti P2 WHERE P2.formulario_id = F.beautiful_id) AS likes
         FROM formulari F
         LEFT JOIN users U_A ON F.author_uid = U_A.uid
         WHERE owner_uid = $1 ${searchFilterFormulari}
-        ${orderByClause}
+        ORDER BY F.data_modifica DESC
     `,
     sqlParamsFormulari,
   );
@@ -114,115 +92,20 @@ export default async function Home({
 
   const { rows: preferiti } = await pool.query(
     `
-        SELECT F.beautiful_id AS "id", titolo, owner_uid AS "ownerUid", U_A.display_name AS "nomeAutore", U_A.foto_profilo AS "photoURL", F.data_creazione as "dataCreazione", descrizione, visibility, views,
+        SELECT F.beautiful_id AS "id", titolo, owner_uid AS "ownerUid", U_A.display_name AS "nomeAutore", U_A.foto_profilo AS "photoURL", F.data_creazione as "dataCreazione", F.data_modifica as "dataModifica", descrizione, visibility, views,
             TRUE AS starred,
             (SELECT COUNT(*) FROM preferiti P2 WHERE P2.formulario_id = F.beautiful_id) AS likes
         FROM formulari F
         JOIN users U_A ON F.author_uid = U_A.uid
         JOIN preferiti P ON P.formulario_id = F.beautiful_id
         WHERE P.user_uid = $1 AND F.visibility > 0 ${searchFilterPreferiti}
-        ${orderByClause}
+        ORDER BY titolo
     `,
     sqlParamsPreferiti,
   );
 
-  const totalFormulari = formulari.length;
-  const totalPreferiti = preferiti.length;
   const displayName = users[0].displayName;
   const photoURL = users[0].photoURL;
-
-  const renderEmptyFormulari = () => (
-    <Empty className="border border-dashed">
-      <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <BookOpen />
-        </EmptyMedia>
-        <EmptyTitle>Nessun formulario</EmptyTitle>
-        <EmptyDescription>Non ci sono formulari da mostrare.</EmptyDescription>
-      </EmptyHeader>
-      <EmptyContent className="flex-row justify-center gap-2">
-        <ForumlarioAdd allowKey={false} showLabel={true} />
-      </EmptyContent>
-    </Empty>
-  );
-
-  const renderEmptyPreferiti = () => (
-    <Empty className="border border-dashed">
-      <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <StarOff />
-        </EmptyMedia>
-        <EmptyTitle>Nessun formulario preferito</EmptyTitle>
-        <EmptyDescription>
-          Non hai ancora aggiunto formulari ai preferiti.
-        </EmptyDescription>
-      </EmptyHeader>
-      <EmptyContent className="flex-row justify-center gap-2">
-        <Button asChild variant="outline" size="lg" className="gap-2 px-8">
-          <Link href="/community/page/1">
-            <UsersRound className="h-5 w-5" />
-            Esplora la Community
-          </Link>
-        </Button>
-      </EmptyContent>
-    </Empty>
-  );
-
-  const renderLoadingSkeleton = () => (
-    <div className="flex flex-col gap-3 w-full">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <Skeleton key={i} className="h-14 w-full rounded-xl" />
-      ))}
-    </div>
-  );
-
-  const renderFormulariContent = () => {
-    if (formulari.length === 0) {
-      return renderEmptyFormulari();
-    }
-
-    if (activeView === "grid") {
-      return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[101rem]:grid-cols-5 gap-4 w-full">
-          {formulari.map((f) => (
-            <FormularioCardHome variant="grid" formulario={f} key={f.id} />
-          ))}
-        </div>
-      );
-    }
-
-    return (
-      <div className="flex flex-col gap-3 w-full">
-        {formulari.map((f) => (
-          <FormularioCardHome variant="list" formulario={f} key={f.id} />
-        ))}
-      </div>
-    );
-  };
-
-  const renderPreferitiContent = () => {
-    if (preferiti.length === 0) {
-      return renderEmptyPreferiti();
-    }
-
-    if (activeView === "grid") {
-      return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[101rem]:grid-cols-5 gap-4 w-full">
-          {preferiti.map((f) => (
-            <FormularioCardHome variant="grid" formulario={f} key={f.id} />
-          ))}
-        </div>
-      );
-    }
-
-    return (
-      <div className="flex flex-col gap-3 w-full">
-        {preferiti.map((f) => (
-          <FormularioCardHome variant="list" formulario={f} key={f.id} />
-        ))}
-      </div>
-    );
-  };
 
   return (
     <>
@@ -294,17 +177,12 @@ export default async function Home({
         <div className="w-full flex flex-col gap-4">
           <HomeTabs
             activeTab={activeTab}
-            activeView={activeView}
-            activeOrder={activeOrder}
-            totalFormulari={totalFormulari}
-            totalPreferiti={totalPreferiti}
+            initialView={initialView}
+            initialOrder={initialOrder}
+            formulari={formulari}
+            preferiti={preferiti}
+            userId={session.uid}
           />
-
-          <Suspense fallback={renderLoadingSkeleton()}>
-            <div className="flex flex-col gap-4 w-full mt-2">
-              {activeTab === "formulari" ? renderFormulariContent() : renderPreferitiContent()}
-            </div>
-          </Suspense>
         </div>
       </div>
     </>
