@@ -21,6 +21,7 @@ import { FormularioCardHome } from "./formulario-card-home";
 import { formatNumber } from "@/src/lib/utils";
 import { SortSelector, SortOption } from "../shared/sort-selector";
 import { useDebouncedCallback } from "use-debounce";
+import { FormularioCard } from "./formulario-card";
 
 interface Formulario {
   id: string;
@@ -189,23 +190,13 @@ export function HomeTabs({
 
     const sortedPreferiti = sortItems(preferiti);
 
-    if (activeView === "grid") {
       return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[101rem]:grid-cols-5 gap-4 w-full">
           {sortedPreferiti.map((f) => (
-            <FormularioCardHome variant="grid" formulario={f} key={f.id} userId={userId} />
+            <FormularioCard formulario={f} key={f.id} userId={userId} />
           ))}
         </div>
       );
-    }
-
-    return (
-      <div className="flex flex-col gap-3 w-full">
-        {sortedPreferiti.map((f) => (
-          <FormularioCardHome variant="list" formulario={f} key={f.id} userId={userId} />
-        ))}
-      </div>
-    );
   };
 
   return (

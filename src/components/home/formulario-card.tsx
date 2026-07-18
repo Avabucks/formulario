@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/src/components/ui/button";
 import {
   Card,
@@ -6,9 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/src/components/ui/card";
-import { SessionData, sessionOptions } from "@/src/lib/session";
 import { formatNumber } from "@/src/lib/utils";
-import { getIronSession } from "iron-session";
 import {
   BookOpen,
   Calendar,
@@ -18,11 +18,10 @@ import {
   LockIcon,
   Star
 } from "lucide-react";
-import { cookies } from "next/headers";
 import Link from "next/link";
+import { StarFormulario } from "../shared/star-formulario";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Separator } from "../ui/separator";
-import { StarFormulario } from "../shared/star-formulario";
 
 type Formulario = {
   id: string;
@@ -37,13 +36,10 @@ type Formulario = {
   starred: boolean;
 };
 
-export async function FormularioCard({
+export function FormularioCard({
   formulario,
-}: Readonly<{ formulario: Formulario }>) {
-  const session = await getIronSession<SessionData>(
-    await cookies(),
-    sessionOptions,
-  );
+  userId,
+}: Readonly<{ formulario: Formulario, userId: string }>) {
 
   return (
     <Card className="w-full">
@@ -55,7 +51,7 @@ export async function FormularioCard({
               <VisibilityIcon visibility={formulario.visibility} />
             </div>
           </div>
-          {session.uid && (
+          {userId && (
             <StarFormulario
               formularioId={formulario.id}
               isStarred={formulario.starred}
