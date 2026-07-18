@@ -17,7 +17,9 @@ export function StarFormulario({
     setStarred(isStarred);
   }, [isStarred]);
 
-  async function handleStar() {
+  async function handleStar(e: React.MouseEvent) {
+    e.stopPropagation();
+    e.preventDefault();
     const formData = new FormData();
     formData.append("formularioId", formularioId);
 

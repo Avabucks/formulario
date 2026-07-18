@@ -2,6 +2,7 @@ import packageJson from "@/package.json";
 
 import ForumlarioAdd from "@/src/components/home/formulario-add";
 import { FormularioCard } from "@/src/components/home/formulario-card";
+import { FormularioCardHome } from "@/src/components/home/formulario-card-home";
 import { Header } from "@/src/components/navigation/header";
 import { AnimatedGridPattern } from "@/src/components/ui/animated-grid-pattern";
 import {
@@ -41,7 +42,9 @@ import {
   ArrowRight,
   BookOpen,
   FileText,
+  Grid,
   Library,
+  List,
   Star,
   StarOff,
   UsersRound,
@@ -142,13 +145,10 @@ export default async function Home() {
   );
 
   const renderLoadingSkeleton = () => (
-    <div className="flex flex-col gap-4 w-full">
-      <Skeleton className="h-10 w-full" />
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 w-full">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <Skeleton key={i} className="h-50 w-full" />
-        ))}
-      </div>
+    <div className="flex flex-col gap-3 w-full">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <Skeleton key={i} className="h-14 w-full rounded-xl" />
+      ))}
     </div>
   );
 
@@ -250,11 +250,32 @@ export default async function Home() {
                 {formulari.length === 0 ? (
                   renderEmptyFormulari()
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[101rem]:grid-cols-5 gap-4 w-full">
-                    {formulari.map((f) => (
-                      <FormularioCard formulario={f} key={f.id} />
-                    ))}
-                  </div>
+                  <Tabs defaultValue="grid">
+                    <div className="hidden md:flex">
+                      <TabsList variant="line" className="w-full sm:w-fit">
+                        <TabsTrigger value="grid" className="gap-2 px-3">
+                          <Grid className="h-4 w-4" />
+                        </TabsTrigger>
+                        <TabsTrigger value="list" className="gap-2 px-3">
+                          <List className="h-4 w-4" />
+                        </TabsTrigger>
+                      </TabsList>
+                    </div>
+                    <TabsContent value="grid" className="mt-0">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[101rem]:grid-cols-5 gap-4 w-full">
+                        {formulari.map((f) => (
+                          <FormularioCardHome variant="grid" formulario={f} key={f.id} />
+                        ))}
+                      </div>
+                    </TabsContent>
+                    <TabsContent value="list" className="mt-0">
+                      <div className="flex flex-col gap-3 w-full">
+                        {formulari.map((f) => (
+                          <FormularioCardHome variant="list" formulario={f} key={f.id} />
+                        ))}
+                      </div>
+                    </TabsContent>
+                  </Tabs>
                 )}
               </div>
             </Suspense>
