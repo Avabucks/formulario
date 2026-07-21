@@ -1,5 +1,5 @@
 export const TableComponent = ({ children }: any) => (
-  <div className="overflow-x-auto my-6 border border-border rounded-lg bg-card/50 shadow-xs">
+  <div className="overflow-x-auto my-6 border border-border rounded-lg bg-card/50">
     <table className="w-full border-collapse text-[15px] text-left">
       {children}
     </table>

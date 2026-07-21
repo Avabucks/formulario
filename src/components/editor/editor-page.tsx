@@ -700,7 +700,7 @@ function EditorAISidebar({
   return (
     <div
       className={clsx(
-        "h-full border-l bg-background flex flex-col z-20 shrink-0 transition-all duration-300 shadow-lg",
+        "h-full border-l bg-background flex flex-col z-20 shrink-0 transition-all duration-300",
         {
           "absolute inset-0 w-full": isMobile,
           "w-162.5": !isMobile && isAiExpanded,

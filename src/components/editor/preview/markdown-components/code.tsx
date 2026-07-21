@@ -34,7 +34,7 @@ export const CodeBlock = ({ className, children, node, ...props }: any) => {
 
   if (isBlock) {
     return (
-      <pre className="my-6 bg-muted/50 border border-border rounded-lg p-4 text-[85%] font-mono overflow-x-auto text-foreground/90 leading-relaxed shadow-xs">
+      <pre className="my-6 bg-muted/50 border border-border rounded-lg p-4 text-[85%] font-mono overflow-x-auto text-foreground/90 leading-relaxed">
         <code>{children}</code>
       </pre>
     );

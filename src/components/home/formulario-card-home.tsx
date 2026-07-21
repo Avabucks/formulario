@@ -58,7 +58,7 @@ export function FormularioCardHome({
           </div>
 
 
-          <div className="flex items-center gap-3 text-xs text-muted-foreground min-w-0">
+          <div className="flex items-center gap-3 text-muted-foreground min-w-0">
             <span className="flex gap-1.5 items-center min-w-0">
               <Avatar className="h-5 w-5 shrink-0" size="sm">
                 {formulario.photoURL && (
