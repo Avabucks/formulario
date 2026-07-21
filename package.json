@@ -16,6 +16,7 @@
     "@base-ui/react": "^1.6.0",
     "@google/generative-ai": "^0.24.1",
     "@monaco-editor/react": "^4.7.0",
+    "@radix-ui/react-use-controllable-state": "^1.2.4",
     "@tailwindcss/postcss": "^4.2.2",
     "@uiw/react-codemirror": "^4.25.5",
     "class-variance-authority": "^0.7.1",
