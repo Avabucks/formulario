@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { ExternalLink } from "lucide-react";
 
 import {
   Dialog,
@@ -216,12 +217,58 @@ interface FloatingAvatar {
   username: string;
 }
 
+export function openDiscordModal() {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent("open-discord-modal"));
+  }
+}
+
+export function DiscordTrigger({
+  variant = "button",
+  children,
+}: Readonly<{
+  variant?: "button" | "link";
+  children?: React.ReactNode;
+}>) {
+  if (variant === "link") {
+    return (
+      <button
+        type="button"
+        onClick={() => openDiscordModal()}
+        className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+      >
+        {children ?? (
+          <>
+            Discord <ExternalLink className="h-3 w-3" />
+          </>
+        )}
+      </button>
+    );
+  }
+
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={() => openDiscordModal()}
+      aria-label="Apri community Discord"
+      className="cursor-pointer"
+    >
+      <DiscordIcon className="h-5 w-5 fill-current" />
+    </Button>
+  );
+}
+
 export default function DiscordWidget() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [popupDisabled, setPopupDisabled] = useState(false);
-  const [members, setMembers] = useState<DiscordMember[]>([]);
-  const [floatingAvatars, setFloatingAvatars] = useState<FloatingAvatar[]>([]);
+
+  useEffect(() => {
+    const handleOpen = () => setOpen(true);
+    window.addEventListener("open-discord-modal", handleOpen);
+    return () => window.removeEventListener("open-discord-modal", handleOpen);
+  }, []);
 
   useEffect(() => {
     const isPopupDisabled =
@@ -236,48 +283,6 @@ export default function DiscordWidget() {
     }
   }, []);
 
-  // Recupera i membri online all'avvio per l'animazione floating
-  useEffect(() => {
-    fetch(`https://discord.com/api/guilds/${GUILD_ID}/widget.json`)
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data: DiscordWidgetData | null) => {
-        if (data?.members) {
-          setMembers(data.members);
-        }
-      })
-      .catch((err) => {
-        console.error("Errore fetch widget per widget floating avatar:", err);
-      });
-  }, []);
-
-  // Avvia l'intervallo ogni 10 secondi per far fluttuare un avatar random
-  useEffect(() => {
-    if (members.length === 0) return;
-
-    const interval = setInterval(() => {
-      const randomMember = members[Math.floor(Math.random() * members.length)];
-
-      const newFloating: FloatingAvatar = {
-        id: Math.random().toString(36).substring(2, 9),
-        avatarUrl:
-          randomMember.avatar_url ||
-          "https://cdn.discordapp.com/embed/avatars/0.png",
-        username: randomMember.username,
-      };
-
-      setFloatingAvatars((prev) => [...prev, newFloating]);
-
-      // Rimuove l'avatar dopo 6.1 secondi (durata dell'animazione)
-      setTimeout(() => {
-        setFloatingAvatars((prev) =>
-          prev.filter((item) => item.id !== newFloating.id),
-        );
-      }, 6100);
-    }, 10000);
-
-    return () => clearInterval(interval);
-  }, [members]);
-
   const disableAutomaticPopup = () => {
     localStorage.setItem(DISCORD_POPUP_DISABLED_KEY, "true");
     setPopupDisabled(true);
@@ -287,69 +292,11 @@ export default function DiscordWidget() {
   if (pathname.startsWith("/editor")) return null;
 
   return (
-    <>
-      <style>{`
-        @keyframes discordFloatUp {
-          0% {
-            transform: translate(-50%, -50%);
-          }
-          100% {
-            transform: translate(-50%, calc(-50% - 70px));
-          }
-        }
-        @keyframes discordScaleFade {
-          0% {
-            transform: scale(0.9);
-            opacity: 1;
-          }
-          20% {
-            opacity: 1;
-          }
-          100% {
-            transform: scale(0.65);
-            opacity: 0;
-          }
-        }
-        .animate-discord-float {
-          animation: discordFloatUp 5.8s cubic-bezier(0.1, 0.76, 0.55, 0.94) forwards;
-        }
-        .animate-discord-scale-fade {
-          animation: discordScaleFade 5.8s cubic-bezier(0.21, 0.87, 0.44, 0.98) forwards;
-        }
-      `}</style>
-
-      {/* Container per gli avatar fluttuanti */}
-      <div className="fixed bottom-6 right-6 z-40 w-12 h-12 pointer-events-none">
-        {floatingAvatars.map((item) => (
-          <div
-            key={item.id}
-            className="absolute left-1/2 top-1/2 animate-discord-float"
-          >
-            <div className="animate-discord-scale-fade relative w-9 h-9 rounded-full bg-[#313338] shadow-[0_4px_10px_rgba(0,0,0,0.25)] overflow-hidden flex items-center justify-center">
-              <img
-                src={item.avatarUrl}
-                alt={item.username}
-                className="w-full h-full object-cover rounded-full"
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <button
-        onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-50 w-12 h-12 flex items-center justify-center rounded-full bg-[#5865F2] hover:bg-[#4752c4] text-white transition-all cursor-pointer shadow-none border-none"
-        aria-label="Apri community Discord"
-      >
-        <DiscordIcon className="h-5.5 w-5.5 fill-current" />
-      </button>
-
-      <DiscordDialog
-        open={open}
-        onOpenChange={setOpen}
-        showDisableOption={!popupDisabled}
-        disableAutomaticPopup={disableAutomaticPopup}
-      />
-    </>
+    <DiscordDialog
+      open={open}
+      onOpenChange={setOpen}
+      showDisableOption={!popupDisabled}
+      disableAutomaticPopup={disableAutomaticPopup}
+    />
   );
 }

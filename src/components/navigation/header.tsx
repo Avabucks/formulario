@@ -7,6 +7,8 @@ import Link from "next/link";
 import { AvatarLogic } from "../auth/avatar-logic";
 import { LandingMenu } from "./landing-menu";
 import { SearchLogic } from "./search-logic";
+import { DiscordTrigger } from "../shared/discord-widget";
+import { GithubButton } from "../shared/github-button";
 
 export async function Header() {
   const session = await getIronSession<SessionData>(
@@ -30,6 +32,8 @@ export async function Header() {
 
       <div className="flex items-center gap-2">
         {session.uid && <SearchLogic />}
+        <DiscordTrigger variant="button" />
+        <GithubButton />
         <div className="h-6 border-l"></div>
         {session.uid ? (
           <AvatarLogic />
