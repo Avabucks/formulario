@@ -1,14 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Button } from "@/src/components/ui/button";
 import { NumberTicker } from "@/src/components/ui/number-ticker";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/src/components/ui/tooltip";
+import { useEffect, useState } from "react";
+import { Button } from "../ui/button";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card";
 
 const REPO_URL = "https://github.com/Avabucks/formulario";
 const REPO_API_URL = "https://api.github.com/repos/Avabucks/formulario";
@@ -16,6 +11,9 @@ const REPO_API_URL = "https://api.github.com/repos/Avabucks/formulario";
 interface RepoInfo {
   stargazers_count: number;
   open_issues_count: number;
+  image?: string;
+  title?: string;
+  description?: string;
 }
 
 function GithubIcon(props: Readonly<React.SVGProps<SVGSVGElement>>) {
@@ -34,9 +32,16 @@ export function GithubButton() {
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data) {
+          console.log("GitHub info fetched:", data);
+
+          const image = `https://opengraph.githubassets.com/1/${data.full_name}`;
+
           setRepoInfo({
             stargazers_count: data.stargazers_count ?? 0,
             open_issues_count: data.open_issues_count ?? 0,
+            image,
+            title: data.name ?? undefined,
+            description: data.description ?? undefined,
           });
         }
       })
@@ -45,39 +50,32 @@ export function GithubButton() {
       });
   }, []);
 
-  const stars = repoInfo?.stargazers_count ?? null;
-
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant="ghost"
-            size="lg"
-            className="px-2.5 h-8"
-            asChild
-            aria-label="Repository GitHub"
-          >
-            <a href={REPO_URL} target="_blank" rel="noopener noreferrer">
-              <GithubIcon className="h-5 w-5 fill-current" />
-              <NumberTicker
-                value={stars || 0}
-                className="text-xs font-medium text-current dark:text-current inline-block"
-              />
-            </a>
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent side="bottom" align="center" className="p-3 w-56 text-left space-y-1">
-          <div className="flex items-center gap-2 font-semibold text-xs leading-none border-b border-background/20 pb-1.5">
-            <GithubIcon className="h-4.5 w-4.5 fill-current shrink-0" />
-            <span className="truncate">Avabucks/formulario</span>
-          </div>
-
-          <p className="text-[11px] opacity-90 leading-relaxed text-left">
-            Contribuisci allo sviluppo open source di FormulaBase, proponi nuove funzionalità o lascia una stella!
-          </p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <HoverCard>
+      <HoverCardTrigger delay={10} closeDelay={100} render={
+        <Button
+          variant="ghost"
+          size="lg"
+          className="px-2.5 h-8"
+          asChild
+          aria-label="Repository GitHub"
+        >
+          <a href={REPO_URL} target="_blank" rel="noopener noreferrer">
+            <GithubIcon className="h-5 w-5 fill-current" />
+            <NumberTicker
+              value={repoInfo?.stargazers_count || 0}
+              className="text-xs font-medium text-current dark:text-current inline-block"
+            />
+          </a>
+        </Button>
+      } />
+      <HoverCardContent className="w-100">
+        <a className="flex flex-col gap-2" href={REPO_URL} target="_blank" rel="noopener noreferrer">
+          <img className="w-full h-auto rounded-lg" src={repoInfo?.image ?? ""} alt={repoInfo?.title} />
+          <span className="font-semibold">{repoInfo?.title}</span>
+          {repoInfo?.description && <p>{repoInfo?.description}</p>}
+        </a>
+      </HoverCardContent>
+    </HoverCard>
   );
 }
