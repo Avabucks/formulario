@@ -1,4 +1,5 @@
 import { Button } from "@/src/components/ui/button";
+import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { getIronSession } from "iron-session";
 import { ArrowRight, Pi } from "lucide-react";
@@ -15,6 +16,15 @@ export async function Header() {
     await cookies(),
     sessionOptions,
   );
+
+  let isAdmin = false;
+  if (session.uid) {
+    const { rows } = await pool.query(
+      `SELECT is_admin as "isAdmin" FROM users WHERE uid = $1`,
+      [session.uid],
+    );
+    isAdmin = !!rows[0]?.isAdmin;
+  }
 
   return (
     <div className="fixed bg-background top-0 left-0 right-0 z-50 flex flex-row justify-between items-center py-3 px-2 md:px-6">
@@ -43,7 +53,7 @@ export async function Header() {
           </>
         )}
         {session.uid ? (
-          <AvatarLogic />
+          <AvatarLogic isAdmin={isAdmin} />
         ) : (
           <Link href="/login">
             <Button variant="default" className="w-fit">

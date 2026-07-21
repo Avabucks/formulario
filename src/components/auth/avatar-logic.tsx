@@ -24,6 +24,7 @@ import {
   Keyboard,
   LogOutIcon,
   Shield,
+  ShieldCheck,
   User,
   Users
 } from "lucide-react";
@@ -34,7 +35,7 @@ import { DiscordDialog } from "../shared/discord-widget";
 import { NewAccountPopup } from "../shared/new-account-popup";
 import { KbShortcuts } from "../navigation/kb-shortcuts";
 
-export function AvatarLogic() {
+export function AvatarLogic({ isAdmin = false }: Readonly<{ isAdmin?: boolean }>) {
   const router = useRouter();
   const [name, setName] = useState<string | null>(null);
   const [photoURL, setPhotoURL] = useState<string | null>(null);
@@ -79,12 +80,7 @@ export function AvatarLogic() {
                 {name?.substring(0, 1).toUpperCase() || "U"}
               </AvatarFallback>
             </Avatar>
-            <div className="flex items-center justify-between gap-2 w-full">
-              <span className="font-medium text-sm leading-none">{name}</span>
-              <Button size="icon" variant="outline" onClick={handleLogout}>
-                <LogOutIcon />
-              </Button>
-            </div>
+            <span className="font-medium text-sm leading-none">{name}</span>
           </div>
           <DropdownMenuSeparator />
           <Link href="/settings">
@@ -141,6 +137,19 @@ export function AvatarLogic() {
               Privacy Policy
             </DropdownMenuItem>
           </Link>
+          {isAdmin && (
+            <Link href="/admin">
+              <DropdownMenuItem>
+                <ShieldCheck />
+                Admin
+              </DropdownMenuItem>
+            </Link>
+          )}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem variant="destructive" onClick={handleLogout}>
+            <LogOutIcon />
+            Logout
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
       <NewAccountPopup setOpen={setOpenOBPopup} open={openOBPopup} />
