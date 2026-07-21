@@ -281,6 +281,15 @@ export function FormattingCommand({
                   </CommandShortcut>
                 </CommandItem>
               </CommandGroup>
+
+              {/* Categoria Plugins */}
+              <CommandGroup heading="Plugins">
+                <FormattingCodeBlock
+                  editorRef={editorRef}
+                  onSelect={handleSelect}
+                  plugin="mermaid"
+                />
+              </CommandGroup>
             </CommandList>
           </Command>
         </DialogContent>

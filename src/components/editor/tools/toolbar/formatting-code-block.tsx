@@ -30,6 +30,7 @@ import {
   ChevronDown,
   ChevronRight,
   SquareCode,
+  GitGraph,
 } from "lucide-react";
 import type { editor } from "monaco-editor";
 import { useEffect, useState } from "react";
@@ -41,9 +42,14 @@ const LANGUAGES = languages.toSorted((a, b) => a.label.localeCompare(b.label));
 
 export function FormattingCodeBlock({
   editorRef,
+  onSelect,
+  plugin,
 }: Readonly<{
   editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
+  onSelect?: () => void;
+  plugin?: "mermaid" | null;
 }>) {
+
   const [open, setOpen] = useState(false);
   const [blockState, setBlockState] = useState<{
     language: string | null;
@@ -79,6 +85,7 @@ export function FormattingCodeBlock({
       const openWithLang = language ? `${OPEN_MARKER}${language}` : OPEN_MARKER;
       handleBlockToggle(editorRef, null, openWithLang, CLOSE_MARKER);
     }
+    onSelect?.();
     setTimeout(() => editorRef.current?.focus(), 0);
   };
 
@@ -86,6 +93,19 @@ export function FormattingCodeBlock({
     setOpen(false);
     handleBlockToggle(editorRef, blockState, OPEN_MARKER, CLOSE_MARKER);
   };
+
+  if (plugin === "mermaid") {
+    return (
+      <CommandItem
+        onSelect={() => handleSelect(plugin)}
+        className="flex items-center gap-2 cursor-pointer"
+      >
+        <GitGraph size={14} />
+        <span>Mermaid</span>
+      </CommandItem>
+
+    );
+  }
 
   return (
     <CommandDialog
@@ -142,6 +162,16 @@ export function FormattingCodeBlockContext({
   editorRef: React.RefObject<editor.IStandaloneCodeEditor | null>;
   setUpdateTrigger: React.Dispatch<React.SetStateAction<number>>;
 }>) {
+  if (activeData.language === "mermaid") {
+    return (
+      <div className="flex items-center text-muted-foreground gap-1.5 pl-0 pr-0 py-1 select-none">
+        <GitGraph className="size-4 text-muted-foreground" />
+        <span className="text-xs text-muted-foreground font-medium font-sans">
+          Grafico Mermaid
+        </span>
+      </div>
+    )
+  }
   return (
     <>
       <div className="flex items-center text-muted-foreground gap-1.5 pl-0 pr-0 py-1 select-none">
