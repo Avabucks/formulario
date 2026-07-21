@@ -31,10 +31,17 @@ export async function Header() {
       </div>
 
       <div className="flex items-center gap-2">
-        {session.uid && <SearchLogic />}
-        <DiscordTrigger variant="button" />
-        <GithubButton />
+        <div className="flex items-center">
+          <DiscordTrigger variant="button" />
+          <GithubButton />
+        </div>
         <div className="h-6 border-l"></div>
+        {session.uid && (
+          <>
+            <SearchLogic />
+            <div className="h-6 border-l"></div>
+          </>
+        )}
         {session.uid ? (
           <AvatarLogic />
         ) : (

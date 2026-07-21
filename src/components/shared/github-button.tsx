@@ -2,9 +2,21 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/src/components/ui/button";
+import { NumberTicker } from "@/src/components/ui/number-ticker";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/src/components/ui/tooltip";
 
 const REPO_URL = "https://github.com/Avabucks/formulario";
 const REPO_API_URL = "https://api.github.com/repos/Avabucks/formulario";
+
+interface RepoInfo {
+  stargazers_count: number;
+  open_issues_count: number;
+}
 
 function GithubIcon(props: Readonly<React.SVGProps<SVGSVGElement>>) {
   return (
@@ -15,34 +27,58 @@ function GithubIcon(props: Readonly<React.SVGProps<SVGSVGElement>>) {
 }
 
 export function GithubButton() {
-  const [stars, setStars] = useState<number | null>(null);
+  const [repoInfo, setRepoInfo] = useState<RepoInfo | null>(null);
 
   useEffect(() => {
     fetch(REPO_API_URL)
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        if (data && typeof data.stargazers_count === "number") {
-          setStars(data.stargazers_count);
-          console.log(data)
+        if (data) {
+          setRepoInfo({
+            stargazers_count: data.stargazers_count ?? 0,
+            open_issues_count: data.open_issues_count ?? 0,
+          });
         }
       })
       .catch((err) => {
-        console.error("Errore fetch GitHub stars:", err);
+        console.error("Errore fetch GitHub info:", err);
       });
   }, []);
 
+  const stars = repoInfo?.stargazers_count ?? null;
+
   return (
-    <Button
-      variant="ghost"
-      size="sm"
-      className="cursor-pointer gap-1.5"
-      asChild
-      aria-label="Repository GitHub"
-    >
-      <a href={REPO_URL} target="_blank" rel="noopener noreferrer">
-        <GithubIcon className="h-4 w-4 fill-current" />
-        {stars !== null && <span className="font-medium text-xs">{stars}</span>}
-      </a>
-    </Button>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="lg"
+            className="px-2.5 h-8"
+            asChild
+            aria-label="Repository GitHub"
+          >
+            <a href={REPO_URL} target="_blank" rel="noopener noreferrer">
+              <GithubIcon className="h-5 w-5 fill-current" />
+              <span>{stars || 0}</span>
+              <NumberTicker
+                value={stars || 0}
+                className="text-xs font-medium text-current dark:text-current inline-block"
+              />
+            </a>
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="bottom" align="center" className="p-3 w-56 text-left space-y-1">
+          <div className="flex items-center gap-2 font-semibold text-xs leading-none border-b border-background/20 pb-1.5">
+            <GithubIcon className="h-4.5 w-4.5 fill-current shrink-0" />
+            <span className="truncate">Avabucks/formulario</span>
+          </div>
+
+          <p className="text-[11px] opacity-90 leading-relaxed text-left">
+            Contribuisci allo sviluppo open source di FormulaBase, proponi nuove funzionalità o lascia una stella!
+          </p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }

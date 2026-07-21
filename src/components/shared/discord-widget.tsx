@@ -254,7 +254,7 @@ export function DiscordTrigger({
       aria-label="Apri community Discord"
       className="cursor-pointer"
     >
-      <DiscordIcon className="h-5 w-5 fill-current" />
+      <DiscordIcon className="h-5.5 w-5.5 fill-current" />
     </Button>
   );
 }
