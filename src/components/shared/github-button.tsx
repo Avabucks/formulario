@@ -3,7 +3,11 @@
 import { NumberTicker } from "@/src/components/ui/number-ticker";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "../ui/hover-card";
 
 const REPO_URL = "https://github.com/Avabucks/formulario";
 const REPO_API_URL = "https://api.github.com/repos/Avabucks/formulario";
@@ -50,26 +54,39 @@ export function GithubButton() {
 
   return (
     <HoverCard>
-      <HoverCardTrigger delay={10} closeDelay={100} render={
-        <Button
-          variant="ghost"
-          size="lg"
-          className="px-2.5 h-8"
-          asChild
-          aria-label="Repository GitHub"
-        >
-          <a href={REPO_URL} target="_blank" rel="noopener noreferrer">
-            <GithubIcon className="h-5 w-5 fill-current" />
-            <NumberTicker
-              value={repoInfo?.stargazers_count || 0}
-              className="text-xs font-medium text-current dark:text-current inline-block"
-            />
-          </a>
-        </Button>
-      } />
+      <HoverCardTrigger
+        delay={10}
+        closeDelay={100}
+        render={
+          <Button
+            variant="ghost"
+            size="lg"
+            className="px-2.5 h-8"
+            asChild
+            aria-label="Repository GitHub"
+          >
+            <a href={REPO_URL} target="_blank" rel="noopener noreferrer">
+              <GithubIcon className="h-5 w-5 fill-current" />
+              <NumberTicker
+                value={repoInfo?.stargazers_count || 0}
+                className="text-xs font-medium text-current dark:text-current inline-block"
+              />
+            </a>
+          </Button>
+        }
+      />
       <HoverCardContent className="w-100">
-        <a className="flex flex-col gap-2" href={REPO_URL} target="_blank" rel="noopener noreferrer">
-          <img className="w-full h-auto rounded-lg" src={repoInfo?.image ?? ""} alt={repoInfo?.title} />
+        <a
+          className="flex flex-col gap-2"
+          href={REPO_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <img
+            className="w-full h-auto rounded-lg"
+            src={repoInfo?.image ?? ""}
+            alt={repoInfo?.title}
+          />
           <span className="font-semibold">{repoInfo?.title}</span>
           {repoInfo?.description && <p>{repoInfo?.description}</p>}
         </a>

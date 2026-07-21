@@ -20,11 +20,10 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Kbd, KbdGroup } from "../ui/kbd";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../ui/tooltip";
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "../ui/hover-card";
 import { loadAnalytics } from "@/src/lib/firebase";
 import { logEvent } from "firebase/analytics";
 
@@ -132,34 +131,44 @@ export default function ForumlarioAdd({
 
   return (
     <Dialog open={open} onOpenChange={(open) => setOpen(open)}>
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <DialogTrigger asChild>
-              <Button variant="default">
-                <Plus size={16} />
-                <div className={`${!showLabel && "hidden md:flex"}`}>
-                  Aggiungi formulario
-                </div>
-              </Button>
-            </DialogTrigger>
-          </TooltipTrigger>
-          <TooltipContent className="pr-1.5">
-            <div className="flex items-center gap-2">
+      <HoverCard>
+        <HoverCardTrigger className="inline-flex">
+          <DialogTrigger asChild>
+            <Button variant="default">
+              <Plus size={16} />
+              <div className={`${!showLabel && "hidden md:flex"}`}>
+                Aggiungi formulario
+              </div>
+            </Button>
+          </DialogTrigger>
+        </HoverCardTrigger>
+        <HoverCardContent className="w-100 space-y-3">
+          <div className="flex items-center justify-between gap-2">
+            <span className="font-semibold text-xs text-foreground">
               Aggiungi formulario
-              {allowKey && (
-                <KbdGroup className="hidden md:flex">
-                  <Kbd>Ctrl</Kbd>
-                  <span>+</span>
-                  <Kbd>Shift</Kbd>
-                  <span>+</span>
-                  <Kbd>A</Kbd>
-                </KbdGroup>
-              )}
-            </div>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+            </span>
+            {allowKey && (
+              <KbdGroup className="hidden md:flex">
+                <Kbd>Ctrl</Kbd>
+                <span>+</span>
+                <Kbd>Shift</Kbd>
+                <span>+</span>
+                <Kbd>A</Kbd>
+              </KbdGroup>
+            )}
+          </div>
+          <div className="relative bg-muted/40 aspect-video w-full rounded-lg overflow-hidden border border-border/60 shadow-xs">
+            <video
+              src="/tutorial/01.mp4"
+              loop
+              muted
+              autoPlay
+              playsInline
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </HoverCardContent>
+      </HoverCard>
       <DialogContent className="sm:max-w-md">
         <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
           <DialogHeader>

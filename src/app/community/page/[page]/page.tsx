@@ -114,7 +114,11 @@ export default async function Capitolo({
           {formulari.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[101rem]:grid-cols-5 gap-4 w-full">
               {formulari.map((f) => (
-                <FormularioCard formulario={f} key={f.id} userId={session.uid} />
+                <FormularioCard
+                  formulario={f}
+                  key={f.id}
+                  userId={session.uid}
+                />
               ))}
             </div>
           ) : (

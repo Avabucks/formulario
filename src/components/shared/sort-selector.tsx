@@ -10,7 +10,12 @@ import {
   DropdownMenuTrigger,
 } from "@/src/components/ui/dropdown-menu";
 
-export type SortOption = "modificato" | "creato" | "titolo" | "views" | "popolari";
+export type SortOption =
+  | "modificato"
+  | "creato"
+  | "titolo"
+  | "views"
+  | "popolari";
 
 interface SortSelectorProps {
   value: SortOption;

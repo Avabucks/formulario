@@ -156,7 +156,7 @@ export const DialogStackTrigger = ({
         "focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
         "bg-primary text-primary-foreground hover:bg-primary/90",
         "h-10 px-4 py-2",
-        className
+        className,
       )}
       onClick={handleClick}
       {...props}
@@ -194,7 +194,7 @@ export const DialogStackOverlay = ({
         "fixed inset-0 z-50 bg-black/80",
         "data-[state=closed]:animate-out data-[state=open]:animate-in",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-        className
+        className,
       )}
       onClick={handleClick}
       {...props}
@@ -236,7 +236,7 @@ export const DialogStackBody = ({
         <div
           className={cn(
             "pointer-events-none fixed inset-0 z-50 mx-auto flex w-full max-w-4xl items-center justify-center p-3 sm:p-6",
-            className
+            className,
           )}
           {...props}
         >
@@ -300,7 +300,7 @@ export const DialogStackContent = ({
     <div
       className={cn(
         "col-start-1 row-start-1 w-full rounded-xl sm:rounded-2xl border bg-background p-4 sm:p-6 shadow-2xl transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-[transform,opacity]",
-        className
+        className,
       )}
       onClick={handleClick}
       style={{
@@ -308,18 +308,19 @@ export const DialogStackContent = ({
         transformOrigin: "top center",
         zIndex: 50 - Math.abs(distanceFromActive),
         opacity: isCurrent ? 1 : isPrevious ? 0.6 : 0,
-        pointerEvents: isCurrent ? "auto" : context.clickable && isPrevious ? "auto" : "none",
-        cursor:
-          context.clickable && isPrevious
-            ? "pointer"
-            : "default",
+        pointerEvents: isCurrent
+          ? "auto"
+          : context.clickable && isPrevious
+            ? "auto"
+            : "none",
+        cursor: context.clickable && isPrevious ? "pointer" : "default",
       }}
       {...props}
     >
       <div
         className={cn(
           "h-full w-full flex flex-col justify-between transition-opacity duration-300",
-          !isCurrent && "pointer-events-none select-none opacity-0"
+          !isCurrent && "pointer-events-none select-none opacity-0",
         )}
       >
         {children}
@@ -338,7 +339,7 @@ export const DialogStackTitle = ({
   <h2
     className={cn(
       "font-semibold text-lg leading-none tracking-tight",
-      className
+      className,
     )}
     {...props}
   >
@@ -367,7 +368,7 @@ export const DialogStackHeader = ({
   <div
     className={cn(
       "flex flex-col space-y-1.5 text-center sm:text-left",
-      className
+      className,
     )}
     {...props}
   />
@@ -430,7 +431,7 @@ export const DialogStackNext = ({
     <button
       className={cn(
         "inline-flex items-center justify-center whitespace-nowrap rounded-md font-medium text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-        className
+        className,
       )}
       disabled={context.activeIndex >= context.totalDialogs - 1}
       onClick={handleNext}
@@ -485,7 +486,7 @@ export const DialogStackPrevious = ({
     <button
       className={cn(
         "inline-flex items-center justify-center whitespace-nowrap rounded-md font-medium text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-        className
+        className,
       )}
       disabled={context.activeIndex <= 0}
       onClick={handlePrevious}

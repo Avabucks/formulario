@@ -1,17 +1,16 @@
 "use client";
 
 import { Button } from "@/src/components/ui/button";
-import {
-  ArrowRight,
-  ScanEye,
-  Zap,
-} from "lucide-react";
+import { ArrowRight, ScanEye, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { AnimatedGridPattern } from "@/src/components/ui/animated-grid-pattern";
 import { cn } from "@/src/lib/utils";
 import { Highlighter } from "../ui/highlighter";
-import { ScrollVelocityContainer, ScrollVelocityRow } from "@/src/components/ui/scroll-based-velocity";
+import {
+  ScrollVelocityContainer,
+  ScrollVelocityRow,
+} from "@/src/components/ui/scroll-based-velocity";
 import katex from "katex";
 import "katex/dist/katex.min.css";
 
@@ -86,10 +85,17 @@ function KatexFormula({ math }: Readonly<{ math: string }>) {
     throwOnError: false,
     displayMode: true,
   });
-  return <div dangerouslySetInnerHTML={{ __html: html }} className="text-foreground text-center" />;
+  return (
+    <div
+      dangerouslySetInnerHTML={{ __html: html }}
+      className="text-foreground text-center"
+    />
+  );
 }
 
-function FormulaSnippet({ formula }: Readonly<{ formula: typeof row1Formulas[number] }>) {
+function FormulaSnippet({
+  formula,
+}: Readonly<{ formula: (typeof row1Formulas)[number] }>) {
   return (
     <div className="mx-6 md:mx-12 flex items-center gap-6 md:gap-12 select-none cursor-default pt-2 pb-2 md:pt-6 md:pb-2">
       {/* Title + Formula Container */}
@@ -98,15 +104,18 @@ function FormulaSnippet({ formula }: Readonly<{ formula: typeof row1Formulas[num
         <span className="absolute -top-4 text-xs font-medium text-muted-foreground opacity-0 md:opacity-0 md:group-hover:opacity-100 md:transition-opacity md:duration-300 select-none pointer-events-none whitespace-nowrap">
           {formula.title}
         </span>
-        
+
         {/* KaTeX Formula (dims slightly on hover on desktop only) */}
         <div className="scale-95 md:scale-100 text-foreground flex items-center justify-center min-h-11 select-none md:group-hover:opacity-30 md:transition-opacity md:duration-300">
           <KatexFormula math={formula.math} />
         </div>
       </div>
-      
+
       {/* Separator / Zap Icon */}
-      <Zap size={18} className="text-muted-foreground/25 shrink-0 select-none" />
+      <Zap
+        size={18}
+        className="text-muted-foreground/25 shrink-0 select-none"
+      />
     </div>
   );
 }
@@ -162,7 +171,10 @@ export function Hero() {
               );
 
               return (
-                <span key={i} className="inline-block mr-1.5 md:mr-[0.3em] last:mr-0">
+                <span
+                  key={i}
+                  className="inline-block mr-1.5 md:mr-[0.3em] last:mr-0"
+                >
                   <Highlighter
                     action="highlight"
                     color="var(--brand-purple-highlight)"
@@ -222,7 +234,6 @@ export function Hero() {
             Guarda la demo
           </Button>
         </motion.div>
-
       </div>
 
       <motion.div
@@ -237,7 +248,11 @@ export function Hero() {
               <FormulaSnippet key={index} formula={formula} />
             ))}
           </ScrollVelocityRow>
-          <ScrollVelocityRow baseVelocity={0.8} direction={-1} className="mt-1 md:mt-3">
+          <ScrollVelocityRow
+            baseVelocity={0.8}
+            direction={-1}
+            className="mt-1 md:mt-3"
+          >
             {row2Formulas.map((formula, index) => (
               <FormulaSnippet key={index} formula={formula} />
             ))}

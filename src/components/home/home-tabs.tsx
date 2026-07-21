@@ -3,7 +3,16 @@
 import { useState, useTransition } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger } from "@/src/components/ui/tabs";
-import { FileText, Star, Grid, List, Search, BookOpen, StarOff, UsersRound } from "lucide-react";
+import {
+  FileText,
+  Star,
+  Grid,
+  List,
+  Search,
+  BookOpen,
+  StarOff,
+  UsersRound,
+} from "lucide-react";
 import { Badge } from "@/src/components/ui/badge";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
@@ -103,11 +112,15 @@ export function HomeTabs({
     const sorted = [...items];
     if (activeOrder === "creato") {
       return sorted.sort(
-        (a, b) => new Date(b.dataCreazione ?? "").getTime() - new Date(a.dataCreazione ?? "").getTime()
+        (a, b) =>
+          new Date(b.dataCreazione ?? "").getTime() -
+          new Date(a.dataCreazione ?? "").getTime(),
       );
     }
     if (activeOrder === "titolo") {
-      return sorted.sort((a, b) => (a.titolo || "").localeCompare(b.titolo || ""));
+      return sorted.sort((a, b) =>
+        (a.titolo || "").localeCompare(b.titolo || ""),
+      );
     }
     if (activeOrder === "views") {
       return sorted.sort((a, b) => (b.views || 0) - (a.views || 0));
@@ -117,7 +130,9 @@ export function HomeTabs({
     }
     // Default: modificato
     return sorted.sort(
-      (a, b) => new Date(b.dataModifica ?? "").getTime() - new Date(a.dataModifica ?? "").getTime()
+      (a, b) =>
+        new Date(b.dataModifica ?? "").getTime() -
+        new Date(a.dataModifica ?? "").getTime(),
     );
   };
 
@@ -169,7 +184,12 @@ export function HomeTabs({
       return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[101rem]:grid-cols-5 gap-4 w-full">
           {sortedFormulari.map((f) => (
-            <FormularioCardHome variant="grid" formulario={f} key={f.id} userId={userId} />
+            <FormularioCardHome
+              variant="grid"
+              formulario={f}
+              key={f.id}
+              userId={userId}
+            />
           ))}
         </div>
       );
@@ -178,7 +198,12 @@ export function HomeTabs({
     return (
       <div className="flex flex-col gap-3 w-full">
         {sortedFormulari.map((f) => (
-          <FormularioCardHome variant="list" formulario={f} key={f.id} userId={userId} />
+          <FormularioCardHome
+            variant="list"
+            formulario={f}
+            key={f.id}
+            userId={userId}
+          />
         ))}
       </div>
     );
@@ -191,13 +216,13 @@ export function HomeTabs({
 
     const sortedPreferiti = sortItems(preferiti);
 
-      return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[101rem]:grid-cols-5 gap-4 w-full">
-          {sortedPreferiti.map((f) => (
-            <FormularioCard formulario={f} key={f.id} userId={userId} />
-          ))}
-        </div>
-      );
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[101rem]:grid-cols-5 gap-4 w-full">
+        {sortedPreferiti.map((f) => (
+          <FormularioCard formulario={f} key={f.id} userId={userId} />
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -208,7 +233,7 @@ export function HomeTabs({
           <h2 className="text-2xl font-semibold tracking-tight text-foreground flex items-center shrink-0">
             La tua raccolta
           </h2>
-          
+
           {/* Sort Selector ONLY on Mobile/Tablet (hidden on Desktop lg) */}
           <SortSelector
             value={activeOrder}
@@ -230,10 +255,9 @@ export function HomeTabs({
             className="pl-10 w-full h-8!"
           />
         </div>
-        
+
         {/* Tabs, View Selectors & Desktop-only Sort Group */}
         <div className="flex items-center justify-between lg:justify-end gap-3 w-full lg:w-auto">
-          
           {/* Sort Selector ONLY on Desktop (hidden on Mobile/Tablet) */}
           <SortSelector
             value={activeOrder}
@@ -246,7 +270,11 @@ export function HomeTabs({
 
           {/* View Selector: Grid / List (Only visible on "formulari" tab, hidden on mobile) */}
           {activeTab === "formulari" && (
-            <Tabs value={activeView} onValueChange={handleViewChange} className="shrink-0 hidden sm:inline-block">
+            <Tabs
+              value={activeView}
+              onValueChange={handleViewChange}
+              className="shrink-0 hidden sm:inline-block"
+            >
               <TabsList variant="line" className="w-full sm:w-fit">
                 <TabsTrigger value="grid" className="gap-2 px-3">
                   <Grid className="h-4 w-4" />
@@ -264,16 +292,26 @@ export function HomeTabs({
           )}
 
           {/* Tab Selector: Formulari / Preferiti (Controlled by URL search param) */}
-          <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full lg:w-auto">
+          <Tabs
+            value={activeTab}
+            onValueChange={handleTabChange}
+            className="w-full lg:w-auto"
+          >
             <TabsList variant="line" className="w-full lg:w-fit">
-              <TabsTrigger value="formulari" className="gap-2 px-3 flex-1 lg:flex-initial">
+              <TabsTrigger
+                value="formulari"
+                className="gap-2 px-3 flex-1 lg:flex-initial"
+              >
                 <FileText className="h-4 w-4" />
                 <span>Formulari</span>
                 <Badge variant="secondary" className="ml-1 h-5 px-1.5">
                   {formatNumber(formulari.length)}
                 </Badge>
               </TabsTrigger>
-              <TabsTrigger value="preferiti" className="gap-2 px-3 flex-1 lg:flex-initial">
+              <TabsTrigger
+                value="preferiti"
+                className="gap-2 px-3 flex-1 lg:flex-initial"
+              >
                 <Star className="h-4 w-4" />
                 <span>Preferiti</span>
                 <Badge variant="secondary" className="ml-1 h-5 px-1.5">
@@ -287,7 +325,9 @@ export function HomeTabs({
 
       {/* Render selected Content */}
       <div className="flex flex-col gap-4 w-full mt-2 flex-1">
-        {activeTab === "formulari" ? renderFormulariContent() : renderPreferitiContent()}
+        {activeTab === "formulari"
+          ? renderFormulariContent()
+          : renderPreferitiContent()}
       </div>
     </div>
   );

@@ -16,7 +16,7 @@ import {
   GlobeIcon,
   LinkIcon,
   LockIcon,
-  Star
+  Star,
 } from "lucide-react";
 import Link from "next/link";
 import { StarFormulario } from "../shared/star-formulario";
@@ -39,8 +39,7 @@ type Formulario = {
 export function FormularioCard({
   formulario,
   userId,
-}: Readonly<{ formulario: Formulario, userId: string }>) {
-
+}: Readonly<{ formulario: Formulario; userId: string }>) {
   return (
     <Card className="w-full">
       <CardHeader>

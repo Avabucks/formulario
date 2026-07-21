@@ -118,5 +118,5 @@ export function StackedCardsIllustration() {
       {/* Fade overlay */}
       <div className="from-background/0 via-background/60 to-background pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-linear-to-b" />
     </div>
-  )
+  );
 }

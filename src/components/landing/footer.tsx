@@ -18,17 +18,22 @@ export function Footer() {
               className="flex items-center gap-2 font-bold tracking-tight text-foreground transition-opacity hover:opacity-80 w-fit"
             >
               <Pi className="h-6 w-6 text-foreground" />
-              <span className="text-lg font-bold tracking-tight">{packageJson.displayName}</span>
+              <span className="text-lg font-bold tracking-tight">
+                {packageJson.displayName}
+              </span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
-              Crea, organizza e condividi i tuoi formulari scientifici con un editor LaTeX avanzato e l&apos;assistente AI.
+              Crea, organizza e condividi i tuoi formulari scientifici con un
+              editor LaTeX avanzato e l&apos;assistente AI.
             </p>
           </div>
 
           {/* Links Columns */}
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 md:col-span-8">
             <div className="flex flex-col gap-3">
-              <span className="text-sm font-medium tracking-wide text-foreground">Piattaforma</span>
+              <span className="text-sm font-medium tracking-wide text-foreground">
+                Piattaforma
+              </span>
               <ul className="flex flex-col gap-2.5 text-sm">
                 <li>
                   <Link
@@ -50,7 +55,9 @@ export function Footer() {
             </div>
 
             <div className="flex flex-col gap-3">
-              <span className="text-sm font-medium tracking-wide text-foreground">Scopri</span>
+              <span className="text-sm font-medium tracking-wide text-foreground">
+                Scopri
+              </span>
               <ul className="flex flex-col gap-2.5 text-sm">
                 <li>
                   <Link
@@ -80,7 +87,9 @@ export function Footer() {
             </div>
 
             <div className="flex flex-col gap-3 col-span-2 sm:col-span-1">
-              <span className="text-sm font-medium tracking-wide text-foreground">Risorse & Legale</span>
+              <span className="text-sm font-medium tracking-wide text-foreground">
+                Risorse & Legale
+              </span>
               <ul className="flex flex-col gap-2.5 text-sm">
                 <li>
                   <DiscordTrigger variant="link" />
@@ -121,10 +130,12 @@ export function Footer() {
         <div className="flex flex-col-reverse items-center justify-between gap-4 sm:flex-row">
           <div className="flex flex-col items-center gap-1.5 sm:items-start">
             <p className="text-xs text-muted-foreground text-center sm:text-left">
-              © {new Date().getFullYear()} {packageJson.displayName}. Tutti i diritti riservati.
+              © {new Date().getFullYear()} {packageJson.displayName}. Tutti i
+              diritti riservati.
             </p>
             <p className="text-[11px] text-muted-foreground/60 text-center sm:text-left">
-              Sviluppato per facilitare lo studio e la condivisione delle materie scientifiche.
+              Sviluppato per facilitare lo studio e la condivisione delle
+              materie scientifiche.
             </p>
           </div>
           <div className="flex items-center gap-4">
@@ -140,4 +151,3 @@ export function Footer() {
     </footer>
   );
 }
-

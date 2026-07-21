@@ -26,7 +26,7 @@ import {
   Shield,
   ShieldCheck,
   User,
-  Users
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -35,7 +35,9 @@ import { DiscordDialog } from "../shared/discord-widget";
 import { NewAccountPopup } from "../shared/new-account-popup";
 import { KbShortcuts } from "../navigation/kb-shortcuts";
 
-export function AvatarLogic({ isAdmin = false }: Readonly<{ isAdmin?: boolean }>) {
+export function AvatarLogic({
+  isAdmin = false,
+}: Readonly<{ isAdmin?: boolean }>) {
   const router = useRouter();
   const [name, setName] = useState<string | null>(null);
   const [photoURL, setPhotoURL] = useState<string | null>(null);

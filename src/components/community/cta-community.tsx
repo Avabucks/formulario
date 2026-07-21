@@ -12,9 +12,7 @@ export function CtaCommunity() {
         maxOpacity={0.3}
         duration={3}
         repeatDelay={1}
-        className={cn(
-          "inset-y-0 h-full w-full opacity-20",
-        )}
+        className={cn("inset-y-0 h-full w-full opacity-20")}
       />
 
       <div className="relative z-10 mx-auto flex min-h-[40vh] max-w-7xl flex-col items-center justify-center px-6 py-16 text-center">

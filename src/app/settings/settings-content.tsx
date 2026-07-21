@@ -27,7 +27,7 @@ import {
   Mail,
   Shield,
   Trash2,
-  User
+  User,
 } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";

@@ -36,15 +36,12 @@ import {
 } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { toast } from "sonner";
 
 type SnippetController = {
   insert: (snippet: string) => void;
 };
 
 const BLOCK_MARKER = "$$";
-
-const FORMULA_FIRST_USE_KEY = "formula_first_use_shown";
 
 export function FormattingLatex({
   editorRef,
@@ -248,33 +245,6 @@ export function FormattingLatex({
       insertInline(snippet);
     } else {
       insertNew(snippet, pendingKind);
-    }
-
-    if (!localStorage.getItem(FORMULA_FIRST_USE_KEY)) {
-      const toastId = toast(
-        <span className="leading-6 flex flex-col md:flex-row gap-2 md:text-nowrap md:flex-nowrap">
-          <span>
-            Usa <Kbd>Tab</Kbd> per spostarti tra i campi della formula e{" "}
-            <Kbd>Shift</Kbd> + <Kbd>Tab</Kbd> per tornare indietro.
-          </span>
-          <button
-            className="text-xs text-muted-foreground underline text-left w-fit cursor-pointer"
-            onClick={() => {
-              localStorage.setItem(FORMULA_FIRST_USE_KEY, "true");
-              toast.dismiss(toastId);
-            }}
-          >
-            Non mostrare più
-          </button>
-        </span>,
-        {
-          position: "bottom-center",
-          duration: 5000,
-          classNames: {
-            toast: "md:!min-w-fit md:!left-1/2 md:!-translate-x-1/2",
-          },
-        },
-      );
     }
 
     (
@@ -506,7 +476,7 @@ export function FormattingLatex({
           </CommandGroup>
         </CommandList>
         {showAll && !query && (
-          <div className="flex items-center justify-between px-3 py-1.5 border-t bg-muted/20 text-xs text-muted-foreground">
+          <div className="-mx-1 flex items-center justify-between border-t bg-muted/40 px-4 py-2 text-xs text-muted-foreground">
             <span>Stai visualizzando tutte le formule</span>
             <Button
               variant="ghost"
@@ -519,6 +489,17 @@ export function FormattingLatex({
             </Button>
           </div>
         )}
+        <div className="-mx-1 -mb-1 flex items-center justify-center rounded-b-xl border-t bg-muted/20 px-4 py-3 text-xs text-muted-foreground text-center">
+          <span className="flex items-center justify-center gap-1.5 flex-wrap">
+            Usa <Kbd>Tab</Kbd> per spostarti tra i campi della formula e{" "}
+            <KbdGroup>
+              <Kbd>Shift</Kbd>
+              <span>+</span>
+              <Kbd>Tab</Kbd>
+            </KbdGroup>{" "}
+            per tornare indietro.
+          </span>
+        </div>
       </Command>
     </CommandDialog>
   );

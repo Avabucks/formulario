@@ -20,10 +20,7 @@ import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { cn } from "@/src/lib/utils";
 import { getIronSession } from "iron-session";
-import {
-  ArrowRight,
-  Library,
-} from "lucide-react";
+import { ArrowRight, Library } from "lucide-react";
 import { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -46,7 +43,8 @@ export default async function Home({
 
   const cookieStore = await cookies();
   const initialView = cookieStore.get("home-view")?.value || "grid";
-  const initialOrder = (cookieStore.get("home-order")?.value || "modificato") as SortOption;
+  const initialOrder = (cookieStore.get("home-order")?.value ||
+    "modificato") as SortOption;
 
   const session = await getIronSession<SessionData>(
     await cookies(),
@@ -108,79 +106,77 @@ export default async function Home({
 
   return (
     <div className="mx-auto flex w-full flex-col gap-4 px-3 pb-8 mt-16 md:px-6 h-full">
-        <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
-          <div className="relative overflow-hidden rounded-xl border bg-card p-6 md:p-8">
-            <AnimatedGridPattern
-              numSquares={20}
-              maxOpacity={0.3}
-              duration={3}
-              repeatDelay={1}
-              className={cn(
-                "inset-y-0 h-full w-full opacity-20",
-              )}
-            />
-            <div className="relative flex max-w-3xl flex-col gap-5">
-              <div className="space-y-2">
-                <div className="flex items-center gap-3">
-                  {photoURL && (
-                    <Avatar size="lg" className="mt-1">
-                      <AvatarImage src={photoURL} alt="foto profilo" />
-                      <AvatarFallback>
-                        {displayName?.substring(0, 1).toUpperCase() || "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                  )}
-                  <h1 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
-                    Ciao, {displayName}
-                  </h1>
-                </div>
-                <p className="max-w-2xl text-base leading-7 text-muted-foreground">
-                  Crea un formulario, dividilo in capitoli e riprendi le
-                  modifiche in ogni momento.
-                </p>
+      <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
+        <div className="relative overflow-hidden rounded-xl border bg-card p-6 md:p-8">
+          <AnimatedGridPattern
+            numSquares={20}
+            maxOpacity={0.3}
+            duration={3}
+            repeatDelay={1}
+            className={cn("inset-y-0 h-full w-full opacity-20")}
+          />
+          <div className="relative flex max-w-3xl flex-col gap-5">
+            <div className="space-y-2">
+              <div className="flex items-center gap-3">
+                {photoURL && (
+                  <Avatar size="lg" className="mt-1">
+                    <AvatarImage src={photoURL} alt="foto profilo" />
+                    <AvatarFallback>
+                      {displayName?.substring(0, 1).toUpperCase() || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                )}
+                <h1 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
+                  Ciao, {displayName}
+                </h1>
               </div>
-              <div className="flex flex-col gap-3 sm:flex-row">
-                <ForumlarioAdd showLabel={true} />
-              </div>
+              <p className="max-w-2xl text-base leading-7 text-muted-foreground">
+                Crea un formulario, dividilo in capitoli e riprendi le modifiche
+                in ogni momento.
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <ForumlarioAdd showLabel={true} />
             </div>
           </div>
-
-          <Card className="hidden md:flex">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Library className="h-5 w-5" />
-                Libreria condivisa
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-1 flex-col justify-between gap-6">
-              <p className="text-sm leading-6 text-muted-foreground">
-                Scopri formulari pubblici, salva quelli utili e usali come base
-                per studiare o preparare lezioni.
-              </p>
-              <Button
-                asChild
-                variant="secondary"
-                className="w-full justify-between"
-              >
-                <Link href="/community/page/1">
-                  Vai alla community
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-        </section>
-        <Separator />
-        <div className="w-full flex flex-col gap-4 h-full">
-          <HomeTabs
-            activeTab={activeTab}
-            initialView={initialView}
-            initialOrder={initialOrder}
-            formulari={formulari}
-            preferiti={preferiti}
-            userId={session.uid}
-          />
         </div>
+
+        <Card className="hidden md:flex">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Library className="h-5 w-5" />
+              Libreria condivisa
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-1 flex-col justify-between gap-6">
+            <p className="text-sm leading-6 text-muted-foreground">
+              Scopri formulari pubblici, salva quelli utili e usali come base
+              per studiare o preparare lezioni.
+            </p>
+            <Button
+              asChild
+              variant="secondary"
+              className="w-full justify-between"
+            >
+              <Link href="/community/page/1">
+                Vai alla community
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </section>
+      <Separator />
+      <div className="w-full flex flex-col gap-4 h-full">
+        <HomeTabs
+          activeTab={activeTab}
+          initialView={initialView}
+          initialOrder={initialOrder}
+          formulari={formulari}
+          preferiti={preferiti}
+          userId={session.uid}
+        />
       </div>
+    </div>
   );
 }

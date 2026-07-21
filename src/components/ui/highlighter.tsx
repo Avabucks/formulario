@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { useLayoutEffect, useRef } from "react"
-import type React from "react"
-import { useInView } from "motion/react"
-import { annotate } from "rough-notation"
-import { type RoughAnnotation } from "rough-notation/lib/model"
+import { useLayoutEffect, useRef } from "react";
+import type React from "react";
+import { useInView } from "motion/react";
+import { annotate } from "rough-notation";
+import { type RoughAnnotation } from "rough-notation/lib/model";
 
 type AnnotationAction =
   | "highlight"
@@ -13,19 +13,19 @@ type AnnotationAction =
   | "circle"
   | "strike-through"
   | "crossed-off"
-  | "bracket"
+  | "bracket";
 
 interface HighlighterProps {
-  children: React.ReactNode
-  action?: AnnotationAction
-  color?: string
-  strokeWidth?: number
-  animationDuration?: number
-  iterations?: number
-  padding?: number
-  multiline?: boolean
-  isView?: boolean
-  delay?: number
+  children: React.ReactNode;
+  action?: AnnotationAction;
+  color?: string;
+  strokeWidth?: number;
+  animationDuration?: number;
+  iterations?: number;
+  padding?: number;
+  multiline?: boolean;
+  isView?: boolean;
+  delay?: number;
 }
 
 export function Highlighter({
@@ -40,21 +40,21 @@ export function Highlighter({
   isView = false,
   delay = 0,
 }: HighlighterProps) {
-  const elementRef = useRef<HTMLSpanElement>(null)
+  const elementRef = useRef<HTMLSpanElement>(null);
 
   const isInView = useInView(elementRef, {
     once: true,
     margin: "-10%",
-  })
+  });
 
   // If isView is false, always show. If isView is true, wait for inView
-  const shouldShow = !isView || isInView
+  const shouldShow = !isView || isInView;
 
   useLayoutEffect(() => {
-    const element = elementRef.current
-    let annotation: RoughAnnotation | null = null
-    let resizeObserver: ResizeObserver | null = null
-    let timer: NodeJS.Timeout | null = null
+    const element = elementRef.current;
+    let annotation: RoughAnnotation | null = null;
+    let resizeObserver: ResizeObserver | null = null;
+    let timer: NodeJS.Timeout | null = null;
 
     if (shouldShow && element) {
       const annotationConfig = {
@@ -65,37 +65,37 @@ export function Highlighter({
         iterations,
         padding,
         multiline,
-      }
+      };
 
-      const currentAnnotation = annotate(element, annotationConfig)
-      annotation = currentAnnotation
+      const currentAnnotation = annotate(element, annotationConfig);
+      annotation = currentAnnotation;
 
       if (delay > 0) {
         timer = setTimeout(() => {
-          currentAnnotation.show()
-        }, delay)
+          currentAnnotation.show();
+        }, delay);
       } else {
-        currentAnnotation.show()
+        currentAnnotation.show();
       }
 
       resizeObserver = new ResizeObserver(() => {
-        currentAnnotation.hide()
-        currentAnnotation.show()
-      })
+        currentAnnotation.hide();
+        currentAnnotation.show();
+      });
 
-      resizeObserver.observe(element)
-      resizeObserver.observe(document.body)
+      resizeObserver.observe(element);
+      resizeObserver.observe(document.body);
     }
 
     return () => {
-      annotation?.remove()
+      annotation?.remove();
       if (timer) {
-        clearTimeout(timer)
+        clearTimeout(timer);
       }
       if (resizeObserver) {
-        resizeObserver.disconnect()
+        resizeObserver.disconnect();
       }
-    }
+    };
   }, [
     shouldShow,
     action,
@@ -106,11 +106,11 @@ export function Highlighter({
     padding,
     multiline,
     delay,
-  ])
+  ]);
 
   return (
     <span ref={elementRef} className="relative inline-block bg-transparent">
       {children}
     </span>
-  )
+  );
 }

@@ -8,7 +8,11 @@ import {
   CardTitle,
 } from "@/src/components/ui/card";
 import { Field, FieldDescription, FieldGroup } from "@/src/components/ui/field";
-import { signInWithCredential, signOut, GoogleAuthProvider } from "firebase/auth";
+import {
+  signInWithCredential,
+  signOut,
+  GoogleAuthProvider,
+} from "firebase/auth";
 import { User } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -50,7 +54,9 @@ export function LoginForm({
     if (!window.google) return;
 
     window.google.accounts.id.initialize({
-      client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "69453402916-lsasjrcj77oiri129k5udhouodde4f7s.apps.googleusercontent.com",
+      client_id:
+        process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
+        "69453402916-lsasjrcj77oiri129k5udhouodde4f7s.apps.googleusercontent.com",
       use_fedcm_for_prompt: true,
       callback: async (response: any) => {
         setLoading(true);
@@ -81,7 +87,7 @@ export function LoginForm({
       btnContainer.innerHTML = ""; // Evita duplicazioni o sovrapposizioni
       window.google.accounts.id.renderButton(btnContainer, {
         type: "standard",
-        theme: resolvedTheme === 'dark' ? 'filled_black' : 'outline',
+        theme: resolvedTheme === "dark" ? "filled_black" : "outline",
         size: "large",
         text: "signin_with",
         shape: "pill",
@@ -132,7 +138,7 @@ export function LoginForm({
                     style={{ colorScheme: "light" }}
                     className={cn(
                       "w-full flex justify-center items-center gap-2",
-                      loading ? "hidden" : "flex"
+                      loading ? "hidden" : "flex",
                     )}
                   >
                     <Spinner data-icon="inline-start" /> Caricamento...
