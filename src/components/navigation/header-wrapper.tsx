@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 
-const HIDE_HEADER_ROUTES = ["/login"];
+const HIDE_HEADER_ROUTES = new Set(["/login"]);
 
 export function HeaderWrapper({
   children,
@@ -11,7 +11,7 @@ export function HeaderWrapper({
 }>) {
   const pathname = usePathname();
 
-  if (HIDE_HEADER_ROUTES.includes(pathname)) {
+  if (HIDE_HEADER_ROUTES.has(pathname)) {
     return null;
   }
 
