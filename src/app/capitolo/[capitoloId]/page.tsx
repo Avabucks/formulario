@@ -154,7 +154,7 @@ export default async function Capitolo({
   });
 
   const renderEmpty = () => (
-    <Empty className="border border-dashed">
+    <Empty className="flex-1">
       <EmptyHeader>
         <EmptyMedia>
           <StackedCardsIllustration />
@@ -209,7 +209,7 @@ export default async function Capitolo({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       )}
-      <div className="flex flex-col gap-4 w-full px-2 md:px-6 pt-16 pb-5">
+      <div className="flex flex-col gap-4 w-full h-full px-2 md:px-6 pt-16 pb-5">
         <BreadcrumbLogic items={breadcrumbs} />
         <div className="flex flex-col gap-4">
           <div className="flex justify-between items-center gap-4">
@@ -221,7 +221,7 @@ export default async function Capitolo({
           </div>
         </div>
         <Suspense fallback={renderLoadingSkeleton()}>
-          <div className="flex flex-col gap-4 w-full">
+          <div className="flex flex-col gap-4 w-full flex-1">
             {argomentiRes.length == 0
               ? renderEmpty()
               : argomentiRes.map((a) => (

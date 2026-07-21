@@ -122,7 +122,7 @@ export function HomeTabs({
   };
 
   const renderEmptyFormulari = () => (
-    <Empty className="border border-dashed">
+    <Empty>
       <EmptyHeader>
         <EmptyMedia>
           <StackedCardsIllustration />
@@ -137,7 +137,7 @@ export function HomeTabs({
   );
 
   const renderEmptyPreferiti = () => (
-    <Empty className="border border-dashed">
+    <Empty>
       <EmptyHeader>
         <EmptyMedia>
           <StackedCardsIllustration />
@@ -201,7 +201,7 @@ export function HomeTabs({
   };
 
   return (
-    <div className="w-full flex flex-col gap-4">
+    <div className="w-full flex flex-col gap-4 h-full">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between w-full">
         {/* Title & Mobile-only Sort Group */}
         <div className="flex items-center justify-between w-full lg:w-auto">
@@ -286,7 +286,7 @@ export function HomeTabs({
       </div>
 
       {/* Render selected Content */}
-      <div className="flex flex-col gap-4 w-full mt-2">
+      <div className="flex flex-col gap-4 w-full mt-2 flex-1">
         {activeTab === "formulari" ? renderFormulariContent() : renderPreferitiContent()}
       </div>
     </div>

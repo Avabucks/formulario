@@ -144,7 +144,7 @@ export default async function Formulario({
   );
 
   const renderEmpty = () => (
-    <Empty className="border border-dashed">
+    <Empty>
       <EmptyHeader>
         <EmptyMedia>
           <StackedCardsIllustration />
@@ -202,7 +202,7 @@ export default async function Formulario({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       )}
-      <div className="flex flex-col gap-4 w-full px-2 md:px-6 pt-16 pb-5">
+      <div className="flex flex-col gap-4 w-full h-full px-2 md:px-6 pt-16 pb-5">
         <ViewTracker formularioId={formulario.id} />
         <BreadcrumbLogic items={breadcrumbs} />
         <div className="flex flex-col gap-4">
@@ -215,7 +215,7 @@ export default async function Formulario({
           </div>
         </div>
         <Suspense fallback={renderLoadingSkeleton()}>
-          <div className="flex flex-col gap-4 w-full">
+          <div className="flex flex-col gap-4 w-full flex-1">
             {capitoli.length == 0
               ? renderEmpty()
               : capitoli.map((c) => (

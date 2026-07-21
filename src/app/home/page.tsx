@@ -107,7 +107,7 @@ export default async function Home({
   const photoURL = users[0].photoURL;
 
   return (
-    <div className="mx-auto flex w-full flex-col gap-4 px-3 pb-8 mt-16 md:px-6">
+    <div className="mx-auto flex w-full flex-col gap-4 px-3 pb-8 mt-16 md:px-6 h-full">
         <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
           <div className="relative overflow-hidden rounded-xl border bg-card p-6 md:p-8">
             <AnimatedGridPattern
@@ -171,7 +171,7 @@ export default async function Home({
           </Card>
         </section>
         <Separator />
-        <div className="w-full flex flex-col gap-4">
+        <div className="w-full flex flex-col gap-4 h-full">
           <HomeTabs
             activeTab={activeTab}
             initialView={initialView}
