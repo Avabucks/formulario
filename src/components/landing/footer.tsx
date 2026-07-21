@@ -5,10 +5,11 @@ import Link from "next/link";
 import { Pi, Mail } from "lucide-react";
 import { ModeToggle } from "@/src/components/theme/theme-toggler";
 import { DiscordTrigger } from "../shared/discord-widget";
+import { GithubButton } from "../shared/github-button";
 
 export function Footer() {
   return (
-    <footer className="w-full border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <footer className="w-full border-t border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
       <div className="mx-auto max-w-6xl px-6 py-12 md:py-16">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-12">
           {/* Brand Column */}
@@ -142,6 +143,7 @@ export function Footer() {
             <div className="flex items-center gap-2">
               {/* Discord */}
               <DiscordTrigger variant="button" />
+              <GithubButton />
             </div>
             <div className="h-4 w-px bg-border" />
             <ModeToggle />

@@ -128,7 +128,7 @@ export default async function Admin({
     );
 
     return (
-      <div className="p-4 space-y-4">
+      <div className="mx-auto flex w-full flex-col gap-4 px-3 pb-8 mt-16 md:px-6 h-full">
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">
             Statistiche per:
