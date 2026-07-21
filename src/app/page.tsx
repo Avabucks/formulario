@@ -14,7 +14,7 @@ export default function Home() {
     url:
       process.env.NEXT_PUBLIC_APP_URL || "https://formulario-five.vercel.app",
     description:
-      "Crea, organizza e condividi i tuoi formulari e cheat sheet scientifici. Usa l'editor avanzato e l'assistente AI per generare formule e appunti in pochi secondi.",
+      "Ogni Stack è un workspace personale per costruire e mantenere una knowledge base intelligente, potenziata dall'AI per organizzare, collegare e far evolvere la conoscenza.",
     potentialAction: {
       "@type": "SearchAction",
       target: `${process.env.NEXT_PUBLIC_APP_URL || "https://formulario-five.vercel.app"}/community/page/1?q={search_term_string}`,

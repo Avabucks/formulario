@@ -1,24 +1,23 @@
 # FormulaBase
 
-FormulaBase è una web app avanzata per creare, organizzare e condividere formulari scientifici e cheat sheet. Permette di scrivere contenuti complessi in Markdown e LaTeX, organizzarli in capitoli e argomenti, salvarli nel proprio spazio personale, condividerli tramite link pubblici o codici QR e utilizzare assistenti AI di ultima generazione per generare o migliorare formule ed appunti.
+**FormulaBase** è la piattaforma per costruire il tuo **Knowledge Stack**. Ogni Stack è un workspace personale per costruire e mantenere una knowledge base intelligente, potenziata dall’AI per organizzare, collegare e far evolvere la conoscenza. Permette di organizzare contenuti complessi in Markdown e LaTeX, formattare note e snippet di codice, visualizzare equazioni matematiche KaTeX e utilizzare l'intelligenza artificiale per riassumere, spiegare ed estendere i tuoi appunti.
 
 ## Funzionalità principali
 
 - **Autenticazione Sicura**: Accesso tramite Google Authentication e Google One Tap integrato con Firebase Auth.
 - **Sessioni Server-Side**: Gestione delle sessioni sicura e performante lato server tramite `iron-session`.
-- **Editor Avanzato a 3 Pannelli**:
-  - **Navigatore Struttura (Outline)**: Un menu ad albero laterale che mostra l'indice dell'argomento e permette di navigare istantaneamente tra le sezioni.
-  - **Monaco Editor**: Editor di codice integrato con evidenziazione della sintassi per Markdown e LaTeX.
-  - **Anteprima KaTeX/Markdown**: Rendering in tempo reale delle formule matematiche e del layout Markdown.
-- **Assistente AI Chat Integrato**: Chat AI accessibile direttamente dall'editor (supportata da Gemini e Groq) che legge il contesto dell'argomento per generare formule, spiegazioni o riassunti.
+- **Architettura a Knowledge Stack**:
+  - **Navigatore Struttura (Albero dello Stack)**: Un menu ad albero laterale che mostra l'indice dello stack organizzato in Sezioni e Pagine per una navigazione istantanea.
+  - **Editor a 3 Pannelli & Anteprima**: Scrittura fluida in Markdown e LaTeX con anteprima live in tempo reale per testo, formule KaTeX e snippet.
+- **Assistente AI Integrato**: Chat AI accessibile direttamente dall'editor (supportata da Gemini e Groq) che legge il contesto della pagina corrente per generare spiegazioni, riassunti ed estensioni.
 - **Condivisione & Community**:
-  - Pubblicazione dei formulari nella sezione **Community** con filtri e ricerca globale.
+  - Pubblicazione degli stack nella sezione **Community** con filtri e ricerca globale.
   - Condivisione immediata tramite link condivisibili o codici QR dinamici generati in-app.
-  - Possibilità di duplicare (clonare) formulari altrui per personalizzarli.
+  - Possibilità di duplicare (clonare) gli stack della community per personalizzarli.
   - Sistema di preferiti e contatore di visualizzazioni.
-- **Dashboard di Amministrazione**: Pannello `/admin` dedicato per il monitoraggio degli utenti attivi, la creazione di formulari, l'analisi della distribuzione delle risorse e la lettura dei feedback degli utenti.
-- **Aesthetics & UX**: Design premium scuro/chiaro moderno basato su Tailwind CSS 4, Radix UI e framer-motion per micro-animazioni fluide.
-- **Ottimizzazione SEO**: Sitemap e robots dinamici, metadati semantici ottimizzati per ciascuna pagina pubblica.
+- **Dashboard di Amministrazione**: Pannello `/admin` dedicato per il monitoraggio degli utenti attivi, la creazione di stack, l'analisi delle risorse e la lettura dei feedback degli utenti.
+- **Aesthetics & UX**: Design premium moderno basato su Tailwind CSS 4, Radix UI e framer-motion per micro-animazioni fluide.
+- **Ottimizzazione SEO**: Sitemap e robots dinamici, metadati semantici ottimizzati per ciascuno stack pubblico.
 
 ---
 

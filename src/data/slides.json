@@ -1,23 +1,23 @@
 [
   {
     "id": "01",
-    "label": "01 - Crea formulario",
-    "title": "Raccogli e struttura le tue formule",
-    "description": "Crea un formulario per ogni materia o esame. Per organizzare al meglio lo studio, puoi strutturare il tuo formulario dividendolo in capitoli e argomenti specifici.",
+    "label": "01 - Organizza i tuoi contenuti",
+    "title": "Dividi le tue note in capitoli e argomenti",
+    "description": "Crea uno spazio per ogni materia, progetto o corso. Organizza i tuoi appunti in capitoli e argomenti per ritrovare tutto al volo.",
     "video": "/tutorial/01.mp4"
   },
   {
     "id": "02",
-    "label": "02 - Come funziona l'editor",
-    "title": "Scrivi formule in LaTeX con anteprima live",
-    "description": "Scrivi formule matematiche in formato LaTeX e visualizzale in tempo reale mentre digiti. L'editor supporta anche testo descrittivo, titoli ed elenchi.",
+    "label": "02 - Editor semplice e veloce",
+    "title": "Scrivi e vedi subito l'anteprima delle tue note",
+    "description": "Un editor comodo con anteprima in tempo reale. Scrivi testo formattato, elenchi, schemi e formule in modo semplice e immediato.",
     "video": "/tutorial/02.mp4"
   },
   {
     "id": "03",
-    "label": "03 - Generazione con AI",
-    "title": "Lascia che l'AI generi il formulario per te",
-    "description": "Descrivi un argomento o un esame e l'AI genererà automaticamente le formule rilevanti con spiegazioni e passaggi dettagliati, pronte da inserire.",
+    "label": "03 - Assistente AI al tuo fianco",
+    "title": "Chiedi aiuto all'AI mentre scrivi",
+    "description": "L'assistente AI legge la pagina su cui stai lavorando per aiutarti a generare riassunti, spiegazioni o approfondimenti in pochi secondi.",
     "video": "/tutorial/03.mp4"
   }
 ]

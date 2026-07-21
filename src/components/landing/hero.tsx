@@ -26,13 +26,12 @@ const wordVariants = {
 };
 
 const titleWords: { text: string; muted: boolean }[] = [
-  { text: "Crea", muted: false },
-  { text: "formulari scientifici", muted: false },
-  { text: "in pochi secondi", muted: false },
+  { text: "Costruisci il tuo", muted: false },
+  { text: "Knowledge Stack", muted: false },
 ];
 
 const subWords =
-  "Scrivi in LaTeX, usa l'AI per generare formule all'istante, organizza lo studio in capitoli e condividi i tuoi schemi tramite QR o link.".split(
+  "Ogni Stack è un workspace personale per costruire e mantenere una knowledge base intelligente, potenziata dall'AI per organizzare, collegare e far evolvere la conoscenza.".split(
     " ",
   );
 
@@ -98,20 +97,14 @@ function FormulaSnippet({
 }: Readonly<{ formula: (typeof row1Formulas)[number] }>) {
   return (
     <div className="mx-6 md:mx-12 flex items-center gap-6 md:gap-12 select-none cursor-default pt-2 pb-2 md:pt-6 md:pb-2">
-      {/* Title + Formula Container */}
       <div className="relative group flex flex-col items-center justify-center min-w-30">
-        {/* Caption revealed on Hover (desktop only) */}
         <span className="absolute -top-4 text-xs font-medium text-muted-foreground opacity-0 md:opacity-0 md:group-hover:opacity-100 md:transition-opacity md:duration-300 select-none pointer-events-none whitespace-nowrap">
           {formula.title}
         </span>
-
-        {/* KaTeX Formula (dims slightly on hover on desktop only) */}
         <div className="scale-95 md:scale-100 text-foreground flex items-center justify-center min-h-11 select-none md:group-hover:opacity-30 md:transition-opacity md:duration-300">
           <KatexFormula math={formula.math} />
         </div>
       </div>
-
-      {/* Separator / Zap Icon */}
       <Zap
         size={18}
         className="text-muted-foreground/25 shrink-0 select-none"
@@ -142,7 +135,7 @@ export function Hero() {
         {/* Titolo — parola per parola */}
         <h1 className="text-balance text-5xl font-bold leading-tight tracking-tight text-foreground md:text-7xl">
           {titleWords.map((word, i) => {
-            const isHighlighted = word.text === "formulari scientifici";
+            const isHighlighted = word.text === "Knowledge Stack";
             const span = (
               <motion.span
                 key={i}

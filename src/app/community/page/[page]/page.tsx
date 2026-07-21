@@ -27,7 +27,7 @@ const SORT_MAP = {
 
 export const metadata: Metadata = {
   title: `Community - ${packageJson.displayName}`,
-  description: `Esplora la community di ${packageJson.displayName}. Trova, consulta e condividi formulari, cheat sheet e formule di matematica, fisica e altre materie scientifiche.`,
+  description: `Esplora la community di ${packageJson.displayName}. Trova, consulta e condividi quaderni digitali, note e appunti di studio.`,
   alternates: {
     canonical: "/community",
   },

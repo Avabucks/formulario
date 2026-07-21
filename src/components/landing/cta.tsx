@@ -20,10 +20,10 @@ export function Cta() {
         className="mx-auto max-w-3xl px-6 text-center"
       >
         <h2 className="text-balance text-3xl font-bold tracking-tight text-foreground md:text-5xl">
-          Pronto a organizzare le tue formule?
+          Pronto a costruire il tuo Knowledge Stack?
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-pretty text-muted-foreground">
-          Crea il tuo primo formulario in meno di un minuto con l'AI o da zero.
+          Crea le pagine del tuo stack in meno di un minuto con l'Assistente AI o da zero.
           Nessuna carta di credito, nessuna configurazione.
         </p>
         <motion.div

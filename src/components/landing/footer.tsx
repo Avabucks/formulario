@@ -23,8 +23,8 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
-              Crea, organizza e condividi i tuoi formulari scientifici con un
-              editor LaTeX avanzato e l&apos;assistente AI.
+              Ogni Stack è un workspace personale per costruire e mantenere una
+              knowledge base intelligente, potenziata dall&apos;AI.
             </p>
           </div>
 

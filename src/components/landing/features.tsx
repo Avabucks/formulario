@@ -7,39 +7,39 @@ import { BookOpen, Lock, QrCode, ScanLine, Search, Wand2 } from "lucide-react";
 const features = [
   {
     icon: Wand2,
-    title: "Genera con l'AI",
+    title: "Assistente AI Integrato",
     description:
-      "Descrivi l'argomento e l'AI crea per te il formulario completo in LaTeX. Dalla cinematica alla chimica organica, in pochi secondi.",
+      "Chiedi all'AI nell'editor di strutturare note, spiegare snippet di codice, creare riassunti intelligenti e quiz di ripasso.",
   },
   {
     icon: Search,
-    title: "Ricerca Intelligente",
+    title: "Ricerca Istantanea nello Stack",
     description:
-      "Trova qualsiasi formula in secondi. Cerca per nome, simbolo, argomento o parola chiave e ottieni risultati istantanei.",
+      "Trova qualsiasi appunto, snippet o capitolo in pochi secondi. Cerca per titolo, tag o contenuto del tuo stack.",
   },
   {
     icon: BookOpen,
-    title: "Organizzazione per Capitoli",
+    title: "Struttura a Moduli & Stack",
     description:
-      "Struttura i tuoi formulari in capitoli e argomenti. Dalla meccanica classica alla termodinamica, tutto al suo posto.",
+      "Organizza i tuoi progetti in stack, sezioni e capitoli ad albero. Tieni ogni idea, appunto o documentazione al suo posto.",
   },
   {
     icon: ScanLine,
-    title: "Editor LaTeX Integrato",
+    title: "Editor e Anteprima Live",
     description:
-      "Scrivi e modifica formule direttamente in LaTeX con anteprima in tempo reale. Nessun software aggiuntivo richiesto.",
+      "Scrivi le pagine del tuo stack in Markdown con anteprima in tempo reale, blocchi di codice evidenziati e formattazione semplice.",
   },
   {
     icon: QrCode,
-    title: "Condivisione via QR Code",
+    title: "Sharing via Link & QR Code",
     description:
-      "Genera un QR code per ogni formulario. Perfetto per stampare e distribuire durante lezioni ed esami.",
+      "Genera un codice QR dinamico o un link unico per ogni stack. Perfetto per condividere note e progetti con colleghi e compagni.",
   },
   {
     icon: Lock,
-    title: "Formulari Privati e Pubblici",
+    title: "Stack Privati & Community",
     description:
-      "Tieni le tue formule per te oppure rendile disponibili alla community. Il controllo è sempre nelle tue mani.",
+      "Mantieni i tuoi stack riservati oppure pubblicali nella Community. Gli altri utenti potranno consultarli e duplicarli al volo.",
   },
 ];
 
@@ -62,11 +62,10 @@ export function Features() {
             Funzionalità
           </p>
           <h2 className="text-balance text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-            Tutto ciò che serve per i tuoi formulari
+            Tutto ciò che serve per il tuo Knowledge Stack
           </h2>
           <p className="mt-4 text-pretty text-muted-foreground">
-            Uno strumento pensato per studenti, docenti e ricercatori. Meno
-            confusione, più formule.
+            Un ambiente di lavoro fluido progettato per developer, builder e studenti. Meno distrazioni, più esecuzione.
           </p>
         </motion.div>
 
