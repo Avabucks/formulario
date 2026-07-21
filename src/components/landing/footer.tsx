@@ -81,7 +81,7 @@ export function Footer() {
               <ul className="flex flex-col gap-2.5 text-sm">
                 <li>
                   <a
-                    href="https://discord.gg/uuRuWtteZ"
+                    href="https://discord.gg/xygMZVYDSB"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors"
@@ -135,7 +135,7 @@ export function Footer() {
             <div className="flex items-center gap-2">
               {/* Discord */}
               <a
-                href="https://discord.gg/uuRuWtteZ"
+                href="https://discord.gg/xygMZVYDSB"
                 target="_blank"
                 rel="noreferrer"
                 className="rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-foreground transition-all duration-200"

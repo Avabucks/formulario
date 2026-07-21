@@ -195,7 +195,7 @@ export function DiscordDialog({
               </Button>
             </DialogClose>
             <Link
-              href="https://discord.gg/uuRuWtteZ"
+              href="https://discord.gg/xygMZVYDSB"
               target="_blank"
               rel="noopener noreferrer"
               className="h-10 bg-[#5865F2] hover:bg-[#4752c4] text-white font-semibold shadow-none cursor-pointer border-none flex items-center justify-center gap-1.5 px-4 rounded-md transition-colors text-sm select-none"
