@@ -14,10 +14,10 @@ import {
   DialogStackTitle,
 } from "@/src/components/ui/dialog-stack";
 import slides from "@/src/data/slides.json";
-import { ArrowLeft, ArrowRight, FileVideo, Sparkles } from "lucide-react";
+import { cn } from "@/src/lib/utils";
+import { ArrowLeft, ArrowRight, FileVideo } from "lucide-react";
 import { useEffect, useState } from "react";
 import ForumlarioAdd from "../home/formulario-add";
-import { cn } from "@/src/lib/utils";
 
 const STORAGE_KEY = "new-account-popup-closed";
 
@@ -32,12 +32,12 @@ export function NewAccountPopup({
 
   useEffect(() => {
     if (open) {
+      localStorage.setItem(STORAGE_KEY, "true");
       setCurrent(0);
     }
   }, [open]);
 
   const handleClose = () => {
-    localStorage.setItem(STORAGE_KEY, "true");
     setOpen(false);
   };
 

@@ -32,8 +32,6 @@ export function GithubButton() {
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data) {
-          console.log("GitHub info fetched:", data);
-
           const image = `https://opengraph.githubassets.com/1/${data.full_name}`;
 
           setRepoInfo({
