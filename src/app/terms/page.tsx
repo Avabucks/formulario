@@ -1,5 +1,4 @@
 import DeleteAccount from "@/src/components/auth/delete-account";
-import { Header } from "@/src/components/navigation/header";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
@@ -30,7 +29,6 @@ export default async function TermsPage() {
 
   return (
     <>
-      <Header />
       <div className="flex flex-col gap-4 w-full pt-16 px-2 md:px-6">
         <div className="max-w-3xl mx-auto w-full py-8 flex flex-col gap-8">
           <div className="flex flex-col gap-2">

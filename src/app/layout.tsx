@@ -8,6 +8,8 @@ import "../styles/editor.css";
 import "../styles/globals.css";
 import DiscordWidget from "../components/shared/discord-widget";
 import { CookieConsent } from "../components/legal/cookie-consent";
+import { Header } from "../components/navigation/header";
+import { HeaderWrapper } from "../components/navigation/header-wrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -124,6 +126,9 @@ export default function RootLayout({
             height={3}
             showSpinner={false}
           />
+          <HeaderWrapper>
+            <Header />
+          </HeaderWrapper>
           <main className="flex flex-1 flex-col">{children}</main>
           <DiscordWidget />
           <Toaster />

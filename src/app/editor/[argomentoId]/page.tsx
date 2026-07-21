@@ -1,7 +1,6 @@
 import packageJson from "@/package.json";
 import { EditorPage } from "@/src/components/editor/editor-page";
 import { BreadcrumbLogic } from "@/src/components/navigation/breadcrumb-logic";
-import { Header } from "@/src/components/navigation/header";
 import { Skeleton } from "@/src/components/ui/skeleton";
 import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
@@ -148,7 +147,6 @@ export default async function Argomento({
 
   return (
     <div className="flex flex-col h-screen">
-      <Header />
       <div className="flex flex-1 flex-col gap-4 w-full px-2 md:px-6 pt-16 pb-5 overflow-hidden">
         <BreadcrumbLogic items={breadcrumbs} />
         <Suspense fallback={<Skeleton className="h-full w-full" />}>

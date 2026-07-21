@@ -1,4 +1,3 @@
-import { Header } from "@/src/components/navigation/header";
 import packageJson from "@/package.json";
 import { Button } from "@/src/components/ui/button";
 import { Footer } from "@/src/components/landing/footer";
@@ -15,7 +14,6 @@ export const metadata: Metadata = {
 export default function PrivacyPage() {
   return (
     <>
-      <Header />
       <div className="flex flex-col gap-4 w-full px-2 md:px-6 pt-16">
         <div className="max-w-3xl mx-auto w-full py-8 flex flex-col gap-8">
           <div className="flex flex-col gap-2">

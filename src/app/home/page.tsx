@@ -2,7 +2,6 @@ import packageJson from "@/package.json";
 
 import ForumlarioAdd from "@/src/components/home/formulario-add";
 import { HomeTabs } from "@/src/components/home/home-tabs";
-import { Header } from "@/src/components/navigation/header";
 import { AnimatedGridPattern } from "@/src/components/ui/animated-grid-pattern";
 import {
   Avatar,
@@ -108,9 +107,7 @@ export default async function Home({
   const photoURL = users[0].photoURL;
 
   return (
-    <>
-      <Header />
-      <div className="mx-auto flex w-full flex-col gap-4 px-3 pb-8 mt-16 md:px-6">
+    <div className="mx-auto flex w-full flex-col gap-4 px-3 pb-8 mt-16 md:px-6">
         <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
           <div className="relative overflow-hidden rounded-xl border bg-card p-6 md:p-8">
             <AnimatedGridPattern
@@ -185,6 +182,5 @@ export default async function Home({
           />
         </div>
       </div>
-    </>
   );
 }

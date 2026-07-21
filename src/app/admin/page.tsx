@@ -251,6 +251,7 @@ export default async function Admin({
                 </div>
                 */}
 
+        {/*
         <h2 className="text-xl font-semibold">Feedback</h2>
         <div className="space-y-3">
           {feedback.length === 0 ? (
@@ -308,6 +309,7 @@ export default async function Admin({
             ))
           )}
         </div>
+        */}
       </div>
     );
   }

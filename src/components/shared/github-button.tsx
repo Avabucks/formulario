@@ -60,7 +60,6 @@ export function GithubButton() {
           >
             <a href={REPO_URL} target="_blank" rel="noopener noreferrer">
               <GithubIcon className="h-5 w-5 fill-current" />
-              <span>{stars || 0}</span>
               <NumberTicker
                 value={stars || 0}
                 className="text-xs font-medium text-current dark:text-current inline-block"

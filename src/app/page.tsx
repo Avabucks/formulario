@@ -1,4 +1,3 @@
-import { Header } from "@/src/components/navigation/header";
 import { Cta } from "../components/landing/cta";
 import { Faq } from "../components/landing/faq";
 import { Features } from "../components/landing/features";
@@ -30,7 +29,6 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <GoogleOneTap />
-      <Header />
       <Hero />
       <VideoDemo />
       <Features />

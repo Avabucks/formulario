@@ -4,7 +4,6 @@ import { CapitoloItem } from "@/src/components/formulario/capitolo-item";
 import ViewTracker from "@/src/components/formulario/view-tracker";
 import { FormularioSettings } from "@/src/components/home/formulario-settings";
 import { BreadcrumbLogic } from "@/src/components/navigation/breadcrumb-logic";
-import { Header } from "@/src/components/navigation/header";
 import {
   Empty,
   EmptyContent,
@@ -202,7 +201,6 @@ export default async function Formulario({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       )}
-      <Header />
       <div className="flex flex-col gap-4 w-full px-2 md:px-6 pt-16 pb-5">
         <ViewTracker formularioId={formulario.id} />
         <BreadcrumbLogic items={breadcrumbs} />

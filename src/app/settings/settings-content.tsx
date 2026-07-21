@@ -1,6 +1,5 @@
 import DeleteAccount from "@/src/components/auth/delete-account";
 import { Footer } from "@/src/components/landing/footer";
-import { Header } from "@/src/components/navigation/header";
 import { ModeToggle } from "@/src/components/theme/theme-toggler";
 import {
   Avatar,
@@ -102,7 +101,6 @@ export async function SettingsContent({
 
   return (
     <>
-      <Header />
       <div className="mx-auto flex w-full flex-1 flex-col gap-6 px-3 pb-10 mt-16 md:px-6">
         <div className="grid gap-6 lg:grid-cols-[16rem_minmax(0,1fr)]">
           <aside className="w-full overflow-y-hidden overflow-x-auto lg:sticky lg:top-16 lg:h-fit">

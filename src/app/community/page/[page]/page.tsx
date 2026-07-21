@@ -3,7 +3,6 @@ import { CommunityFilters } from "@/src/components/community/community-filters";
 import { CtaCommunity } from "@/src/components/community/cta-community";
 import { FormularioCard } from "@/src/components/home/formulario-card";
 import { Footer } from "@/src/components/landing/footer";
-import { Header } from "@/src/components/navigation/header";
 import {
   Pagination,
   PaginationContent,
@@ -106,7 +105,6 @@ export default async function Capitolo({
 
   return (
     <>
-      <Header />
       <div className="flex flex-col gap-4 w-full px-2 pt-16 pb-5 md:px-6">
         <div className="rounded-xl overflow-hidden">
           <CtaCommunity />
