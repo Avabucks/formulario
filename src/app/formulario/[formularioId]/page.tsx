@@ -11,6 +11,7 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
+  StackedCardsIllustration,
 } from "@/src/components/ui/empty";
 import { Skeleton } from "@/src/components/ui/skeleton";
 import { TypographyH2 } from "@/src/components/ui/typography";
@@ -145,8 +146,8 @@ export default async function Formulario({
   const renderEmpty = () => (
     <Empty className="border border-dashed">
       <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <BookmarkX />
+        <EmptyMedia>
+          <StackedCardsIllustration />
         </EmptyMedia>
         <EmptyTitle>Nessun Capitolo</EmptyTitle>
         <EmptyDescription>

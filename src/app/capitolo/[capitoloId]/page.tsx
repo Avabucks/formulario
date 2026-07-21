@@ -10,6 +10,7 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
+  StackedCardsIllustration,
 } from "@/src/components/ui/empty";
 import { Skeleton } from "@/src/components/ui/skeleton";
 import { TypographyH2 } from "@/src/components/ui/typography";
@@ -155,12 +156,12 @@ export default async function Capitolo({
   const renderEmpty = () => (
     <Empty className="border border-dashed">
       <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <BookmarkX />
+        <EmptyMedia>
+          <StackedCardsIllustration />
         </EmptyMedia>
-        <EmptyTitle>Nessun Capitolo</EmptyTitle>
+        <EmptyTitle>Nessun Argomento</EmptyTitle>
         <EmptyDescription>
-          {`Non ci sono capitoli da mostrare in "${capitolo.titolo}".`}
+          {`Non ci sono argomenti da mostrare in "${capitolo.titolo}".`}
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent className="flex-row justify-center gap-2">

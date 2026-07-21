@@ -14,6 +14,7 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
+  StackedCardsIllustration,
 } from "@/src/components/ui/empty";
 import Link from "next/link";
 import ForumlarioAdd from "./formulario-add";
@@ -123,8 +124,8 @@ export function HomeTabs({
   const renderEmptyFormulari = () => (
     <Empty className="border border-dashed">
       <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <BookOpen />
+        <EmptyMedia>
+          <StackedCardsIllustration />
         </EmptyMedia>
         <EmptyTitle>Nessun formulario</EmptyTitle>
         <EmptyDescription>Non ci sono formulari da mostrare.</EmptyDescription>
@@ -138,8 +139,8 @@ export function HomeTabs({
   const renderEmptyPreferiti = () => (
     <Empty className="border border-dashed">
       <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <StarOff />
+        <EmptyMedia>
+          <StackedCardsIllustration />
         </EmptyMedia>
         <EmptyTitle>Nessun formulario preferito</EmptyTitle>
         <EmptyDescription>
