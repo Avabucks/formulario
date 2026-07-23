@@ -51,12 +51,16 @@ export async function generateMetadata({
     };
   }
 
+  const description =
+    formulario.descrizione ||
+    "Consulta questo formulario nel tuo Knowledge Stack per impilare i tuoi progetti, navigare tra alberi concettuali ordinati ed elaborare tutto con l'assistente AI";
+
   return {
     title: `${formulario.titolo} - ${packageJson.displayName}`,
-    description: formulario.descrizione,
+    description,
     openGraph: {
       title: `${formulario.titolo} - ${packageJson.displayName}`,
-      description: formulario.descrizione,
+      description,
       images: [
         {
           url: "/social.png",
@@ -69,7 +73,7 @@ export async function generateMetadata({
     twitter: {
       card: "summary_large_image",
       title: `${formulario.titolo} - ${packageJson.displayName}`,
-      description: formulario.descrizione,
+      description,
       images: ["/social.png"],
     },
   };

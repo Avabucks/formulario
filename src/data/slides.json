@@ -3,21 +3,21 @@
     "id": "01",
     "label": "01 - Memory Stack Architecture",
     "title": "Impila la tua conoscenza in uno Stack di Memoria",
-    "description": "Organizza materie, corsi e progetti in uno stack centralizzato. Mantieni sempre in memoria il contesto di lavoro attivo per accedere ad ogni risorsa senza dispersione.",
+    "description": "Organizza materie, corsi e progetti in uno stack centralizzato mantenendo sempre in memoria il contesto di lavoro attivo per accedere ad ogni risorsa senza dispersione.",
     "video": "/tutorial/01.mp4"
   },
   {
     "id": "02",
     "label": "02 - Knowledge Trees & Pointers",
     "title": "Puntatori diretti agli Alberi di Conoscenza",
-    "description": "Ogni sezione dello stack agisce da puntatore ad un albero informativo gerarchico (Capitoli, Pagine e Sub-nodi). Salta da un concetto all'altro all'istante.",
+    "description": "Ogni sezione dello stack agisce da puntatore ad un albero informativo gerarchico per saltare da un concetto all'altro all'istante.",
     "video": "/tutorial/02.mp4"
   },
   {
     "id": "03",
     "label": "03 - Assistente AI Contestuale",
     "title": "Chat contestuale & Modifiche in anteprima",
-    "description": "L'AI legge la scheda attiva per aiutarti a generare, rifinire o ristrutturare i tuoi contenuti. Revisiona ogni modifica con un'anteprima visiva prima di applicarla.",
+    "description": "L'AI legge la scheda attiva per aiutarti a generare, rifinire o ristrutturare i tuoi contenuti e ti permette di revisionare ogni modifica con un'anteprima visiva prima di applicarla.",
     "video": "/tutorial/03.mp4"
   }
 ]

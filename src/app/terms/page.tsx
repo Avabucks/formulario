@@ -10,7 +10,7 @@ import { pool } from "@/src/lib/db";
 
 export const metadata: Metadata = {
   title: `Termini e condizioni - ${packageJson.displayName}`,
-  description: `Termini di servizio e condizioni d'uso della piattaforma ${packageJson.displayName}.`,
+  description: `Termini e condizioni d'uso del Knowledge Stack per impilare i tuoi progetti, navigare tra alberi concettuali ordinati ed elaborare tutto con l'assistente AI`,
   alternates: {
     canonical: "/terms",
   },

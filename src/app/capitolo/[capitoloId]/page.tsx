@@ -51,12 +51,16 @@ export async function generateMetadata({
     };
   }
 
+  const description =
+    capitolo.descrizione ||
+    "Esplora questo capitolo nel tuo Knowledge Stack per impilare i tuoi progetti, navigare tra alberi concettuali ordinati ed elaborare tutto con l'assistente AI";
+
   return {
     title: `${capitolo.titolo} - ${packageJson.displayName}`,
-    description: capitolo.descrizione,
+    description,
     openGraph: {
       title: `${capitolo.titolo} - ${packageJson.displayName}`,
-      description: capitolo.descrizione,
+      description,
       images: [
         {
           url: "/social.png",
@@ -69,7 +73,7 @@ export async function generateMetadata({
     twitter: {
       card: "summary_large_image",
       title: `${capitolo.titolo} - ${packageJson.displayName}`,
-      description: capitolo.descrizione,
+      description,
       images: ["/social.png"],
     },
   };

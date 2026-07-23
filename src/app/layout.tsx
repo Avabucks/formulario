@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_APP_URL || "https://formulario-five.vercel.app",
   ),
   title: `${packageJson.displayName} - Knowledge Stack`,
-  description: `Ogni Stack è un workspace personale per costruire e mantenere una knowledge base intelligente, potenziata dall'AI per organizzare, collegare e far evolvere la conoscenza.`,
+  description: `Impila i tuoi progetti come uno stack di memoria, naviga tra alberi concettuali ordinati ed elabora tutto con l'assistente AI`,
   keywords: [
     "knowledge stack",
     "stack",
@@ -81,7 +81,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: `${packageJson.displayName} - Knowledge Stack`,
-    description: `Ogni Stack è un workspace personale per costruire e mantenere una knowledge base intelligente, potenziata dall'AI per organizzare, collegare e far evolvere la conoscenza.`,
+    description: `Impila i tuoi progetti come uno stack di memoria, naviga tra alberi concettuali ordinati ed elabora tutto con l'assistente AI`,
     images: [
       {
         url: "/social.png",
@@ -94,7 +94,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: `${packageJson.displayName} - Knowledge Stack`,
-    description: `Ogni Stack è un workspace personale per costruire e mantenere una knowledge base intelligente, potenziata dall'AI per organizzare, collegare e far evolvere la conoscenza.`,
+    description: `Impila i tuoi progetti come uno stack di memoria, naviga tra alberi concettuali ordinati ed elabora tutto con l'assistente AI`,
     images: ["/social.png"],
   },
   appleWebApp: {

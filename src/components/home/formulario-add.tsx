@@ -137,7 +137,7 @@ export default function ForumlarioAdd({
             <Button variant="default">
               <Plus size={16} />
               <div className={`${!showLabel && "hidden md:flex"}`}>
-                Aggiungi formulario
+                Alloca nello stack
               </div>
             </Button>
           </DialogTrigger>
@@ -145,7 +145,7 @@ export default function ForumlarioAdd({
         <HoverCardContent className="w-100 space-y-3">
           <div className="flex items-center justify-between gap-2">
             <span className="font-semibold text-xs text-foreground">
-              Aggiungi formulario
+              Alloca nello stack
             </span>
             {allowKey && (
               <KbdGroup className="hidden md:flex">
@@ -172,7 +172,7 @@ export default function ForumlarioAdd({
       <DialogContent className="sm:max-w-md">
         <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>Aggiungi un formulario</DialogTitle>
+            <DialogTitle>Alloca nello stack</DialogTitle>
           </DialogHeader>
           <FieldGroup>
             <Field>

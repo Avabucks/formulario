@@ -30,7 +30,7 @@ import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: `Admin - ${packageJson.displayName}`,
-  description: `...`,
+  description: `Pannello di amministrazione del Knowledge Stack per gestire gli utenti, impilare i tuoi progetti, navigare tra alberi concettuali ordinati ed elaborare tutto con l'assistente AI`,
   robots: {
     index: false,
     follow: false,

@@ -7,7 +7,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: `Accedi - ${packageJson.displayName}`,
-  description: `Accedi a ${packageJson.displayName} per creare, organizzare e gestire i tuoi formulari personali e cheat sheet scientifici.`,
+  description: `Accedi al tuo Knowledge Stack personale per impilare i tuoi progetti, navigare tra alberi concettuali ordinati ed elaborare tutto con l'assistente AI`,
   alternates: {
     canonical: "/login",
   },

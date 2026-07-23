@@ -14,7 +14,7 @@ export default function Home() {
     url:
       process.env.NEXT_PUBLIC_APP_URL || "https://formulario-five.vercel.app",
     description:
-      "Ogni Stack è un workspace personale per costruire e mantenere una knowledge base intelligente, potenziata dall'AI per organizzare, collegare e far evolvere la conoscenza.",
+      "Impila i tuoi progetti come uno stack di memoria, naviga tra alberi concettuali ordinati ed elabora tutto con l'assistente AI",
     potentialAction: {
       "@type": "SearchAction",
       target: `${process.env.NEXT_PUBLIC_APP_URL || "https://formulario-five.vercel.app"}/community/page/1?q={search_term_string}`,

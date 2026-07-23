@@ -49,12 +49,16 @@ export async function generateMetadata({
     };
   }
 
+  const description =
+    argomento.descrizione ||
+    "Modifica i tuoi contenuti nel Knowledge Stack per impilare i tuoi progetti, navigare tra alberi concettuali ordinati ed elaborare tutto con l'assistente AI";
+
   return {
     title: `${argomento.titolo} - ${packageJson.displayName}`,
-    description: argomento.descrizione,
+    description,
     openGraph: {
       title: `${argomento.titolo} - ${packageJson.displayName}`,
-      description: argomento.descrizione,
+      description,
       images: [
         {
           url: "/social.png",
@@ -67,7 +71,7 @@ export async function generateMetadata({
     twitter: {
       card: "summary_large_image",
       title: `${argomento.titolo} - ${packageJson.displayName}`,
-      description: argomento.descrizione,
+      description,
       images: ["/social.png"],
     },
   };

@@ -19,7 +19,7 @@ export function CtaCommunity() {
         {/* Title */}
         <h1 className="mb-6 max-w-3xl text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl">
           <span className="text-balance">
-            Scopri i quaderni della{" "}
+            Scopri gli stack della{" "}
             <span className="relative">
               Community
               <svg
@@ -42,8 +42,8 @@ export function CtaCommunity() {
 
         {/* Description */}
         <p className="mb-8 max-w-xl text-lg text-muted-foreground md:text-xl">
-          Esplora i quaderni creati da studenti e professionisti.
-          Trova, salva e condividi le tue note preferite.
+          Esplora i Knowledge Stack condivisi dalla community.
+          Scopri alberi di conoscenza strutturati, salva le note chiave ed esegui il fork dei progetti nel tuo workspace.
         </p>
       </div>
     </section>

@@ -5,7 +5,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: `Privacy Policy - ${packageJson.displayName}`,
-  description: `Informativa sul trattamento dei dati personali (Privacy Policy) di ${packageJson.displayName} ai sensi del Regolamento (UE) 2016/679 (GDPR).`,
+  description: `Informativa sulla privacy del tuo Knowledge Stack per proteggere i tuoi progetti, navigare in sicurezza tra alberi concettuali ordinati ed elaborare tutto con l'assistente AI`,
   alternates: {
     canonical: "/privacy",
   },

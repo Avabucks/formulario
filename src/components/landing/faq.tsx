@@ -13,17 +13,17 @@ const faqs = [
   {
     question: "Cos'è uno Stack di Memoria su FormulaBase?",
     answer:
-      "È il tuo spazio di lavoro principale in cui impili i tuoi Knowledge Trees (alberi di conoscenza). Funziona come una struttura a memoria in cui ogni livello mantiene i riferimenti ai tuoi argomenti e corsi per una consultazione rapida e ordinata.",
+      "È il tuo spazio di lavoro principale in cui impili i tuoi Knowledge Trees (alberi di conoscenza), strutturato come una memoria in cui ogni livello mantiene i riferimenti ai tuoi argomenti per una consultazione rapida e ordinata.",
   },
   {
     question: "Come funzionano i puntatori e gli alberi di conoscenza?",
     answer:
-      "Ogni materia o progetto è organizzato ad albero (Capitoli, Pagine, Sub-nodi). I puntatori concettuali ti permettono di accedere istantaneamente a qualsiasi ramo o foglia tramite ricerca rapida o collegamenti diretti.",
+      "Ogni materia o progetto è organizzato ad albero con nodi e knowledge, mentre i puntatori concettuali ti permettono di accedere istantaneamente a qualsiasi ramo o foglia tramite ricerca rapida e collegamenti diretti.",
   },
   {
     question: "Come funziona l'Assistente AI nell'editor?",
     answer:
-      "È una chat contestuale nativa che legge in tempo reale la scheda o il capitolo su cui stai lavorando. Puoi chiederle di strutturare, rifinire o generare contenuti: l'AI propone le modifiche direttamente nell'editor con un'anteprima visiva di ogni cambiamento, permettendoti di approvarle con un click.",
+      "È una chat contestuale nativa che legge in tempo reale la scheda su cui stai lavorando per strutturare, rifinire o generare contenuti, proponendo le modifiche direttamente nell'editor con un'anteprima visiva che puoi approvare con un click.",
   },
   {
     question: "Come posso formattare le note nei vari nodi?",
@@ -33,12 +33,12 @@ const faqs = [
   {
     question: "Come funziona la condivisione e il 'fork' dello Stack?",
     answer:
-      "Ogni Knowledge Stack può generare un QR code o link unico. Puoi condividere lo stack in modalità privata, pubblica o community per consentire ad altri di consultarlo e duplicarlo (fork) nel proprio profilo.",
+      "Ogni Knowledge Stack può generare un QR code o link unico per condividere il tuo progetto in modalità privata, pubblica o community e consentire ad altri di consultarlo o duplicarlo nel proprio profilo.",
   },
   {
     question: "È gratuito?",
     answer:
-      "Sì, puoi iniziare gratuitamente senza carta di credito. Crei i tuoi stack, organizzi i tuoi alberi di conoscenza ed utilizzi l'assistente AI e l'editor live fin da subito.",
+      "Sì, puoi iniziare gratuitamente e senza carta di credito per creare i tuoi stack, organizzare i tuoi alberi di conoscenza e utilizzare l'assistente AI con l'editor live fin da subito.",
   },
 ];
 

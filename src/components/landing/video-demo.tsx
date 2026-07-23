@@ -81,14 +81,13 @@ export function VideoDemo() {
           className="mx-auto mb-20 max-w-2xl text-center"
         >
           <p className="mb-3 text-sm font-medium uppercase tracking-widest text-muted-foreground">
-            Demo
+            Demo &amp; Workflow
           </p>
           <h2 className="text-balance text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-            Tutto quello che ti serve
+            Tutto il tuo Knowledge Stack in azione
           </h2>
           <p className="mt-4 text-pretty text-muted-foreground">
-            Abbiamo unito creazione, organizzazione e condivisione in un'unica
-            interfaccia.
+            Organizzazione ad albero, puntatori intelligenti ed editing contestuale AI in un'unica interfaccia.
           </p>
         </motion.div>
 

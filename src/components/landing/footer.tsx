@@ -24,8 +24,7 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
-              Ogni Stack è un workspace personale per costruire e mantenere una
-              knowledge base intelligente, potenziata dall&apos;AI.
+              Impila i tuoi progetti come uno stack di memoria, naviga tra alberi concettuali ordinati ed elabora tutto con l'assistente AI.
             </p>
           </div>
 

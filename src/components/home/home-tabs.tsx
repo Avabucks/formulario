@@ -231,7 +231,7 @@ export function HomeTabs({
         {/* Title & Mobile-only Sort Group */}
         <div className="flex items-center justify-between w-full lg:w-auto">
           <h2 className="text-2xl font-semibold tracking-tight text-foreground flex items-center shrink-0">
-            La tua raccolta
+            Il tuo Stack
           </h2>
 
           {/* Sort Selector ONLY on Mobile/Tablet (hidden on Desktop lg) */}
@@ -246,7 +246,7 @@ export function HomeTabs({
         <div className="hidden lg:block flex-1 relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Cerca nella tua raccolta..."
+            placeholder="Cerca nel tuo stack..."
             value={searchVal}
             onChange={(e) => {
               setSearchVal(e.target.value);

@@ -7,6 +7,7 @@ import Link from "next/link";
 import { AnimatedGridPattern } from "@/src/components/ui/animated-grid-pattern";
 import { cn } from "@/src/lib/utils";
 import { Highlighter } from "../ui/highlighter";
+import { HeroStackAnimation } from "./hero-stack-animation";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -20,12 +21,12 @@ const wordVariants = {
 };
 
 const titleWords: { text: string; muted: boolean }[] = [
-  { text: "Costruisci il tuo", muted: false },
+  { text: "Alloca il tuo", muted: false },
   { text: "Knowledge Stack", muted: false },
 ];
 
 const subWords =
-  "Impila i tuoi progetti come uno stack di memoria e naviga tra alberi concettuali ordinati. Accedi a qualsiasi scheda al volo ed elaborala con l'assistente AI.".split(
+  "Impila i tuoi progetti come uno stack di memoria, naviga tra alberi concettuali ordinati ed elabora tutto con l'assistente AI.".split(
     " ",
   );
 
@@ -37,7 +38,7 @@ const AFTER_SUB = SUB_START + subWords.length * SUB_STEP + 0.05;
 
 export function Hero() {
   return (
-    <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden py-20">
+    <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden py-20 lg:py-28">
       <div className="absolute inset-0 bg-background" />
       <AnimatedGridPattern
         numSquares={30}
@@ -51,10 +52,10 @@ export function Hero() {
         )}
       />
       {/* Ambient Radial Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-137.5 h-137.5 bg-brand-purple/10 dark:bg-brand-purple/5 rounded-full blur-[130px] pointer-events-none -z-10" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-brand-purple/10 dark:bg-brand-purple/5 rounded-full blur-[130px] pointer-events-none -z-10" />
 
-      <div className="relative z-10 mx-auto max-w-4xl px-6 text-center my-auto">
-        {/* Titolo — parola per parola */}
+      <div className="relative z-10 mx-auto max-w-4xl px-6 text-center my-auto w-full">
+        {/* Titolo — parola per parola al centro */}
         <h1 className="text-balance text-5xl font-bold leading-tight tracking-tight text-foreground md:text-7xl">
           {titleWords.map((word, i) => {
             const isHighlighted = word.text === "Knowledge Stack";
@@ -106,7 +107,7 @@ export function Hero() {
           })}
         </h1>
 
-        {/* Sottotitolo — parola per parola */}
+        {/* Sottotitolo — parola per parola al centro */}
         <p className="mx-auto mt-6 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl">
           {subWords.map((word, i) => (
             <motion.span
@@ -122,7 +123,7 @@ export function Hero() {
           ))}
         </p>
 
-        {/* CTA buttons */}
+        {/* CTA buttons al centro */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -148,6 +149,16 @@ export function Hero() {
             <ScanEye className="h-5 w-5" />
             Guarda la demo
           </Button>
+        </motion.div>
+
+        {/* Animazione dello Stack centrata subito sotto */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.96, y: 24 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.7, ease, delay: AFTER_SUB + 0.15 }}
+          className="mt-14 w-full"
+        >
+          <HeroStackAnimation />
         </motion.div>
       </div>
     </section>

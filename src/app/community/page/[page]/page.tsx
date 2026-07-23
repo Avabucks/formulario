@@ -27,7 +27,7 @@ const SORT_MAP = {
 
 export const metadata: Metadata = {
   title: `Community - ${packageJson.displayName}`,
-  description: `Esplora la community di ${packageJson.displayName}. Trova, consulta e condividi quaderni digitali, note e appunti di studio.`,
+  description: `Esplora la pila di progetti e formulari condivisi dalla community, naviga tra alberi concettuali ordinati ed elabora tutto con l'assistente AI`,
   alternates: {
     canonical: "/community",
   },

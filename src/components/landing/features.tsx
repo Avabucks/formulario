@@ -9,37 +9,37 @@ const features = [
     icon: Wand2,
     title: "Assistente AI Contestuale",
     description:
-      "Un copilota che legge la scheda attiva come contesto. Chatta con le note, applica modifiche al volo e revisiona i cambiamenti in anteprima.",
+      "Un copilota che legge la scheda attiva come contesto per chattare con le note, applicare modifiche al volo e revisionare i cambiamenti in anteprima.",
   },
   {
     icon: Search,
     title: "Ricerca Istantanea nello Stack",
     description:
-      "Trova qualsiasi appunto, snippet o capitolo in pochi secondi. Cerca per titolo, tag o contenuto del tuo stack.",
+      "Trova qualsiasi appunto, snippet o capitolo in pochi secondi cercando per titolo, tag o contenuto del tuo stack.",
   },
   {
     icon: BookOpen,
     title: "Struttura ad Albero & Stack",
     description:
-      "Organizza i tuoi progetti in uno stack di memoria dividendo note e documentazione in capitoli e schede ad albero.",
+      "Organizza la conoscenza come uno stack LIFO collegato ad alberi concettuali ordinati e navigabili.",
   },
   {
     icon: ScanLine,
     title: "Editor e Anteprima Live",
     description:
-      "Scrivi le pagine del tuo stack in Markdown con anteprima in tempo reale, blocchi di codice evidenziati e formattazione semplice.",
+      "Scrivi la knowledge del tuo stack in Markdown con anteprima in tempo reale, blocchi di codice evidenziati e formattazione semplice.",
   },
   {
     icon: QrCode,
     title: "Sharing via Link & QR Code",
     description:
-      "Genera un codice QR dinamico o un link unico per condividere il tuo stack. Perfetto per condividere note e progetti al volo.",
+      "Genera un codice QR dinamico o un link unico per condividere il tuo stack e mostrare note e progetti al volo.",
   },
   {
     icon: Lock,
     title: "Stack Privati & Community",
     description:
-      "Mantieni i tuoi stack riservati oppure pubblicali nella Community per permettere ad altri utenti di consultarli e duplicarli.",
+      "Mantieni privati i tuoi stack o pubblicali alla community per costruire conoscenza condivisa.",
   },
 ];
 
@@ -65,7 +65,7 @@ export function Features() {
             Tutto ciò che serve per il tuo Knowledge Stack
           </h2>
           <p className="mt-4 text-pretty text-muted-foreground">
-            Un ambiente di lavoro fluido progettato per developer, builder e studenti. Meno distrazioni, più esecuzione.
+            Un ambiente di lavoro fluido progettato per developer, builder e studenti per ridurre le distrazioni e massimizzare l'esecuzione.
           </p>
         </motion.div>
 

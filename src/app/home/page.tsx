@@ -29,7 +29,7 @@ import { SortOption } from "@/src/components/shared/sort-selector";
 
 export const metadata: Metadata = {
   title: `Home - ${packageJson.displayName}`,
-  description: `Crea, organizza e condividi i tuoi formulari e cheat sheet con ${packageJson.displayName}. Usa l'editor avanzato e l'assistente AI per generare formule e appunti in pochi secondi.`,
+  description: `Organizza e impila i tuoi progetti nel tuo workspace personale, naviga tra alberi concettuali ordinati ed elabora tutto con l'assistente AI`,
 };
 
 export default async function Home({
@@ -131,8 +131,7 @@ export default async function Home({
                 </h1>
               </div>
               <p className="max-w-2xl text-base leading-7 text-muted-foreground">
-                Crea un formulario, dividilo in capitoli e riprendi le modifiche
-                in ogni momento.
+                Alloca nuovo spazio nello stack per espandere la tua conoscenza.
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
@@ -145,13 +144,13 @@ export default async function Home({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Library className="h-5 w-5" />
-              Libreria condivisa
+              Stack della Community
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-1 flex-col justify-between gap-6">
             <p className="text-sm leading-6 text-muted-foreground">
-              Scopri formulari pubblici, salva quelli utili e usali come base
-              per studiare o preparare lezioni.
+              Esplora i progetti della community, naviga alberi concettuali
+              condivisi e salva gli stack più utili nel tuo workspace.
             </p>
             <Button
               asChild

@@ -24,7 +24,7 @@ export function Cta() {
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-pretty text-muted-foreground">
           Impila i tuoi progetti e crea i tuoi alberi di conoscenza in meno di un
-          minuto con l'Assistente AI. Nessuna carta di credito, nessuna configurazione.
+          minuto con l'Assistente AI, senza alcuna carta di credito e senza configurazione.
         </p>
         <motion.div
           initial={{ opacity: 0, y: 16 }}
