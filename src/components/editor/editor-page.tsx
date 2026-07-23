@@ -7,6 +7,7 @@ import {
   Eye,
   Maximize2,
   Minimize2,
+  PanelLeft,
   PenLine,
   Redo2,
   Sparkles,
@@ -18,6 +19,7 @@ import { FormularioSettings } from "../home/formulario-settings";
 import { TakeFormulario } from "../home/take-formulario";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
+import { Separator } from "../ui/separator";
 import { Toggle } from "../ui/toggle";
 import { Kbd, KbdGroup, useIsMac } from "../ui/kbd";
 import { Spinner } from "../ui/spinner";
@@ -33,6 +35,7 @@ import { EditorPreview } from "./preview/editor-preview";
 import { FormattingCommand } from "./tools/formatting-command";
 import { EditorInput, SyncStatus } from "./input/editor-input";
 import { ShortcutsListener } from "./tools/shortcuts-listener";
+import TreeFiles from "./tree/tree-files";
 
 const MIN_RESIZABLE_SIZE = 20;
 const MAX_RESIZABLE_SIZE = 80;
@@ -41,7 +44,8 @@ export function EditorPage({
   argomentoId,
   editable,
   formularioId,
-}: Readonly<{ argomentoId: string; editable: boolean; formularioId: string }>) {
+  tree
+}: Readonly<{ argomentoId: string; editable: boolean; formularioId: string, tree: any[] }>) {
   const isMobile = useIsMobile();
 
   const [textAreaContent, setTextAreaContent] = useState<string>("");
@@ -56,6 +60,7 @@ export function EditorPage({
     "preview",
   );
   const [hasSetInitialView, setHasSetInitialView] = useState<boolean>(false);
+  const [showTree, setShowTree] = useState<boolean>(true);
   const [showAI, setShowAI] = useState<boolean>(false);
   const [isAiExpanded, setIsAiExpanded] = useState<boolean>(false);
   const [saveLoading, setSaveLoading] = useState<boolean>(false);
@@ -321,6 +326,31 @@ export function EditorPage({
     <div className="flex w-full border-b bg-background/95 backdrop-blur-xs min-h-14 md:min-h-15 items-center justify-between px-2.5 md:px-4 py-1.5 md:py-2 gap-2 md:gap-4 overflow-x-auto scrollbar-none select-none">
       {/* Left: History & Formatting Tray */}
       <div className="flex flex-1 items-center gap-1.5 md:gap-3 min-w-0">
+        {/* Tree Toggle & Divider */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Toggle
+                  variant="outline"
+                  size="sm"
+                  pressed={showTree}
+                  onPressedChange={setShowTree}
+                  aria-label="Toggle Tree"
+                  className="h-7 w-7 md:h-8 md:w-8 p-0 shrink-0 cursor-pointer"
+                >
+                  <PanelLeft className="size-3.5 md:size-4" />
+                </Toggle>
+              </TooltipTrigger>
+              <TooltipContent>
+                {showTree ? "Nascondi albero" : "Mostra albero"}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <div className="h-5 w-px bg-border shrink-0 mx-1" />
+        </div>
+
         {/* History Capsule */}
         <div className="flex items-center gap-1 shrink-0">
           <TooltipProvider>
@@ -492,7 +522,7 @@ export function EditorPage({
     }
 
     return (
-      <div className="flex w-full border-b bg-background/95 backdrop-blur-xs min-h-14 md:min-h-15 items-center justify-between px-2.5 md:px-4 py-1.5 md:py-2 gap-2 md:gap-4 overflow-x-auto scrollbar-none select-none">
+      <div className="flex w-full border-b bg-background/95 backdrop-blur-xs min-h-14 md:min-h-15 items-center justify-between py-1.5 md:py-2 gap-2 md:gap-4 overflow-x-auto scrollbar-none select-none">
         {/* Left: TakeFormulario */}
         <div className="flex items-center gap-1.5 md:gap-3 shrink-0">
           <TakeFormulario formularioId={formularioId} />
@@ -558,6 +588,9 @@ export function EditorPage({
       )}
 
       <div className="flex flex-1 min-h-0 w-full relative overflow-hidden">
+
+        {showTree && <TreeFiles tree={tree} />}
+
         <EditorPanels
           switchView={switchView}
           isMobile={isMobile}

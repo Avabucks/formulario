@@ -27,13 +27,13 @@ export async function generateMetadata({
   const argomento =
     rowCount && rowCount > 0
       ? (() => {
-          const { content, ...rest } = argomentoRows[0];
-          const firstLine = content?.split("\n")[0] ?? "";
-          const titolo = firstLine.startsWith("#")
-            ? firstLine.replace(/^#+\s*/, "")
-            : "Senza titolo";
-          return { ...rest, titolo };
-        })()
+        const { content, ...rest } = argomentoRows[0];
+        const firstLine = content?.split("\n")[0] ?? "";
+        const titolo = firstLine.startsWith("#")
+          ? firstLine.replace(/^#+\s*/, "")
+          : "Senza titolo";
+        return { ...rest, titolo };
+      })()
       : null;
 
   if (!argomento) {
@@ -136,28 +136,65 @@ export default async function Argomento({
     }
   }
 
-  const breadcrumbs = [
-    { label: "Home", href: "/" },
+  // Fetch tree data (capitoli and argomenti of the formulario)
+  const { rows: treeRows } = await pool.query(
+    `SELECT 
+        C.beautiful_id AS "capitoloId",
+        COALESCE(C.titolo, 'Senza titolo') AS "capitoloTitolo",
+        C.sort_order AS "capitoloSortOrder",
+        A.beautiful_id AS "argomentoId",
+        A.content AS "argomentoContent",
+        A.sort_order AS "argomentoSortOrder"
+     FROM capitoli C
+     LEFT JOIN argomenti A ON A.capitolo = C.beautiful_id
+     WHERE C.formulario = $1
+     ORDER BY C.sort_order ASC, A.sort_order ASC`,
+    [argomento.formularioId],
+  );
+
+  const capitoliMap: Record<
+    string,
     {
-      label: argomento.formularioTitolo,
-      href: `/formulario/${argomento.formularioId}`,
-    },
-    {
-      label: argomento.capitoloTitolo,
-      href: `/capitolo/${argomento.capitoloId}`,
-    },
-    { label: argomento.titolo, href: `/editor/${argomento}` },
-  ];
+      id: string;
+      titolo: string;
+      sortOrder: number;
+      argomenti: { id: string; titolo: string; sortOrder: number }[];
+    }
+  > = {};
+
+  for (const row of treeRows) {
+    if (!capitoliMap[row.capitoloId]) {
+      capitoliMap[row.capitoloId] = {
+        id: row.capitoloId,
+        titolo: row.capitoloTitolo,
+        sortOrder: row.capitoloSortOrder,
+        argomenti: [],
+      };
+    }
+    if (row.argomentoId) {
+      const firstLine = row.argomentoContent?.split("\n")[0] ?? "";
+      const argomentoTitolo = firstLine.startsWith("#")
+        ? firstLine.replace(/^#+\s*/, "")
+        : "Senza titolo";
+      capitoliMap[row.capitoloId].argomenti.push({
+        id: row.argomentoId,
+        titolo: argomentoTitolo,
+        sortOrder: row.argomentoSortOrder,
+      });
+    }
+  }
+
+  const tree = Object.values(capitoliMap).sort((a, b) => a.sortOrder - b.sortOrder);
 
   return (
     <div className="flex flex-col h-screen">
-      <div className="flex flex-1 flex-col gap-4 w-full px-2 md:px-6 pt-16 pb-5 overflow-hidden">
-        <BreadcrumbLogic items={breadcrumbs} />
+      <div className="flex flex-1 flex-col gap-4 w-full px-2 md:px-6 pt-15 pb-5 overflow-hidden">
         <Suspense fallback={<Skeleton className="h-full w-full" />}>
           <EditorPage
             argomentoId={argomento.id}
             editable={argomento.editable}
             formularioId={argomento.formularioId}
+            tree={tree}
           />
         </Suspense>
       </div>

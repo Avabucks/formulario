@@ -103,9 +103,9 @@ export const DialogStack = ({
         clickable,
       }}
     >
-      <div className={className} {...props}>
+      <>
         {children}
-      </div>
+      </>
     </DialogStackContext.Provider>
   );
 };
