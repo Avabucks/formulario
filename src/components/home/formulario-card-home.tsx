@@ -32,7 +32,7 @@ type Formulario = {
 
 export function FormularioCardHome({
   formulario,
-  variant = "grid",
+  variant = "list",
   userId,
 }: Readonly<{
   formulario: Formulario;

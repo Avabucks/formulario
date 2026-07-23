@@ -42,7 +42,6 @@ export default async function Home({
   const searchQuery = q?.trim() ?? "";
 
   const cookieStore = await cookies();
-  const initialView = cookieStore.get("home-view")?.value || "grid";
   const initialOrder = (cookieStore.get("home-order")?.value ||
     "modificato") as SortOption;
 
@@ -169,7 +168,6 @@ export default async function Home({
       <div className="w-full flex flex-col gap-4 h-full">
         <HomeTabs
           activeTab={activeTab}
-          initialView={initialView}
           initialOrder={initialOrder}
           formulari={formulari}
           preferiti={preferiti}

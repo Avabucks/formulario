@@ -6,8 +6,6 @@ import { Tabs, TabsList, TabsTrigger } from "@/src/components/ui/tabs";
 import {
   FileText,
   Star,
-  Grid,
-  List,
   Search,
   BookOpen,
   StarOff,
@@ -32,6 +30,7 @@ import { formatNumber } from "@/src/lib/utils";
 import { SortSelector, SortOption } from "../shared/sort-selector";
 import { useDebouncedCallback } from "use-debounce";
 import { FormularioCard } from "./formulario-card";
+import { Separator } from "@/src/components/ui/separator";
 
 interface Formulario {
   id: string;
@@ -49,7 +48,6 @@ interface Formulario {
 
 interface HomeTabsProps {
   activeTab: string; // Controlled by URL parameter
-  initialView: string; // Synced with server cookie
   initialOrder: SortOption; // Synced with server cookie
   formulari: Formulario[];
   preferiti: Formulario[];
@@ -58,7 +56,6 @@ interface HomeTabsProps {
 
 export function HomeTabs({
   activeTab,
-  initialView,
   initialOrder,
   formulari,
   preferiti,
@@ -70,7 +67,6 @@ export function HomeTabs({
   const [isPending, startTransition] = useTransition();
 
   // Initialize state directly from server cookies to prevent any hydration flash/glitch
-  const [activeView, setActiveView] = useState<string>(initialView);
   const [activeOrder, setActiveOrder] = useState<SortOption>(initialOrder);
 
   const [searchVal, setSearchVal] = useState(searchParams.get("q") ?? "");
@@ -81,12 +77,6 @@ export function HomeTabs({
       params.set("tab", tabValue);
       router.push(`${pathname}?${params.toString()}`);
     });
-  };
-
-  const handleViewChange = (viewValue: string) => {
-    setActiveView(viewValue);
-    // Persist via cookie to let the server know on next reload
-    document.cookie = `home-view=${viewValue}; path=/; max-age=31536000; SameSite=Lax`;
   };
 
   const handleOrderChange = (orderValue: SortOption) => {
@@ -179,32 +169,31 @@ export function HomeTabs({
     }
 
     const sortedFormulari = sortItems(formulari);
-
-    if (activeView === "grid") {
-      return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[101rem]:grid-cols-5 gap-4 w-full">
-          {sortedFormulari.map((f) => (
-            <FormularioCardHome
-              variant="grid"
-              formulario={f}
-              key={f.id}
-              userId={userId}
-            />
-          ))}
-        </div>
-      );
-    }
+    const totalItems = sortedFormulari.length;
 
     return (
       <div className="flex flex-col gap-3 w-full">
-        {sortedFormulari.map((f) => (
-          <FormularioCardHome
-            variant="list"
-            formulario={f}
-            key={f.id}
-            userId={userId}
-          />
-        ))}
+        {sortedFormulari.map((f, index) => {
+          const hexIndex = (totalItems - 1 - index)
+            .toString(16)
+            .toUpperCase()
+            .padStart(2, "0");
+          return (
+            <div key={f.id} className="flex items-center gap-3 w-full">
+              <span className="font-mono text-xs text-muted-foreground font-semibold shrink-0 select-none min-w-[3rem] text-right">
+                0x{hexIndex}
+              </span>
+              <Separator orientation="vertical" className="h-4 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <FormularioCardHome
+                  variant="list"
+                  formulario={f}
+                  userId={userId}
+                />
+              </div>
+            </div>
+          );
+        })}
       </div>
     );
   };
@@ -256,7 +245,7 @@ export function HomeTabs({
           />
         </div>
 
-        {/* Tabs, View Selectors & Desktop-only Sort Group */}
+        {/* Tabs & Desktop-only Sort Group */}
         <div className="flex items-center justify-between lg:justify-end gap-3 w-full lg:w-auto">
           {/* Sort Selector ONLY on Desktop (hidden on Mobile/Tablet) */}
           <SortSelector
@@ -265,31 +254,8 @@ export function HomeTabs({
             className="h-8 px-3 w-auto hidden lg:inline-flex"
           />
 
-          {/* Separator between Order and View Selector (or Tab Selector if View is hidden) */}
+          {/* Separator between Order and Tab Selector */}
           <div className="h-5 w-px bg-border hidden lg:block shrink-0" />
-
-          {/* View Selector: Grid / List (Only visible on "formulari" tab, hidden on mobile) */}
-          {activeTab === "formulari" && (
-            <Tabs
-              value={activeView}
-              onValueChange={handleViewChange}
-              className="shrink-0 hidden sm:inline-block"
-            >
-              <TabsList variant="line" className="w-full sm:w-fit">
-                <TabsTrigger value="grid" className="gap-2 px-3">
-                  <Grid className="h-4 w-4" />
-                </TabsTrigger>
-                <TabsTrigger value="list" className="gap-2 px-3">
-                  <List className="h-4 w-4" />
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-          )}
-
-          {/* Separator between View Selector and Tab Selector (only if View Selector is rendered) */}
-          {activeTab === "formulari" && (
-            <div className="h-5 w-px bg-border hidden lg:block shrink-0" />
-          )}
 
           {/* Tab Selector: Formulari / Preferiti (Controlled by URL search param) */}
           <Tabs
