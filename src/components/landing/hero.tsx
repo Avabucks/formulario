@@ -1,18 +1,12 @@
 "use client";
 
 import { Button } from "@/src/components/ui/button";
-import { ArrowRight, ScanEye, Zap } from "lucide-react";
+import { ArrowRight, ScanEye } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { AnimatedGridPattern } from "@/src/components/ui/animated-grid-pattern";
 import { cn } from "@/src/lib/utils";
 import { Highlighter } from "../ui/highlighter";
-import {
-  ScrollVelocityContainer,
-  ScrollVelocityRow,
-} from "@/src/components/ui/scroll-based-velocity";
-import katex from "katex";
-import "katex/dist/katex.min.css";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -31,7 +25,7 @@ const titleWords: { text: string; muted: boolean }[] = [
 ];
 
 const subWords =
-  "Ogni Stack è un workspace personale per costruire e mantenere una knowledge base intelligente, potenziata dall'AI per organizzare, collegare e far evolvere la conoscenza.".split(
+  "Impila i tuoi progetti come uno stack di memoria e naviga tra alberi concettuali ordinati. Accedi a qualsiasi scheda al volo ed elaborala con l'assistente AI.".split(
     " ",
   );
 
@@ -40,78 +34,6 @@ const TITLE_STEP = 0.055;
 const SUB_START = TITLE_START + titleWords.length * TITLE_STEP + 0.1;
 const SUB_STEP = 0.03;
 const AFTER_SUB = SUB_START + subWords.length * SUB_STEP + 0.05;
-
-const row1Formulas = [
-  {
-    title: "Definizione di Derivata",
-    math: String.raw`f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h}`,
-  },
-  {
-    title: "Formula di Eulero",
-    math: String.raw`e^{ix} = \cos x + i\sin x`,
-  },
-  {
-    title: "Forza Elettrostatica di Coulomb",
-    math: String.raw`F = \frac{1}{4\pi\varepsilon_0} \frac{q_1 q_2}{r^2}`,
-  },
-  {
-    title: "Equazione di Dirac",
-    math: String.raw`(i\gamma^\mu \partial_\mu - m)\psi = 0`,
-  },
-];
-
-const row2Formulas = [
-  {
-    title: "Equazione dei Gas Perfetti",
-    math: "pV = nRT",
-  },
-  {
-    title: "Equazione di Einstein",
-    math: String.raw`G_{\mu\nu} + \Lambda g_{\mu\nu} = \frac{8\pi G}{c^4} T_{\mu\nu}`,
-  },
-  {
-    title: "Distribuzione Normale di Gauss",
-    math: String.raw`f(x) = \frac{1}{\sigma \sqrt{2\pi}} e^{-\frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^2}`,
-  },
-  {
-    title: "Trasformata di Laplace",
-    math: String.raw`L\{f(t)\} = \int_{0}^{\infty} e^{-st} f(t) dt`,
-  },
-];
-
-function KatexFormula({ math }: Readonly<{ math: string }>) {
-  const html = katex.renderToString(math, {
-    throwOnError: false,
-    displayMode: true,
-  });
-  return (
-    <div
-      dangerouslySetInnerHTML={{ __html: html }}
-      className="text-foreground text-center"
-    />
-  );
-}
-
-function FormulaSnippet({
-  formula,
-}: Readonly<{ formula: (typeof row1Formulas)[number] }>) {
-  return (
-    <div className="mx-6 md:mx-12 flex items-center gap-6 md:gap-12 select-none cursor-default pt-2 pb-2 md:pt-6 md:pb-2">
-      <div className="relative group flex flex-col items-center justify-center min-w-30">
-        <span className="absolute -top-4 text-xs font-medium text-muted-foreground opacity-0 md:opacity-0 md:group-hover:opacity-100 md:transition-opacity md:duration-300 select-none pointer-events-none whitespace-nowrap">
-          {formula.title}
-        </span>
-        <div className="scale-95 md:scale-100 text-foreground flex items-center justify-center min-h-11 select-none md:group-hover:opacity-30 md:transition-opacity md:duration-300">
-          <KatexFormula math={formula.math} />
-        </div>
-      </div>
-      <Zap
-        size={18}
-        className="text-muted-foreground/25 shrink-0 select-none"
-      />
-    </div>
-  );
-}
 
 export function Hero() {
   return (
@@ -228,32 +150,6 @@ export function Hero() {
           </Button>
         </motion.div>
       </div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease, delay: AFTER_SUB + 0.2 }}
-        className="relative flex w-full flex-col items-center justify-center overflow-hidden select-none"
-      >
-        <ScrollVelocityContainer className="py-2 select-none">
-          <ScrollVelocityRow baseVelocity={0.8} direction={1}>
-            {row1Formulas.map((formula, index) => (
-              <FormulaSnippet key={index} formula={formula} />
-            ))}
-          </ScrollVelocityRow>
-          <ScrollVelocityRow
-            baseVelocity={0.8}
-            direction={-1}
-            className="mt-1 md:mt-3"
-          >
-            {row2Formulas.map((formula, index) => (
-              <FormulaSnippet key={index} formula={formula} />
-            ))}
-          </ScrollVelocityRow>
-        </ScrollVelocityContainer>
-        <div className="from-background to-transparent pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-linear-to-r z-10"></div>
-        <div className="from-background to-transparent pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-linear-to-l z-10"></div>
-      </motion.div>
     </section>
   );
 }

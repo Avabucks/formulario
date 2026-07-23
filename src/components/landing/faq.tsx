@@ -11,34 +11,34 @@ import {
 
 const faqs = [
   {
-    question: "Come fa l'AI ad aiutarmi nella creazione del quaderno?",
+    question: "Cos'è uno Stack di Memoria su FormulaBase?",
     answer:
-      "Ti basta inserire l'argomento o la traccia delle tue note e l'AI genera istantaneamente una struttura completa. Otterrai capitoli organizzati, spiegazioni ed elenchi pronti all'uso. È la fine del 'foglio bianco': l'AI fa il lavoro iniziale, tu rifinisci i dettagli.",
+      "È il tuo spazio di lavoro principale in cui impili i tuoi Knowledge Trees (alberi di conoscenza). Funziona come una struttura a memoria in cui ogni livello mantiene i riferimenti ai tuoi argomenti e corsi per una consultazione rapida e ordinata.",
   },
   {
-    question: "Come posso formattare le mie note su FormulaBase?",
+    question: "Come funzionano i puntatori e gli alberi di conoscenza?",
     answer:
-      "L'editor di FormulaBase supporta la formattazione intuitiva in Markdown e testo semplice, rendendo immediata la scrittura di titoli, elenchi, citazioni ed evidenziazioni.",
+      "Ogni materia o progetto è organizzato ad albero (Capitoli, Pagine, Sub-nodi). I puntatori concettuali ti permettono di accedere istantaneamente a qualsiasi ramo o foglia tramite ricerca rapida o collegamenti diretti.",
   },
   {
-    question: "Come funziona la condivisione via QR code?",
+    question: "Come funziona l'Assistente AI nell'editor?",
     answer:
-      "Ogni quaderno ha un QR code univoco generato automaticamente. Prima di condividere scegli la visibilità: privato (solo tu), pubblico con link (chiunque abbia il QR o l'URL) o community (visibile a tutti gli utenti di FormulaBase). Stampalo o condividilo con chi vuoi.",
+      "È una chat contestuale nativa che legge in tempo reale la scheda o il capitolo su cui stai lavorando. Puoi chiederle di strutturare, rifinire o generare contenuti: l'AI propone le modifiche direttamente nell'editor con un'anteprima visiva di ogni cambiamento, permettendoti di approvarle con un click.",
   },
   {
-    question: "Qual è la differenza tra privato, pubblico e community?",
+    question: "Come posso formattare le note nei vari nodi?",
     answer:
-      "Privato: visibile solo a te, ideale per le note in lavorazione. Pubblico con link: accessibile a chiunque abbia il link o il QR code, ottimo per condividere con la tua classe. Community: appare nella raccolta pubblica e può essere trovato e duplicato da altri utenti.",
+      "L'editor di FormulaBase supporta la scrittura in Markdown live con formule matematiche in LaTeX, blocchi di codice evidenziati e anteprima in tempo reale.",
   },
   {
-    question: "Posso modificare un quaderno creato da altri?",
+    question: "Come funziona la condivisione e il 'fork' dello Stack?",
     answer:
-      "Sì! Se trovi un quaderno utile nella Community, puoi duplicarlo nel tuo profilo con un click. Otterrai una copia personale che potrai integrare o personalizzare come preferisci, senza alterare il lavoro originale dell'autore.",
+      "Ogni Knowledge Stack può generare un QR code o link unico. Puoi condividere lo stack in modalità privata, pubblica o community per consentire ad altri di consultarlo e duplicarlo (fork) nel proprio profilo.",
   },
   {
     question: "È gratuito?",
     answer:
-      "Sì, puoi iniziare gratuitamente senza carta di credito. Crei quaderni, usi l'editor di note e condividi via QR code o link da subito.",
+      "Sì, puoi iniziare gratuitamente senza carta di credito. Crei i tuoi stack, organizzi i tuoi alberi di conoscenza ed utilizzi l'assistente AI e l'editor live fin da subito.",
   },
 ];
 

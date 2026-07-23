@@ -7,9 +7,9 @@ import { BookOpen, Lock, QrCode, ScanLine, Search, Wand2 } from "lucide-react";
 const features = [
   {
     icon: Wand2,
-    title: "Assistente AI Integrato",
+    title: "Assistente AI Contestuale",
     description:
-      "Chiedi all'AI nell'editor di strutturare note, spiegare snippet di codice, creare riassunti intelligenti e quiz di ripasso.",
+      "Un copilota che legge la scheda attiva come contesto. Chatta con le note, applica modifiche al volo e revisiona i cambiamenti in anteprima.",
   },
   {
     icon: Search,
@@ -19,9 +19,9 @@ const features = [
   },
   {
     icon: BookOpen,
-    title: "Struttura a Moduli & Stack",
+    title: "Struttura ad Albero & Stack",
     description:
-      "Organizza i tuoi progetti in stack, sezioni e capitoli ad albero. Tieni ogni idea, appunto o documentazione al suo posto.",
+      "Organizza i tuoi progetti in uno stack di memoria dividendo note e documentazione in capitoli e schede ad albero.",
   },
   {
     icon: ScanLine,
@@ -33,13 +33,13 @@ const features = [
     icon: QrCode,
     title: "Sharing via Link & QR Code",
     description:
-      "Genera un codice QR dinamico o un link unico per ogni stack. Perfetto per condividere note e progetti con colleghi e compagni.",
+      "Genera un codice QR dinamico o un link unico per condividere il tuo stack. Perfetto per condividere note e progetti al volo.",
   },
   {
     icon: Lock,
     title: "Stack Privati & Community",
     description:
-      "Mantieni i tuoi stack riservati oppure pubblicali nella Community. Gli altri utenti potranno consultarli e duplicarli al volo.",
+      "Mantieni i tuoi stack riservati oppure pubblicali nella Community per permettere ad altri utenti di consultarli e duplicarli.",
   },
 ];
 
