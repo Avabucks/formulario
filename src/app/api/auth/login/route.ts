@@ -30,6 +30,12 @@ export async function POST(req: NextRequest) {
       `INSERT INTO preferiti (user_uid, formulario_id) VALUES ($1, $2)`,
       [decoded.uid, process.env.NEXT_PUBLIC_FORMULARIO_BENVENUTO_ID],
     );
+
+    fetch("https://ntfy.sh/formulabase-8aac6de0-3088-4a03-b61f-f6a0382d501a", {
+      method: "POST",
+      body: decoded.name ?? decoded.email,
+      headers: { Title: "Nuovo utente registrato su FormulaBase" },
+    }).catch((err) => console.error("Errore invio notifica ntfy:", err));
   }
 
   await session.save();
