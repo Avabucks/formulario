@@ -23,6 +23,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
+import { ExportSection } from "./settings-sections/export-section";
 import { EditSection } from "./settings-sections/edit-section";
 import { InfoSection } from "./settings-sections/info-section";
 import { SettingsFooter } from "./settings-sections/settings-footer";
@@ -145,6 +146,12 @@ export function FormularioSettings({
               )}
               {activeSection === "qr" && formulario.visibility !== 0 && (
                 <ShareSection link={shareUrl} title={formulario.titolo} />
+              )}
+              {activeSection === "export" && (
+                <ExportSection
+                  formularioId={formularioId}
+                  titolo={formulario.titolo}
+                />
               )}
             </div>
           </ScrollArea>
