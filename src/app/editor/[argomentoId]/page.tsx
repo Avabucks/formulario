@@ -1,13 +1,10 @@
 import packageJson from "@/package.json";
-import { EditorPage } from "@/src/components/editor/editor-page";
-import { BreadcrumbLogic } from "@/src/components/navigation/breadcrumb-logic";
-import { Skeleton } from "@/src/components/ui/skeleton";
+import { Workspace } from "@/src/components/workspace/workspace";
 import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { Suspense } from "react";
 
 export async function generateMetadata({
   params,
@@ -90,7 +87,7 @@ export default async function Argomento({
   const { rows: argomentoRows, rowCount } = await pool.query(
     `SELECT A.beautiful_id AS "id",
             A.content AS "content",
-            F.titolo AS "formularioTitolo", F.owner_uid as "ownerUid", F.beautiful_id AS "formularioId",
+            F.titolo AS "formularioTitolo", F.descrizione AS "formularioDescrizione", U_A.display_name AS "nomeAutore", F.owner_uid as "ownerUid", F.beautiful_id AS "formularioId",
             COALESCE(C.titolo, 'Senza titolo') AS "capitoloTitolo", C.beautiful_id AS "capitoloId"
             FROM argomenti A
             JOIN capitoli C ON  A.capitolo = C.beautiful_id
@@ -132,31 +129,17 @@ export default async function Argomento({
     }
   }
 
-  const breadcrumbs = [
-    { label: "Home", href: "/" },
-    {
-      label: argomento.formularioTitolo,
-      href: `/formulario/${argomento.formularioId}`,
-    },
-    {
-      label: argomento.capitoloTitolo,
-      href: `/capitolo/${argomento.capitoloId}`,
-    },
-    { label: argomento.titolo, href: `/editor/${argomento}` },
-  ];
-
   return (
     <div className="flex flex-col h-screen">
-      <div className="flex flex-1 flex-col gap-4 w-full px-2 md:px-6 pt-16 pb-5 overflow-hidden">
-        <BreadcrumbLogic items={breadcrumbs} />
-        <Suspense fallback={<Skeleton className="h-full w-full" />}>
-          <EditorPage
-            argomentoId={argomento.id}
-            editable={argomento.editable}
-            formularioId={argomento.formularioId}
-          />
-        </Suspense>
-      </div>
+      <Workspace
+        formulario={{
+          id: argomento.formularioId,
+          titolo: argomento.formularioTitolo,
+          descrizione: argomento.formularioDescrizione,
+          nomeAutore: argomento.nomeAutore,
+          editable: argomento.editable,
+        }}
+      />
     </div>
   );
 }

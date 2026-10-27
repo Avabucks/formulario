@@ -2,7 +2,6 @@
 import Editor, { Monaco } from "@monaco-editor/react";
 import { AlertTriangle, CheckCheck } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
-import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -193,7 +192,6 @@ export function EditorInput({
   saveError: boolean;
   setSaveError: (value: boolean) => void;
 }>) {
-  const router = useRouter();
   const { resolvedTheme } = useTheme();
   const monacoRef = useRef<Monaco | null>(null);
   const [monacoReady, setMonacoReady] = useState(false);
@@ -225,7 +223,6 @@ export function EditorInput({
           const text = await res.text();
           throw new Error(text);
         }
-        router.refresh();
       })
       .catch(() => setSaveError(true))
       .finally(() => {

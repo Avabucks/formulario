@@ -1,27 +1,11 @@
 import packageJson from "@/package.json";
-import { CapitoloAdd } from "@/src/components/formulario/capitolo-add";
-import { CapitoloItem } from "@/src/components/formulario/capitolo-item";
 import ViewTracker from "@/src/components/formulario/view-tracker";
-import { FormularioSettings } from "@/src/components/home/formulario-settings";
-import { BreadcrumbLogic } from "@/src/components/navigation/breadcrumb-logic";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-  StackedCardsIllustration,
-} from "@/src/components/ui/empty";
-import { Skeleton } from "@/src/components/ui/skeleton";
-import { TypographyH2 } from "@/src/components/ui/typography";
+import { Workspace } from "@/src/components/workspace/workspace";
 import { pool } from "@/src/lib/db";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { getIronSession } from "iron-session";
-import { BookmarkX } from "lucide-react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { Suspense } from "react";
 
 export async function generateMetadata({
   params,
@@ -123,51 +107,6 @@ export default async function Formulario({
     }
   }
 
-  const breadcrumbs = [
-    { label: "Home", href: "/" },
-    { label: formulario.titolo, href: `/formulario/${formularioId}` },
-  ];
-
-  // Fetch capitoli for the formulario
-  const { rows: capitoli } = await pool.query(
-    `SELECT
-            c.beautiful_id        AS "id",
-            COALESCE(c.titolo, 'Senza titolo') AS "titolo",
-            COUNT(a.beautiful_id) AS "argomentiCount",
-            c.sort_order          AS "sortOrder"
-         FROM capitoli c
-         LEFT JOIN argomenti a ON a.capitolo = c.beautiful_id
-         WHERE c.formulario = $1
-         GROUP BY c.beautiful_id, c.titolo, c.formulario, c.sort_order
-         ORDER BY c.sort_order ASC`,
-    [formularioId],
-  );
-
-  const renderEmpty = () => (
-    <Empty>
-      <EmptyHeader>
-        <EmptyMedia>
-          <StackedCardsIllustration />
-        </EmptyMedia>
-        <EmptyTitle>Nessun Capitolo</EmptyTitle>
-        <EmptyDescription>
-          {`Non ci sono capitoli da mostrare in "${formulario.titolo}".`}
-        </EmptyDescription>
-      </EmptyHeader>
-      <EmptyContent className="flex-row justify-center gap-2">
-        {formulario.editable && <CapitoloAdd formulario={formulario} />}
-      </EmptyContent>
-    </Empty>
-  );
-
-  const renderLoadingSkeleton = () => (
-    <div className="flex flex-col gap-4 w-full">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <Skeleton key={i} className="h-11.5 w-full" />
-      ))}
-    </div>
-  );
-
   const showSchema = formulario.visibility === 2;
   const jsonLd = showSchema
     ? {
@@ -202,34 +141,17 @@ export default async function Formulario({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       )}
-      <div className="flex flex-col gap-4 w-full h-full px-2 md:px-6 pt-16 pb-5">
+      <div className="flex flex-col h-screen">
         <ViewTracker formularioId={formulario.id} />
-        <BreadcrumbLogic items={breadcrumbs} />
-        <div className="flex flex-col gap-4">
-          <div className="flex justify-between items-center gap-4">
-            <TypographyH2 className="w-full">{formulario.titolo}</TypographyH2>
-            <div className="flex gap-2 items-center">
-              <FormularioSettings formularioId={formulario.id} />
-              {formulario.editable && <CapitoloAdd formulario={formulario} />}
-            </div>
-          </div>
-        </div>
-        <Suspense fallback={renderLoadingSkeleton()}>
-          <div className="flex flex-col gap-4 w-full flex-1">
-            {capitoli.length == 0
-              ? renderEmpty()
-              : capitoli.map((c) => (
-                  <CapitoloItem
-                    key={c.id}
-                    capitolo={{
-                      ...c,
-                      editable: formulario.editable,
-                      capitoliCount: capitoli.length,
-                    }}
-                  />
-                ))}
-          </div>
-        </Suspense>
+        <Workspace
+          formulario={{
+            id: formulario.id,
+            titolo: formulario.titolo,
+            descrizione: formulario.descrizione,
+            nomeAutore: formulario.nomeAutore,
+            editable: formulario.editable,
+          }}
+        />
       </div>
     </>
   );

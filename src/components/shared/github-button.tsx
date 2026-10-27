@@ -28,7 +28,9 @@ function GithubIcon(props: Readonly<React.SVGProps<SVGSVGElement>>) {
   );
 }
 
-export function GithubButton() {
+export function GithubButton({
+  showStars = true,
+}: Readonly<{ showStars?: boolean }>) {
   const [repoInfo, setRepoInfo] = useState<RepoInfo | null>(null);
 
   useEffect(() => {
@@ -67,10 +69,12 @@ export function GithubButton() {
           >
             <a href={REPO_URL} target="_blank" rel="noopener noreferrer">
               <GithubIcon className="h-5 w-5 fill-current" />
-              <NumberTicker
-                value={repoInfo?.stargazers_count || 0}
-                className="text-xs font-medium text-current dark:text-current inline-block"
-              />
+              {showStars && (
+                <NumberTicker
+                  value={repoInfo?.stargazers_count || 0}
+                  className="text-xs font-medium text-current dark:text-current inline-block"
+                />
+              )}
             </a>
           </Button>
         }

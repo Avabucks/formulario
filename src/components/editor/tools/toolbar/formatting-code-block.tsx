@@ -49,7 +49,6 @@ export function FormattingCodeBlock({
   onSelect?: () => void;
   plugin?: "mermaid" | null;
 }>) {
-
   const [open, setOpen] = useState(false);
   const [blockState, setBlockState] = useState<{
     language: string | null;
@@ -103,7 +102,6 @@ export function FormattingCodeBlock({
         <GitGraph size={14} />
         <span>Mermaid</span>
       </CommandItem>
-
     );
   }
 
@@ -170,7 +168,7 @@ export function FormattingCodeBlockContext({
           Grafico Mermaid
         </span>
       </div>
-    )
+    );
   }
   return (
     <>

@@ -11,7 +11,9 @@
         { "label": "Visualizzazione Dividi", "keys": ["Alt", "2"] },
         { "label": "Visualizzazione Anteprima", "keys": ["Alt", "3"] },
         { "label": "Tavolozza comandi", "keys": ["Ctrl", "Space"] },
-        { "label": "Editor a schermo intero (Fullscreen)", "keys": ["F"] }
+        { "label": "Mostra/nascondi explorer", "keys": ["Alt", "E"] },
+        { "label": "Chiudi scheda", "keys": ["Alt", "W"] },
+        { "label": "Rinomina capitolo (explorer)", "keys": ["F2"] }
       ]
     },
     {

@@ -2,23 +2,13 @@
 
 import { useIsMobile } from "@/src/hooks/useIsMobile";
 import clsx from "clsx";
-import {
-  Columns2,
-  Eye,
-  Maximize2,
-  Minimize2,
-  PenLine,
-  Redo2,
-  Sparkles,
-  Undo2,
-} from "lucide-react";
+import { Columns2, Eye, PenLine, Redo2, Sparkles, Undo2 } from "lucide-react";
 import type { editor, Selection } from "monaco-editor";
 import { useEffect, useRef, useState } from "react";
 import { FormularioSettings } from "../home/formulario-settings";
 import { TakeFormulario } from "../home/take-formulario";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
-import { Toggle } from "../ui/toggle";
 import { Kbd, KbdGroup, useIsMac } from "../ui/kbd";
 import { Spinner } from "../ui/spinner";
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
@@ -29,6 +19,21 @@ import {
   TooltipTrigger,
 } from "../ui/tooltip";
 import { EditorAI } from "./chat/editor-ai";
+import {
+  ExplorerToggle,
+  useExplorerVisibility,
+  WorkspaceLayout,
+} from "../workspace/workspace-layout";
+import {
+  EditorView,
+  getCachedArgomento,
+  getCachedView,
+  loadArgomento,
+  openTab,
+  reloadStructure,
+  setCachedArgomento,
+  setCachedView,
+} from "../workspace/workspace-store";
 import { EditorPreview } from "./preview/editor-preview";
 import { FormattingCommand } from "./tools/formatting-command";
 import { EditorInput, SyncStatus } from "./input/editor-input";
@@ -44,18 +49,32 @@ export function EditorPage({
 }: Readonly<{ argomentoId: string; editable: boolean; formularioId: string }>) {
   const isMobile = useIsMobile();
 
-  const [textAreaContent, setTextAreaContent] = useState<string>("");
-  const [markdownContent, setMarkdownContent] = useState<string>("");
+  // Reopening a tab restores its content and view instantly
+  const [cached] = useState(() => getCachedArgomento(argomentoId));
+  const [cachedView] = useState(() => getCachedView(argomentoId));
+
+  const [textAreaContent, setTextAreaContent] = useState<string>(
+    cached?.content ?? "",
+  );
+  const [markdownContent, setMarkdownContent] = useState<string>(
+    cached?.content ?? "",
+  );
   const [user, setUser] = useState<{
     display_name: string;
     foto_profilo: string;
-  } | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [edited, setEdited] = useState<boolean>(false);
-  const [switchView, setSwitchView] = useState<"preview" | "divided" | "edit">(
-    "preview",
+  } | null>(
+    cached
+      ? { display_name: cached.display_name, foto_profilo: cached.foto_profilo }
+      : null,
   );
-  const [hasSetInitialView, setHasSetInitialView] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(!cached);
+  const [edited, setEdited] = useState<boolean>(false);
+  const [switchView, setSwitchView] = useState<EditorView>(
+    cachedView ?? "preview",
+  );
+  const [hasSetInitialView, setHasSetInitialView] = useState<boolean>(
+    cachedView !== undefined,
+  );
   const [showAI, setShowAI] = useState<boolean>(false);
   const [isAiExpanded, setIsAiExpanded] = useState<boolean>(false);
   const [saveLoading, setSaveLoading] = useState<boolean>(false);
@@ -63,7 +82,7 @@ export function EditorPage({
   const [resizableSize, setResizableSize] = useState<number>(40);
   const [isFocused, setIsFocused] = useState(false);
   const [selection, setSelection] = useState<Selection | null>(null);
-  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  const [showExplorer, setShowExplorer] = useExplorerVisibility(isMobile);
 
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const isMac = useIsMac();
@@ -116,6 +135,10 @@ export function EditorPage({
     setResizableSize(newSize);
   };
 
+  useEffect(() => {
+    openTab(formularioId, argomentoId);
+  }, [formularioId, argomentoId]);
+
   const handleUndo = () => {
     editorRef.current?.trigger("source", "undo", null);
   };
@@ -125,11 +148,9 @@ export function EditorPage({
   };
 
   const fetchContent = async () => {
+    if (cached) return;
     try {
-      const response = await fetch(`/api/argomenti/${argomentoId}`);
-      if (!response.ok) throw new Error("Errore nel caricamento");
-
-      const data = await response.json();
+      const data = await loadArgomento(argomentoId);
       setTextAreaContent(data.content);
       setMarkdownContent(data.content);
       setUser({
@@ -152,6 +173,20 @@ export function EditorPage({
     }
     setMarkdownContent(textAreaContent);
   }, [edited]);
+
+  useEffect(() => {
+    if (loading || !user) return;
+    setCachedArgomento(argomentoId, { content: textAreaContent, ...user });
+  }, [argomentoId, loading, textAreaContent, user]);
+
+  // Keep explorer and tab titles in sync once a save lands
+  useEffect(() => {
+    if (!saveLoading && !loading) reloadStructure(formularioId);
+  }, [saveLoading]);
+
+  useEffect(() => {
+    setCachedView(argomentoId, switchView);
+  }, [argomentoId, switchView]);
 
   useEffect(() => {
     if (!loading && !hasSetInitialView) {
@@ -195,33 +230,6 @@ export function EditorPage({
       return false;
     };
 
-    const handleFullscreenShortcut = (e: KeyboardEvent): boolean => {
-      if (e.key === "Escape" && isFullscreen) {
-        setIsFullscreen(false);
-        return true;
-      }
-      if (
-        e.key.toLowerCase() === "f" &&
-        !e.ctrlKey &&
-        !e.metaKey &&
-        !e.altKey &&
-        !e.shiftKey
-      ) {
-        const activeEl = document.activeElement;
-        const isTyping =
-          activeEl &&
-          (activeEl.tagName === "INPUT" ||
-            activeEl.tagName === "TEXTAREA" ||
-            activeEl.getAttribute("contenteditable") === "true");
-        if (!isFocused && !isTyping) {
-          e.preventDefault();
-          setIsFullscreen((prev) => !prev);
-          return true;
-        }
-      }
-      return false;
-    };
-
     const handleHistoryShortcut = (e: KeyboardEvent): boolean => {
       const isZ = e.key.toLowerCase() === "z" || e.code === "KeyZ";
       const isY = e.key.toLowerCase() === "y" || e.code === "KeyY";
@@ -254,14 +262,13 @@ export function EditorPage({
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (handleFullscreenShortcut(e)) return;
       if (handleHistoryShortcut(e)) return;
       if (handleViewAndAiShortcut(e)) return;
     };
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [handleUndo, handleRedo, editable, isMobile, isFullscreen, isFocused]);
+  }, [handleUndo, handleRedo, editable, isMobile, isFocused]);
 
   const titleComponent = () => {
     if (switchView === "preview" || !editable)
@@ -282,12 +289,14 @@ export function EditorPage({
     return null;
   };
 
+  const explorerToggle = (
+    <ExplorerToggle open={showExplorer} setOpen={setShowExplorer} />
+  );
+
   const viewTabs = (
     <Tabs
       value={switchView}
-      onValueChange={(val) =>
-        setSwitchView(val as "preview" | "divided" | "edit")
-      }
+      onValueChange={(val) => setSwitchView(val as EditorView)}
       className="gap-0 select-none shrink-0"
     >
       <TabsList variant="line" className="h-7 md:h-8 p-0 bg-transparent gap-0">
@@ -321,6 +330,9 @@ export function EditorPage({
     <div className="flex w-full border-b bg-background/95 backdrop-blur-xs min-h-14 md:min-h-15 items-center justify-between px-2.5 md:px-4 py-1.5 md:py-2 gap-2 md:gap-4 overflow-x-auto scrollbar-none select-none">
       {/* Left: History & Formatting Tray */}
       <div className="flex flex-1 items-center gap-1.5 md:gap-3 min-w-0">
+        {explorerToggle}
+        <div className="h-6 w-px bg-border shrink-0 hidden sm:block" />
+
         {/* History Capsule */}
         <div className="flex items-center gap-1 shrink-0">
           <TooltipProvider>
@@ -429,33 +441,6 @@ export function EditorPage({
         <div className="h-6 w-px bg-border hidden sm:block" />
         {viewTabs}
         <div className="h-6 w-px bg-border hidden sm:block" />
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Toggle
-                variant="outline"
-                pressed={isFullscreen}
-                onPressedChange={setIsFullscreen}
-                className="h-7 w-7 md:h-8 md:w-8 text-foreground shrink-0 cursor-pointer p-0 flex items-center justify-center"
-              >
-                {isFullscreen ? (
-                  <Minimize2 className="size-3.5 md:size-4" />
-                ) : (
-                  <Maximize2 className="size-3.5 md:size-4" />
-                )}
-              </Toggle>
-            </TooltipTrigger>
-            <TooltipContent className="pr-1.5">
-              <div className="flex items-center gap-2">
-                {isFullscreen ? "Esci da schermo intero" : "Schermo intero"}
-                <KbdGroup>
-                  <Kbd>F</Kbd>
-                </KbdGroup>
-              </div>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        <div className="h-6 w-px bg-border hidden sm:block" />
         <FormularioSettings formularioId={formularioId} />
       </div>
     </div>
@@ -495,6 +480,7 @@ export function EditorPage({
       <div className="flex w-full border-b bg-background/95 backdrop-blur-xs min-h-14 md:min-h-15 items-center justify-between px-2.5 md:px-4 py-1.5 md:py-2 gap-2 md:gap-4 overflow-x-auto scrollbar-none select-none">
         {/* Left: TakeFormulario */}
         <div className="flex items-center gap-1.5 md:gap-3 shrink-0">
+          {explorerToggle}
           <TakeFormulario formularioId={formularioId} />
           <div className="h-6 w-px bg-border hidden sm:block" />
           {titleComponent()}
@@ -507,33 +493,6 @@ export function EditorPage({
         <div className="flex items-center gap-1.5 md:gap-3 shrink-0">
           {viewTabs}
           <div className="h-6 w-px bg-border hidden sm:block" />
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Toggle
-                  variant="outline"
-                  pressed={isFullscreen}
-                  onPressedChange={setIsFullscreen}
-                  className="size-7 md:size-8 text-foreground shrink-0 cursor-pointer p-0"
-                >
-                  {isFullscreen ? (
-                    <Minimize2 size={isMobile ? 14 : 15} />
-                  ) : (
-                    <Maximize2 size={isMobile ? 14 : 15} />
-                  )}
-                </Toggle>
-              </TooltipTrigger>
-              <TooltipContent className="pr-1.5">
-                <div className="flex items-center gap-2">
-                  {isFullscreen ? "Esci da schermo intero" : "Schermo intero"}
-                  <KbdGroup>
-                    <Kbd>F</Kbd>
-                  </KbdGroup>
-                </div>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          <div className="h-6 w-px bg-border hidden sm:block" />
           <FormularioSettings formularioId={formularioId} />
         </div>
       </div>
@@ -541,50 +500,51 @@ export function EditorPage({
   };
 
   return (
-    <div
-      className={clsx(
-        "flex flex-1 flex-col min-h-0 overflow-hidden",
-        isFullscreen
-          ? "fixed inset-0 z-50 bg-background w-screen h-screen rounded-none border-none"
-          : "border rounded-lg",
-      )}
+    <WorkspaceLayout
+      formularioId={formularioId}
+      argomentoId={argomentoId}
+      activeTitle={
+        loading ? undefined : getMarkdownTitle(textAreaContent ?? "")
+      }
+      dirty={saveLoading}
+      editable={editable}
+      isMobile={isMobile}
+      explorerOpen={showExplorer}
+      setExplorerOpen={setShowExplorer}
+      header={loading ? null : editorHeader()}
     >
-      {loading ? (
-        <div className="flex h-full items-center justify-center">
+      {loading && (
+        <div className="absolute inset-0 flex items-center justify-center">
           <Spinner />
         </div>
-      ) : (
-        editorHeader()
       )}
 
-      <div className="flex flex-1 min-h-0 w-full relative overflow-hidden">
-        <EditorPanels
-          switchView={switchView}
-          isMobile={isMobile}
-          resizableSize={resizableSize}
-          handleMouseDown={handleMouseDown}
-          handleSliderKeyDown={handleSliderKeyDown}
-          input={input}
-          preview={preview}
-          editable={editable}
-          loading={loading}
-          saveError={saveError}
-          saveLoading={saveLoading}
-        />
+      <EditorPanels
+        switchView={switchView}
+        isMobile={isMobile}
+        resizableSize={resizableSize}
+        handleMouseDown={handleMouseDown}
+        handleSliderKeyDown={handleSliderKeyDown}
+        input={input}
+        preview={preview}
+        editable={editable}
+        loading={loading}
+        saveError={saveError}
+        saveLoading={saveLoading}
+      />
 
-        <EditorAISidebar
-          editable={editable}
-          isMobile={isMobile}
-          isAiExpanded={isAiExpanded}
-          showAI={showAI}
-          editorRef={editorRef}
-          setShowAI={setShowAI}
-          setIsAiExpanded={setIsAiExpanded}
-        />
-      </div>
+      <EditorAISidebar
+        editable={editable}
+        isMobile={isMobile}
+        isAiExpanded={isAiExpanded}
+        showAI={showAI}
+        editorRef={editorRef}
+        setShowAI={setShowAI}
+        setIsAiExpanded={setIsAiExpanded}
+      />
 
       <ShortcutsListener editorRef={editorRef} isFocused={isFocused} />
-    </div>
+    </WorkspaceLayout>
   );
 }
 

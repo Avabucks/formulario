@@ -43,7 +43,7 @@ export async function Header() {
       <div className="flex items-center gap-2">
         <div className="flex items-center">
           <DiscordTrigger variant="button" />
-          <GithubButton />
+          <GithubButton showStars={false} />
         </div>
         <div className="h-6 border-l"></div>
         {session.uid && (
