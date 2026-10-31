@@ -26,6 +26,7 @@ import {
 } from "@/src/components/ui/tooltip";
 import {
   ChevronRight,
+  ImageIcon,
   SquareTerminal,
   Radical,
   SquareRadical,
@@ -200,6 +201,23 @@ export function FormattingCommand({
                       <Kbd>T</Kbd>
                     </KbdGroup>
                   </CommandShortcut>
+                </CommandItem>
+              </CommandGroup>
+
+              {/* Categoria Media */}
+              <CommandGroup heading="Media">
+                <CommandItem
+                  onSelect={() => {
+                    shouldPreventCloseFocus.current = true;
+                    handleSelect();
+                    globalThis.dispatchEvent(
+                      new CustomEvent("editor:insert-image"),
+                    );
+                  }}
+                  className="flex items-center gap-2 cursor-pointer"
+                >
+                  <ImageIcon size={14} />
+                  <span>Immagine</span>
                 </CommandItem>
               </CommandGroup>
 

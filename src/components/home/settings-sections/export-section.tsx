@@ -452,6 +452,16 @@ async function printPdf(markdown: string, titolo: string) {
 
   await cssLoaded;
   await doc.fonts.ready;
+  await Promise.all(
+    Array.from(doc.images).map((img) =>
+      img.complete
+        ? null
+        : new Promise<void>((resolve) => {
+            img.onload = () => resolve();
+            img.onerror = () => resolve();
+          }),
+    ),
+  );
 
   win.onafterprint = () => iframe.remove();
   win.focus();

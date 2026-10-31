@@ -72,3 +72,15 @@ CREATE TABLE IF NOT EXISTS feedback (
   testo TEXT NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+--
+-- Table structure for table 'uploads' (immagini su Cloudflare R2)
+--
+CREATE TABLE IF NOT EXISTS uploads (
+  id SERIAL PRIMARY KEY,
+  key VARCHAR(255) NOT NULL UNIQUE,
+  user_uid VARCHAR(255) NOT NULL,
+  argomento_id VARCHAR(255),
+  size INTEGER NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS uploads_user_uid_idx ON uploads(user_uid);

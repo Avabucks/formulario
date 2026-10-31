@@ -8,6 +8,12 @@ import {
   getOrderedListRegex,
   getUnorderedListRegex,
 } from "@/src/lib/editor/formatting-utils";
+import { toast } from "sonner";
+import {
+  altFromFileName,
+  isUploadableImage,
+  uploadImage,
+} from "@/src/lib/editor/image-upload";
 import { NavigationBlocker } from "../../navigation/navigation-blocker";
 import {
   getEditorViewState,
@@ -265,6 +271,110 @@ export function EditorInput({
     return () => clearTimeout(timeout);
   }, [textAreaContent]);
 
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Inserts a placeholder at once, then swaps it with the real link when the upload lands
+  const insertImages = (
+    files: File[],
+    position?: { lineNumber: number; column: number } | null,
+  ) => {
+    const editorInstance = editorRef.current as editor.IStandaloneCodeEditor;
+    const model = editorInstance?.getModel();
+    if (!editorInstance || !model) return;
+
+    const images = files.filter(isUploadableImage);
+    if (images.length === 0) {
+      if (files.length > 0)
+        toast.error("Formato non supportato (usa PNG, JPG, WebP o GIF)", {
+          position: "bottom-center",
+        });
+      return;
+    }
+
+    if (position) editorInstance.setPosition(position);
+
+    for (const file of images) {
+      const placeholder = `![Caricamento immagine…](upload-${crypto.randomUUID()})`;
+      const selection = editorInstance.getSelection();
+      if (!selection) continue;
+      editorInstance.executeEdits("image-upload", [
+        { range: selection, text: placeholder + "\n", forceMoveMarkers: true },
+      ]);
+
+      const replacePlaceholder = (text: string) => {
+        const match = model.findMatches(
+          placeholder,
+          false,
+          false,
+          true,
+          null,
+          false,
+        )[0];
+        if (match)
+          editorInstance.executeEdits("image-upload", [
+            { range: match.range, text },
+          ]);
+      };
+
+      uploadImage(file, argomentoId)
+        .then((url) =>
+          replacePlaceholder(`![${altFromFileName(file.name)}](${url})`),
+        )
+        .catch((error: Error) => {
+          replacePlaceholder("");
+          toast.error(error.message, { position: "bottom-center" });
+        });
+    }
+    editorInstance.focus();
+  };
+
+  useEffect(() => {
+    const wrapper = wrapperRef.current;
+    if (!wrapper || !editable) return;
+
+    const imageFiles = (data: DataTransfer | null) =>
+      Array.from(data?.files ?? []).filter((f) => f.type.startsWith("image/"));
+
+    // Capture phase so Monaco never sees image pastes/drops
+    const handlePaste = (e: ClipboardEvent) => {
+      const files = imageFiles(e.clipboardData);
+      if (files.length === 0) return;
+      e.preventDefault();
+      e.stopPropagation();
+      insertImages(files);
+    };
+    const handleDragOver = (e: DragEvent) => {
+      if (!e.dataTransfer?.types.includes("Files")) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "copy";
+    };
+    const handleDrop = (e: DragEvent) => {
+      const files = imageFiles(e.dataTransfer);
+      if (files.length === 0) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const target = (
+        editorRef.current as editor.IStandaloneCodeEditor | null
+      )?.getTargetAtClientPoint(e.clientX, e.clientY);
+      insertImages(files, target?.position);
+    };
+    const handleOpenPicker = () => fileInputRef.current?.click();
+
+    wrapper.addEventListener("paste", handlePaste, true);
+    wrapper.addEventListener("dragover", handleDragOver, true);
+    wrapper.addEventListener("drop", handleDrop, true);
+    globalThis.addEventListener("editor:insert-image", handleOpenPicker);
+    return () => {
+      wrapper.removeEventListener("paste", handlePaste, true);
+      wrapper.removeEventListener("dragover", handleDragOver, true);
+      wrapper.removeEventListener("drop", handleDrop, true);
+      globalThis.removeEventListener("editor:insert-image", handleOpenPicker);
+    };
+    // insertImages only reads refs and argomentoId, fixed for this mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editable]);
+
   const handleChange = (content = "") => {
     setTextAreaContent(content);
     setEdited(true);
@@ -350,8 +460,21 @@ export function EditorInput({
   };
 
   return (
-    <div className="relative h-full overflow-hidden group">
+    <div ref={wrapperRef} className="relative h-full overflow-hidden group">
       <NavigationBlocker blocked={saveLoading} />
+      {editable && (
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/png,image/jpeg,image/webp,image/gif"
+          multiple
+          hidden
+          onChange={(e) => {
+            insertImages(Array.from(e.target.files ?? []));
+            e.target.value = "";
+          }}
+        />
+      )}
       <Editor
         defaultLanguage="markdown-math"
         defaultValue={textAreaContent}
