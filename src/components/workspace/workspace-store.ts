@@ -279,3 +279,24 @@ export function getCachedView(argomentoId: string) {
 export function setCachedView(argomentoId: string, view: EditorView) {
   views.set(argomentoId, view);
 }
+
+/* ---------- Per-argomento scroll positions ---------- */
+
+const previewScrolls = new Map<string, number>();
+const editorViewStates = new Map<string, unknown>();
+
+export function getPreviewScroll(argomentoId: string) {
+  return previewScrolls.get(argomentoId) ?? 0;
+}
+
+export function setPreviewScroll(argomentoId: string, scrollTop: number) {
+  previewScrolls.set(argomentoId, scrollTop);
+}
+
+export function getEditorViewState(argomentoId: string) {
+  return editorViewStates.get(argomentoId);
+}
+
+export function setEditorViewState(argomentoId: string, state: unknown) {
+  editorViewStates.set(argomentoId, state);
+}

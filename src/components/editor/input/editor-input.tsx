@@ -9,6 +9,10 @@ import {
   getUnorderedListRegex,
 } from "@/src/lib/editor/formatting-utils";
 import { NavigationBlocker } from "../../navigation/navigation-blocker";
+import {
+  getEditorViewState,
+  setEditorViewState,
+} from "../../workspace/workspace-store";
 import { Spinner } from "../../ui/spinner";
 
 const darkRules = [
@@ -356,6 +360,17 @@ export function EditorInput({
             handleListEnter(editor, monaco, e);
           });
           handleEditorDidMount(editor, monaco);
+
+          // Restore scroll/cursor when coming back to this tab
+          const viewState = getEditorViewState(argomentoId);
+          if (viewState)
+            editor.restoreViewState(
+              viewState as editor.ICodeEditorViewState,
+            );
+          const saveViewState = () =>
+            setEditorViewState(argomentoId, editor.saveViewState());
+          editor.onDidScrollChange(saveViewState);
+          editor.onDidChangeCursorPosition(saveViewState);
         }}
         onChange={handleChange}
         theme="markdown-math-theme"

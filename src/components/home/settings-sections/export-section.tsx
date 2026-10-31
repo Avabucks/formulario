@@ -88,6 +88,14 @@ export function ExportSection({
     });
   }
 
+  function setAll(checked: boolean) {
+    setSelected(
+      checked
+        ? new Set(capitoli?.flatMap((c) => c.argomenti.map((a) => a.id)))
+        : new Set(),
+    );
+  }
+
   async function handleExport() {
     if (!capitoli) return;
 
@@ -167,6 +175,35 @@ export function ExportSection({
 
         {scope === "custom" && (
           <div className="flex flex-col gap-1 rounded-md border p-3">
+            {totalArgomenti > 0 && (
+              <div className="flex items-center justify-between gap-2 pb-2 mb-1 border-b">
+                <span className="text-xs text-muted-foreground">
+                  {selected.size} di {totalArgomenti} selezionati
+                </span>
+                <div className="flex gap-1">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 px-2 text-xs"
+                    disabled={selected.size === totalArgomenti}
+                    onClick={() => setAll(true)}
+                  >
+                    Seleziona tutti
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 px-2 text-xs"
+                    disabled={selected.size === 0}
+                    onClick={() => setAll(false)}
+                  >
+                    Deseleziona tutti
+                  </Button>
+                </div>
+              </div>
+            )}
             {totalArgomenti === 0 && (
               <p className="text-sm text-muted-foreground">
                 Nessun argomento da esportare.
@@ -246,7 +283,7 @@ function FormatOption({
         "flex items-center gap-3 rounded-md border px-3 py-3 text-left transition-colors",
         active
           ? "border-primary bg-accent text-accent-foreground"
-          : "text-muted-foreground hover:bg-accent/50 hover:text-foreground",
+          : "text-foreground hover:bg-accent/50 hover:border-foreground/30",
       )}
     >
       {icon}

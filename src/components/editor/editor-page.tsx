@@ -447,7 +447,10 @@ export function EditorPage({
   );
 
   const preview = !loading && (
-    <EditorPreview markdownContent={markdownContent ?? ""} />
+    <EditorPreview
+      markdownContent={markdownContent ?? ""}
+      scrollKey={argomentoId}
+    />
   );
   const editor = (
     <EditorInput

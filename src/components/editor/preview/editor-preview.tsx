@@ -22,6 +22,10 @@ import remarkMath from "remark-math";
 import { useIsMobile } from "@/src/hooks/useIsMobile";
 import { OutlineNavigator, type PreviewHeading } from "./outline-navigator";
 import { markdownComponents } from "./markdown-components";
+import {
+  getPreviewScroll,
+  setPreviewScroll,
+} from "../../workspace/workspace-store";
 
 const remarkPlugins = [remarkMath, remarkBreaks, remarkGfm];
 const rehypePlugins = [rehypeKatex];
@@ -62,7 +66,8 @@ function extractMarkdownHeadings(markdown: string) {
 
 export const EditorPreview = memo(function EditorPreview({
   markdownContent,
-}: Readonly<{ markdownContent: string }>) {
+  scrollKey,
+}: Readonly<{ markdownContent: string; scrollKey?: string }>) {
   const patternId = `cross-${useId()}`;
   const isMobile = useIsMobile();
   const [scale, setScale] = useState(1);
@@ -302,6 +307,55 @@ export const EditorPreview = memo(function EditorPreview({
       window.removeEventListener("resize", updateActiveHeading);
     };
   }, [headings, showNavigatorTemporarily, updateActiveHeading, isMobile]);
+
+  // Remember the scroll position per argomento so switching tabs (or views) restores it
+  useEffect(() => {
+    const container = containerRef.current;
+    const content = contentRef.current;
+    if (!container || !scrollKey) return;
+
+    // Keep re-applying while late content (mermaid, fonts) grows the page,
+    // until the user scrolls on their own
+    let restoring = true;
+    const restore = () => {
+      if (container.clientHeight > 0)
+        container.scrollTop = getPreviewScroll(scrollKey);
+    };
+    const stopRestoring = () => {
+      restoring = false;
+    };
+    const stopTimer = setTimeout(stopRestoring, 1500);
+
+    restore();
+
+    const handleScroll = () => {
+      // A hidden container reports 0: don't overwrite the saved position
+      if (container.clientHeight > 0 && !restoring)
+        setPreviewScroll(scrollKey, container.scrollTop);
+    };
+
+    let wasVisible = container.clientHeight > 0;
+    const observer = new ResizeObserver(() => {
+      const visible = container.clientHeight > 0;
+      if (visible && (!wasVisible || restoring)) restore();
+      wasVisible = visible;
+    });
+    observer.observe(container);
+    if (content) observer.observe(content);
+
+    const userEvents = ["wheel", "touchstart", "keydown", "mousedown"] as const;
+    for (const event of userEvents)
+      container.addEventListener(event, stopRestoring, { passive: true });
+    container.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      clearTimeout(stopTimer);
+      observer.disconnect();
+      for (const event of userEvents)
+        container.removeEventListener(event, stopRestoring);
+      container.removeEventListener("scroll", handleScroll);
+    };
+  }, [scrollKey, isMobile]);
 
   const handleHeadingClick = useCallback(
     (heading: PreviewHeading) => {
