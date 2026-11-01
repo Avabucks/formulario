@@ -18,7 +18,7 @@ export default function PrivacyPage() {
         <div className="max-w-3xl mx-auto w-full py-8 flex flex-col gap-8">
           <div className="flex flex-col gap-2">
             <p className="text-xs text-muted-foreground uppercase tracking-widest">
-              Ultimo aggiornamento: Luglio 2026
+              Ultimo aggiornamento: Novembre 2026
             </p>
             <h1 className="text-3xl font-bold">Privacy Policy</h1>
             <p className="text-muted-foreground">
@@ -72,6 +72,19 @@ export default function PrivacyPage() {
                 formulari
               </li>
             </ul>
+            <h3 className="text-foreground font-semibold mt-3 mb-1">
+              Contenuti caricati dall'utente:
+            </h3>
+            <p>
+              Le immagini che carichi nelle note (formati WebP, PNG, JPEG e GIF)
+              vengono salvate sul nostro spazio di archiviazione, insieme alla
+              loro dimensione, data di caricamento e all'argomento a cui sono
+              collegate. Quando possibile le immagini vengono ricompresse sul
+              tuo dispositivo prima dell'invio, operazione che ne rimuove i
+              metadati (ad esempio la posizione GPS); le GIF e i file che non
+              beneficiano della compressione vengono invece caricati così come
+              sono, metadati inclusi.
+            </p>
             <h3 className="text-foreground font-semibold mt-3 mb-1">
               Dati raccolti automaticamente:
             </h3>
@@ -188,6 +201,39 @@ export default function PrivacyPage() {
                 <strong>foto profilo</strong>.
               </li>
             </ul>
+            <h3 className="text-foreground font-semibold mt-3 mb-1">
+              Immagini caricate nelle note:
+            </h3>
+            <p>
+              Le immagini sono archiviate su{" "}
+              <span className="text-foreground font-medium">Cloudflare R2</span>{" "}
+              (servizio di Cloudflare, Inc., regolato dalla{" "}
+              <a
+                href="https://www.cloudflare.com/privacypolicy/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline text-foreground"
+              >
+                Privacy Policy di Cloudflare
+              </a>
+              ) e vengono servite tramite un indirizzo web contenente un
+              identificativo casuale e non indovinabile. Ciò significa che{" "}
+              <strong>
+                un'immagine è visibile a chiunque possieda il suo link diretto
+              </strong>
+              , indipendentemente dal livello di visibilità del formulario in
+              cui è inserita, e che non è possibile elencare o cercare le
+              immagini degli altri utenti.
+            </p>
+            <p className="mt-3">
+              Di conseguenza, se un formulario è stato pubblico o condiviso e
+              successivamente reso privato, chi aveva già ottenuto il link di
+              un'immagine potrebbe continuare a visualizzarla. Per rendere
+              un'immagine non più accessibile puoi eliminarla in qualsiasi
+              momento dal &quot;Gestore immagini&quot;. Ti invitiamo a non
+              caricare immagini contenenti dati personali o informazioni
+              riservate.
+            </p>
           </Section>
 
           <Section title="6. Web Analytics e Cookie">
@@ -227,8 +273,8 @@ export default function PrivacyPage() {
               account e di tutti i dati ad esso associati in qualsiasi momento
               tramite la "Zona Pericolosa" nelle Impostazioni del tuo profilo.
               In caso di cancellazione, tutti i dati personali relativi al
-              profilo e l'intero archivio dei formulari creati (sia privati sia
-              pubblici/condivisi), saranno{" "}
+              profilo, l'intero archivio dei formulari creati (sia privati sia
+              pubblici/condivisi) e tutte le immagini caricate, saranno{" "}
               <strong>definitivamente ed immediatamente eliminati</strong> dai
               nostri sistemi, salvo obblighi di conservazione previsti dalle
               leggi vigenti.

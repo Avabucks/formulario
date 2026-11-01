@@ -1,5 +1,6 @@
 import DeleteAccount from "@/src/components/auth/delete-account";
 import { Footer } from "@/src/components/landing/footer";
+import { ImageLibrary } from "@/src/components/shared/image-manager";
 import { ModeToggle } from "@/src/components/theme/theme-toggler";
 import {
   Avatar,
@@ -24,6 +25,7 @@ import {
   ChevronRight,
   Cookie,
   Handshake,
+  Images,
   Mail,
   Shield,
   Trash2,
@@ -41,6 +43,12 @@ const settingsNav = [
     href: "/settings/preferences",
     label: "Preferenze",
     icon: Brush,
+  },
+  {
+    id: "images",
+    href: "/settings/images",
+    label: "Gestore immagini",
+    icon: Images,
   },
   {
     id: "legal",
@@ -199,6 +207,15 @@ export async function SettingsContent({
                   </div>
                   <ModeToggle />
                 </div>
+              </SettingsSection>
+            )}
+
+            {activeSection === "images" && (
+              <SettingsSection
+                title="Gestore immagini"
+                description="Le immagini caricate nelle tue note. Carica, incolla o trascina qui nuove immagini."
+              >
+                <ImageLibrary />
               </SettingsSection>
             )}
 

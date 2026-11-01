@@ -21,6 +21,7 @@ import {
   Brush,
   Cookie,
   Handshake,
+  Images,
   Keyboard,
   LogOutIcon,
   Shield,
@@ -85,6 +86,12 @@ export function AvatarLogic({
             <span className="font-medium text-sm leading-none">{name}</span>
           </div>
           <DropdownMenuSeparator />
+          <Link href="/home">
+            <DropdownMenuItem>
+              <Book />
+              Visualizza i tuoi formulari
+            </DropdownMenuItem>
+          </Link>
           <Link href="/settings">
             <DropdownMenuItem>
               <User />
@@ -97,16 +104,16 @@ export function AvatarLogic({
               Account
             </DropdownMenuItem>
           </Link>
-          <Link href="/home">
-            <DropdownMenuItem>
-              <Book />
-              Visualizza i tuoi formulari
-            </DropdownMenuItem>
-          </Link>
           <Link href="/settings/preferences">
             <DropdownMenuItem>
               <Brush />
               Preferenze
+            </DropdownMenuItem>
+          </Link>
+          <Link href="/settings/images">
+            <DropdownMenuItem>
+              <Images />
+              Gestore immagini
             </DropdownMenuItem>
           </Link>
 

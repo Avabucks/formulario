@@ -16,7 +16,10 @@ async function compressImage(file: File): Promise<Blob> {
   if (file.type === "image/gif") return file;
 
   const bitmap = await createImageBitmap(file);
-  const ratio = Math.min(1, MAX_DIMENSION / Math.max(bitmap.width, bitmap.height));
+  const ratio = Math.min(
+    1,
+    MAX_DIMENSION / Math.max(bitmap.width, bitmap.height),
+  );
   const width = Math.round(bitmap.width * ratio);
   const height = Math.round(bitmap.height * ratio);
 
@@ -37,8 +40,8 @@ async function compressImage(file: File): Promise<Blob> {
   return webp;
 }
 
-/** Uploads the image to R2 and returns its public URL */
-export async function uploadImage(file: File, argomentoId: string) {
+/** Uploads the image to R2 and returns its public URL; without argomentoId it goes to the user's library */
+export async function uploadImage(file: File, argomentoId?: string) {
   const blob = await compressImage(file);
 
   const res = await fetch("/api/uploads", {

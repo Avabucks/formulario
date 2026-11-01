@@ -489,6 +489,7 @@ h5, h6 { font-size: 11pt; }
 p { margin: 0.5em 0; }
 a { color: #1a56db; }
 img, svg { max-width: 100%; }
+img { display: block; width: auto; height: auto; margin: 1em auto; break-inside: avoid; }
 pre {
   background: #f5f5f5;
   border-radius: 6px;

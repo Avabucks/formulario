@@ -143,7 +143,7 @@ export function Footer() {
             <div className="flex items-center gap-2">
               {/* Discord */}
               <DiscordTrigger variant="button" />
-              <GithubButton />
+              <GithubButton showStars={false} />
             </div>
             <div className="h-4 w-px bg-border" />
             <ModeToggle />

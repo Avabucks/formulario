@@ -20,6 +20,7 @@ import {
   setEditorViewState,
 } from "../../workspace/workspace-store";
 import { Spinner } from "../../ui/spinner";
+import { ImageManager } from "../../shared/image-manager";
 
 const darkRules = [
   { token: "math.display", foreground: "4EC9B0" },
@@ -272,7 +273,23 @@ export function EditorInput({
   }, [textAreaContent]);
 
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [imagePickerOpen, setImagePickerOpen] = useState(false);
+
+  // Inserts an image picked from the image manager at the cursor
+  const insertImageUrl = (url: string) => {
+    const editorInstance = editorRef.current as editor.IStandaloneCodeEditor;
+    const selection = editorInstance?.getSelection();
+    if (!editorInstance || !selection) return;
+    editorInstance.executeEdits("image-insert", [
+      {
+        range: selection,
+        text: `![immagine](${url})\n`,
+        forceMoveMarkers: true,
+      },
+    ]);
+    // Let the dialog finish closing before giving focus back to Monaco
+    setTimeout(() => editorInstance.focus(), 0);
+  };
 
   // Inserts a placeholder at once, then swaps it with the real link when the upload lands
   const insertImages = (
@@ -359,7 +376,7 @@ export function EditorInput({
       )?.getTargetAtClientPoint(e.clientX, e.clientY);
       insertImages(files, target?.position);
     };
-    const handleOpenPicker = () => fileInputRef.current?.click();
+    const handleOpenPicker = () => setImagePickerOpen(true);
 
     wrapper.addEventListener("paste", handlePaste, true);
     wrapper.addEventListener("dragover", handleDragOver, true);
@@ -463,16 +480,11 @@ export function EditorInput({
     <div ref={wrapperRef} className="relative h-full overflow-hidden group">
       <NavigationBlocker blocked={saveLoading} />
       {editable && (
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/png,image/jpeg,image/webp,image/gif"
-          multiple
-          hidden
-          onChange={(e) => {
-            insertImages(Array.from(e.target.files ?? []));
-            e.target.value = "";
-          }}
+        <ImageManager
+          open={imagePickerOpen}
+          setOpen={setImagePickerOpen}
+          argomentoId={argomentoId}
+          onPick={(image) => insertImageUrl(image.url)}
         />
       )}
       <Editor
@@ -487,9 +499,7 @@ export function EditorInput({
           // Restore scroll/cursor when coming back to this tab
           const viewState = getEditorViewState(argomentoId);
           if (viewState)
-            editor.restoreViewState(
-              viewState as editor.ICodeEditorViewState,
-            );
+            editor.restoreViewState(viewState as editor.ICodeEditorViewState);
           const saveViewState = () =>
             setEditorViewState(argomentoId, editor.saveViewState());
           editor.onDidScrollChange(saveViewState);

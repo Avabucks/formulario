@@ -1,5 +1,7 @@
 import { pool } from "@/src/lib/db";
 import { adminAuth } from "@/src/lib/firebase-admin";
+import { getR2 } from "@/src/lib/r2";
+import { DeleteObjectsCommand } from "@aws-sdk/client-s3";
 import { SessionData, sessionOptions } from "@/src/lib/session";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
@@ -60,6 +62,38 @@ export async function DELETE(request: Request) {
       { status: 400 },
     );
   }
+
+  // Remove the user's images from R2 before dropping their rows
+  const r2 = getR2();
+  const { rows: uploads } = await pool.query<{ key: string }>(
+    `SELECT key FROM uploads WHERE user_uid = $1`,
+    [session.uid],
+  );
+  if (r2 && uploads.length) {
+    try {
+      // DeleteObjects accepts at most 1000 keys per request
+      for (let i = 0; i < uploads.length; i += 1000) {
+        await r2.client.send(
+          new DeleteObjectsCommand({
+            Bucket: r2.bucket,
+            Delete: {
+              Objects: uploads
+                .slice(i, i + 1000)
+                .map(({ key }) => ({ Key: key })),
+              Quiet: true,
+            },
+          }),
+        );
+      }
+    } catch (error) {
+      console.error("Errore eliminazione immagini account:", error);
+      return NextResponse.json(
+        { error: "Errore durante l'eliminazione delle immagini, riprova" },
+        { status: 500 },
+      );
+    }
+  }
+  await pool.query(`DELETE FROM uploads WHERE user_uid = $1`, [session.uid]);
 
   await pool.query(`DELETE FROM formulari WHERE owner_uid = $1`, [session.uid]);
   await pool.query(`DELETE FROM users WHERE uid = $1`, [session.uid]);
