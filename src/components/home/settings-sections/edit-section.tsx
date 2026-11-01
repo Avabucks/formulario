@@ -9,6 +9,7 @@ import { Input } from "../../ui/input";
 import { Label } from "../../ui/label";
 import { Switch } from "../../ui/switch";
 import { Textarea } from "../../ui/textarea";
+import { CategoriaCombo } from "../../categorie/categoria-combo";
 import { Formulario } from "./types";
 
 export function EditSection({
@@ -88,6 +89,22 @@ export function EditSection({
                 });
                 setEdited(true);
               }}
+            />
+          </Field>
+          <Field>
+            <Label htmlFor="categoria-1">Categoria</Label>
+            <CategoriaCombo
+              id="categoria-1"
+              value={formulario.categoriaId}
+              onChange={(categoriaId) => {
+                setFormulario({ ...formulario, categoriaId });
+                setEdited(true);
+              }}
+            />
+            <input
+              type="hidden"
+              name="categoriaId"
+              value={formulario.categoriaId ?? ""}
             />
           </Field>
           <div className="flex flex-col gap-4">

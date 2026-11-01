@@ -1,19 +1,71 @@
-"use client";
-
 import packageJson from "@/package.json";
-import Link from "next/link";
-import { Pi, Mail } from "lucide-react";
 import { ModeToggle } from "@/src/components/theme/theme-toggler";
+import { SessionData, sessionOptions } from "@/src/lib/session";
+import { getIronSession } from "iron-session";
+import { Mail, Pi } from "lucide-react";
+import { cookies } from "next/headers";
+import Link from "next/link";
 import { DiscordTrigger } from "../shared/discord-widget";
 import { GithubButton } from "../shared/github-button";
 
-export function Footer() {
+type FooterLink = { href: string; label: string };
+
+// Logged out: landing links
+const GUEST_COLUMNS: { title: string; links: FooterLink[] }[] = [
+  {
+    title: "Piattaforma",
+    links: [
+      { href: "/login", label: "Accedi" },
+      { href: "/community", label: "Community" },
+    ],
+  },
+  {
+    title: "Scopri",
+    links: [
+      { href: "/#features", label: "Funzionalità" },
+      { href: "/#demo", label: "Video Demo" },
+      { href: "/#faq", label: "FAQ" },
+    ],
+  },
+];
+
+// Logged in: app and settings links
+const USER_COLUMNS: { title: string; links: FooterLink[] }[] = [
+  {
+    title: "Piattaforma",
+    links: [
+      { href: "/home", label: "I tuoi formulari" },
+      { href: "/community", label: "Community" },
+    ],
+  },
+  {
+    title: "Impostazioni",
+    links: [
+      { href: "/settings/profile", label: "Profilo" },
+      { href: "/settings/account", label: "Account" },
+      { href: "/settings/preferences", label: "Preferenze" },
+      { href: "/settings/categories", label: "Categorie" },
+      { href: "/settings/images", label: "Gestore immagini" },
+    ],
+  },
+];
+
+const linkClass =
+  "text-muted-foreground hover:text-foreground transition-colors";
+
+export async function Footer() {
+  const session = await getIronSession<SessionData>(
+    await cookies(),
+    sessionOptions,
+  );
+  const columns = session.uid ? USER_COLUMNS : GUEST_COLUMNS;
+
   return (
     <footer className="w-full border-t border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
-      <div className="mx-auto max-w-6xl px-6 py-12 md:py-16">
+      <div className="w-full px-3 py-12 md:px-6 md:py-16">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-12">
           {/* Brand Column */}
-          <div className="flex flex-col gap-4 md:col-span-4">
+          <div className="flex flex-col gap-4 md:col-span-5">
             <Link
               href="/"
               className="flex items-center gap-2 font-bold tracking-tight text-foreground transition-opacity hover:opacity-80 w-fit"
@@ -23,69 +75,30 @@ export function Footer() {
                 {packageJson.displayName}
               </span>
             </Link>
-            <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-md">
               Crea, organizza e condividi i tuoi formulari scientifici con un
               editor LaTeX avanzato e l&apos;assistente AI.
             </p>
           </div>
 
           {/* Links Columns */}
-          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 md:col-span-8">
-            <div className="flex flex-col gap-3">
-              <span className="text-sm font-medium tracking-wide text-foreground">
-                Piattaforma
-              </span>
-              <ul className="flex flex-col gap-2.5 text-sm">
-                <li>
-                  <Link
-                    href="/login"
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    Accedi
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/community"
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    Community
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <span className="text-sm font-medium tracking-wide text-foreground">
-                Scopri
-              </span>
-              <ul className="flex flex-col gap-2.5 text-sm">
-                <li>
-                  <Link
-                    href="/#features"
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    Funzionalità
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/#demo"
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    Video Demo
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/#faq"
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    FAQ
-                  </Link>
-                </li>
-              </ul>
-            </div>
+          <div className="grid grid-cols-2 gap-8 sm:flex sm:justify-end sm:gap-8 sm:*:w-44 lg:*:w-52 md:col-span-7">
+            {columns.map((column) => (
+              <div key={column.title} className="flex flex-col gap-3">
+                <span className="text-sm font-medium tracking-wide text-foreground">
+                  {column.title}
+                </span>
+                <ul className="flex flex-col gap-2.5 text-sm">
+                  {column.links.map((link) => (
+                    <li key={link.href}>
+                      <Link href={link.href} className={linkClass}>
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
 
             <div className="flex flex-col gap-3 col-span-2 sm:col-span-1">
               <span className="text-sm font-medium tracking-wide text-foreground">

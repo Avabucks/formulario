@@ -1,5 +1,6 @@
 import DeleteAccount from "@/src/components/auth/delete-account";
 import { Footer } from "@/src/components/landing/footer";
+import { CategorieManager } from "@/src/components/categorie/categorie-manager";
 import { ImageLibrary } from "@/src/components/shared/image-manager";
 import { ModeToggle } from "@/src/components/theme/theme-toggler";
 import {
@@ -25,6 +26,7 @@ import {
   ChevronRight,
   Cookie,
   Handshake,
+  Hash,
   Images,
   Mail,
   Shield,
@@ -43,6 +45,12 @@ const settingsNav = [
     href: "/settings/preferences",
     label: "Preferenze",
     icon: Brush,
+  },
+  {
+    id: "categories",
+    href: "/settings/categories",
+    label: "Categorie",
+    icon: Hash,
   },
   {
     id: "images",
@@ -207,6 +215,15 @@ export async function SettingsContent({
                   </div>
                   <ModeToggle />
                 </div>
+              </SettingsSection>
+            )}
+
+            {activeSection === "categories" && (
+              <SettingsSection
+                title="Categorie"
+                description="Organizza i tuoi formulari con categorie personali: scegli nome e colore, poi assegnale dalle impostazioni di ogni formulario."
+              >
+                <CategorieManager />
               </SettingsSection>
             )}
 

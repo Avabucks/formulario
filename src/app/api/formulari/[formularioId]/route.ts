@@ -17,7 +17,7 @@ export async function GET(
   const { formularioId } = await params;
 
   const { rows, rowCount } = await pool.query(
-    `SELECT F.beautiful_id AS "id", F.titolo, F.descrizione, F.owner_uid as "ownerUid", COALESCE(U_A.display_name, 'Utente eliminato') AS "nomeAutore", U_A.foto_profilo AS "photoURL",  F.data_creazione as "dataCreazione", F.views, F.visibility,
+    `SELECT F.beautiful_id AS "id", F.titolo, F.descrizione, F.owner_uid as "ownerUid", COALESCE(U_A.display_name, 'Utente eliminato') AS "nomeAutore", U_A.foto_profilo AS "photoURL",  F.data_creazione as "dataCreazione", F.views, F.visibility, F.categoria_id AS "categoriaId",
             ${uid ? `EXISTS (SELECT 1 FROM preferiti P WHERE P.formulario_id = F.beautiful_id AND P.user_uid = $2) AS starred` : `FALSE AS starred`},
             (SELECT COUNT(*) FROM preferiti P2 WHERE P2.formulario_id = F.beautiful_id) AS likes
          FROM formulari F
@@ -33,9 +33,12 @@ export async function GET(
       { status: 404 },
     );
 
+  const editable = uid ? rows[0].ownerUid === uid : false;
   const formulario = {
     ...rows[0],
-    editable: uid ? rows[0].ownerUid === uid : false,
+    editable,
+    // La categoria è personale del proprietario
+    categoriaId: editable ? rows[0].categoriaId : null,
   };
 
   return NextResponse.json(formulario);

@@ -34,6 +34,18 @@ CREATE TABLE IF NOT EXISTS formulari (
   views INTEGER NOT NULL DEFAULT 0
 );
 --
+-- Table structure for table 'categorie' (categorie personali dell'utente)
+--
+CREATE TABLE IF NOT EXISTS categorie (
+  id SERIAL PRIMARY KEY,
+  user_uid VARCHAR(255) NOT NULL,
+  nome VARCHAR(30) NOT NULL,
+  colore VARCHAR(7) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(user_uid, nome)
+);
+ALTER TABLE formulari ADD COLUMN IF NOT EXISTS categoria_id INTEGER REFERENCES categorie(id) ON DELETE SET NULL;
+--
 -- Table structure for table 'capitoli'
 --
 CREATE TABLE IF NOT EXISTS capitoli (

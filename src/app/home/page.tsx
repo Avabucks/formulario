@@ -2,6 +2,7 @@ import packageJson from "@/package.json";
 
 import ForumlarioAdd from "@/src/components/home/formulario-add";
 import { HomeTabs } from "@/src/components/home/home-tabs";
+import { Footer } from "@/src/components/landing/footer";
 import { AnimatedGridPattern } from "@/src/components/ui/animated-grid-pattern";
 import {
   Avatar,
@@ -43,7 +44,9 @@ export default async function Home({
   const cookieStore = await cookies();
   // Ultima tab scelta (salvata nel cookie)
   const initialTab =
-    cookieStore.get("home-tab")?.value === "preferiti" ? "preferiti" : "formulari";
+    cookieStore.get("home-tab")?.value === "preferiti"
+      ? "preferiti"
+      : "formulari";
   const initialOrder = (cookieStore.get("home-order")?.value ||
     "modificato") as SortOption;
 
@@ -71,6 +74,7 @@ export default async function Home({
   const { rows: formulari } = await pool.query(
     `
         SELECT F.beautiful_id AS "id", titolo, owner_uid AS "ownerUid", COALESCE(U_A.display_name, 'Utente eliminato') AS "nomeAutore", U_A.foto_profilo AS "photoURL", F.data_creazione as "dataCreazione", F.data_modifica as "dataModifica", descrizione, visibility, views,
+            F.categoria_id AS "categoriaId",
             EXISTS (SELECT 1 FROM preferiti P WHERE P.formulario_id = F.beautiful_id AND P.user_uid = $1) AS starred,
             (SELECT COUNT(*) FROM preferiti P2 WHERE P2.formulario_id = F.beautiful_id) AS likes
         FROM formulari F
@@ -102,81 +106,90 @@ export default async function Home({
     sqlParamsPreferiti,
   );
 
+  const { rows: categorie } = await pool.query(
+    `SELECT id, nome, colore FROM categorie WHERE user_uid = $1 ORDER BY LOWER(nome)`,
+    [session.uid],
+  );
+
   const displayName = users[0].displayName;
   const photoURL = users[0].photoURL;
 
   return (
-    <div className="mx-auto flex w-full flex-col gap-4 px-3 pb-8 mt-16 md:px-6 h-full">
-      <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
-        <div className="relative overflow-hidden rounded-xl border bg-card p-6 md:p-8">
-          <AnimatedGridPattern
-            numSquares={20}
-            maxOpacity={0.3}
-            duration={3}
-            repeatDelay={1}
-            className={cn("inset-y-0 h-full w-full opacity-20")}
-          />
-          <div className="relative flex max-w-3xl flex-col gap-5">
-            <div className="space-y-2">
-              <div className="flex items-center gap-3">
-                {photoURL && (
-                  <Avatar size="lg" className="mt-1">
-                    <AvatarImage src={photoURL} alt="foto profilo" />
-                    <AvatarFallback>
-                      {displayName?.substring(0, 1).toUpperCase() || "U"}
-                    </AvatarFallback>
-                  </Avatar>
-                )}
-                <h1 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
-                  Ciao, {displayName}
-                </h1>
+    <>
+      <div className="mx-auto flex w-full flex-col gap-4 px-3 pb-8 mt-16 md:px-6 h-full">
+        <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
+          <div className="relative overflow-hidden rounded-xl border bg-card p-6 md:p-8">
+            <AnimatedGridPattern
+              numSquares={20}
+              maxOpacity={0.3}
+              duration={3}
+              repeatDelay={1}
+              className={cn("inset-y-0 h-full w-full opacity-20")}
+            />
+            <div className="relative flex max-w-3xl flex-col gap-5">
+              <div className="space-y-2">
+                <div className="flex items-center gap-3">
+                  {photoURL && (
+                    <Avatar size="lg" className="mt-1">
+                      <AvatarImage src={photoURL} alt="foto profilo" />
+                      <AvatarFallback>
+                        {displayName?.substring(0, 1).toUpperCase() || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
+                  <h1 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
+                    Ciao, {displayName}
+                  </h1>
+                </div>
+                <p className="max-w-2xl text-base leading-7 text-muted-foreground">
+                  Crea un formulario, dividilo in capitoli e riprendi le
+                  modifiche in ogni momento.
+                </p>
               </div>
-              <p className="max-w-2xl text-base leading-7 text-muted-foreground">
-                Crea un formulario, dividilo in capitoli e riprendi le modifiche
-                in ogni momento.
-              </p>
-            </div>
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <ForumlarioAdd showLabel={true} />
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <ForumlarioAdd showLabel={true} />
+              </div>
             </div>
           </div>
-        </div>
 
-        <Card className="hidden md:flex">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Library className="h-5 w-5" />
-              Libreria condivisa
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-1 flex-col justify-between gap-6">
-            <p className="text-sm leading-6 text-muted-foreground">
-              Scopri formulari pubblici, salva quelli utili e usali come base
-              per studiare o preparare lezioni.
-            </p>
-            <Button
-              asChild
-              variant="secondary"
-              className="w-full justify-between"
-            >
-              <Link href="/community/page/1">
-                Vai alla community
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
-      </section>
-      <Separator />
-      <div className="w-full flex flex-col gap-4 h-full">
-        <HomeTabs
-          initialTab={initialTab}
-          initialOrder={initialOrder}
-          formulari={formulari}
-          preferiti={preferiti}
-          userId={session.uid}
-        />
+          <Card className="hidden md:flex">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Library className="h-5 w-5" />
+                Libreria condivisa
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-1 flex-col justify-between gap-6">
+              <p className="text-sm leading-6 text-muted-foreground">
+                Scopri formulari pubblici, salva quelli utili e usali come base
+                per studiare o preparare lezioni.
+              </p>
+              <Button
+                asChild
+                variant="secondary"
+                className="w-full justify-between"
+              >
+                <Link href="/community/page/1">
+                  Vai alla community
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </section>
+        <Separator />
+        <div className="w-full flex flex-col gap-4 h-full">
+          <HomeTabs
+            initialTab={initialTab}
+            initialOrder={initialOrder}
+            formulari={formulari}
+            preferiti={preferiti}
+            categorie={categorie}
+            userId={session.uid}
+          />
+        </div>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 }

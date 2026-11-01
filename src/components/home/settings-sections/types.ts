@@ -9,6 +9,7 @@ export type Formulario = {
   likes: number;
   starred: boolean;
   editable: boolean;
+  categoriaId: number | null;
 };
 
 export type SettingsSection = "info" | "edit" | "structure" | "qr" | "export";

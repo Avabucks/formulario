@@ -25,11 +25,13 @@ import {
 } from "@/src/components/ui/empty";
 import Link from "next/link";
 import ForumlarioAdd from "./formulario-add";
-import { FormularioCardHome } from "./formulario-card-home";
 import { formatNumber } from "@/src/lib/utils";
 import { SortSelector, SortOption } from "../shared/sort-selector";
 import { useDebouncedCallback } from "use-debounce";
 import { FormularioCard } from "./formulario-card";
+import { Categoria } from "@/src/lib/categorie";
+import { CategoriaTag } from "../categorie/categoria-tag";
+import { toast } from "sonner";
 
 interface Formulario {
   id: string;
@@ -43,6 +45,7 @@ interface Formulario {
   views: number;
   likes: number;
   starred: boolean;
+  categoriaId?: number | null;
 }
 
 interface HomeTabsProps {
@@ -50,6 +53,7 @@ interface HomeTabsProps {
   initialOrder: SortOption; // Synced with server cookie
   formulari: Formulario[];
   preferiti: Formulario[];
+  categorie: Categoria[];
   userId: string;
 }
 
@@ -58,6 +62,7 @@ export function HomeTabs({
   initialOrder,
   formulari,
   preferiti,
+  categorie: initialCategorie,
   userId,
 }: Readonly<HomeTabsProps>) {
   const router = useRouter();
@@ -67,6 +72,43 @@ export function HomeTabs({
 
   // Initialize state directly from server cookies to prevent any hydration flash/glitch
   const [activeTab, setActiveTab] = useState<string>(initialTab);
+  // Shared by all cards, so a category created from one card shows up in the others
+  const [categorie, setCategorie] = useState<Categoria[]>(initialCategorie);
+
+  // Optimistic category changes made from the cards. Reset whenever the server
+  // sends fresh data (router.refresh), which then already contains them.
+  const [assigned, setAssigned] = useState<Record<string, number | null>>({});
+  const [assignedFor, setAssignedFor] = useState(formulari);
+  if (assignedFor !== formulari) {
+    setAssignedFor(formulari);
+    setAssigned({});
+  }
+
+  const getCategoriaId = (f: Formulario) =>
+    f.id in assigned ? assigned[f.id] : (f.categoriaId ?? null);
+
+  const handleCategoriaChange = async (
+    f: Formulario,
+    categoriaId: number | null,
+  ) => {
+    const previous = getCategoriaId(f);
+    if (previous === categoriaId) return;
+    setAssigned((prev) => ({ ...prev, [f.id]: categoriaId }));
+    try {
+      const res = await fetch("/api/formulari/categoria", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ formularioId: f.id, categoriaId }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error ?? "Errore durante il cambio categoria.");
+      }
+    } catch (error) {
+      setAssigned((prev) => ({ ...prev, [f.id]: previous }));
+      toast.error((error as Error).message, { position: "bottom-center" });
+    }
+  };
   const [activeOrder, setActiveOrder] = useState<SortOption>(initialOrder);
 
   const [searchVal, setSearchVal] = useState(searchParams.get("q") ?? "");
@@ -168,14 +210,64 @@ export function HomeTabs({
 
     const sortedFormulari = sortItems(formulari);
 
-    return (
+    const renderGrid = (items: Formulario[]) => (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[101rem]:grid-cols-5 gap-4 w-full">
-        {sortedFormulari.map((f) => (
-          <FormularioCardHome
+        {items.map((f) => (
+          <FormularioCard
             formulario={f}
             key={f.id}
             userId={userId}
+            categoria={{
+              categorie,
+              onCategorieChange: setCategorie,
+              categoriaId: getCategoriaId(f),
+              onCategoriaChange: (id) => handleCategoriaChange(f, id),
+            }}
           />
+        ))}
+      </div>
+    );
+
+    // Groups: "no category" first, then categories in alphabetical order
+    // (categorie is kept sorted). Unknown ids fall back to "no category".
+    const known = new Set(categorie.map((c) => c.id));
+    const senza = sortedFormulari.filter((f) => {
+      const id = getCategoriaId(f);
+      return id === null || !known.has(id);
+    });
+    const gruppi = categorie
+      .map((c) => ({
+        categoria: c,
+        items: sortedFormulari.filter((f) => getCategoriaId(f) === c.id),
+      }))
+      .filter((g) => g.items.length > 0);
+
+    // Nothing categorized yet: plain grid, no headers
+    if (gruppi.length === 0) return renderGrid(sortedFormulari);
+
+    return (
+      <div className="flex flex-col gap-8 w-full">
+        {senza.length > 0 && (
+          <section className="flex flex-col gap-3">
+            <GroupHeader count={senza.length}>
+              <span className="text-sm font-medium text-muted-foreground">
+                Nessuna categoria
+              </span>
+            </GroupHeader>
+            {renderGrid(senza)}
+          </section>
+        )}
+        {gruppi.map(({ categoria, items }) => (
+          <section key={categoria.id} className="flex flex-col gap-3">
+            <GroupHeader count={items.length}>
+              <CategoriaTag
+                nome={categoria.nome}
+                colore={categoria.colore}
+                className="text-base"
+              />
+            </GroupHeader>
+            {renderGrid(items)}
+          </section>
         ))}
       </div>
     );
@@ -278,6 +370,21 @@ export function HomeTabs({
           ? renderFormulariContent()
           : renderPreferitiContent()}
       </div>
+    </div>
+  );
+}
+
+function GroupHeader({
+  count,
+  children,
+}: Readonly<{ count: number; children: React.ReactNode }>) {
+  return (
+    <div className="flex items-center gap-3">
+      {children}
+      <Badge variant="secondary" className="h-5 px-1.5">
+        {formatNumber(count)}
+      </Badge>
+      <div className="h-px flex-1 bg-border" />
     </div>
   );
 }

@@ -21,9 +21,9 @@ import {
   Brush,
   Cookie,
   Handshake,
-  Images,
   Keyboard,
   LogOutIcon,
+  Settings,
   Shield,
   ShieldCheck,
   User,
@@ -110,10 +110,10 @@ export function AvatarLogic({
               Preferenze
             </DropdownMenuItem>
           </Link>
-          <Link href="/settings/images">
+          <Link href="/settings">
             <DropdownMenuItem>
-              <Images />
-              Gestore immagini
+              <Settings />
+              Impostazioni
             </DropdownMenuItem>
           </Link>
 

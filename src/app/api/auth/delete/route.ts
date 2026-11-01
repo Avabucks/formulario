@@ -96,6 +96,7 @@ export async function DELETE(request: Request) {
   await pool.query(`DELETE FROM uploads WHERE user_uid = $1`, [session.uid]);
 
   await pool.query(`DELETE FROM formulari WHERE owner_uid = $1`, [session.uid]);
+  await pool.query(`DELETE FROM categorie WHERE user_uid = $1`, [session.uid]);
   await pool.query(`DELETE FROM users WHERE uid = $1`, [session.uid]);
 
   session.destroy();
