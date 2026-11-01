@@ -19,6 +19,18 @@ CREATE TABLE IF NOT EXISTS users (
   data_creazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 --
+-- Table structure for table 'categorie' (categorie personali dell'utente)
+--
+CREATE TABLE IF NOT EXISTS categorie (
+  id SERIAL PRIMARY KEY,
+  user_uid VARCHAR(255) NOT NULL,
+  nome VARCHAR(30) NOT NULL,
+  colore VARCHAR(7) NOT NULL,
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(user_uid, nome)
+);
+--
 -- Table structure for table 'formulari'
 --
 CREATE TABLE IF NOT EXISTS formulari (
@@ -31,20 +43,9 @@ CREATE TABLE IF NOT EXISTS formulari (
   data_modifica TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   descrizione TEXT,
   visibility INTEGER NOT NULL DEFAULT 0,
-  views INTEGER NOT NULL DEFAULT 0
+  views INTEGER NOT NULL DEFAULT 0,
+  categoria_id INTEGER REFERENCES categorie(id) ON DELETE SET NULL
 );
---
--- Table structure for table 'categorie' (categorie personali dell'utente)
---
-CREATE TABLE IF NOT EXISTS categorie (
-  id SERIAL PRIMARY KEY,
-  user_uid VARCHAR(255) NOT NULL,
-  nome VARCHAR(30) NOT NULL,
-  colore VARCHAR(7) NOT NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE(user_uid, nome)
-);
-ALTER TABLE formulari ADD COLUMN IF NOT EXISTS categoria_id INTEGER REFERENCES categorie(id) ON DELETE SET NULL;
 --
 -- Table structure for table 'capitoli'
 --

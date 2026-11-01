@@ -107,7 +107,7 @@ export default async function Home({
   );
 
   const { rows: categorie } = await pool.query(
-    `SELECT id, nome, colore FROM categorie WHERE user_uid = $1 ORDER BY LOWER(nome)`,
+    `SELECT id, nome, colore FROM categorie WHERE user_uid = $1 ORDER BY sort_order, id`,
     [session.uid],
   );
 

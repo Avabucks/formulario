@@ -228,8 +228,8 @@ export function HomeTabs({
       </div>
     );
 
-    // Groups: "no category" first, then categories in alphabetical order
-    // (categorie is kept sorted). Unknown ids fall back to "no category".
+    // Groups: "no category" first, then categories in the user's order
+    // (sort_order from the db). Unknown ids fall back to "no category".
     const known = new Set(categorie.map((c) => c.id));
     const senza = sortedFormulari.filter((f) => {
       const id = getCategoriaId(f);

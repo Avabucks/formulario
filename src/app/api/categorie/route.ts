@@ -41,13 +41,15 @@ function handleDbError(error: unknown) {
   return NextResponse.json({ error: "Errore del server" }, { status: 500 });
 }
 
-/** Lists the current user's categories */
+/** Lists the current user's categories, with how many formulari use each one */
 export async function GET() {
   const uid = await getUid();
   if (!uid) return unauthorized();
 
   const { rows } = await pool.query(
-    `SELECT id, nome, colore FROM categorie WHERE user_uid = $1 ORDER BY LOWER(nome)`,
+    `SELECT C.id, C.nome, C.colore,
+       (SELECT COUNT(*)::int FROM formulari F WHERE F.categoria_id = C.id) AS "formulariCount"
+     FROM categorie C WHERE C.user_uid = $1 ORDER BY C.sort_order, C.id`,
     [uid],
   );
   return NextResponse.json(rows);
@@ -76,7 +78,10 @@ export async function POST(request: Request) {
       );
 
     const { rows } = await pool.query(
-      `INSERT INTO categorie (user_uid, nome, colore) VALUES ($1, $2, $3)
+      // New categories go to the end of the user's list
+      `INSERT INTO categorie (user_uid, nome, colore, sort_order)
+       VALUES ($1, $2, $3,
+         (SELECT COALESCE(MAX(sort_order), 0) + 1 FROM categorie WHERE user_uid = $1))
        RETURNING id, nome, colore`,
       [uid, nome, colore.toLowerCase()],
     );
@@ -114,6 +119,44 @@ export async function PUT(request: Request) {
 
     revalidatePath("/home");
     return NextResponse.json(rows[0]);
+  } catch (error) {
+    return handleDbError(error);
+  }
+}
+
+/** Saves the display order: body is { ids } with every category id of the user, in order */
+export async function PATCH(request: Request) {
+  const uid = await getUid();
+  if (!uid) return unauthorized();
+
+  const { ids } = await request.json().catch(() => ({}));
+  if (
+    !Array.isArray(ids) ||
+    !ids.every(Number.isInteger) ||
+    new Set(ids).size !== ids.length
+  )
+    return NextResponse.json({ error: "Ordine non valido" }, { status: 400 });
+
+  try {
+    // Only the user's own categories are touched; ids must cover all of them
+    const result = await pool.query(
+      `UPDATE categorie C SET sort_order = O.pos
+       FROM unnest($1::int[]) WITH ORDINALITY AS O(id, pos)
+       WHERE C.id = O.id AND C.user_uid = $2`,
+      [ids, uid],
+    );
+    const { rows: count } = await pool.query(
+      `SELECT COUNT(*)::int AS n FROM categorie WHERE user_uid = $1`,
+      [uid],
+    );
+    if (result.rowCount !== ids.length || count[0].n !== ids.length)
+      return NextResponse.json(
+        { error: "Elenco categorie non aggiornato, ricarica la pagina" },
+        { status: 409 },
+      );
+
+    revalidatePath("/home");
+    return NextResponse.json({ success: true });
   } catch (error) {
     return handleDbError(error);
   }

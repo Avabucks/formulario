@@ -1,7 +1,7 @@
 "use client";
 
 import { useIsMobile } from "@/src/hooks/useIsMobile";
-import { BookOpen } from "lucide-react";
+import { BookOpen, ChevronRight } from "lucide-react";
 import { FormularioSettings } from "../home/formulario-settings";
 import { TakeFormulario } from "../home/take-formulario";
 import { Kbd, KbdGroup } from "../ui/kbd";
@@ -70,8 +70,9 @@ export function FormularioWelcome({
             </p>
           )}
           {structure && (
-            <p className="text-xs text-muted-foreground">
-              {capitoliCount} {capitoliCount === 1 ? "capitolo" : "capitoli"} ·{" "}
+            <p className="flex items-center gap-1 text-xs text-muted-foreground">
+              {capitoliCount} {capitoliCount === 1 ? "capitolo" : "capitoli"}
+              <ChevronRight className="size-3" />
               {argomentiCount}{" "}
               {argomentiCount === 1 ? "argomento" : "argomenti"}
             </p>

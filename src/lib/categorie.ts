@@ -2,6 +2,8 @@ export type Categoria = {
   id: number;
   nome: string;
   colore: string;
+  /** Only returned by GET /api/categorie */
+  formulariCount?: number;
 };
 
 export const CATEGORIA_NOME_MAX = 30;

@@ -22,7 +22,5 @@ export const updateCategoria = (categoria: Categoria) =>
 export const deleteCategoria = (id: number) =>
   request<{ success: true }>("DELETE", { id });
 
-export const sortCategorie = (list: Categoria[]) =>
-  [...list].sort((a, b) =>
-    a.nome.localeCompare(b.nome, "it", { sensitivity: "base" }),
-  );
+export const reorderCategorie = (ids: number[]) =>
+  request<{ success: true }>("PATCH", { ids });

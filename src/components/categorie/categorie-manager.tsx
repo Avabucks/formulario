@@ -19,14 +19,14 @@ import {
   CATEGORIA_NOME_MAX,
   Categoria,
 } from "@/src/lib/categorie";
-import { Plus, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
   createCategoria,
   deleteCategoria,
   fetchCategorie,
-  sortCategorie,
+  reorderCategorie,
   updateCategoria,
 } from "./api";
 import { CategoriaTag } from "./categoria-tag";
@@ -67,8 +67,7 @@ export function CategorieManager() {
     setSaving(true);
     try {
       const categoria = await createCategoria(trimmed, colore);
-      const list = sortCategorie([...(categorie ?? []), categoria]);
-      setCategorie(list);
+      setCategorie([...(categorie ?? []), { ...categoria, formulariCount: 0 }]);
       setNome("");
       setColore(CATEGORIA_COLORI[0]);
     } catch (error) {
@@ -81,12 +80,27 @@ export function CategorieManager() {
   async function handleUpdate(categoria: Categoria) {
     const previous = categorie;
     setCategorie((list) =>
-      sortCategorie(
-        (list ?? []).map((c) => (c.id === categoria.id ? categoria : c)),
-      ),
+      (list ?? []).map((c) => (c.id === categoria.id ? categoria : c)),
     );
     try {
       await updateCategoria(categoria);
+    } catch (error) {
+      setCategorie(previous);
+      toastError(error);
+    }
+  }
+
+  async function handleMove(index: number, direction: -1 | 1) {
+    if (!categorie) return;
+    const target = index + direction;
+    if (target < 0 || target >= categorie.length) return;
+
+    const previous = categorie;
+    const list = [...categorie];
+    [list[index], list[target]] = [list[target], list[index]];
+    setCategorie(list);
+    try {
+      await reorderCategorie(list.map((c) => c.id));
     } catch (error) {
       setCategorie(previous);
       toastError(error);
@@ -152,10 +166,13 @@ export function CategorieManager() {
 
       {categorie && categorie.length > 0 && (
         <ul className="flex flex-col gap-2">
-          {categorie.map((c) => (
+          {categorie.map((c, i) => (
             <CategoriaRow
               key={c.id}
               categoria={c}
+              isFirst={i === 0}
+              isLast={i === categorie.length - 1}
+              onMove={(direction) => handleMove(i, direction)}
               onUpdate={handleUpdate}
               onDelete={handleDelete}
             />
@@ -168,10 +185,16 @@ export function CategorieManager() {
 
 function CategoriaRow({
   categoria,
+  isFirst,
+  isLast,
+  onMove,
   onUpdate,
   onDelete,
 }: Readonly<{
   categoria: Categoria;
+  isFirst: boolean;
+  isLast: boolean;
+  onMove: (direction: -1 | 1) => void;
   onUpdate: (categoria: Categoria) => void;
   onDelete: (categoria: Categoria) => void;
 }>) {
@@ -201,7 +224,32 @@ function CategoriaRow({
   }
 
   return (
-    <li className="flex items-center gap-3 rounded-lg border p-2 pl-3">
+    <li className="flex items-center gap-3 rounded-lg border p-2 pl-1">
+      <div className="flex shrink-0 flex-col">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          aria-label={`Sposta su ${categoria.nome}`}
+          className="h-4 w-6 text-muted-foreground"
+          disabled={isFirst}
+          onClick={() => onMove(-1)}
+        >
+          <ChevronUp className="size-3.5" />
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          aria-label={`Sposta giù ${categoria.nome}`}
+          className="h-4 w-6 text-muted-foreground"
+          disabled={isLast}
+          onClick={() => onMove(1)}
+        >
+          <ChevronDown className="size-3.5" />
+        </Button>
+      </div>
+
       <Popover onOpenChange={commitColore}>
         <PopoverTrigger asChild>
           <button
@@ -231,6 +279,11 @@ function CategoriaRow({
         aria-label="Nome categoria"
         className="h-8 flex-1 border-transparent bg-transparent shadow-none hover:border-input focus-visible:border-input dark:bg-transparent"
       />
+
+      <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
+        {categoria.formulariCount ?? 0}{" "}
+        {categoria.formulariCount === 1 ? "formulario" : "formulari"}
+      </span>
 
       <CategoriaTag
         nome={nome.trim() || categoria.nome}

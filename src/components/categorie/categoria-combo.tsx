@@ -22,7 +22,7 @@ import { ChevronsUpDown, Plus, Settings2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { createCategoria, fetchCategorie, sortCategorie } from "./api";
+import { createCategoria, fetchCategorie } from "./api";
 import { CategoriaTag } from "./categoria-tag";
 
 /** Popover with search, "none", the user's categories and on-the-fly creation; the trigger is the child */
@@ -64,7 +64,7 @@ export function CategoriaPicker({
     setCreating(true);
     try {
       const categoria = await createCategoria(nome, newColore);
-      onCategorieChange(sortCategorie([...(categorie ?? []), categoria]));
+      onCategorieChange([...(categorie ?? []), categoria]);
       select(categoria.id);
     } catch (error) {
       toast.error((error as Error).message, { position: "bottom-center" });
