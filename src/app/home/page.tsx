@@ -35,14 +35,15 @@ export const metadata: Metadata = {
 export default async function Home({
   searchParams,
 }: Readonly<{
-  searchParams: Promise<{ tab?: string; q?: string }>;
+  searchParams: Promise<{ q?: string }>;
 }>) {
-  const { tab, q } = await searchParams;
-  const activeTab = tab === "preferiti" ? "preferiti" : "formulari";
+  const { q } = await searchParams;
   const searchQuery = q?.trim() ?? "";
 
   const cookieStore = await cookies();
-  const initialView = cookieStore.get("home-view")?.value || "grid";
+  // Ultima tab scelta (salvata nel cookie)
+  const initialTab =
+    cookieStore.get("home-tab")?.value === "preferiti" ? "preferiti" : "formulari";
   const initialOrder = (cookieStore.get("home-order")?.value ||
     "modificato") as SortOption;
 
@@ -169,8 +170,7 @@ export default async function Home({
       <Separator />
       <div className="w-full flex flex-col gap-4 h-full">
         <HomeTabs
-          activeTab={activeTab}
-          initialView={initialView}
+          initialTab={initialTab}
           initialOrder={initialOrder}
           formulari={formulari}
           preferiti={preferiti}

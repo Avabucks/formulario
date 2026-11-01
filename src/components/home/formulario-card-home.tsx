@@ -1,7 +1,7 @@
 "use client";
 
 import { Card } from "@/src/components/ui/card";
-import { cn, formatNumber } from "@/src/lib/utils";
+import { formatNumber } from "@/src/lib/utils";
 import {
   BookOpen,
   Calendar,
@@ -32,11 +32,9 @@ type Formulario = {
 
 export function FormularioCardHome({
   formulario,
-  variant = "grid",
   userId,
 }: Readonly<{
   formulario: Formulario;
-  variant?: "grid" | "list";
   userId?: string;
 }>) {
   return (
@@ -46,18 +44,8 @@ export function FormularioCardHome({
         className="absolute inset-0 z-0"
       />
 
-      <div
-        className={cn(
-          "relative z-10 pointer-events-none flex justify-between gap-4 px-4 min-w-0 w-full",
-          variant === "grid" ? "items-start" : "items-center",
-        )}
-      >
-        <div
-          className={cn(
-            "flex gap-2 flex-1 min-w-0",
-            variant === "list" ? "flex-row items-center gap-4" : "flex-col",
-          )}
-        >
+      <div className="relative z-10 pointer-events-none flex items-start justify-between gap-4 px-4 min-w-0 w-full">
+        <div className="flex flex-col gap-2 flex-1 min-w-0">
           <div className="flex items-center gap-2 min-w-0">
             <BookOpen className="h-4 w-4 text-primary shrink-0" />
             <span className="font-semibold text-sm sm:text-base tracking-tight text-foreground truncate">
@@ -114,12 +102,7 @@ export function FormularioCardHome({
           </div>
         </div>
 
-        <div
-          className={cn(
-            "pointer-events-auto shrink-0 relative z-20",
-            variant === "grid" && "-mt-1",
-          )}
-        >
+        <div className="pointer-events-auto shrink-0 relative z-20 -mt-1">
           {userId && (
             <StarFormulario
               formularioId={formulario.id}

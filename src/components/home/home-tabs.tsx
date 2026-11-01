@@ -6,8 +6,6 @@ import { Tabs, TabsList, TabsTrigger } from "@/src/components/ui/tabs";
 import {
   FileText,
   Star,
-  Grid,
-  List,
   Search,
   BookOpen,
   StarOff,
@@ -48,8 +46,7 @@ interface Formulario {
 }
 
 interface HomeTabsProps {
-  activeTab: string; // Controlled by URL parameter
-  initialView: string; // Synced with server cookie
+  initialTab: string; // Synced with server cookie
   initialOrder: SortOption; // Synced with server cookie
   formulari: Formulario[];
   preferiti: Formulario[];
@@ -57,8 +54,7 @@ interface HomeTabsProps {
 }
 
 export function HomeTabs({
-  activeTab,
-  initialView,
+  initialTab,
   initialOrder,
   formulari,
   preferiti,
@@ -70,23 +66,15 @@ export function HomeTabs({
   const [isPending, startTransition] = useTransition();
 
   // Initialize state directly from server cookies to prevent any hydration flash/glitch
-  const [activeView, setActiveView] = useState<string>(initialView);
+  const [activeTab, setActiveTab] = useState<string>(initialTab);
   const [activeOrder, setActiveOrder] = useState<SortOption>(initialOrder);
 
   const [searchVal, setSearchVal] = useState(searchParams.get("q") ?? "");
 
   const handleTabChange = (tabValue: string) => {
-    startTransition(() => {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set("tab", tabValue);
-      router.push(`${pathname}?${params.toString()}`);
-    });
-  };
-
-  const handleViewChange = (viewValue: string) => {
-    setActiveView(viewValue);
-    // Persist via cookie to let the server know on next reload
-    document.cookie = `home-view=${viewValue}; path=/; max-age=31536000; SameSite=Lax`;
+    setActiveTab(tabValue);
+    // Persist last selected tab for next visits
+    document.cookie = `home-tab=${tabValue}; path=/; max-age=31536000; SameSite=Lax`;
   };
 
   const handleOrderChange = (orderValue: SortOption) => {
@@ -180,26 +168,10 @@ export function HomeTabs({
 
     const sortedFormulari = sortItems(formulari);
 
-    if (activeView === "grid") {
-      return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[101rem]:grid-cols-5 gap-4 w-full">
-          {sortedFormulari.map((f) => (
-            <FormularioCardHome
-              variant="grid"
-              formulario={f}
-              key={f.id}
-              userId={userId}
-            />
-          ))}
-        </div>
-      );
-    }
-
     return (
-      <div className="flex flex-col gap-3 w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[101rem]:grid-cols-5 gap-4 w-full">
         {sortedFormulari.map((f) => (
           <FormularioCardHome
-            variant="list"
             formulario={f}
             key={f.id}
             userId={userId}
@@ -265,33 +237,10 @@ export function HomeTabs({
             className="h-8 px-3 w-auto hidden lg:inline-flex"
           />
 
-          {/* Separator between Order and View Selector (or Tab Selector if View is hidden) */}
+          {/* Separator between Order and Tab Selector */}
           <div className="h-5 w-px bg-border hidden lg:block shrink-0" />
 
-          {/* View Selector: Grid / List (Only visible on "formulari" tab, hidden on mobile) */}
-          {activeTab === "formulari" && (
-            <Tabs
-              value={activeView}
-              onValueChange={handleViewChange}
-              className="shrink-0 hidden sm:inline-block"
-            >
-              <TabsList variant="line" className="w-full sm:w-fit">
-                <TabsTrigger value="grid" className="gap-2 px-3">
-                  <Grid className="h-4 w-4" />
-                </TabsTrigger>
-                <TabsTrigger value="list" className="gap-2 px-3">
-                  <List className="h-4 w-4" />
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-          )}
-
-          {/* Separator between View Selector and Tab Selector (only if View Selector is rendered) */}
-          {activeTab === "formulari" && (
-            <div className="h-5 w-px bg-border hidden lg:block shrink-0" />
-          )}
-
-          {/* Tab Selector: Formulari / Preferiti (Controlled by URL search param) */}
+          {/* Tab Selector: Formulari / Preferiti (persisted via cookie) */}
           <Tabs
             value={activeTab}
             onValueChange={handleTabChange}
